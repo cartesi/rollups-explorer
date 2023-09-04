@@ -1,0 +1,26 @@
+fragment InputItem on Input {
+  id
+  application {
+    id
+  }
+  index
+  payload
+  msgSender
+  timestamp
+  transactionHash
+}
+
+query inputs {
+  inputs(orderBy: timestamp_DESC) {
+    ...InputItem
+  }
+}
+
+query stats {
+  inputsConnection(orderBy: id_ASC) {
+    totalCount
+  }
+  applicationsConnection(orderBy: id_ASC) {
+    totalCount
+  }
+}
