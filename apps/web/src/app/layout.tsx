@@ -1,8 +1,7 @@
 "use client";
-import "@mantine/code-highlight/styles.css";
-import { AppShell, ColorSchemeScript, Container } from "@mantine/core";
 import "@mantine/core/styles.css";
 import React, { FC } from "react";
+import { AppShell, ColorSchemeScript, Container } from "@mantine/core";
 
 import Header from "../components/header";
 import GraphQLProvider from "../providers/graphqlProvider";

@@ -2,9 +2,6 @@
     "$schema": "https://turbo.build/schema.json",
     "globalEnv": ["NEXT_PUBLIC_ENABLE_TESTNETS"],
     "pipeline": {
-        "codegen": {
-            "outputs": ["src/graphql/**", "src/contracts.ts"]
-        },
         "build": {
             "dependsOn": ["^build", "codegen"],
             "outputs": [
@@ -14,6 +11,17 @@
                 "storybook-static/**"
             ]
         },
+        "clean": {
+            "cache": false
+        },
+        "codegen": {
+            "outputs": ["src/graphql/**", "src/contracts.ts"]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "lint": {},
         "test": {
             "dependsOn": ["build"],
             "inputs": [
@@ -22,11 +30,6 @@
                 "test/**/*.ts",
                 "test/**/*.tsx"
             ]
-        },
-        "lint": {},
-        "dev": {
-            "cache": false,
-            "persistent": true
         }
     }
 }

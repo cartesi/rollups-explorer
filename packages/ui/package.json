@@ -10,12 +10,21 @@
         "dist/**"
     ],
     "scripts": {
-        "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
+        "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-        "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
+        "dev": "tsup --watch",
         "lint": "eslint \"src/**/*.ts*\""
     },
-    "dependencies": {},
+    "dependencies": {
+        "@mantine/core": "^7.0.0-beta.3",
+        "@mantine/hooks": "^7.0.0-beta.3",
+        "@react-spring/web": "^9.7.3",
+        "react-icons": "^4"
+    },
+    "peerDependencies": {
+        "@mantine/core": "^7.0.0-beta.3",
+        "@mantine/hooks": "^7.0.0-beta.3"
+    },
     "devDependencies": {
         "@cartesi/tsconfig": "workspace:*",
         "@types/react": "^18",
@@ -23,7 +32,7 @@
         "eslint": "^8",
         "eslint-config-cartesi": "workspace:*",
         "react": "^18",
-        "tsup": "^5",
+        "tsup": "^7",
         "typescript": "^5"
     },
     "publishConfig": {

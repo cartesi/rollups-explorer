@@ -3,7 +3,14 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "build": "turbo run build"
+        "build": "turbo run build",
+        "dev": "turbo run dev --no-cache --continue",
+        "lint": "turbo run lint",
+        "clean": "turbo run clean && rm -rf node_modules",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "changeset": "changeset",
+        "version-packages": "changeset version",
+        "release": "turbo run build && changeset publish"
     },
     "devDependencies": {
         "eslint-config-cartesi": "workspace:*",
@@ -14,5 +21,5 @@
     "engines": {
         "node": ">=18.0.0"
     },
-    "packageManager": "pnpm@8.7.0"
+    "packageManager": "pnpm@8.7.1"
 }
