@@ -1,8 +1,12 @@
 {
+    "name": "rollups-explorer",
+    "version": "0.1.0",
+    "private": true,
     "scripts": {
         "build": "turbo run build"
     },
     "devDependencies": {
+        "eslint-config-cartesi": "workspace:*",
         "prettier": "^3.0.3",
         "turbo": "^1.10.13",
         "@changesets/cli": "^2.26.2"
@@ -10,8 +14,5 @@
     "engines": {
         "node": ">=18.0.0"
     },
-    "packageManager": "pnpm@8.6.10",
-    "name": "rollups-explorer",
-    "version": "0.1.0",
-    "private": true
+    "packageManager": "pnpm@8.7.0"
 }

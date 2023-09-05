@@ -1,18 +1,24 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "globalEnv": ["NEXT_PUBLIC_ENABLE_TESTNETS"],
     "pipeline": {
         "codegen": {
             "outputs": ["src/graphql/**", "src/contracts.ts"]
         },
         "build": {
             "dependsOn": ["^build", "codegen"],
-            "outputs": [".next/**", "!.next/cache/**", "dist"]
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**",
+                "dist",
+                "storybook-static/**"
+            ]
         },
         "test": {
             "dependsOn": ["build"],
             "inputs": [
-                "src/**/*.tsx",
                 "src/**/*.ts",
+                "src/**/*.tsx",
                 "test/**/*.ts",
                 "test/**/*.tsx"
             ]

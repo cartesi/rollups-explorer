@@ -1,0 +1,14 @@
+{
+    "name": "eslint-config-cartesi",
+    "version": "0.0.0",
+    "main": "index.js",
+    "license": "Apache-2.0",
+    "private": true,
+    "dependencies": {
+        "eslint-config-next": "latest",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-react": "7.29.4",
+        "eslint-config-turbo": "latest",
+        "typescript": "^5"
+    }
+}
