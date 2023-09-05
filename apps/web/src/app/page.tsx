@@ -85,11 +85,9 @@ const Explorer: FC = (props) => {
             <Summary items={summaries} />
 
             <Divider
-                mt="xl"
-                mb="md"
-                labelPosition="center"
+                labelPosition="left"
                 label={
-                    <Group gap={1}>
+                    <Group>
                         <TbInbox size={40} />
                         <Title order={3}>Inputs</Title>
                     </Group>
