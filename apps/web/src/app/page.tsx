@@ -1,18 +1,20 @@
 "use client";
-import { FC } from "react";
 import {
     Anchor,
     Breadcrumbs,
     Card,
+    Divider,
+    Flex,
     Group,
     Stack,
     Table,
     Text,
     Title,
 } from "@mantine/core";
+import { FC } from "react";
 import { TbApps, TbInbox } from "react-icons/tb";
-import { useInputsQuery, useStatsQuery } from "../graphql/index";
 import InputRow from "../components/inputRow";
+import { useInputsQuery, useStatsQuery } from "../graphql/index";
 
 const Explorer: FC = (props) => {
     const [{ data: stats }] = useStatsQuery();
@@ -22,30 +24,44 @@ const Explorer: FC = (props) => {
             <Breadcrumbs>
                 <Anchor>Home</Anchor>
             </Breadcrumbs>
-            <Group>
-                <Card w={200} radius="md" shadow="sm">
-                    <Group gap={5}>
-                        <TbInbox size={20} />
-                        <Text c="dimmed">Inputs</Text>
-                    </Group>
-                    <Text fw={800} size="xl">
-                        {stats?.inputsConnection.totalCount}
-                    </Text>
+
+            <Group grow>
+                <Card w={200} radius="md" shadow="xs">
+                    <Flex align="center" gap={10}>
+                        <TbInbox size={36} />
+                        <Flex direction="column" columnGap={2}>
+                            <Text c="dimmed">Inputs</Text>
+                            <Text fw="bold" fz="2rem">
+                                {stats?.inputsConnection.totalCount}
+                            </Text>
+                        </Flex>
+                    </Flex>
                 </Card>
-                <Card w={200} radius="md" shadow="sm">
-                    <Group gap={5}>
-                        <TbApps />
-                        <Text c="dimmed">Applications</Text>
-                    </Group>
-                    <Text fw={800} size="xl">
-                        {stats?.applicationsConnection.totalCount}
-                    </Text>
+                <Card w={200} radius="md" shadow="xs">
+                    <Flex align="center" gap={10}>
+                        <TbApps size={36} />
+                        <Flex direction="column">
+                            <Text c="dimmed" p={0}>
+                                Applications
+                            </Text>
+                            <Text fw="bold" fz="2rem">
+                                {stats?.applicationsConnection.totalCount}
+                            </Text>
+                        </Flex>
+                    </Flex>
                 </Card>
             </Group>
-            <Group>
-                <TbInbox size={40} />
-                <Title order={3}>Inputs</Title>
-            </Group>
+            <Divider
+                mt="xl"
+                mb="md"
+                labelPosition="center"
+                label={
+                    <Group gap={1}>
+                        <TbInbox size={40} />
+                        <Title order={3}>Inputs</Title>
+                    </Group>
+                }
+            />
             <Table>
                 <Table.Thead>
                     <Table.Tr>
