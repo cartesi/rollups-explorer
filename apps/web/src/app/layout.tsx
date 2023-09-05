@@ -1,17 +1,15 @@
 "use client";
-import "@mantine/core/styles.css";
 import "@mantine/code-highlight/styles.css";
+import { AppShell, ColorSchemeScript, Container } from "@mantine/core";
+import "@mantine/core/styles.css";
 import React, { FC } from "react";
-import { AppShell, Burger, ColorSchemeScript } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 
-import StyleProvider from "../providers/styleProvider";
-import WalletProvider from "../providers/walletProvider";
 import Header from "../components/header";
 import GraphQLProvider from "../providers/graphqlProvider";
+import StyleProvider from "../providers/styleProvider";
+import WalletProvider from "../providers/walletProvider";
 
 const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [opened, { toggle }] = useDisclosure();
     return (
         <html lang="en">
             <head>
@@ -22,17 +20,13 @@ const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
                 <StyleProvider>
                     <WalletProvider>
                         <GraphQLProvider>
-                            <AppShell header={{ height: 60 }} padding="md">
+                            <AppShell header={{ height: 80 }} padding="md">
                                 <AppShell.Header>
-                                    <Burger
-                                        opened={opened}
-                                        onClick={toggle}
-                                        hiddenFrom="sm"
-                                        size="sm"
-                                    />
                                     <Header />
                                 </AppShell.Header>
-                                <AppShell.Main>{children}</AppShell.Main>
+                                <AppShell.Main>
+                                    <Container>{children}</Container>
+                                </AppShell.Main>
                             </AppShell>
                         </GraphQLProvider>
                     </WalletProvider>
