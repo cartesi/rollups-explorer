@@ -7,18 +7,18 @@ import {
     Text,
     Tooltip,
 } from "@mantine/core";
+import Link from "next/link";
 import { FC } from "react";
+import { TbCheck, TbCopy } from "react-icons/tb";
 import { jsNumberForAddress } from "react-jazzicon";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { Address, getAddress } from "viem";
-import { TbCheck, TbCopy } from "react-icons/tb";
-import Link from "next/link";
 
 import {
     dAppAddressRelayAddress,
-    erc20PortalAddress,
     erc1155BatchPortalAddress,
     erc1155SinglePortalAddress,
+    erc20PortalAddress,
     erc721PortalAddress,
     etherPortalAddress,
 } from "../contracts";
@@ -53,10 +53,15 @@ const Address: FC<AddressProps> = ({
 }) => {
     value = getAddress(value);
     const name = resolveName(value);
-    const text = shorten ? `${value.substring(0, 24)}...` : value;
+    const text = shorten ? `${value.substring(0, 21)}...` : value;
+
     const label = name ? (
-        <Tooltip label={value}>
+        <Tooltip label={value} withArrow>
             <Text>{name}</Text>
+        </Tooltip>
+    ) : shorten ? (
+        <Tooltip label={value} withArrow>
+            <Text>{text}</Text>
         </Tooltip>
     ) : (
         <Text>{text}</Text>
@@ -69,6 +74,7 @@ const Address: FC<AddressProps> = ({
                     seed={jsNumberForAddress(value)}
                 />
             )}
+
             {href ? (
                 <Anchor href={href} component={Link}>
                     {label}
