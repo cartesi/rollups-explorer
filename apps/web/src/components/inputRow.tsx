@@ -9,20 +9,20 @@ import {
     Text,
     Textarea,
 } from "@mantine/core";
-import { FC } from "react";
+import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
-import { Hex, getAddress, hexToString } from "viem";
+import { FC } from "react";
 import {
     TbAlphabetLatin,
     TbArrowRight,
-    TbX,
     TbFileText,
     TbJson,
+    TbX,
 } from "react-icons/tb";
-import { useDisclosure } from "@mantine/hooks";
+import { Hex, getAddress, hexToString } from "viem";
+import { erc20PortalAddress, etherPortalAddress } from "../contracts";
 import { InputItemFragment } from "../graphql";
 import Address from "./address";
-import { erc20PortalAddress, etherPortalAddress } from "../contracts";
 
 export type InputCardProps = {
     input: InputItemFragment;
@@ -65,13 +65,18 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
         <>
             <Table.Tr>
                 <Table.Td>
-                    <Address value={from} icon />
+                    <Address value={from} icon shorten />
                 </Table.Td>
                 <Table.Td>
                     <TbArrowRight />
                 </Table.Td>
                 <Table.Td>
-                    <Address value={to} icon href={`/applications/${to}`} />
+                    <Address
+                        value={to}
+                        icon
+                        href={`/applications/${to}`}
+                        shorten
+                    />
                 </Table.Td>
                 <Table.Td>{method}</Table.Td>
                 <Table.Td>
