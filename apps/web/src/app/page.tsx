@@ -4,7 +4,6 @@ import {
     Anchor,
     Breadcrumbs,
     Card,
-    Divider,
     Grid,
     Group,
     Pagination,
@@ -87,16 +86,10 @@ const Explorer: FC = (props) => {
 
             <Summary />
 
-            <Divider
-                ref={targetRef}
-                labelPosition="center"
-                label={
-                    <Group>
-                        <TbInbox size={40} />
-                        <Title order={3}>Inputs</Title>
-                    </Group>
-                }
-            />
+            <Group ref={targetRef}>
+                <TbInbox size={40} />
+                <Title order={2}>Inputs</Title>
+            </Group>
 
             <Card shadow="md" withBorder px="xl" mt="md">
                 <Stack>
