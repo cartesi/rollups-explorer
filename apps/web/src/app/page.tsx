@@ -28,8 +28,8 @@ import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
 
 const Summary = () => {
     const [{ data: stats }] = useStatsQuery();
-    const inputs = stats?.inputsConnection.totalCount ?? 0;
-    const applications = stats?.applicationsConnection.totalCount ?? 0;
+    const inputs = stats?.inputsConnection?.totalCount ?? 0;
+    const applications = stats?.applicationsConnection?.totalCount ?? 0;
     return (
         <Grid gutter="md">
             <Grid.Col span={{ base: 12, md: 6 }} my="md">
