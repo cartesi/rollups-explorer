@@ -1,26 +1,37 @@
 fragment InputItem on Input {
-  id
-  application {
     id
-  }
-  index
-  payload
-  msgSender
-  timestamp
-  transactionHash
+    application {
+        id
+    }
+    index
+    payload
+    msgSender
+    timestamp
+    transactionHash
 }
 
-query inputs {
-  inputs(orderBy: timestamp_DESC) {
-    ...InputItem
-  }
+query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String) {
+    inputsConnection(orderBy: $orderBy, first: $limit, after: $after) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...InputItem
+            }
+        }
+    }
 }
 
 query stats {
-  inputsConnection(orderBy: id_ASC) {
-    totalCount
-  }
-  applicationsConnection(orderBy: id_ASC) {
-    totalCount
-  }
+    inputsConnection(orderBy: id_ASC) {
+        totalCount
+    }
+    applicationsConnection(orderBy: id_ASC) {
+        totalCount
+    }
 }
