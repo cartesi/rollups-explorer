@@ -26,10 +26,12 @@ import {
 } from "../graphql/index";
 import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
 
-const Summary = () => {
-    const [{ data: stats }] = useStatsQuery();
-    const inputs = stats?.inputsConnection?.totalCount ?? 0;
-    const applications = stats?.applicationsConnection?.totalCount ?? 0;
+interface SummaryProps {
+    inputs: number;
+    applications: number;
+}
+
+const Summary = ({ inputs, applications }: SummaryProps) => {
     return (
         <Grid gutter="md">
             <Grid.Col span={{ base: 12, md: 6 }} my="md">
@@ -49,6 +51,7 @@ const Summary = () => {
 const Explorer: FC = (props) => {
     const [{ limit, page }, updateParams] = usePaginationParams();
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
+    const [{ data: stats }] = useStatsQuery();
     const [{ data, fetching }] = useInputsQuery({
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,
@@ -84,7 +87,10 @@ const Explorer: FC = (props) => {
                 <Anchor>Home</Anchor>
             </Breadcrumbs>
 
-            <Summary />
+            <Summary
+                inputs={stats?.inputsConnection?.totalCount ?? 0}
+                applications={stats?.applicationsConnection?.totalCount ?? 0}
+            />
 
             <Group ref={targetRef}>
                 <TbInbox size={40} />
