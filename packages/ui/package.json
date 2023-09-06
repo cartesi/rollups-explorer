@@ -1,0 +1,41 @@
+{
+    "name": "@cartesi/rollups-explorer-ui",
+    "version": "0.0.0",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "sideEffects": false,
+    "license": "Apache-2.0",
+    "files": [
+        "dist/**"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        "dev": "tsup --watch",
+        "lint": "eslint \"src/**/*.ts*\""
+    },
+    "dependencies": {
+        "@mantine/core": "^7.0.0-beta.3",
+        "@mantine/hooks": "^7.0.0-beta.3",
+        "@react-spring/web": "^9.7.3",
+        "react-icons": "^4"
+    },
+    "peerDependencies": {
+        "@mantine/core": "^7.0.0-beta.3",
+        "@mantine/hooks": "^7.0.0-beta.3"
+    },
+    "devDependencies": {
+        "@cartesi/tsconfig": "workspace:*",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "eslint": "^8",
+        "eslint-config-cartesi": "workspace:*",
+        "react": "^18",
+        "tsup": "^7",
+        "typescript": "^5"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

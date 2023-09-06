@@ -1,3 +1,5 @@
-node_modules
 .turbo
 .next
+dist
+node_modules
+storybook-static

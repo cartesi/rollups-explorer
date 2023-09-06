@@ -1,11 +1,11 @@
 "use client";
 import { animated, useSpring } from "@react-spring/web";
 
-interface NumberProps {
+interface TweenedNumber {
     value: number;
 }
 
-const TweenedNumber = ({ value }: NumberProps) => {
+const TweenedNumber = ({ value }: TweenedNumber) => {
     const { number } = useSpring({
         from: { number: 0 },
         number: value,

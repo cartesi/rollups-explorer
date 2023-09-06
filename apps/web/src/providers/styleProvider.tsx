@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+import { theme } from "./theme";
 
 export type StyleProviderProps = {
     children?: React.ReactNode;
@@ -8,7 +9,7 @@ export type StyleProviderProps = {
 
 const StyleProvider: FC<StyleProviderProps> = (props) => {
     return (
-        <MantineProvider defaultColorScheme="dark">
+        <MantineProvider defaultColorScheme="dark" theme={theme}>
             {props.children}
             <Notifications />
         </MantineProvider>
