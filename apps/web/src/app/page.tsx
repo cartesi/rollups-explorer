@@ -3,7 +3,6 @@ import { SummaryCard } from "@cartesi/rollups-explorer-ui";
 import {
     Anchor,
     Breadcrumbs,
-    Card,
     Grid,
     Group,
     Pagination,
@@ -97,72 +96,64 @@ const Explorer: FC = (props) => {
                 <Title order={2}>Inputs</Title>
             </Group>
 
-            <Card shadow="md" withBorder px="xl" mt="md">
-                <Stack>
+            <Stack>
+                <Pagination
+                    styles={{ root: { alignSelf: "flex-end" } }}
+                    value={activePage}
+                    total={totalPages}
+                    onChange={(pageN) => {
+                        updateParams(pageN, limit);
+                    }}
+                />
+                <Table>
+                    <Table.Thead>
+                        <Table.Tr>
+                            <Table.Th>From</Table.Th>
+                            <Table.Th></Table.Th>
+                            <Table.Th>To</Table.Th>
+                            <Table.Th>Method</Table.Th>
+                            <Table.Th>Index</Table.Th>
+                            <Table.Th>Age</Table.Th>
+                            <Table.Th>Data</Table.Th>
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                        {data?.inputsConnection.edges.map(({ node: input }) => (
+                            <InputRow key={input.id} input={input} />
+                        ))}
+                    </Table.Tbody>
+                </Table>
+
+                <Group justify="space-between" align="center">
+                    <Group>
+                        <Text>Show:</Text>
+                        <Select
+                            style={{ width: "5rem" }}
+                            value={limit.toString()}
+                            onChange={(val) => {
+                                const entry = val ?? limit;
+                                const l = pathOr(limit, [entry], limitBounds);
+                                updateParams(page, l);
+                            }}
+                            data={[
+                                limitBounds[10].toString(),
+                                limitBounds[20].toString(),
+                                limitBounds[30].toString(),
+                            ]}
+                        />
+                        <Text>inputs</Text>
+                    </Group>
                     <Pagination
                         styles={{ root: { alignSelf: "flex-end" } }}
                         value={activePage}
                         total={totalPages}
                         onChange={(pageN) => {
                             updateParams(pageN, limit);
+                            scrollIntoView({ alignment: "center" });
                         }}
                     />
-                    <Table>
-                        <Table.Thead>
-                            <Table.Tr>
-                                <Table.Th>From</Table.Th>
-                                <Table.Th></Table.Th>
-                                <Table.Th>To</Table.Th>
-                                <Table.Th>Method</Table.Th>
-                                <Table.Th>Index</Table.Th>
-                                <Table.Th>Age</Table.Th>
-                                <Table.Th>Data</Table.Th>
-                            </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                            {data?.inputsConnection.edges.map(
-                                ({ node: input }) => (
-                                    <InputRow key={input.id} input={input} />
-                                ),
-                            )}
-                        </Table.Tbody>
-                    </Table>
-
-                    <Group justify="space-between" align="center">
-                        <Group>
-                            <Text>Show:</Text>
-                            <Select
-                                style={{ width: "5rem" }}
-                                value={limit.toString()}
-                                onChange={(val) => {
-                                    const entry = val ?? limit;
-                                    const l = pathOr(
-                                        limit,
-                                        [entry],
-                                        limitBounds,
-                                    );
-                                    updateParams(page, l);
-                                }}
-                                data={[
-                                    limitBounds[10].toString(),
-                                    limitBounds[20].toString(),
-                                    limitBounds[30].toString(),
-                                ]}
-                            />
-                            <Text>inputs</Text>
-                        </Group>
-                        <Pagination
-                            styles={{ root: { alignSelf: "flex-end" } }}
-                            value={activePage}
-                            total={totalPages}
-                            onChange={(pageN) => {
-                                updateParams(pageN, limit);
-                                scrollIntoView({ alignment: "center" });
-                            }}
-                        />
-                    </Group>
-                </Stack>
-            </Card>
+                </Group>
+            </Stack>
         </Stack>
     );
 };
