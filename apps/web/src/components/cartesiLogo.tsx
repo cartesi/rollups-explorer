@@ -3,8 +3,7 @@ import { useMantineColorScheme, useMantineTheme } from "@mantine/core";
 const CartesiLogo = () => {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
-    const color =
-        colorScheme === "dark" ? theme.colors.cyan[5] : theme.colors.teal[5];
+    const color = colorScheme === "dark" ? theme.colors.cyan[5] : theme.black;
 
     return (
         <div style={{ display: "block", width: 192, height: 80, color }}>
