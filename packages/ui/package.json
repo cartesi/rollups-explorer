@@ -19,7 +19,9 @@
         "@mantine/core": "^7.0.0",
         "@mantine/hooks": "^7.0.0",
         "@react-spring/web": "^9.7.3",
-        "react-icons": "^4"
+        "ramda": "^0.29.0",
+        "react-icons": "^4",
+        "viem": "^1"
     },
     "peerDependencies": {
         "@mantine/core": "^7.0.0",
@@ -27,6 +29,7 @@
     },
     "devDependencies": {
         "@cartesi/tsconfig": "*",
+        "@types/ramda": "^0.29.3",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "eslint": "^8",
