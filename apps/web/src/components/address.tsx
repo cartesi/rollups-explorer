@@ -53,7 +53,7 @@ const Address: FC<AddressProps> = ({
 }) => {
     value = getAddress(value);
     const name = resolveName(value);
-    const text = shorten ? `${value.substring(0, 21)}...` : value;
+    const text = shorten ? `${value.slice(0, 8)}...${value.slice(-6)}` : value;
 
     const label = name ? (
         <Tooltip label={value} withArrow>

@@ -6,7 +6,7 @@ export type GraphQLProviderProps = {
 
 const url =
     process.env.NEXT_PUBLIC_BE_GRAPHQL_URL ??
-    "https://squid.subsquid.io/rollups-sepolia/v/v5/graphql";
+    "https://squid.subsquid.io/rollups-sepolia/graphql";
 
 const GraphQLProvider: FC<GraphQLProviderProps> = (props) => {
     // TODO: change according to selected chain

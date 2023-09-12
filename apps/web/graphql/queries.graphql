@@ -8,6 +8,17 @@ fragment InputItem on Input {
     msgSender
     timestamp
     transactionHash
+    erc20Deposit {
+        id
+        from
+        token {
+            id
+            name
+            symbol
+            decimals
+        }
+        amount
+    }
 }
 
 query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String) {

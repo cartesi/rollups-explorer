@@ -23,9 +23,7 @@ const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
                                 <AppShell.Header>
                                     <Header />
                                 </AppShell.Header>
-                                <AppShell.Main>
-                                    <Container>{children}</Container>
-                                </AppShell.Main>
+                                <AppShell.Main>{children}</AppShell.Main>
                             </AppShell>
                         </GraphQLProvider>
                     </WalletProvider>
