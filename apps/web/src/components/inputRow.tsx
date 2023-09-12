@@ -145,13 +145,18 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                             </Tabs.List>
 
                             <Tabs.Panel value="raw">
-                                <Textarea rows={10}>{input.payload}</Textarea>
+                                <Textarea
+                                    rows={10}
+                                    value={input.payload}
+                                    readOnly
+                                />
                             </Tabs.Panel>
 
                             <Tabs.Panel value="text">
                                 <Textarea
                                     rows={10}
                                     value={hexToString(input.payload as Hex)}
+                                    readOnly
                                 />
                             </Tabs.Panel>
 
