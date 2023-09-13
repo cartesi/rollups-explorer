@@ -1,27 +1,27 @@
 "use client";
-import "@rainbow-me/rainbowkit/styles.css";
+import { useMantineColorScheme } from "@mantine/core";
 import {
     RainbowKitProvider,
-    getDefaultWallets,
     connectorsForWallets,
     darkTheme,
+    getDefaultWallets,
     lightTheme,
 } from "@rainbow-me/rainbowkit";
+import "@rainbow-me/rainbowkit/styles.css";
 import {
     argentWallet,
-    trustWallet,
     ledgerWallet,
+    trustWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { sepolia, hardhat } from "wagmi/chains";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
+import { hardhat, mainnet, sepolia } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
-import { useMantineColorScheme } from "@mantine/core";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
     [
         ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
             ? [sepolia, hardhat]
-            : []),
+            : [mainnet]),
     ],
     [publicProvider()],
 );
@@ -34,7 +34,7 @@ const { wallets } = getDefaultWallets({
 });
 
 const appInfo = {
-    appName: "Cartesi Explorer",
+    appName: "Cartesi Rollups Explorer",
     learnMoreUrl: "https://rollups.cartesi.io",
 };
 
