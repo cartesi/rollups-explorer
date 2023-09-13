@@ -47,16 +47,28 @@ query stats($applicationId: String) {
     }
 }
 
-query applications($where: ApplicationWhereInput) {
-    applications(where: $where) {
+fragment ApplicationItem on Application {
+    id
+    owner
+    factory {
         id
     }
 }
 
-query tokens($where: TokenWhereInput) {
-    tokens(where: $where) {
-        id
-        name
-        symbol
+query applications($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $factoryId: String) {
+    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {factory: {id_startsWith: $factoryId}}) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...ApplicationItem
+            }
+        }
     }
 }
+
