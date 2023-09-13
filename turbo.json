@@ -1,9 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "globalEnv": [
-        "NEXT_PUBLIC_ENABLE_TESTNETS",
-        "NEXT_PUBLIC_EXPLORER_API_URL"
-    ],
+    "globalEnv": ["NEXT_PUBLIC_CHAIN_ID", "NEXT_PUBLIC_EXPLORER_API_URL"],
     "pipeline": {
         "build": {
             "dependsOn": ["^build", "codegen"],
