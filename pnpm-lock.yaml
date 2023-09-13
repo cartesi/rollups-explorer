@@ -141,6 +141,9 @@ importers:
       '@wagmi/cli':
         specifier: ^1
         version: 1.5.0(typescript@5.2.2)(wagmi@1.4.0)
+      dotenv-cli:
+        specifier: 7.3.0
+        version: 7.3.0
       eslint:
         specifier: ^8
         version: 8.48.0
@@ -8458,6 +8461,16 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.6.2
+    dev: true
+
+  /dotenv-cli@7.3.0:
+    resolution: {integrity: sha512-314CA4TyK34YEJ6ntBf80eUY+t1XaFLyem1k9P0sX1gn30qThZ5qZr/ZwE318gEnzyYP9yj9HJk6SqwE0upkfw==}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+      dotenv: 16.3.1
+      dotenv-expand: 10.0.0
+      minimist: 1.2.8
     dev: true
 
   /dotenv-expand@10.0.0:
