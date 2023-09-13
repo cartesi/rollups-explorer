@@ -1,19 +1,23 @@
 import { useMantineColorScheme, useMantineTheme } from "@mantine/core";
+import { FC } from "react";
 
-const CartesiLogo = () => {
+type CartesiLogoProps = {
+    height?: number;
+};
+
+const CartesiLogo: FC<CartesiLogoProps> = ({ height }) => {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
     const color = colorScheme === "dark" ? theme.colors.cyan[5] : theme.black;
 
     return (
-        <div style={{ display: "block", width: 192, height: 80, color }}>
+        <div style={{ display: "block", height, color }}>
             <svg
                 id="Layer_2"
                 data-name="Layer 2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 1356.98 344.03"
-                width={192}
-                height={80}
+                height={height}
                 fill={color}
             >
                 <g id="Layer_1-2" data-name="Layer 1-2" fill="currentColor">
