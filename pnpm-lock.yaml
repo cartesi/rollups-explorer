@@ -27,16 +27,16 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@mantine/core':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(@mantine/hooks@7.0.0-beta.5)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       '@mantine/form':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(react@18.2.0)
       '@mantine/hooks':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(react@18.2.0)
       '@mantine/notifications':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(@mantine/core@7.0.0-beta.5)(@mantine/hooks@7.0.0-beta.5)(react-dom@18.2.0)(react@18.2.0)
       '@rainbow-me/rainbowkit':
         specifier: ^1.0.11
@@ -175,10 +175,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@mantine/core':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(@mantine/hooks@7.0.0-beta.5)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       '@mantine/hooks':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(react@18.2.0)
       react:
         specifier: ^18.2.0
@@ -289,10 +289,10 @@ importers:
   packages/ui:
     dependencies:
       '@mantine/core':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(@mantine/hooks@7.0.0-beta.5)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       '@mantine/hooks':
-        specifier: ^7.0.0-beta.4
+        specifier: ^7.0.0-beta.5
         version: 7.0.0-beta.5(react@18.2.0)
       '@react-spring/web':
         specifier: ^9.7.3

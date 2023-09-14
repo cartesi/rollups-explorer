@@ -7,6 +7,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FC } from "react";
 import { TbMoonStars, TbSun } from "react-icons/tb";
 import CartesiLogo from "./cartesiLogo";
@@ -21,6 +22,7 @@ const Header: FC = () => {
             <CartesiLogo />
 
             <Flex direction="row" gap="md" align="center">
+                <ConnectButton />
                 <Switch
                     checked={colorScheme === "dark"}
                     onChange={() => toggleColorScheme()}
