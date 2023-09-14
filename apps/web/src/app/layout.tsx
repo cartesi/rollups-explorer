@@ -1,12 +1,12 @@
 "use client";
 import "@mantine/core/styles.css";
 import React, { FC } from "react";
-import { AppShell, ColorSchemeScript, Container } from "@mantine/core";
+import { ColorSchemeScript } from "@mantine/core";
 
-import Header from "../components/header";
 import GraphQLProvider from "../providers/graphqlProvider";
 import StyleProvider from "../providers/styleProvider";
 import WalletProvider from "../providers/walletProvider";
+import Shell from "./shell";
 
 const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -19,12 +19,7 @@ const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
                 <StyleProvider>
                     <WalletProvider>
                         <GraphQLProvider>
-                            <AppShell header={{ height: 80 }} padding="md">
-                                <AppShell.Header>
-                                    <Header />
-                                </AppShell.Header>
-                                <AppShell.Main>{children}</AppShell.Main>
-                            </AppShell>
+                            <Shell>{children}</Shell>
                         </GraphQLProvider>
                     </WalletProvider>
                 </StyleProvider>
