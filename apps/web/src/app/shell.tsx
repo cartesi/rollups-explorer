@@ -54,14 +54,6 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
                                     Home
                                 </Button>
                             </Link>
-                            <Link href="/applications">
-                                <Button
-                                    variant="subtle"
-                                    leftSection={<TbApps />}
-                                >
-                                    Applications
-                                </Button>
-                            </Link>
                             <Button
                                 variant="transaparent"
                                 leftSection={<TbPigMoney />}
@@ -90,11 +82,6 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
             </AppShell.Header>
             <AppShell.Navbar py="md" px={4}>
                 <NavLink label="Home" href="/" leftSection={<TbHome />} />
-                <NavLink
-                    label="Applications"
-                    href="/applications"
-                    leftSection={<TbApps />}
-                />
                 <NavLink
                     disabled
                     label="Deposit"
