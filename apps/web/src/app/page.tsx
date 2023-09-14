@@ -1,9 +1,8 @@
 "use client";
-import { SummaryCard } from "@cartesi/rollups-explorer-ui";
+import { Summary } from "@cartesi/rollups-explorer-ui";
 import {
     Anchor,
     Breadcrumbs,
-    Grid,
     Group,
     Pagination,
     Select,
@@ -13,7 +12,7 @@ import {
     Title,
 } from "@mantine/core";
 import { FC, useEffect, useState } from "react";
-import { TbApps, TbInbox } from "react-icons/tb";
+import { TbInbox } from "react-icons/tb";
 
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
@@ -24,28 +23,6 @@ import {
     useStatsQuery,
 } from "../graphql/index";
 import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
-
-interface SummaryProps {
-    inputs: number;
-    applications: number;
-}
-
-const Summary = ({ inputs, applications }: SummaryProps) => {
-    return (
-        <Grid gutter="md">
-            <Grid.Col span={{ base: 12, md: 6 }} my="md">
-                <SummaryCard title="Inputs" icon={TbInbox} value={inputs} />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 6 }} my="md">
-                <SummaryCard
-                    title="Applications"
-                    icon={TbApps}
-                    value={applications}
-                />
-            </Grid.Col>
-        </Grid>
-    );
-};
 
 const Explorer: FC = (props) => {
     const [{ limit, page }, updateParams] = usePaginationParams();

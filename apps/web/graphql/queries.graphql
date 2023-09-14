@@ -21,8 +21,8 @@ fragment InputItem on Input {
     }
 }
 
-query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String) {
-    inputsConnection(orderBy: $orderBy, first: $limit, after: $after) {
+query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String, $applicationId: String) {
+    inputsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {application: {id_startsWith: $applicationId}}) {
         totalCount
         pageInfo {
             hasNextPage
@@ -38,11 +38,11 @@ query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String) {
     }
 }
 
-query stats {
-    inputsConnection(orderBy: id_ASC) {
+query stats($applicationId: String) {
+    inputsConnection(orderBy: id_ASC, where: {application: {id_startsWith: $applicationId}}) {
         totalCount
     }
-    applicationsConnection(orderBy: id_ASC) {
+    applicationsConnection(orderBy: id_ASC, where: {id_startsWith: $applicationId}) {
         totalCount
     }
 }
