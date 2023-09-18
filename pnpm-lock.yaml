@@ -276,10 +276,50 @@ importers:
         version: 8.3.0(eslint@8.49.0)
       eslint-config-turbo:
         specifier: latest
-        version: 1.10.13(eslint@8.49.0)
+        version: 1.10.14(eslint@8.49.0)
       eslint-plugin-react:
         specifier: 7.29.4
         version: 7.29.4(eslint@8.49.0)
+      typescript:
+        specifier: ^5
+        version: 5.2.2
+
+  packages/rollups-wagmi:
+    dependencies:
+      wagmi:
+        specifier: ^1
+        version: 1.4.0(@types/react@18.2.21)(encoding@0.1.13)(lokijs@1.5.12)(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)(viem@1.10.1)
+    devDependencies:
+      '@cartesi/rollups':
+        specifier: ^1.0
+        version: 1.0.0
+      '@cartesi/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@sunodo/wagmi-plugin-hardhat-deploy':
+        specifier: ^0.2
+        version: 0.2.0(typescript@5.2.2)(wagmi@1.4.0)
+      '@types/react':
+        specifier: ^18
+        version: 18.2.21
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.2.7
+      '@wagmi/cli':
+        specifier: ^1
+        version: 1.5.0(typescript@5.2.2)(wagmi@1.4.0)
+      eslint:
+        specifier: ^8
+        version: 8.49.0
+      eslint-config-cartesi:
+        specifier: workspace:*
+        version: link:../eslint-config-cartesi
+      react:
+        specifier: ^18
+        version: 18.2.0
+      tsup:
+        specifier: ^7
+        version: 7.2.0(typescript@5.2.2)
       typescript:
         specifier: ^5
         version: 5.2.2
@@ -2469,7 +2509,6 @@ packages:
     dependencies:
       eslint: 8.49.0
       eslint-visitor-keys: 3.4.3
-    dev: false
 
   /@eslint-community/regexpp@4.8.0:
     resolution: {integrity: sha512-JylOEEzDiOryeUnFbQz+oViCXS0KsvR1mvHkoMiu5+UiBvy+RYX7tzlIIIEstF/gVa2tj9AQXk3dgnxv6KxhFg==}
@@ -2479,7 +2518,6 @@ packages:
   /@eslint-community/regexpp@4.8.1:
     resolution: {integrity: sha512-PWiOzLIUAjN/w5K17PoF4n6sKBw0gqLHPhywmYHP4t1VFQQVYeb1yWsJwnMVEMl3tUHME7X/SJPZLmtG7XBDxQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
-    dev: false
 
   /@eslint/eslintrc@2.1.2:
     resolution: {integrity: sha512-+wvgpDsrB1YqAMdEUCcnTlpfVBH7Vqn6A/NT3D8WVXFIaKMlErPIZT3oCIAVCOtarRpMtelZLqJeU3t7WY6X6g==}
@@ -2505,7 +2543,6 @@ packages:
   /@eslint/js@8.49.0:
     resolution: {integrity: sha512-1S8uAY/MTJqVx0SC4epBq+N2yhuwtNwLbJYNZyhL2pO1ZVKn5HFXav5T41Ryzy9K9V7ZId2JB2oy/W4aCd9/2w==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    dev: false
 
   /@fal-works/esbuild-plugin-global-externals@2.1.2:
     resolution: {integrity: sha512-cEee/Z+I12mZcFJshKcCqC8tuX5hG3s+d+9nZ3LabqKF1vKdF41B92pJVCBggjAGORAeOzyyDDKrZwIkLffeOQ==}
@@ -8849,13 +8886,13 @@ packages:
       eslint: 8.49.0
     dev: false
 
-  /eslint-config-turbo@1.10.13(eslint@8.49.0):
-    resolution: {integrity: sha512-Ffa0SxkRCPMtfUX/HDanEqsWoLwZTQTAXO9W4IsOtycb2MzJDrVcLmoFW5sMwCrg7gjqbrC4ZJoD+1SPPzIVqg==}
+  /eslint-config-turbo@1.10.14(eslint@8.49.0):
+    resolution: {integrity: sha512-ZeB+IcuFXy1OICkLuAplVa0euoYbhK+bMEQd0nH9+Lns18lgZRm33mVz/iSoH9VdUzl/1ZmFmoK+RpZc+8R80A==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
       eslint: 8.49.0
-      eslint-plugin-turbo: 1.10.13(eslint@8.49.0)
+      eslint-plugin-turbo: 1.10.14(eslint@8.49.0)
     dev: false
 
   /eslint-import-resolver-node@0.3.9:
@@ -9055,8 +9092,8 @@ packages:
       string.prototype.matchall: 4.0.9
     dev: false
 
-  /eslint-plugin-turbo@1.10.13(eslint@8.49.0):
-    resolution: {integrity: sha512-el4AAmn0zXmvHEyp1h0IQMfse10Vy8g5Vbg4IU3+vD9CSj5sDbX07iFVt8sCKg7og9Q5FAa9mXzlCf7t4vYgzg==}
+  /eslint-plugin-turbo@1.10.14(eslint@8.49.0):
+    resolution: {integrity: sha512-sBdBDnYr9AjT1g4lR3PBkZDonTrMnR4TvuGv5W0OiF7z9az1rI68yj2UHJZvjkwwcGu5mazWA1AfB0oaagpmfg==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
@@ -9173,7 +9210,6 @@ packages:
       text-table: 0.2.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
 
   /espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
