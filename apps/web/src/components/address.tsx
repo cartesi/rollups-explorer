@@ -21,7 +21,7 @@ import {
     erc20PortalAddress,
     erc721PortalAddress,
     etherPortalAddress,
-} from "../contracts";
+} from "@cartesi/rollups-wagmi";
 
 export type AddressProps = {
     value: Address;

@@ -22,7 +22,7 @@ import {
     TbX,
 } from "react-icons/tb";
 import { Hex, formatUnits, getAddress, hexToString } from "viem";
-import { erc20PortalAddress, etherPortalAddress } from "../contracts";
+import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
 import { InputItemFragment } from "../graphql";
 import Address from "./address";
 

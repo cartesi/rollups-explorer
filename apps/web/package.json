@@ -5,15 +5,14 @@
     "scripts": {
         "build": "next build",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
-        "codegen": "run-p codegen:graphql codegen:wagmi",
-        "codegen:graphql": "dotenv -e .env -c -- graphql-codegen",
-        "codegen:wagmi": "wagmi generate",
+        "codegen": "dotenv -e .env -c -- graphql-codegen",
         "dev": "next dev",
         "start": "next start",
         "lint": "next lint"
     },
     "dependencies": {
         "@cartesi/rollups-explorer-ui": "workspace:^",
+        "@cartesi/rollups-wagmi": "workspace:^",
         "@mantine/core": "^7",
         "@mantine/form": "^7",
         "@mantine/hooks": "^7",
@@ -33,12 +32,13 @@
         "react-dom": "^18",
         "react-icons": "^4",
         "react-jazzicon": "^1",
+        "tslib": "^2.6.2",
         "urql": "^4",
         "viem": "^1",
-        "wagmi": "^1"
+        "wagmi": "^1",
+        "ws": "^8.14.1"
     },
     "devDependencies": {
-        "@cartesi/rollups": "^1.0",
         "@cartesi/tsconfig": "workspace:^",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
@@ -48,12 +48,10 @@
         "@graphql-codegen/typescript-operations": "^4",
         "@graphql-codegen/typescript-urql": "^3",
         "@graphql-typed-document-node/core": "^3",
-        "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
         "@types/node": "^20",
         "@types/ramda": "^0.29.3",
         "@types/react": "^18",
         "@types/react-dom": "^18",
-        "@wagmi/cli": "^1",
         "dotenv-cli": "7.3.0",
         "eslint": "^8",
         "eslint-config-cartesi": "workspace:^",

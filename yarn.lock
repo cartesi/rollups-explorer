@@ -1620,6 +1620,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cartesi/rollups-wagmi@workspace:^, @cartesi/rollups-wagmi@workspace:packages/rollups-wagmi":
+  version: 0.0.0-use.local
+  resolution: "@cartesi/rollups-wagmi@workspace:packages/rollups-wagmi"
+  dependencies:
+    "@cartesi/rollups": ^1.0
+    "@cartesi/tsconfig": "workspace:^"
+    "@sunodo/wagmi-plugin-hardhat-deploy": ^0.2
+    "@types/react": ^18
+    "@types/react-dom": ^18
+    "@wagmi/cli": ^1
+    eslint: ^8
+    eslint-config-cartesi: "workspace:^"
+    react: ^18
+    tsup: ^7
+    typescript: ^5
+    viem: ^1
+    wagmi: ^1
+  peerDependencies:
+    viem: ^1
+    wagmi: ^1
+  languageName: unknown
+  linkType: soft
+
 "@cartesi/rollups@npm:^1.0":
   version: 1.0.2
   resolution: "@cartesi/rollups@npm:1.0.2"
@@ -17227,7 +17250,7 @@ eslint-config-turbo@latest:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.1":
+"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.1, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
@@ -18116,8 +18139,8 @@ eslint-config-turbo@latest:
   version: 0.0.0-use.local
   resolution: "web@workspace:apps/web"
   dependencies:
-    "@cartesi/rollups": ^1.0
     "@cartesi/rollups-explorer-ui": "workspace:^"
+    "@cartesi/rollups-wagmi": "workspace:^"
     "@cartesi/tsconfig": "workspace:^"
     "@graphql-codegen/add": ^5
     "@graphql-codegen/cli": ^5
@@ -18133,12 +18156,10 @@ eslint-config-turbo@latest:
     "@mantine/notifications": ^7
     "@rainbow-me/rainbowkit": ^1
     "@react-spring/web": ^9
-    "@sunodo/wagmi-plugin-hardhat-deploy": ^0.2
     "@types/node": ^20
     "@types/ramda": ^0.29.3
     "@types/react": ^18
     "@types/react-dom": ^18
-    "@wagmi/cli": ^1
     abitype: ^0.9
     dotenv-cli: 7.3.0
     encoding: ^0.1
@@ -18160,10 +18181,12 @@ eslint-config-turbo@latest:
     react-icons: ^4
     react-jazzicon: ^1
     ts-node: ^10
+    tslib: ^2.6.2
     typescript: ^5
     urql: ^4
     viem: ^1
     wagmi: ^1
+    ws: ^8.14.1
   languageName: unknown
   linkType: soft
 
@@ -18463,7 +18486,7 @@ eslint-config-turbo@latest:
   languageName: node
   linkType: hard
 
-"ws@npm:8.14.1, ws@npm:^8.12.0, ws@npm:^8.13.0, ws@npm:^8.2.3, ws@npm:^8.5.0":
+"ws@npm:8.14.1, ws@npm:^8.12.0, ws@npm:^8.13.0, ws@npm:^8.14.1, ws@npm:^8.2.3, ws@npm:^8.5.0":
   version: 8.14.1
   resolution: "ws@npm:8.14.1"
   peerDependencies:

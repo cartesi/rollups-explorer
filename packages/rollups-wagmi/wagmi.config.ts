@@ -1,13 +1,14 @@
 import { defineConfig } from "@wagmi/cli";
-import { erc } from "@wagmi/cli/plugins";
+import { erc, react } from "@wagmi/cli/plugins";
 import hardhatDeploy from "@sunodo/wagmi-plugin-hardhat-deploy";
 
 export default defineConfig({
-    out: "src/contracts.ts",
+    out: "src/index.tsx",
     plugins: [
         hardhatDeploy({
             directory: "abi",
         }),
         erc(),
+        react(),
     ],
 });

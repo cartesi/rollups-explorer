@@ -45,5 +45,4 @@ yarn-error.log*
 *.tsbuildinfo
 
 # generated files
-src/contracts.ts
 src/graphql

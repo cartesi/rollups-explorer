@@ -15,7 +15,7 @@
             "cache": false
         },
         "codegen": {
-            "outputs": ["src/graphql/**", "src/contracts.ts"]
+            "outputs": ["src/graphql/**"]
         },
         "dev": {
             "dependsOn": ["codegen"],

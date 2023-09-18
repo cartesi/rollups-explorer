@@ -1,0 +1,5 @@
+{
+    "extends": "@cartesi/tsconfig/react-library.json",
+    "include": [".", ".eslintrc.js"],
+    "exclude": ["dist", "build", "node_modules"]
+}
