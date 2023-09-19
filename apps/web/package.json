@@ -13,7 +13,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-ui": "*",
+        "@cartesi/rollups-explorer-ui": "workspace:^",
         "@mantine/core": "^7",
         "@mantine/form": "^7",
         "@mantine/hooks": "^7",
@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.0",
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:^",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
@@ -56,7 +56,7 @@
         "@wagmi/cli": "^1",
         "dotenv-cli": "7.3.0",
         "eslint": "^8",
-        "eslint-config-cartesi": "*",
+        "eslint-config-cartesi": "workspace:^",
         "npm-run-all": "^4",
         "postcss": "^8",
         "postcss-preset-mantine": "^1.6",

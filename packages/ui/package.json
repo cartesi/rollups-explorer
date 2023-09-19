@@ -26,11 +26,11 @@
         "@mantine/hooks": "^7"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:^",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "eslint": "^8",
-        "eslint-config-cartesi": "*",
+        "eslint-config-cartesi": "workspace:^",
         "react": "^18",
         "tsup": "^7",
         "typescript": "^5"

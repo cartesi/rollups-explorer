@@ -11,7 +11,7 @@
         "preview": "serve storybook-static"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-ui": "*",
+        "@cartesi/rollups-explorer-ui": "workspace:^",
         "@mantine/core": "^7",
         "@mantine/hooks": "^7",
         "react": "^18.2.0",
@@ -19,7 +19,7 @@
         "react-icons": "^4"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:^",
         "@storybook/addon-essentials": "^7.4.0",
         "@storybook/addon-interactions": "^7.4.0",
         "@storybook/addon-links": "^7.4.0",
