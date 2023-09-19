@@ -11,15 +11,15 @@
         "preview": "serve storybook-static"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-ui": "workspace:*",
-        "@mantine/core": "^7.0.0-beta.5",
-        "@mantine/hooks": "^7.0.0-beta.5",
+        "@cartesi/rollups-explorer-ui": "*",
+        "@mantine/core": "^7",
+        "@mantine/hooks": "^7",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-icons": "^4"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "workspace:*",
+        "@cartesi/tsconfig": "*",
         "@storybook/addon-essentials": "^7.4.0",
         "@storybook/addon-interactions": "^7.4.0",
         "@storybook/addon-links": "^7.4.0",

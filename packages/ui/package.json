@@ -16,21 +16,21 @@
         "lint": "eslint \"src/**/*.ts*\""
     },
     "dependencies": {
-        "@mantine/core": "^7.0.0-beta.5",
-        "@mantine/hooks": "^7.0.0-beta.5",
-        "@react-spring/web": "^9.7.3",
+        "@mantine/core": "^7",
+        "@mantine/hooks": "^7",
+        "@react-spring/web": "^9",
         "react-icons": "^4"
     },
     "peerDependencies": {
-        "@mantine/core": "^7.0.0-beta.5",
-        "@mantine/hooks": "^7.0.0-beta.5"
+        "@mantine/core": "^7",
+        "@mantine/hooks": "^7"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "workspace:*",
+        "@cartesi/tsconfig": "*",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "eslint": "^8",
-        "eslint-config-cartesi": "workspace:*",
+        "eslint-config-cartesi": "*",
         "react": "^18",
         "tsup": "^7",
         "typescript": "^5"

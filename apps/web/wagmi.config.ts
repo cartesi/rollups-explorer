@@ -6,7 +6,7 @@ export default defineConfig({
     out: "src/contracts.ts",
     plugins: [
         hardhatDeploy({
-            directory: "node_modules/@cartesi/rollups/export/abi",
+            directory: "../../node_modules/@cartesi/rollups/export/abi",
         }),
         erc(),
     ],
