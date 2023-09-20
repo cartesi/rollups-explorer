@@ -5,15 +5,14 @@
     "scripts": {
         "build": "next build",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
-        "codegen": "run-p codegen:graphql codegen:wagmi",
-        "codegen:graphql": "dotenv -e .env -c -- graphql-codegen",
-        "codegen:wagmi": "wagmi generate",
+        "codegen": "dotenv -e .env -c -- graphql-codegen",
         "dev": "next dev",
         "start": "next start",
         "lint": "next lint"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-ui": "workspace:*",
+        "@cartesi/rollups-explorer-ui": "*",
+        "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.0.0-beta.5",
         "@mantine/form": "^7.0.0-beta.5",
         "@mantine/hooks": "^7.0.0-beta.5",
@@ -39,7 +38,7 @@
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.0",
-        "@cartesi/tsconfig": "workspace:*",
+        "@cartesi/tsconfig": "*",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
@@ -56,7 +55,7 @@
         "@wagmi/cli": "^1",
         "dotenv-cli": "7.3.0",
         "eslint": "^8",
-        "eslint-config-cartesi": "workspace:*",
+        "eslint-config-cartesi": "*",
         "npm-run-all": "^4",
         "postcss": "^8",
         "postcss-preset-mantine": "^1.6",

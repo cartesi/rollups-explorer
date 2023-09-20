@@ -1,5 +1,5 @@
 {
-    "name": "@cartesi/rollups-explorer-ui",
+    "name": "@cartesi/rollups-wagmi",
     "version": "0.0.0",
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
@@ -12,23 +12,23 @@
     "scripts": {
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        "codegen": "wagmi generate",
         "dev": "tsup --watch",
         "lint": "eslint \"src/**/*.ts*\""
     },
     "dependencies": {
-        "@mantine/core": "^7.0.0-beta.5",
-        "@mantine/hooks": "^7.0.0-beta.5",
-        "@react-spring/web": "^9.7.3",
-        "react-icons": "^4"
+        "wagmi": "^1"
     },
     "peerDependencies": {
-        "@mantine/core": "^7.0.0-beta.5",
-        "@mantine/hooks": "^7.0.0-beta.5"
+        "wagmi": "^1"
     },
     "devDependencies": {
+        "@cartesi/rollups": "^1.0",
         "@cartesi/tsconfig": "*",
+        "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "@wagmi/cli": "^1",
         "eslint": "^8",
         "eslint-config-cartesi": "*",
         "react": "^18",
