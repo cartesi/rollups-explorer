@@ -52,6 +52,7 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
     const [opened, { toggle }] = useDisclosure(false);
     const age = prettyMilliseconds(Date.now() - input.timestamp * 1000, {
         unitCount: 2,
+        secondsDecimalDigits: 0,
         verbose: true,
     });
 
