@@ -5,6 +5,7 @@ import {
     ReportContent,
     VoucherContent,
 } from "@cartesi/rollups-explorer-ui";
+import { Button, Group, Stack, Title } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useEffect, useState } from "react";
 
@@ -171,6 +172,110 @@ const InputDetailsNoContent = () => {
     );
 };
 
+const WithDynamicContent = () => {
+    const reportQuery = useEmulatedData([reportEx]);
+    const voucherQuery = useEmulatedData([
+        jsonWithdraw0,
+        jsonWithdraw1,
+        jsonContent,
+    ]);
+    const noticeQuery = useEmulatedData([queryContent]);
+
+    const [showNotice, setShowNotice] = useState(false);
+    const [showReport, setShowReport] = useState(true);
+    const [showVourcher, setShowVourcher] = useState(false);
+
+    return (
+        <Stack>
+            <Title order={1}>
+                Toggle the content and watch the tabs change
+            </Title>
+            <Group gap={3}>
+                <Button onClick={() => setShowVourcher((v) => !v)}>
+                    Toggle Voucher
+                </Button>
+                <Button onClick={() => setShowReport((v) => !v)}>
+                    Toggle Report
+                </Button>
+                <Button onClick={() => setShowNotice((v) => !v)}>
+                    Toggle Notice
+                </Button>
+            </Group>
+            <InputDetails>
+                <InputContent content={queryContent} contentType="text" />
+
+                {showReport && (
+                    <ReportContent
+                        content={reportQuery.data}
+                        contentType="raw"
+                        paging={{
+                            onNextPage: () => reportQuery.nextPage(),
+                            onPreviousPage: () => reportQuery.prevPage(),
+                            total: reportQuery.total,
+                        }}
+                    />
+                )}
+
+                {showVourcher && (
+                    <VoucherContent
+                        content={voucherQuery.data}
+                        contentType="json"
+                        paging={{
+                            onNextPage: () => voucherQuery.nextPage(),
+                            onPreviousPage: () => voucherQuery.prevPage(),
+                            total: voucherQuery.total,
+                        }}
+                    />
+                )}
+
+                {showNotice && (
+                    <NoticeContent
+                        content={noticeQuery.data}
+                        contentType="text"
+                        paging={{
+                            onNextPage: () => noticeQuery.nextPage(),
+                            onPreviousPage: () => noticeQuery.prevPage(),
+                            total: noticeQuery.total,
+                        }}
+                    />
+                )}
+            </InputDetails>
+        </Stack>
+    );
+};
+
+const WithActionToConnect = () => {
+    const [delay, setDelay] = useState(0);
+    const voucherQuery = useEmulatedData(
+        [jsonWithdraw0, jsonWithdraw1, jsonContent],
+        delay,
+    );
+    const [isConnected, setIsConnected] = useState(false);
+
+    return (
+        <InputDetails>
+            <InputContent content={queryContent} contentType="text" />
+            <VoucherContent
+                isConnected={isConnected}
+                onConnect={() => {
+                    setDelay(600);
+                    setIsConnected(() => {
+                        return true;
+                    });
+                }}
+                content={voucherQuery.data}
+                isLoading={voucherQuery.loading}
+                contentType="raw"
+                paging={{
+                    onNextPage: () => voucherQuery.nextPage(),
+                    onPreviousPage: () => voucherQuery.prevPage(),
+                    total: voucherQuery.total,
+                }}
+            />
+        </InputDetails>
+    );
+};
+
 export const Default: Story = {
     render: () => <InputDetailsWithHooks />,
 };
@@ -181,4 +286,12 @@ export const WithDelay: Story = {
 
 export const VoucherWithNoContent = {
     render: () => <InputDetailsNoContent />,
+};
+
+export const DynamicDisplayingContent = {
+    render: () => <WithDynamicContent />,
+};
+
+export const WithConnectAction = {
+    render: () => <WithActionToConnect />,
 };

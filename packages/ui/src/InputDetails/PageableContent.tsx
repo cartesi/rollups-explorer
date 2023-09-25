@@ -2,14 +2,16 @@
 import {
     ActionIcon,
     Box,
+    Button,
     Group,
     LoadingOverlay,
+    Skeleton,
     Stack,
     Text,
     useMantineTheme,
 } from "@mantine/core";
 import { allPass, complement, isEmpty, isNotNil } from "ramda";
-import { FunctionComponent, useState } from "react";
+import { FC, FunctionComponent, useState } from "react";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import {
     ContentProps,
@@ -28,12 +30,48 @@ export interface Paging {
 
 export interface PageableContentProps extends ContentProps {
     isLoading?: boolean;
+    isConnected?: boolean;
+    onConnect?: () => void;
     paging?: Paging;
 }
 
 const isNotNilOrEmpty = allPass([complement(isEmpty), isNotNil]);
 
+interface ConnectProps {
+    onConnect: () => void;
+}
+
+const Connect: FC<ConnectProps> = ({ onConnect }) => {
+    return (
+        <Stack>
+            <Group m={0} p={0}>
+                <Skeleton animate={false} height={50} circle my="sm" />
+                <Skeleton animate={false} height={50} circle my="sm" />
+                <Skeleton animate={false} height={50} circle my="sm" />
+            </Group>
+            <Skeleton animate={false} height={8} radius="xl" />
+            <Skeleton animate={false} height={8} mt={6} radius="xl" />
+            <Skeleton
+                animate={false}
+                height={8}
+                mt={6}
+                width="70%"
+                radius="xl"
+            />
+            <Group justify="center">
+                <Button size="compact-lg" onClick={() => onConnect()}>
+                    Connect
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
+
 export const PageableContent: FunctionComponent<PageableContentProps> = ({
+    isConnected = true,
+    onConnect = () => {
+        throw new Error("OnConnect callback not defined");
+    },
     isLoading,
     content,
     contentType,
@@ -71,46 +109,52 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                 overlayProps={{ blur: 2 }}
                 loaderProps={{ color: theme.primaryColor, type: "oval" }}
             />
-            <Stack h="100%" justify="center">
-                {hasContent || isLoading ? (
-                    <>
-                        <Group gap={1} justify="space-between">
-                            <ContentTypeControl
-                                type={type}
-                                onTypeChange={setContentType}
-                            />
-                            {hasPaging && (
-                                <Group gap={3} align="end">
-                                    <ActionIcon
-                                        variant="subtle"
-                                        onClick={prevPage}
-                                        disabled={pageNumber === 1}
-                                        aria-label="Button to load the previous content"
-                                    >
-                                        <TbChevronLeft />
-                                    </ActionIcon>
-                                    <Text>
-                                        {pageNumber} of {paging.total}
-                                    </Text>
-                                    <ActionIcon
-                                        variant="subtle"
-                                        onClick={nextPage}
-                                        disabled={pageNumber === paging.total}
-                                        aria-label="Button to load the next content"
-                                    >
-                                        <TbChevronRight />
-                                    </ActionIcon>
-                                </Group>
-                            )}
+            {!isConnected && <Connect onConnect={onConnect} />}
+
+            {isConnected && (
+                <Stack h="100%" justify="center">
+                    {hasContent || isLoading ? (
+                        <>
+                            <Group gap={1} justify="space-between">
+                                <ContentTypeControl
+                                    type={type}
+                                    onTypeChange={setContentType}
+                                />
+                                {hasPaging && (
+                                    <Group gap={3} align="end">
+                                        <ActionIcon
+                                            variant="subtle"
+                                            onClick={prevPage}
+                                            disabled={pageNumber === 1}
+                                            aria-label="Button to load the previous content"
+                                        >
+                                            <TbChevronLeft />
+                                        </ActionIcon>
+                                        <Text>
+                                            {pageNumber} of {paging.total}
+                                        </Text>
+                                        <ActionIcon
+                                            variant="subtle"
+                                            onClick={nextPage}
+                                            disabled={
+                                                pageNumber === paging.total
+                                            }
+                                            aria-label="Button to load the next content"
+                                        >
+                                            <TbChevronRight />
+                                        </ActionIcon>
+                                    </Group>
+                                )}
+                            </Group>
+                            <DisplayContent type={type} content={content} />
+                        </>
+                    ) : (
+                        <Group justify="center" align="center">
+                            <Text c="dimmed">No content to be displayed</Text>
                         </Group>
-                        <DisplayContent type={type} content={content} />
-                    </>
-                ) : (
-                    <Group justify="center" align="center">
-                        <Text c="dimmed">No content to be displayed</Text>
-                    </Group>
-                )}
-            </Stack>
+                    )}
+                </Stack>
+            )}
         </Box>
     );
 };
