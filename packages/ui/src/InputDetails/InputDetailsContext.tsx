@@ -104,11 +104,6 @@ export const useSupportedTabs = () => {
     return result;
 };
 
-export const useAvailableContent = () => {
-    const [result] = useSelector(prop("availableContent"));
-    return result;
-};
-
 export const useInputDetailsState = () => {
     const ctx = useContext(InputDetailsContext);
     return ctx.state;

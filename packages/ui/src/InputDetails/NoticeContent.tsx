@@ -4,8 +4,13 @@ import { PageableContent, PageableContentProps } from "./PageableContent";
 
 export interface NoticeContentType extends FC<PageableContentProps> {}
 
-const NoticeContent: NoticeContentType = (props) => PageableContent(props);
+const DISPLAY_NAME = "NoticeContent" as const;
 
-NoticeContent.displayName = "NoticeContent";
+const NoticeContent: NoticeContentType = (props) => {
+    PageableContent.displayName = DISPLAY_NAME;
+    return PageableContent(props);
+};
+
+NoticeContent.displayName = DISPLAY_NAME;
 
 export default NoticeContent;

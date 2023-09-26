@@ -104,6 +104,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     return (
         <Box pos="relative" h="100%">
             <LoadingOverlay
+                data-testid={`loading-overlay-${PageableContent.displayName?.toLowerCase()}`}
                 visible={isLoading}
                 zIndex={1000}
                 overlayProps={{ blur: 2 }}

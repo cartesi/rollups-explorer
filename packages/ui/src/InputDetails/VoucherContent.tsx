@@ -4,8 +4,13 @@ import { PageableContent, PageableContentProps } from "./PageableContent";
 
 export interface VoucherContentType extends FC<PageableContentProps> {}
 
-const VoucherContent: VoucherContentType = (props) => PageableContent(props);
+const DISPLAY_NAME = "VoucherContent" as const;
 
-VoucherContent.displayName = "VoucherContent";
+const VoucherContent: VoucherContentType = (props) => {
+    PageableContent.displayName = DISPLAY_NAME;
+    return PageableContent(props);
+};
+
+VoucherContent.displayName = DISPLAY_NAME;
 
 export default VoucherContent;
