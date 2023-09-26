@@ -7,3 +7,4 @@ export {
 } from "./InputDetails";
 export { Summary } from "./Summary";
 export { SummaryCard } from "./SummaryCard";
+export { TransactionProgress } from "./TransactionProgress";
