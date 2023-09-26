@@ -3,11 +3,10 @@ import {
     AppShell,
     Burger,
     Button,
-    Flex,
     Group,
+    Modal,
     NavLink,
     Switch,
-    UnstyledButton,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
@@ -15,12 +14,17 @@ import { useDisclosure } from "@mantine/hooks";
 import { FC } from "react";
 import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { TbApps, TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
+import { TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
 import Link from "next/link";
+import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
+import { useAccount } from "wagmi";
 
 const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
+    const [deposit, { open: openDeposit, close: closeDeposit }] =
+        useDisclosure(false);
     const theme = useMantineTheme();
+    const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     return (
         <AppShell
@@ -35,6 +39,9 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
             }}
             padding="md"
         >
+            <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
+                <ERC20DepositForm />
+            </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
                     <Burger
@@ -55,9 +62,10 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
                                 </Button>
                             </Link>
                             <Button
-                                variant="transaparent"
+                                variant="subtle"
                                 leftSection={<TbPigMoney />}
-                                disabled
+                                onClick={openDeposit}
+                                disabled={!isConnected}
                             >
                                 Deposit
                             </Button>

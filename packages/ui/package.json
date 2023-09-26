@@ -19,12 +19,14 @@
         "test:ci": "vitest run --coverage"
     },
     "dependencies": {
+        "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.0.0",
         "@mantine/hooks": "^7.0.0",
         "@react-spring/web": "^9.7.3",
         "ramda": "^0.29.0",
         "react-icons": "^4",
-        "viem": "^1"
+        "viem": "^1",
+        "wagmi": "^1"
     },
     "peerDependencies": {
         "@mantine/core": "^7.0.0",
