@@ -12,6 +12,8 @@
         "lint": "turbo run lint",
         "clean": "turbo run clean && rm -rf node_modules",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "test" : "turbo run test",
+        "test:ci" : "turbo run test:ci",
         "changeset": "changeset",
         "version-packages": "changeset version",
         "release": "turbo run build && changeset publish"

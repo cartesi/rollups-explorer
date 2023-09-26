@@ -31,6 +31,16 @@
                 "test/**/*.ts",
                 "test/**/*.tsx"
             ]
+        },
+        "test:ci": {
+            "dependsOn": ["^build"],
+            "outputs": ["coverage/**"],
+            "inputs": [
+                "src/**/*.ts",
+                "src/**/*.tsx",
+                "test/**/*.ts",
+                "test/**/*.tsx"
+            ]
         }
     }
 }
