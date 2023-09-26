@@ -103,7 +103,11 @@ const InputDetailsContent: FC = () => {
                 return !childComp ? (
                     <Fragment key={tab.label} />
                 ) : (
-                    <Tabs.Panel key={`panel-${tab.label}`} value={tab.label} data-testid={`panel-${tab.label.toLowerCase()}`} >
+                    <Tabs.Panel
+                        key={`panel-${tab.label}`}
+                        value={tab.label}
+                        data-testid={`panel-${tab.label.toLowerCase()}`}
+                    >
                         {childComp}
                     </Tabs.Panel>
                 );
@@ -166,6 +170,5 @@ export {
     InputDetails,
     NoticeContent,
     ReportContent,
-    VoucherContent
+    VoucherContent,
 };
-

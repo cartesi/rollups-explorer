@@ -7,7 +7,7 @@ import {
 } from "@cartesi/rollups-explorer-ui";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const meta: Meta<typeof InputDetails> = {
     component: InputDetails,
@@ -30,17 +30,21 @@ const useEmulatedData = (dataList: string[], delay = 0) => {
     const [index, setIndex] = useState(0);
     const data = loading ? "" : dataList[index];
 
-    const updateHooks = (action: () => void) => {
-        if (delay > 0) {
-            setLoading(true);
-            setTimeout(() => {
+    const updateHooks = useCallback(
+        (action: () => void) => {
+            if (delay > 0) {
+                setLoading(true);
+                setTimeout(() => {
+                    action();
+                    setLoading(false);
+                }, delay);
+            } else {
                 action();
-                setLoading(false);
-            }, delay);
-        } else {
-            action();
-        }
-    };
+            }
+        },
+        [setLoading, delay],
+    );
+
     const nextPage = () => {
         updateHooks(() => setIndex((n) => n + 1));
     };
@@ -53,7 +57,7 @@ const useEmulatedData = (dataList: string[], delay = 0) => {
         if (delay > 0) {
             updateHooks(() => setIndex(0));
         }
-    }, []);
+    }, [delay, updateHooks]);
 
     return {
         total: dataList.length,
