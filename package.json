@@ -17,10 +17,10 @@
         "release": "turbo run build && changeset publish"
     },
     "devDependencies": {
+        "@changesets/cli": "^2.26.2",
         "eslint-config-cartesi": "*",
         "prettier": "^3.0.3",
-        "turbo": "^1.10.13",
-        "@changesets/cli": "^2.26.2"
+        "turbo": "^1.10.13"
     },
     "engines": {
         "node": ">=18.0.0"

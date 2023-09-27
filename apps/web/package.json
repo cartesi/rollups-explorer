@@ -45,7 +45,7 @@
         "@graphql-codegen/typed-document-node": "^5",
         "@graphql-codegen/typescript": "^4",
         "@graphql-codegen/typescript-operations": "^4",
-        "@graphql-codegen/typescript-urql": "^3",
+        "@graphql-codegen/typescript-urql": "^4",
         "@graphql-typed-document-node/core": "^3",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
         "@types/node": "^20",
