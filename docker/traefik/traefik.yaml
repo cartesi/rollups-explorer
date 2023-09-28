@@ -1,0 +1,11 @@
+api:
+    dashboard: true
+    insecure: true
+entryPoints:
+    web:
+        address: ":8080"
+    traefik:
+        address: ":8088"
+providers:
+    file:
+        directory: /etc/traefik/conf.d
