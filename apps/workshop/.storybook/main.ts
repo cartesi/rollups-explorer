@@ -10,6 +10,7 @@ const config: StorybookConfig = {
         "@storybook/addon-interactions",
         "@storybook/addon-styling",
         "storybook-dark-mode",
+        "@storybook/addon-viewport",
     ],
     docs: {
         autodocs: "tag",

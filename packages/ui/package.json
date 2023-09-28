@@ -13,13 +13,18 @@
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "dev": "tsup --watch",
-        "lint": "eslint \"src/**/*.ts*\""
+        "lint": "eslint \"src/**/*.ts*\"",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:ci": "vitest run --coverage"
     },
     "dependencies": {
         "@mantine/core": "^7.0.0",
         "@mantine/hooks": "^7.0.0",
         "@react-spring/web": "^9.7.3",
-        "react-icons": "^4"
+        "ramda": "^0.29.0",
+        "react-icons": "^4",
+        "viem": "^1"
     },
     "peerDependencies": {
         "@mantine/core": "^7.0.0",
@@ -27,13 +32,19 @@
     },
     "devDependencies": {
         "@cartesi/tsconfig": "*",
+        "@testing-library/jest-dom": "^6.1.3",
+        "@testing-library/react": "^14.0.0",
+        "@types/ramda": "^0.29.3",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "@vitest/coverage-v8": "^0.34.5",
         "eslint": "^8",
         "eslint-config-cartesi": "*",
+        "jsdom": "^22.1.0",
         "react": "^18",
         "tsup": "^7",
-        "typescript": "^5"
+        "typescript": "^5",
+        "vitest": "^0.34.5"
     },
     "publishConfig": {
         "access": "public"

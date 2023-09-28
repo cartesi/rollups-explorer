@@ -1,8 +1,4 @@
 "use client";
-import { FC, useEffect, useState } from "react";
-import { useScrollIntoView } from "@mantine/hooks";
-import { pathOr } from "ramda";
-import { TbInbox } from "react-icons/tb";
 import {
     Anchor,
     Breadcrumbs,
@@ -14,14 +10,18 @@ import {
     Text,
     Title,
 } from "@mantine/core";
+import { useScrollIntoView } from "@mantine/hooks";
 import Link from "next/link";
-import { InputOrderByInput, useInputsQuery } from "../../../graphql";
+import { pathOr } from "ramda";
+import { FC, useEffect, useState } from "react";
+import { TbInbox } from "react-icons/tb";
 import Address from "../../../components/address";
+import InputRow from "../../../components/inputRow";
+import { InputOrderByInput, useInputsQuery } from "../../../graphql";
 import {
     limitBounds,
     usePaginationParams,
 } from "../../../hooks/usePaginationParams";
-import InputRow from "../../../components/inputRow";
 
 export type ApplicationPageProps = {
     params: { address: string };
