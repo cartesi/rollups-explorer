@@ -2,8 +2,8 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
     entry: ["src/index.tsx"],
-    format: ["esm", "cjs"],
+    format: ["esm", "cjs", "iife"],
     dts: true,
-    external: ["react"],
+    external: ["react", "wagmi"],
     sourcemap: true,
 });

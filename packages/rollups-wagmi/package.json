@@ -1,10 +1,9 @@
 {
     "name": "@cartesi/rollups-wagmi",
     "version": "0.0.0",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
+    "main": "./dist/index.global.js",
+    "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
-    "type": "module",
     "sideEffects": false,
     "license": "Apache-2.0",
     "files": [
@@ -14,7 +13,7 @@
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "codegen": "wagmi generate",
-        "dev": "tsup --watch"
+        "dev": "tsup --watch"        
     },
     "dependencies": {
         "wagmi": "^1"
