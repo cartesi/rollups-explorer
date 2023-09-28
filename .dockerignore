@@ -1,0 +1,10 @@
+.dockerignore
+.git
+.next
+.turbo
+dist
+docker
+Dockerfile
+node_modules
+npm-debug.log
+README.md
