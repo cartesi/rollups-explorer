@@ -1,11 +1,8 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-const schema = process.env.NEXT_PUBLIC_EXPLORER_API_URL;
-
-if (!schema)
-    throw new Error(
-        "NEXT_PUBLIC_EXPLORER_API_URL environment variable is required for GraphQL code generation.",
-    );
+const schema = "https://squid.subsquid.io/cartesi-rollups-mainnet/graphql";
+// const schema = "https://squid.subsquid.io/cartesi-rollups-sepolia/graphql";
+// const schema = "http://127.0.0.1:4350/graphql";
 
 const plugins = [
     {

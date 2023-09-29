@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+    proxy:
+        image: traefik:v2.10
+        ports:
+            - 8080:8080
+            - 8088:8088
+        volumes:
+            - ./traefik:/etc/traefik
+    explorer:
+        image: cartesi/rollups-explorer:devel
+        expose:
+            - 3000
