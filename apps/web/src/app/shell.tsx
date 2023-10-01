@@ -28,10 +28,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const [{ data }] = useApplications();
-    const dataApplications = Array.isArray(data?.applications)
-        ? data.applications
-        : [];
-    const applications = dataApplications.map((a) => a.id);
+    const applications = (data?.applications ?? []).map((a) => a.id);
 
     return (
         <AppShell

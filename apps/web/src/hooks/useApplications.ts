@@ -11,9 +11,7 @@ const Applications = gql`
 `;
 
 interface Applications {
-    data: {
-        applications: Application[];
-    };
+    applications: Application[];
 }
 
 const useApplications = (
@@ -22,7 +20,7 @@ const useApplications = (
     return Urql.useQuery<Applications, ApplicationInputsArgs>({
         query: Applications,
         ...options,
-    } as Urql.UseQueryArgs<ApplicationInputsArgs, Applications>);
+    });
 };
 
 export default useApplications;
