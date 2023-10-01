@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
-import * as Urql from 'urql';
-import {Application, ApplicationInputsArgs, Omit, StatsQueryVariables} from "../graphql";
+import * as Urql from 'urql'
+import { Application, ApplicationInputsArgs, Omit } from "../graphql"
 
 const Applications = gql`
     query applications(
