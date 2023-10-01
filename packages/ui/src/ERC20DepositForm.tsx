@@ -7,6 +7,7 @@ import {
     usePrepareErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
+    Autocomplete,
     Button,
     Collapse,
     Group,
@@ -15,9 +16,10 @@ import {
     Text,
     TextInput,
     Textarea,
+    Alert,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, useState } from "react";
+import {FC, useState} from "react";
 import {
     TbChevronDown,
     TbChevronUp,
@@ -57,7 +59,12 @@ export const transactionButtonState = (
     return { loading, disabled };
 };
 
-export const ERC20DepositForm: FC = () => {
+export interface ERC20DepositFormProps {
+    applications: string[],
+}
+
+export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
+    const { applications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
     // connected account
@@ -174,14 +181,22 @@ export const ERC20DepositForm: FC = () => {
     return (
         <form>
             <Stack>
-                <TextInput
+                <Autocomplete
                     label="Application"
                     description="The application smart contract address"
                     placeholder="0x"
+                    data={applications}
                     value={application}
-                    onChange={(e) => setApplication(e.target.value)}
                     withAsterisk
+                    onChange={setApplication}
                 />
+
+                {application !== '' && !applications.includes(application) && (
+                    <Alert variant="light" color="blue">
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
+
                 <TextInput
                     label="ERC-20"
                     description="The ERC-20 smart contract address"
