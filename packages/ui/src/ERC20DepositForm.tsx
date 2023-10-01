@@ -61,10 +61,11 @@ export const transactionButtonState = (
 
 export interface ERC20DepositFormProps {
     applications: string[];
+    tokens: string[];
 }
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
-    const { applications } = props;
+    const { applications, tokens } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
     // connected account
@@ -197,18 +198,30 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     </Alert>
                 )}
 
-                <TextInput
+                <Autocomplete
                     label="ERC-20"
                     description="The ERC-20 smart contract address"
                     placeholder="0x"
+                    data={tokens}
                     value={erc20Address}
                     error={erc20Errors[0]}
-                    onChange={(e) => {
-                        setErc20Address(e.target.value);
-                    }}
-                    rightSection={erc20.isLoading && <Loader size="xs" />}
                     withAsterisk
+                    rightSection={erc20.isLoading && <Loader size="xs" />}
+                    onChange={(nextValue) => {
+                        const formattedValue = nextValue.substring(
+                            nextValue.indexOf("0x"),
+                        );
+                        setErc20Address(formattedValue);
+                    }}
                 />
+
+                {erc20Address !== "" &&
+                    !tokens.some((t) => t.includes(erc20Address)) && (
+                        <Alert variant="light" color="blue">
+                            This is the first deposit of that token.
+                        </Alert>
+                    )}
+
                 <Collapse in={erc20.isSuccess && erc20Errors.length == 0}>
                     <Stack>
                         <TextInput

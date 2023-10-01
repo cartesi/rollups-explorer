@@ -19,6 +19,7 @@ import Link from "next/link";
 import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
 import { useAccount } from "wagmi";
 import useApplications from "../hooks/useApplications";
+import useTokens from "../hooks/useTokens";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
@@ -27,8 +28,12 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data }] = useApplications();
-    const applications = (data?.applications ?? []).map((a) => a.id);
+    const [{ data: applicationData }] = useApplications();
+    const applications = (applicationData?.applications ?? []).map((a) => a.id);
+    const [{ data: tokenData }] = useTokens();
+    const tokens = (tokenData?.tokens ?? []).map(
+        (a) => `${a.symbol} - ${a.name} - ${a.id}`,
+    );
 
     return (
         <AppShell
@@ -44,7 +49,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             padding="md"
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
-                <ERC20DepositForm applications={applications} />
+                <ERC20DepositForm applications={applications} tokens={tokens} />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
