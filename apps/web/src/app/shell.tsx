@@ -11,7 +11,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {ReactNode, FC} from "react";
+import { ReactNode, FC } from "react";
 import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
@@ -27,8 +27,10 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data }] = useApplications()
-    const dataApplications = Array.isArray(data?.applications) ? data.applications : [];
+    const [{ data }] = useApplications();
+    const dataApplications = Array.isArray(data?.applications)
+        ? data.applications
+        : [];
     const applications = dataApplications.map((a) => a.id);
 
     return (

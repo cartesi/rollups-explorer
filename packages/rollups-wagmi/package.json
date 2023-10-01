@@ -13,7 +13,7 @@
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "codegen": "wagmi generate",
-        "dev": "tsup --watch"        
+        "dev": "tsup --watch"
     },
     "dependencies": {
         "wagmi": "^1"

@@ -19,7 +19,7 @@ import {
     Alert,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {FC, useState} from "react";
+import { FC, useState } from "react";
 import {
     TbChevronDown,
     TbChevronUp,
@@ -60,7 +60,7 @@ export const transactionButtonState = (
 };
 
 export interface ERC20DepositFormProps {
-    applications: string[],
+    applications: string[];
 }
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
@@ -191,7 +191,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     onChange={setApplication}
                 />
 
-                {application !== '' && !applications.includes(application) && (
+                {application !== "" && !applications.includes(application) && (
                     <Alert variant="light" color="blue">
                         This is a deposit to an undeployed application.
                     </Alert>
