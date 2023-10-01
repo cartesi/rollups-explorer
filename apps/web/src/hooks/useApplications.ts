@@ -1,14 +1,10 @@
-import gql from 'graphql-tag';
-import * as Urql from 'urql'
-import { Application, ApplicationInputsArgs, Omit } from "../graphql"
+import gql from "graphql-tag";
+import * as Urql from "urql";
+import { Application, ApplicationInputsArgs, Omit } from "../graphql";
 
 const Applications = gql`
-    query applications(
-        $where: ApplicationWhereInput
-    ) {
-        applications(
-            where: $where
-        ) {
+    query applications($where: ApplicationWhereInput) {
+        applications(where: $where) {
             id
         }
     }
@@ -16,14 +12,16 @@ const Applications = gql`
 
 interface Applications {
     data: {
-        applications: Application[]
-    }
+        applications: Application[];
+    };
 }
 
-const useApplications = (options?: Omit<Urql.UseQueryArgs<ApplicationInputsArgs>, 'query'>) => {
+const useApplications = (
+    options?: Omit<Urql.UseQueryArgs<ApplicationInputsArgs>, "query">
+) => {
     return Urql.useQuery<Applications, ApplicationInputsArgs>({
         query: Applications,
-        ...options
+        ...options,
     } as Urql.UseQueryArgs<ApplicationInputsArgs, Applications>);
 };
 
