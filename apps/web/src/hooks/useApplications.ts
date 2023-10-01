@@ -17,7 +17,7 @@ interface Applications {
 }
 
 const useApplications = (
-    options?: Omit<Urql.UseQueryArgs<ApplicationInputsArgs>, "query">
+    options?: Omit<Urql.UseQueryArgs<ApplicationInputsArgs>, "query">,
 ) => {
     return Urql.useQuery<Applications, ApplicationInputsArgs>({
         query: Applications,
