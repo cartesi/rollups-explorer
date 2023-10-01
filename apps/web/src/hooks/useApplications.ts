@@ -14,11 +14,17 @@ const Applications = gql`
     }
 `;
 
+interface Applications {
+    data: {
+        applications: Application[]
+    }
+}
+
 const useApplications = (options?: Omit<Urql.UseQueryArgs<ApplicationInputsArgs>, 'query'>) => {
-    return Urql.useQuery<Application, ApplicationInputsArgs>({
+    return Urql.useQuery<Applications, ApplicationInputsArgs>({
         query: Applications,
         ...options
-    } as Urql.UseQueryArgs<ApplicationInputsArgs, Application>);
+    } as Urql.UseQueryArgs<ApplicationInputsArgs, Applications>);
 };
 
 export default useApplications;
