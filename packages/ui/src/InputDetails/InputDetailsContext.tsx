@@ -63,6 +63,7 @@ const InputDetailsContext = createContext<ContextProps>({
 
 const getOnlySupportedContent = (dict: OptionalContents) => {
     const supportedTypes = map(prop("type"), SUPPORTED_TABS);
+    //@ts-ignore
     return pick(supportedTypes, dict);
 };
 
@@ -88,10 +89,12 @@ const useSelector: UseSelector = (predicate) => {
     return [result];
 };
 
-const availableContentAsSet = pipe(
+type AvailableContentAsSet = (value: State) => Set<SupportedContent>;
+
+const availableContentAsSet: AvailableContentAsSet = pipe(
     prop("availableContent"),
     keys,
-    memoizeWith(join("/"), (keys) => new Set(keys)),
+    memoizeWith(join("/"), (keys) => new Set(keys as SupportedContent[])),
 );
 
 export const useDefinedContentSet = () => {
