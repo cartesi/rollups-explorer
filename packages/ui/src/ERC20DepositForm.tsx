@@ -101,10 +101,10 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const balance = erc20.data?.[3].result as bigint | undefined;
     const erc20Errors = erc20.data
         ? erc20.data
-            .filter((d) => d.error instanceof Error)
-            .map((d) => {
-                return (d.error as BaseError).shortMessage;
-            })
+              .filter((d) => d.error instanceof Error)
+              .map((d) => {
+                  return (d.error as BaseError).shortMessage;
+              })
         : [];
 
     // token amount to deposit
