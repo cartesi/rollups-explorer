@@ -7,6 +7,7 @@ import {
     usePrepareErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
+    Autocomplete,
     Button,
     Collapse,
     Group,
@@ -15,6 +16,7 @@ import {
     Text,
     TextInput,
     Textarea,
+    Alert,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, useState } from "react";
@@ -57,7 +59,13 @@ export const transactionButtonState = (
     return { loading, disabled };
 };
 
-export const ERC20DepositForm: FC = () => {
+export interface ERC20DepositFormProps {
+    applications: string[];
+    tokens: string[];
+}
+
+export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
+    const { applications, tokens } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
     // connected account
@@ -93,10 +101,10 @@ export const ERC20DepositForm: FC = () => {
     const balance = erc20.data?.[3].result as bigint | undefined;
     const erc20Errors = erc20.data
         ? erc20.data
-              .filter((d) => d.error instanceof Error)
-              .map((d) => {
-                  return (d.error as BaseError).shortMessage;
-              })
+            .filter((d) => d.error instanceof Error)
+            .map((d) => {
+                return (d.error as BaseError).shortMessage;
+            })
         : [];
 
     // token amount to deposit
@@ -174,26 +182,46 @@ export const ERC20DepositForm: FC = () => {
     return (
         <form>
             <Stack>
-                <TextInput
+                <Autocomplete
                     label="Application"
                     description="The application smart contract address"
                     placeholder="0x"
+                    data={applications}
                     value={application}
-                    onChange={(e) => setApplication(e.target.value)}
                     withAsterisk
+                    onChange={setApplication}
                 />
-                <TextInput
+
+                {application !== "" && !applications.includes(application) && (
+                    <Alert variant="light" color="blue">
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
+
+                <Autocomplete
                     label="ERC-20"
                     description="The ERC-20 smart contract address"
                     placeholder="0x"
+                    data={tokens}
                     value={erc20Address}
                     error={erc20Errors[0]}
-                    onChange={(e) => {
-                        setErc20Address(e.target.value);
-                    }}
-                    rightSection={erc20.isLoading && <Loader size="xs" />}
                     withAsterisk
+                    rightSection={erc20.isLoading && <Loader size="xs" />}
+                    onChange={(nextValue) => {
+                        const formattedValue = nextValue.substring(
+                            nextValue.indexOf("0x"),
+                        );
+                        setErc20Address(formattedValue);
+                    }}
                 />
+
+                {erc20Address !== "" &&
+                    !tokens.some((t) => t.includes(erc20Address)) && (
+                        <Alert variant="light" color="blue">
+                            This is the first deposit of that token.
+                        </Alert>
+                    )}
+
                 <Collapse in={erc20.isSuccess && erc20Errors.length == 0}>
                     <Stack>
                         <TextInput

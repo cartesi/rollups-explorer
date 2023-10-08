@@ -46,3 +46,17 @@ query stats($applicationId: String) {
         totalCount
     }
 }
+
+query applications($where: ApplicationWhereInput) {
+    applications(where: $where) {
+        id
+    }
+}
+
+query tokens($where: TokenWhereInput) {
+    tokens(where: $where) {
+        id
+        name
+        symbol
+    }
+}
