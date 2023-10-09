@@ -1,0 +1,62 @@
+
+query inputDetails (
+  $inputIdx: Int!
+  $first: Int!
+  $noticesNextPage: String
+  $noticesPrevPage: String
+  $reportNextPage: String
+  $reportPrevPage: String
+  $voucherNextPage: String
+  $voucherPrevPage: String
+) {
+  input(index: $inputIdx){    
+    vouchers(first: $first, after: $voucherNextPage, before: $voucherPrevPage) {
+      totalCount
+      edges {
+        node {
+          index
+          payload
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+    notices(first: $first, after: $noticesNextPage, before: $noticesPrevPage){
+      totalCount
+      edges {
+        node {
+          index
+          payload
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+    reports(first: $first, after: $reportNextPage, before: $reportPrevPage) {
+      totalCount
+      edges {
+        node {
+          index
+          payload
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+}
