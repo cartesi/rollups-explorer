@@ -40,7 +40,6 @@
         "wagmi": "^1"
     },
     "devDependencies": {
-        "@cartesi/rollups": "^1.0",
         "@cartesi/tsconfig": "*",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
