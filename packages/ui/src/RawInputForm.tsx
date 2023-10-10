@@ -7,21 +7,24 @@ import {
     Button,
     Collapse,
     Group,
+    Loader,
     Stack,
+    Text,
+    TextInput,
     Textarea,
     Autocomplete,
     Alert,
-    Loader,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { TbCheck, TbAlertCircle } from "react-icons/tb";
+import { FC, useEffect, useState } from "react";
+import { TbCheck } from "react-icons/tb";
 import {
+    BaseError,
+    formatUnits,
     getAddress,
     isAddress,
     isHex,
+    parseUnits,
     toHex,
-    zeroAddress,
-    BaseError,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { cacheExchange, fetchExchange } from "@urql/core";
@@ -56,37 +59,29 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
             rawInput: toHex(values.rawInput),
         }),
     });
-    const { address, rawInput } = form.getTransformedValues();
-    const prepare = usePrepareInputBoxAddInput({
-        args: [address, rawInput],
-        enabled: form.isValid(),
-    });
-    const execute = useInputBoxAddInput(prepare.config);
-    const wait = useWaitForTransaction(execute.data);
-    const loading = execute.status === "loading" || wait.status === "loading";
-    const canSubmit = form.isValid() && prepare.error === null;
 
-    useEffect(() => {
-        if (wait.status === "success") {
-            form.reset();
-        }
-    }, [wait.status]);
+    const addInput = useInputBoxAddInput({
+        args: [
+            application as `0x${string}`, // isAddress(application) ? getAddress(application) : "0x",
+            rawInput as `0x${string}`,
+        ],
+    });
+    const addInputWait = useWaitForTransaction(addInput.data);
+    const canSubmitInput = application !== "" && isHex(rawInput);
+    const { disabled, loading } = transactionButtonState(
+        addInput,
+        addInputWait,
+        addInput.write,
+        false,
+    );
 
     return (
         <form>
             <Stack>
-                <Autocomplete
-                    label="Application"
-                    description="The application smart contract address"
-                    placeholder="0x"
-                    data={applications}
-                    withAsterisk
-                    rightSection={prepare.isLoading && <Loader size="xs" />}
-                    {...form.getInputProps("application")}
-                    error={
-                        form.errors.application ||
-                        (prepare.error as BaseError)?.shortMessage
-                    }
+                <ApplicationAutocomplete
+                    application={application}
+                    applications={applications}
+                    onChange={setApplication}
                 />
 
                 {!form.errors.application &&
@@ -104,31 +99,25 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
                 <Textarea
                     label="Raw input"
                     description="Raw input for the application"
+                    value={rawInput}
+                    error={isHex(rawInput) ? undefined : "Invalid hex string"}
                     withAsterisk
-                    {...form.getInputProps("rawInput")}
+                    onChange={(e) => setRawInput(e.target.value)}
                 />
 
-                <Collapse
-                    in={
-                        execute.isLoading ||
-                        wait.isLoading ||
-                        execute.isSuccess ||
-                        execute.isError
-                    }
-                >
+                <Collapse in={addInput.isLoading || addInputWait.isLoading}>
                     <TransactionProgress
-                        prepare={prepare}
-                        execute={execute}
-                        wait={wait}
+                        prepare={addInput}
+                        execute={addInput}
+                        wait={addInputWait}
                         confirmationMessage="Raw input sent successfully!"
-                        defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
 
                 <Group justify="right">
                     <Button
                         variant="filled"
-                        disabled={!canSubmit}
+                        disabled={!canSubmitInput}
                         leftSection={<TbCheck />}
                         loading={loading}
                         onClick={execute.write}

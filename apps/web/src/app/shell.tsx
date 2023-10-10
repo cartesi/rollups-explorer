@@ -44,6 +44,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [navDepositOpened, { toggle: toggleNavDeposit }] =
         useDisclosure(false);
     const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
+    const [rawInput, { open: openRawInput, close: closeRawInput }] =
         useDisclosure(false);
     const [rawInput, { open: openRawInput, close: closeRawInput }] =
         useDisclosure(false);
@@ -99,6 +100,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 title="Deposit Ether"
             >
                 <EtherDepositForm applications={applications} />
+                opened={rawInput}
+                onClose={closeRawInput}
+                title="Send raw input"
+            >
+                <RawInputForm applications={applications} />
             </Modal>
             <Modal
                 opened={rawInput}
@@ -146,6 +152,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 data-testid="deposit-ether-button"
                             >
                                 Deposit Ether
+                                leftSection={<TbInbox />}
+                                onClick={openRawInput}
+                                disabled={!isConnected}
+                            >
+                                Send raw input
                             </Button>
                             <Button
                                 variant="subtle"
