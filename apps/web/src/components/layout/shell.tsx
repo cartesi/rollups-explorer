@@ -14,7 +14,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import {
     TbApps,
     TbArrowsDownUp,
@@ -30,7 +30,8 @@ import ConnectionView from "../../components/connection/connectionView";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
-const Shell: FC<{ children: ReactNode }> = ({ children }) => {
+const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
+    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [
