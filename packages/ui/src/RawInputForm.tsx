@@ -8,7 +8,6 @@ import {
     Button,
     Collapse,
     Group,
-    Loader,
     Stack,
     Textarea,
 } from "@mantine/core";
