@@ -1,3 +1,6 @@
+export { Card } from "./Card";
+export { ERC20DepositForm } from "./ERC20DepositForm";
+export { EtherDepositForm } from "./EtherDepositForm";
 export {
     InputContent,
     InputDetails,
@@ -5,10 +8,7 @@ export {
     ReportContent,
     VoucherContent,
 } from "./InputDetails";
-export { ERC20DepositForm } from "./ERC20DepositForm";
-export { EtherDepositForm } from "./EtherDepositForm";
 export { RawInputForm } from "./RawInputForm";
 export { Summary } from "./Summary";
 export { SummaryCard } from "./SummaryCard";
 export { TransactionProgress } from "./TransactionProgress";
-export { Card } from "./Card";
