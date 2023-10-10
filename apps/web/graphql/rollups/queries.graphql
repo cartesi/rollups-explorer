@@ -60,3 +60,19 @@ query inputDetails (
     }
   }
 }
+
+
+query checkStatus {
+  inputs {
+    totalCount
+  }
+  vouchers {
+    totalCount
+  }
+  reports {
+    totalCount
+  }
+  notices {
+    totalCount
+  }
+}
