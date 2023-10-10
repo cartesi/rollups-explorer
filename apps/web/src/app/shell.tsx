@@ -42,6 +42,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [navDepositOpened, { toggle: toggleNavDeposit }] =
         useDisclosure(false);
     const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
+    const [rawInput, { open: openRawInput, close: closeRawInput }] =
         useDisclosure(false);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
@@ -93,6 +94,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 title="Deposit Ether"
             >
                 <EtherDepositForm applications={applications} />
+                opened={rawInput}
+                onClose={closeRawInput}
+                title="Send raw input"
+            >
+                <RawInputForm applications={applications} />
             </Modal>
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
@@ -126,6 +132,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 data-testid="deposit-ether-button"
                             >
                                 Deposit Ether
+                                leftSection={<TbInbox />}
+                                onClick={openRawInput}
+                                disabled={!isConnected}
+                            >
+                                Send raw input
                             </Button>
                             {!isSmallDevice && <ConnectButton />}
                             <Switch
