@@ -28,6 +28,9 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
+    onSubmit: () => void;
+}
+
 }
 
 export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {

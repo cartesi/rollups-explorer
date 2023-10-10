@@ -36,7 +36,10 @@ import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
 
-const Shell: FC<{ children: ReactNode }> = ({ children }) => {
+import { useApplicationsQuery } from "../graphql";
+
+const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
+    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
@@ -102,7 +105,10 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 onClose={closeRawInput}
                 title="Send raw input"
             >
-                <RawInputForm applications={applications} />
+                <RawInputForm
+                    applications={applications}
+                    onSubmit={router.refresh}
+                />
             </Modal>
             <Modal
                 opened={rawInput}
