@@ -1,46 +1,18 @@
+import { FC, useCallback, useEffect, useState } from "react";
 import { useInputBoxAddInput } from "@cartesi/rollups-wagmi";
 import {
     Button,
     Collapse,
     Group,
-    Loader,
     Stack,
-    Text,
-    TextInput,
     Textarea,
     Autocomplete,
     Alert,
 } from "@mantine/core";
-import { FC, useEffect, useState } from "react";
 import { TbCheck } from "react-icons/tb";
-import {
-    BaseError,
-    formatUnits,
-    getAddress,
-    isAddress,
-    isHex,
-    parseUnits,
-    toHex,
-} from "viem";
-import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
-import { TransactionStageStatus } from "./TransactionStatus";
+import { isHex } from "viem";
+import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
-
-export const transactionButtonState = (
-    execute: TransactionStageStatus,
-    wait: TransactionStageStatus,
-    write?: () => void,
-    disableOnSuccess: boolean = true,
-) => {
-    const loading = execute.status === "loading" || wait.status === "loading";
-
-    const disabled =
-        execute.error != null ||
-        (disableOnSuccess && wait.status === "success") ||
-        !write;
-
-    return { loading, disabled };
-};
 
 export interface ApplicationAutocompleteProps {
     applications: string[];
@@ -75,28 +47,32 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
 
 export interface RawInputFormProps {
     applications: string[];
+    onSubmit: () => void;
 }
 
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
-    const { applications } = props;
-    const { address } = useAccount();
+    const { applications, onSubmit } = props;
     const [rawInput, setRawInput] = useState<string>("0x");
     const [application, setApplication] = useState("");
-
     const addInput = useInputBoxAddInput({
-        args: [
-            application as `0x${string}`, // isAddress(application) ? getAddress(application) : "0x",
-            rawInput as `0x${string}`,
-        ],
+        args: [application as `0x${string}`, rawInput as `0x${string}`],
     });
     const addInputWait = useWaitForTransaction(addInput.data);
     const canSubmitInput = application !== "" && isHex(rawInput);
-    const { disabled, loading } = transactionButtonState(
-        addInput,
-        addInputWait,
-        addInput.write,
-        false,
-    );
+    const loading =
+        addInput.status === "loading" || addInputWait.status === "loading";
+
+    const onSend = useCallback(() => {
+        addInput.write();
+    }, [addInput]);
+
+    useEffect(() => {
+        if (addInputWait.status === "success") {
+            setApplication("");
+            setRawInput("0x");
+            onSubmit();
+        }
+    }, [addInputWait.status, onSubmit]);
 
     return (
         <form>
@@ -116,12 +92,20 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                     onChange={(e) => setRawInput(e.target.value)}
                 />
 
-                <Collapse in={addInput.isLoading || addInputWait.isLoading}>
+                <Collapse
+                    in={
+                        addInput.isLoading ||
+                        addInputWait.isLoading ||
+                        addInput.isSuccess ||
+                        addInput.isError
+                    }
+                >
                     <TransactionProgress
                         prepare={addInput}
                         execute={addInput}
                         wait={addInputWait}
                         confirmationMessage="Raw input sent successfully!"
+                        defaultErrorMessage={addInput.error?.message}
                     />
                 </Collapse>
 
@@ -131,10 +115,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         disabled={!canSubmitInput}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={() => {
-                            addInput.write({ data: rawInput as `0x${string}` });
-                            // addInput.write();
-                        }}
+                        onClick={onSend}
                     >
                         Send
                     </Button>
