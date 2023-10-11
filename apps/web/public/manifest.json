@@ -1,0 +1,17 @@
+{
+    "name": "CartesiScan",
+    "iconPath": "images/logo.svg",
+    "description": "Scan DApp inputs and interact with DApp's backend at ease.",
+    "providedBy": { "name": "Cartesi", "url": "https://cartesiscan.io" },
+    "theme_color": "black",
+    "background_color": "white",
+    "display": "standalone",
+    "start_url": ".",
+    "icons": [
+        {
+            "src": "favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }
+    ]
+}

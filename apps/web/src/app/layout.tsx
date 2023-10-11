@@ -1,7 +1,7 @@
 "use client";
+import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import React, { FC } from "react";
-import { ColorSchemeScript } from "@mantine/core";
 
 import GraphQLProvider from "../providers/graphqlProvider";
 import StyleProvider from "../providers/styleProvider";
@@ -13,7 +13,7 @@ const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
         <html lang="en">
             <head>
                 <ColorSchemeScript />
-                <link rel="shortcut icon" href="/favicon.svg" />
+                <link rel="shortcut icon" href="/favicon.ico" />
             </head>
             <body>
                 <StyleProvider>
