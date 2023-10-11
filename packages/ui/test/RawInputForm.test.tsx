@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 import { RawInputForm, ApplicationAutocomplete } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
@@ -42,7 +42,7 @@ vi.mock("wagmi", async () => {
 });
 
 describe("Rollups RawInputForm", () => {
-    afterEach(() => {
+    afterAll(() => {
         vi.restoreAllMocks();
     });
 
