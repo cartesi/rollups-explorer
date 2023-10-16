@@ -169,9 +169,7 @@ describe("Rollups RawInputForm", () => {
             );
 
             expect(
-                screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
+                screen.getByText("This is an undeployed application."),
             ).toBeInTheDocument();
         });
 
