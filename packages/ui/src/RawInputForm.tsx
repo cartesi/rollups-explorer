@@ -38,7 +38,7 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
 
             {application !== "" && !applications.includes(application) && (
                 <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
-                    This is a deposit to an undeployed application.
+                    This is an undeployed application.
                 </Alert>
             )}
         </>
