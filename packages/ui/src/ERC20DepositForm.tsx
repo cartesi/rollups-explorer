@@ -25,6 +25,7 @@ import {
     TbChevronUp,
     TbCheck,
     TbPigMoney,
+    TbAlertCircle,
 } from "react-icons/tb";
 import {
     BaseError,
@@ -87,7 +88,7 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
             />
 
             {application !== "" && !applications.includes(application) && (
-                <Alert variant="light" color="blue">
+                <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
                     This is a deposit to an undeployed application.
                 </Alert>
             )}
@@ -127,7 +128,11 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
 
             {erc20Address !== "" &&
                 !tokens.some((t) => t.includes(erc20Address)) && (
-                    <Alert variant="light" color="blue">
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
                         This is the first deposit of that token.
                     </Alert>
                 )}
