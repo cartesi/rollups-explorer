@@ -9,7 +9,7 @@ import {
     Autocomplete,
     Alert,
 } from "@mantine/core";
-import { TbCheck } from "react-icons/tb";
+import { TbCheck, TbAlertCircle } from "react-icons/tb";
 import { isHex } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
@@ -37,7 +37,7 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
             />
 
             {application !== "" && !applications.includes(application) && (
-                <Alert variant="light" color="blue">
+                <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
                     This is a deposit to an undeployed application.
                 </Alert>
             )}
