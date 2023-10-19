@@ -11,21 +11,29 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC } from "react";
+import { ReactNode, FC } from "react";
 import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
 import Link from "next/link";
 import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
 import { useAccount } from "wagmi";
+import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
-const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
+const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const [{ data: applicationData }] = useApplicationsQuery();
+    const applications = (applicationData?.applications ?? []).map((a) => a.id);
+    const [{ data: tokenData }] = useTokensQuery();
+    const tokens = (tokenData?.tokens ?? []).map(
+        (a) => `${a.symbol} - ${a.name} - ${a.id}`,
+    );
+
     return (
         <AppShell
             header={{ height: 60 }}
@@ -40,7 +48,7 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
             padding="md"
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
-                <ERC20DepositForm />
+                <ERC20DepositForm applications={applications} tokens={tokens} />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
