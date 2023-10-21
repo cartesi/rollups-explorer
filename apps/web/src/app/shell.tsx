@@ -36,8 +36,6 @@ import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
 
-import { useApplicationsQuery } from "../graphql";
-
 const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
     const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
