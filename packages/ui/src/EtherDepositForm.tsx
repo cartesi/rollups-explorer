@@ -11,21 +11,30 @@ import {
     Autocomplete,
     Alert,
     Textarea,
+    Loader,
 } from "@mantine/core";
 import { TbCheck, TbAlertCircle } from "react-icons/tb";
-import { getAddress, isAddress, isHex, toHex } from "viem";
+import { BaseError, getAddress, isAddress, isHex, toHex } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface ApplicationAutocompleteProps {
     applications: string[];
     application: string;
+    error?: string;
+    isLoading?: boolean;
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
     props,
 ) => {
-    const { applications, application, onChange } = props;
+    const {
+        applications,
+        application,
+        error,
+        isLoading = false,
+        onChange,
+    } = props;
 
     return (
         <>
@@ -35,7 +44,9 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
                 placeholder="0x"
                 data={applications}
                 value={application}
+                error={error}
                 withAsterisk
+                rightSection={isLoading && <Loader size="xs" />}
                 onChange={onChange}
             />
 
@@ -59,10 +70,10 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const [execLayerData, setExecLayerData] = useState("0x");
     const depositPrepare = usePrepareEtherPortalDepositEther({
         args: [
-            isAddress(application) ? getAddress(application) : "0x",
+            isAddress(application) ? getAddress(application) : "0x1",
             toHex(execLayerData),
         ],
-        enabled: true,
+        enabled: isAddress(application),
     });
     const deposit = useEtherPortalDepositEther(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
@@ -77,17 +88,14 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         }
     }, [depositWait.status, onSubmit]);
 
-    useEffect(() => {
-        console.log("deposit::", deposit.status);
-        console.log("depositWait::", depositWait.status);
-    }, [deposit, depositWait]);
-
     return (
         <form>
             <Stack>
                 <ApplicationAutocomplete
                     application={application}
                     applications={applications}
+                    error={(depositPrepare.error as BaseError)?.shortMessage}
+                    isLoading={depositPrepare.isLoading}
                     onChange={setApplication}
                 />
 
@@ -100,19 +108,6 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     }
                     onChange={(e) => setExecLayerData(e.target.value)}
                 />
-
-                {application !== "" && depositPrepare.error && (
-                    <Alert
-                        variant="light"
-                        color="red"
-                        icon={<TbAlertCircle />}
-                        styles={{
-                            message: { wordBreak: "break-word" },
-                        }}
-                    >
-                        {depositPrepare.error.message}
-                    </Alert>
-                )}
 
                 <Collapse
                     in={
@@ -127,11 +122,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         execute={deposit}
                         wait={depositWait}
                         confirmationMessage="Ether deposited successfully!"
-                        defaultErrorMessage={
-                            application === ""
-                                ? undefined
-                                : deposit.error?.message
-                        }
+                        defaultErrorMessage={deposit.error?.message}
                     />
                 </Collapse>
 
