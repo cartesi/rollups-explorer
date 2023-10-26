@@ -12,6 +12,9 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { ReactNode, FC } from "react";
+import CartesiLogo from "../components/cartesiLogo";
+import { useRouter } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
@@ -29,9 +32,12 @@ import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
+    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
+        useDisclosure(false);
+    const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
         useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
@@ -67,6 +73,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
                 <ERC20DepositForm applications={applications} tokens={tokens} />
             </Modal>
+            <Modal
+                opened={etherDeposit}
+                onClose={closeEtherDeposit}
+                title="Deposit Ether"
+            >
+                <EtherDepositForm applications={applications} />
+            </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
                     <Burger
@@ -101,6 +114,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 disabled={!isConnected}
                             >
                                 Deposit
+                            </Button>
+                            <Button
+                                variant="subtle"
+                                leftSection={<TbPigMoney />}
+                                onClick={openEtherDeposit}
+                                disabled={!isConnected}
+                            >
+                                Deposit Ether
                             </Button>
                             <ConnectButton />
                             <Switch
