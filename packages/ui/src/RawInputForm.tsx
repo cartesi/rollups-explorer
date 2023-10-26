@@ -1,5 +1,8 @@
-import { FC, useCallback, useEffect, useState } from "react";
-import { useInputBoxAddInput } from "@cartesi/rollups-wagmi";
+import { FC, useEffect, useState } from "react";
+import {
+    useInputBoxAddInput,
+    usePrepareInputBoxAddInput,
+} from "@cartesi/rollups-wagmi";
 import {
     Button,
     Collapse,
@@ -8,21 +11,30 @@ import {
     Textarea,
     Autocomplete,
     Alert,
+    Loader,
 } from "@mantine/core";
 import { TbCheck, TbAlertCircle } from "react-icons/tb";
-import { isHex } from "viem";
+import { BaseError, isHex } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface ApplicationAutocompleteProps {
     applications: string[];
     application: string;
+    error?: string;
+    isLoading?: boolean;
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
     props,
 ) => {
-    const { applications, application, onChange } = props;
+    const {
+        applications,
+        application,
+        error,
+        isLoading = false,
+        onChange,
+    } = props;
 
     return (
         <>
@@ -32,7 +44,9 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
                 placeholder="0x"
                 data={applications}
                 value={application}
+                error={error}
                 withAsterisk
+                rightSection={isLoading && <Loader size="xs" />}
                 onChange={onChange}
             />
 
@@ -54,17 +68,16 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const { applications, onSubmit } = props;
     const [rawInput, setRawInput] = useState<string>("0x");
     const [application, setApplication] = useState("");
-    const addInput = useInputBoxAddInput({
+    const isValidInput = application !== "" && isHex(rawInput);
+    const addInputPrepare = usePrepareInputBoxAddInput({
         args: [application as `0x${string}`, rawInput as `0x${string}`],
+        enabled: isValidInput,
     });
+    const canSubmit = isValidInput && addInputPrepare.error === null;
+    const addInput = useInputBoxAddInput(addInputPrepare.config);
     const addInputWait = useWaitForTransaction(addInput.data);
-    const canSubmitInput = application !== "" && isHex(rawInput);
     const loading =
         addInput.status === "loading" || addInputWait.status === "loading";
-
-    const onSend = useCallback(() => {
-        addInput.write();
-    }, [addInput]);
 
     useEffect(() => {
         if (addInputWait.status === "success") {
@@ -80,6 +93,8 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                 <ApplicationAutocomplete
                     application={application}
                     applications={applications}
+                    error={(addInputPrepare.error as BaseError)?.shortMessage}
+                    isLoading={addInputPrepare.isLoading}
                     onChange={setApplication}
                 />
 
@@ -101,7 +116,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                     }
                 >
                     <TransactionProgress
-                        prepare={addInput}
+                        prepare={addInputPrepare}
                         execute={addInput}
                         wait={addInputWait}
                         confirmationMessage="Raw input sent successfully!"
@@ -112,10 +127,10 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                 <Group justify="right">
                     <Button
                         variant="filled"
-                        disabled={!canSubmitInput}
+                        disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={onSend}
+                        onClick={addInput.write}
                     >
                         Send
                     </Button>
