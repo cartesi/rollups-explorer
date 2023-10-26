@@ -61,11 +61,10 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
 
 export interface EtherDepositFormProps {
     applications: string[];
-    onSubmit: () => void;
 }
 
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
-    const { applications, onSubmit } = props;
+    const { applications } = props;
     const [application, setApplication] = useState("");
     const [execLayerData, setExecLayerData] = useState("0x");
     const depositPrepare = usePrepareEtherPortalDepositEther({
@@ -86,7 +85,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             setApplication("");
             setExecLayerData("0x");
         }
-    }, [depositWait.status, onSubmit]);
+    }, [depositWait.status]);
 
     return (
         <form>
