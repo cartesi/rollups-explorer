@@ -78,7 +78,10 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 onClose={closeEtherDeposit}
                 title="Deposit Ether"
             >
-                <EtherDepositForm applications={applications} />
+                <EtherDepositForm
+                    applications={applications}
+                    onSubmit={router.refresh}
+                />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
