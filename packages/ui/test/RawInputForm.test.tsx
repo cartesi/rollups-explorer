@@ -28,6 +28,9 @@ const defaultProps = {
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
     return {
+        usePrepareInputBoxAddInput: () => ({
+            config: {},
+        }),
         useInputBoxAddInput: () => ({
             data: {},
             wait: vi.fn(),
@@ -101,6 +104,10 @@ describe("Rollups RawInputForm", () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            rollupsWagmi.usePrepareInputBoxAddInput = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                error: null,
+            });
             rollupsWagmi.useInputBoxAddInput = vi.fn().mockReturnValue({
                 ...rollupsWagmi.useInputBoxAddInput,
                 write: mockedWrite,
