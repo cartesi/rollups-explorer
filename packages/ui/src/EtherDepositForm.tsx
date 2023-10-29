@@ -75,9 +75,10 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         ],
         enabled: isAddress(application),
     });
+    const isValidInput = application !== "" && isHex(execLayerData);
     const deposit = useEtherPortalDepositEther(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
-    const canSubmit = application !== "" && depositPrepare.error === null;
+    const canSubmit = isValidInput && depositPrepare.error === null;
     const loading =
         deposit.status === "loading" || depositWait.status === "loading";
 
