@@ -1,5 +1,5 @@
 import { Globals } from "@react-spring/web";
-import "@testing-library/jest-dom/vitest";
+import "@testing-library/jest-dom";
 import { beforeAll, vi } from "vitest";
 
 Object.defineProperty(window, "matchMedia", {
