@@ -47,6 +47,12 @@ const useConnectionConfigActions = () => {
     const dispatch = useConnectionConfigDispatcher();
     const repository = useConnectionRepository();
     const actions = {
+        showConnectionModal() {
+            dispatch({ type: "SHOW_CONNECTION_MODAL" });
+        },
+        hideConnectionModal() {
+            dispatch({ type: "HIDE_CONNECTION_MODAL" });
+        },
         addConnection(connection: Connection, opt?: ActionLifecycle) {
             repository
                 .add(connection)
@@ -105,7 +111,12 @@ const getConnections: (state: State) => Connection[] = pipe(
 
 const useConnectionConfig = () => {
     const connections = useSelector(getConnections);
-    const { addConnection, removeConnection } = useConnectionConfigActions();
+    const {
+        addConnection,
+        removeConnection,
+        hideConnectionModal,
+        showConnectionModal,
+    } = useConnectionConfigActions();
     const getConnection = (addr: Address) =>
         find(propEq(addr, "address"), connections);
     const hasConnection = (addr: Address) => getConnection(addr) !== undefined;
@@ -117,6 +128,8 @@ const useConnectionConfig = () => {
         hasConnection,
         addConnection,
         removeConnection,
+        hideConnectionModal,
+        showConnectionModal,
     };
 };
 

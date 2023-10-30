@@ -15,15 +15,28 @@ import { useDisclosure } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
-import { TbApps, TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
+import {
+    TbApps,
+    TbHome,
+    TbMoonStars,
+    TbPigMoney,
+    TbPlugConnected,
+    TbSun,
+} from "react-icons/tb";
+import { Address } from "viem";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
+import AppConnectionForm from "../components/connectionForm";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
+    const [
+        connection,
+        { open: openConnectionModal, close: closeConnectionModal },
+    ] = useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -49,6 +62,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
                 <ERC20DepositForm applications={applications} tokens={tokens} />
+            </Modal>
+            <Modal
+                opened={connection}
+                onClose={closeConnectionModal}
+                title="Create App Connection"
+            >
+                <AppConnectionForm applications={applications as Address[]} />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
@@ -84,6 +104,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 disabled={!isConnected}
                             >
                                 Deposit
+                            </Button>
+
+                            <Button
+                                variant="subtle"
+                                leftSection={<TbPlugConnected />}
+                                onClick={openConnectionModal}
+                            >
+                                Create Connection
                             </Button>
                             <ConnectButton />
                             <Switch

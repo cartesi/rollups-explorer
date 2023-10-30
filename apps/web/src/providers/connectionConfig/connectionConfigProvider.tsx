@@ -1,5 +1,7 @@
 "use client";
+import { Modal } from "@mantine/core";
 import React, { FC, useEffect, useReducer } from "react";
+import AppConnectionForm from "../../components/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import localRepository from "./localRepository";
@@ -15,6 +17,8 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
         () => ({ state, dispatch, repository: localRepository }),
         [state],
     );
+
+    const closeModal = () => dispatch({ type: "HIDE_CONNECTION_MODAL" });
 
     useEffect(() => {
         repository
@@ -33,6 +37,13 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
     return (
         <ConnectionConfigContext.Provider value={store}>
             {children}
+            <Modal
+                opened={state.showConnectionModal}
+                onClose={closeModal}
+                title="Create App Connection"
+            >
+                <AppConnectionForm onSubmitted={closeModal} />
+            </Modal>
         </ConnectionConfigContext.Provider>
     );
 };

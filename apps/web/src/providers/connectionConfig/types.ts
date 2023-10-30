@@ -38,10 +38,24 @@ export type RemoveConnection = {
     payload: { address: Address };
 };
 
+export type ShowConnectionModal = {
+    type: "SHOW_CONNECTION_MODAL";
+};
+
+export type HideConnectionModal = {
+    type: "HIDE_CONNECTION_MODAL";
+};
+
 export interface State {
     connections: Connection[];
+    showConnectionModal: boolean;
 }
-export type Action = SetConnections | AddConnection | RemoveConnection;
+export type Action =
+    | SetConnections
+    | AddConnection
+    | RemoveConnection
+    | ShowConnectionModal
+    | HideConnectionModal;
 
 export type ContextProps = {
     state: State;

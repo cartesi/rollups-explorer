@@ -4,6 +4,7 @@ import { Connection, Reducer, State } from "./types";
 
 export const initialState = {
     connections: [],
+    showConnectionModal: false,
 } satisfies State;
 
 const sortByTimestampDesc = sort<Connection>(
@@ -12,6 +13,16 @@ const sortByTimestampDesc = sort<Connection>(
 
 export const connectionConfigReducer: Reducer = (state, action): State => {
     switch (action.type) {
+        case "SHOW_CONNECTION_MODAL":
+            return {
+                ...state,
+                showConnectionModal: true,
+            };
+        case "HIDE_CONNECTION_MODAL":
+            return {
+                ...state,
+                showConnectionModal: false,
+            };
         case "SET_CONNECTIONS":
             return {
                 ...state,
