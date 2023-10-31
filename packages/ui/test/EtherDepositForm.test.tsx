@@ -5,7 +5,6 @@ import {
     ApplicationAutocomplete,
 } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
-// import {useEtherPortalDepositEther, usePrepareEtherPortalDepositEther} from "@cartesi/rollups-wagmi";
 
 const ApplicationAutoCompleteComponent = withMantineTheme(
     ApplicationAutocomplete,
