@@ -21,7 +21,7 @@ import {
     TbJson,
     TbX,
 } from "react-icons/tb";
-import { Hex, formatUnits, getAddress, hexToString } from "viem";
+import { Hex, formatUnits, getAddress, hexToBool, hexToNumber, hexToString, slice, trim } from "viem";
 import { InputItemFragment } from "../graphql";
 import Address from "./address";
 
@@ -46,6 +46,19 @@ const methodResolver: MethodResolver = (input) => {
     }
     return undefined;
 };
+const decodePayload = (payload: Hex) => {
+    const isERC20Method = slice(payload, 0, 1) === '0x01'
+    if (isERC20Method) {
+        const _ret = hexToBool(slice(payload, 0, 1))
+        const _token = slice(payload, 4, 21)
+        const _from = slice(payload, 21, 41)
+        const _amount = hexToNumber(trim(slice(payload, 41)))
+        const decode = { _ret, _token, _from, _amount }
+        return JSON.stringify(decode)
+    } else {
+        return hexToString(payload)
+    }
+}
 
 const InputRow: FC<InputCardProps> = ({ input }) => {
     const [opened, { toggle }] = useDisclosure(false);
@@ -57,7 +70,6 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
 
     const from = input.msgSender as Address;
     const to = input.application.id as Address;
-
     const erc20Deposit = (input: InputItemFragment) =>
         input.erc20Deposit ? (
             <Text size="xs">
@@ -155,7 +167,7 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                             <Tabs.Panel value="text">
                                 <Textarea
                                     rows={10}
-                                    value={hexToString(input.payload as Hex)}
+                                    value={decodePayload(input.payload as Hex)}
                                     readOnly
                                 />
                             </Tabs.Panel>
@@ -163,7 +175,7 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                             <Tabs.Panel value="json">
                                 <JsonInput
                                     rows={10}
-                                    value={hexToString(input.payload as Hex)}
+                                    value={decodePayload(input.payload as Hex)}
                                 />
                             </Tabs.Panel>
                         </Tabs>
