@@ -140,6 +140,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     href="/deposit"
                     leftSection={<TbPigMoney />}
                 />
+                <ConnectButton />
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
         </AppShell>
