@@ -14,8 +14,8 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
 }) => {
     const [state, dispatch] = useReducer(connectionConfigReducer, initialState);
     const store = React.useMemo(
-        () => ({ state, dispatch, repository: localRepository }),
-        [state],
+        () => ({ state, dispatch, repository }),
+        [state, repository],
     );
 
     const closeModal = () => dispatch({ type: "HIDE_CONNECTION_MODAL" });
@@ -32,7 +32,7 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
             .catch((reason) =>
                 console.error(`Error trying to fetch connections: ${reason}`),
             );
-    }, []);
+    }, [repository]);
 
     return (
         <ConnectionConfigContext.Provider value={store}>

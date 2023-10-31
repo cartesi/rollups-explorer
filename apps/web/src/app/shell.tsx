@@ -4,6 +4,7 @@ import {
     AppShell,
     Burger,
     Button,
+    Drawer,
     Group,
     Modal,
     NavLink,
@@ -17,26 +18,22 @@ import Link from "next/link";
 import { FC, ReactNode } from "react";
 import {
     TbApps,
+    TbDotsVertical,
     TbHome,
     TbMoonStars,
     TbPigMoney,
-    TbPlugConnected,
     TbSun,
 } from "react-icons/tb";
-import { Address } from "viem";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
-import AppConnectionForm from "../components/connectionForm";
+import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
+    const [menu, { open: openMenu, close: closeMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
-    const [
-        connection,
-        { open: openConnectionModal, close: closeConnectionModal },
-    ] = useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -62,13 +59,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
                 <ERC20DepositForm applications={applications} tokens={tokens} />
-            </Modal>
-            <Modal
-                opened={connection}
-                onClose={closeConnectionModal}
-                title="Create App Connection"
-            >
-                <AppConnectionForm applications={applications as Address[]} />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
@@ -105,14 +95,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Deposit
                             </Button>
-
-                            <Button
-                                variant="subtle"
-                                leftSection={<TbPlugConnected />}
-                                onClick={openConnectionModal}
-                            >
-                                Create Connection
-                            </Button>
                             <ConnectButton />
                             <Switch
                                 checked={colorScheme === "dark"}
@@ -130,6 +112,12 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             />
                         </Group>
                     </Group>
+                    <Button variant="subtle" onClick={openMenu}>
+                        <TbDotsVertical size={theme.other.iconSize} />
+                    </Button>
+                    <Drawer opened={menu} onClose={closeMenu} position="right">
+                        <ConnectionView />
+                    </Drawer>
                 </Group>
             </AppShell.Header>
             <AppShell.Navbar py="md" px={4}>

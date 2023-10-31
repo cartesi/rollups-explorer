@@ -10,10 +10,11 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
-import { UseQueryState, useQuery } from "urql";
+import { UseQueryExecute, UseQueryState, useQuery } from "urql";
 import { Address, isAddress } from "viem";
+import { useApplicationsQuery } from "../graphql";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
@@ -21,9 +22,9 @@ import {
 } from "../graphql/rollups/operations";
 import { useConnectionConfig } from "../providers/connectionConfig/hooks";
 
-export interface AppConnectionFormProps {
+interface AppConnectionFormProps {
     application?: Address;
-    applications?: Address[];
+    onSubmitted?: () => void;
 }
 
 interface DisplayQueryResultProps {
@@ -71,17 +72,28 @@ const DisplayQueryResult: FC<DisplayQueryResultProps> = ({ result }) => {
     );
 };
 
+const useApplications = (): [string[], UseQueryExecute] => {
+    const [result, executeQuery] = useApplicationsQuery();
+    const data = result.data;
+    const applications = React.useMemo(
+        () => (data?.applications ?? []).map((a) => a.id),
+        [data],
+    );
+
+    return [applications, executeQuery];
+};
+
 const AppConnectionForm: FC<AppConnectionFormProps> = ({
     application,
-    applications,
+    onSubmitted,
 }) => {
     const { addConnection, hasConnection } = useConnectionConfig();
+    const [applications] = useApplications();
 
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
             address: application ?? "",
-            name: application ?? "",
             url: "",
         },
         validate: {
@@ -98,7 +110,6 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
             },
         },
         transformValues: (values) => ({
-            name: values.name || values.address,
             address: values.address as Address,
             url: values.url,
         }),
@@ -123,14 +134,14 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     const displayQueryResult = url === operation?.context?.url;
 
     const onSuccess = () => {
-        const { name } = form.getTransformedValues();
+        const { address } = form.getTransformedValues();
         notifications.show({
-            message: `Connection ${name} created with success`,
+            message: `Connection ${address} created with success`,
             color: "green",
             withBorder: true,
         });
-
         form.reset();
+        onSubmitted && onSubmitted();
     };
 
     const onFailure = () => {
@@ -157,13 +168,6 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
             })}
         >
             <Flex direction="column" gap="sm">
-                <TextInput
-                    label="Name"
-                    description="Meaningful name for display purposes."
-                    placeholder="My app 1"
-                    {...form.getInputProps("name")}
-                />
-
                 <Autocomplete
                     withAsterisk
                     label="Address"
