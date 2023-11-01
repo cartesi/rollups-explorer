@@ -9,9 +9,10 @@ import InputRow, {
 } from "../../src/components/inputRow";
 import { InputItemFragment } from "../../src/graphql";
 import withMantineTheme from "../utils/WithMantineTheme";
-import { inputERC20Deposit } from "../utils/stubs/inputRowData";
+import { inputERC20Deposit, inputUnknown } from "../utils/stubs/inputRowData";
 
 const depositERC20Method = inputERC20Deposit as unknown as InputItemFragment;
+const depositUnknownMethod = inputUnknown as unknown as InputItemFragment;
 const Wrapper: FC<InputCardProps> = ({ input }) => {
     return (
         <Table>
@@ -78,6 +79,12 @@ describe("InputRow Component", () => {
             expect(text).toBe(depositERC20Method.payload);
             await fireEvent.click(asTextTabs);
             expect(screen.getAllByText(decode)[0]).toBeInTheDocument();
+        });
+    });
+    describe("Input Method Unknown", () => {
+        it("should display only the sender address", () => {
+            render(<InputRowE input={depositUnknownMethod} />);
+            expect(screen.queryByText("ERC20Portal")).not.toBeInTheDocument();
         });
     });
 });
