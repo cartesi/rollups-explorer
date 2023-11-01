@@ -16,6 +16,9 @@ import {
 import { TbCheck, TbAlertCircle } from "react-icons/tb";
 import { BaseError, isHex } from "viem";
 import { useWaitForTransaction } from "wagmi";
+import { cacheExchange, fetchExchange } from "@urql/core";
+import { withUrqlClient } from "next-urql";
+import { useApplicationsQuery } from "web/src/graphql";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface ApplicationAutocompleteProps {
@@ -26,7 +29,7 @@ export interface ApplicationAutocompleteProps {
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props,
+    props
 ) => {
     const {
         applications,
@@ -60,15 +63,19 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
 };
 
 export interface RawInputFormProps {
-    applications: string[];
     onSubmit: () => void;
 }
 
-export const RawInputForm: FC<RawInputFormProps> = (props) => {
-    const { applications, onSubmit } = props;
+export const RawInputForm = withUrqlClient((ssrExchange) => ({
+    url: process.env.NEXT_PUBLIC_EXPLORER_API_URL as string,
+    exchanges: [cacheExchange, ssrExchange, fetchExchange],
+}))((props: RawInputFormProps) => {
+    const { onSubmit } = props;
     const [rawInput, setRawInput] = useState<string>("0x");
     const [application, setApplication] = useState("");
     const isValidInput = application !== "" && isHex(rawInput);
+    const [{ data: applicationData }] = useApplicationsQuery();
+    const applications = (applicationData?.applications ?? []).map((a) => a.id);
     const addInputPrepare = usePrepareInputBoxAddInput({
         args: [application as `0x${string}`, rawInput as `0x${string}`],
         enabled: isValidInput,
@@ -138,4 +145,4 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             </Stack>
         </form>
     );
-};
+});

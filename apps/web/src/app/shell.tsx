@@ -62,7 +62,7 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
         },
     });
     const tokens = (tokenData?.tokens ?? []).map(
-        (a) => `${a.symbol} - ${a.name} - ${a.id}`,
+        (a) => `${a.symbol} - ${a.name} - ${a.id}`
     );
 
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
@@ -99,10 +99,7 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClose={closeRawInput}
                 title="Send raw input"
             >
-                <RawInputForm
-                    applications={applications}
-                    onSubmit={router.refresh}
-                />
+                <RawInputForm pageProps={undefined} onSubmit={router.refresh} />
             </Modal>
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
