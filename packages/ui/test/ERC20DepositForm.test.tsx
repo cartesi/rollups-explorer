@@ -154,7 +154,7 @@ describe("Rollups ERC20DepositForm", () => {
             render(<Component {...defaultProps} />);
 
             expect(
-                screen.getByText("The application smart contract address"),
+                screen.getByText("The application smart contract address")
             ).toBeInTheDocument();
         });
 
@@ -177,8 +177,8 @@ describe("Rollups ERC20DepositForm", () => {
 
             expect(
                 screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
+                    "This is a deposit to an undeployed application."
+                )
             ).toBeInTheDocument();
         });
     });
@@ -194,7 +194,7 @@ describe("Rollups ERC20DepositForm", () => {
             render(<Component {...defaultProps} />);
 
             expect(
-                screen.getByText("The ERC-20 smart contract address"),
+                screen.getByText("The ERC-20 smart contract address")
             ).toBeInTheDocument();
         });
 
@@ -218,7 +218,7 @@ describe("Rollups ERC20DepositForm", () => {
             });
 
             expect(
-                screen.getByText("This is the first deposit of that token."),
+                screen.getByText("This is the first deposit of that token.")
             ).toBeInTheDocument();
         });
 
