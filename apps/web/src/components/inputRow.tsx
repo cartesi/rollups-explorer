@@ -55,7 +55,7 @@ const methodResolver: MethodResolver = (input) => {
     }
     return undefined;
 };
-const decodePayload = (payload: Hex) => {
+export const decodePayload = (payload: Hex): string => {
     const isERC20Method = slice(payload, 0, 1) === "0x01";
     if (isERC20Method) {
         const _ret = hexToBool(slice(payload, 0, 1));
