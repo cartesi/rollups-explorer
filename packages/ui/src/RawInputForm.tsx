@@ -24,10 +24,12 @@ import {
     BaseError,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
+import { cacheExchange, fetchExchange } from "@urql/core";
+import { withUrqlClient } from "next-urql";
+import { useApplicationsQuery } from "web/src/graphql";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
-    applications: string[];
     onSubmit: () => void;
 }
 
@@ -137,4 +139,4 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
             </Stack>
         </form>
     );
-};
+});
