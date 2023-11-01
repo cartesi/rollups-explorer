@@ -42,7 +42,7 @@ const useEmulatedData = (dataList: string[], delay = 0) => {
                 action();
             }
         },
-        [setLoading, delay],
+        [setLoading, delay]
     );
 
     const nextPage = () => {
@@ -72,7 +72,7 @@ const InputDetailsWithDelay = () => {
     const reportQuery = useEmulatedData([reportEx], 1000);
     const voucherQuery = useEmulatedData(
         [jsonWithdraw0, jsonWithdraw1, jsonContent],
-        1500,
+        1500
     );
     const noticeQuery = useEmulatedData([queryContent], 300);
 
@@ -252,7 +252,7 @@ const WithActionToConnect = () => {
     const [delay, setDelay] = useState(0);
     const voucherQuery = useEmulatedData(
         [jsonWithdraw0, jsonWithdraw1, jsonContent],
-        delay,
+        delay
     );
     const [isConnected, setIsConnected] = useState(false);
 

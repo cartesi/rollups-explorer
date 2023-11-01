@@ -11,12 +11,12 @@ describe("Rollups Summary", () => {
 
         expect(screen.getByText("Applications")).toBeInTheDocument();
         expect(
-            screen.getByTestId("summary-card-applications-icon"),
+            screen.getByTestId("summary-card-applications-icon")
         ).toBeInTheDocument();
         expect(screen.getByText("10")).toBeInTheDocument();
         expect(screen.getByText("Inputs")).toBeInTheDocument();
         expect(
-            screen.getByTestId("summary-card-inputs-icon"),
+            screen.getByTestId("summary-card-inputs-icon")
         ).toBeInTheDocument();
         expect(screen.getByText("2")).toBeInTheDocument();
     });
