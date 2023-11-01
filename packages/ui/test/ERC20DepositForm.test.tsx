@@ -11,7 +11,7 @@ import withMantineTheme from "./utils/WithMantineTheme";
 const Component = withMantineTheme(ERC20DepositForm);
 
 const ApplicationAutoCompleteComponent = withMantineTheme(
-    ApplicationAutocomplete,
+    ApplicationAutocomplete
 );
 
 const TokenAutoCompleteComponent = withMantineTheme(TokenAutocomplete);
@@ -113,7 +113,7 @@ describe("Rollups ERC20DepositForm", () => {
             render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />,
+                />
             );
 
             expect(screen.getByText("Application")).toBeInTheDocument();
@@ -123,11 +123,11 @@ describe("Rollups ERC20DepositForm", () => {
             render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />,
+                />
             );
 
             expect(
-                screen.getByText("The application smart contract address"),
+                screen.getByText("The application smart contract address")
             ).toBeInTheDocument();
         });
 
@@ -135,7 +135,7 @@ describe("Rollups ERC20DepositForm", () => {
             const { container } = render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />,
+                />
             );
             const input = container.querySelector("input");
 
@@ -147,13 +147,13 @@ describe("Rollups ERC20DepositForm", () => {
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
                     application="undeployed-application"
-                />,
+                />
             );
 
             expect(
                 screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
+                    "This is a deposit to an undeployed application."
+                )
             ).toBeInTheDocument();
         });
 
@@ -163,7 +163,7 @@ describe("Rollups ERC20DepositForm", () => {
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
                     application={selectedApplication}
-                />,
+                />
             );
             const input = container.querySelector("input");
 
@@ -182,13 +182,13 @@ describe("Rollups ERC20DepositForm", () => {
             render(<TokenAutoCompleteComponent {...defaultTokenProps} />);
 
             expect(
-                screen.getByText("The ERC-20 smart contract address"),
+                screen.getByText("The ERC-20 smart contract address")
             ).toBeInTheDocument();
         });
 
         it("should display correct placeholder", () => {
             const { container } = render(
-                <TokenAutoCompleteComponent {...defaultTokenProps} />,
+                <TokenAutoCompleteComponent {...defaultTokenProps} />
             );
             const input = container.querySelector("input");
 
@@ -200,11 +200,11 @@ describe("Rollups ERC20DepositForm", () => {
                 <TokenAutoCompleteComponent
                     {...defaultTokenProps}
                     erc20Address="undeployed-address"
-                />,
+                />
             );
 
             expect(
-                screen.getByText("This is the first deposit of that token."),
+                screen.getByText("This is the first deposit of that token.")
             ).toBeInTheDocument();
         });
 
@@ -214,7 +214,7 @@ describe("Rollups ERC20DepositForm", () => {
                 <TokenAutoCompleteComponent
                     {...defaultTokenProps}
                     erc20Address={selectedToken}
-                />,
+                />
             );
             const input = container.querySelector("input");
 
@@ -227,7 +227,7 @@ describe("Rollups ERC20DepositForm", () => {
                 <TokenAutoCompleteComponent
                     {...defaultTokenProps}
                     error={error}
-                />,
+                />
             );
 
             expect(screen.getByText(error)).toBeInTheDocument();
@@ -235,10 +235,10 @@ describe("Rollups ERC20DepositForm", () => {
 
         it("should display spinner while loading", () => {
             const { container } = render(
-                <TokenAutoCompleteComponent {...defaultTokenProps} isLoading />,
+                <TokenAutoCompleteComponent {...defaultTokenProps} isLoading />
             );
             const rightSlot = container.querySelector(
-                '[data-position="right"]',
+                '[data-position="right"]'
             );
 
             expect(isObject(rightSlot)).toBe(true);

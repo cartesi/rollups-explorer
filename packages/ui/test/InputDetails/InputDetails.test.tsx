@@ -34,7 +34,7 @@ describe("Rollups InputDetails", () => {
                 <VoucherContent content={jsonWithdraw0} contentType="json" />
                 <NoticeContent content={reportText} contentType="text" />
                 <ReportContent content={reportText} contentType="text" />
-            </InputDetailsE>,
+            </InputDetailsE>
         );
 
         expect(screen.getByText("Input")).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe("Rollups InputDetails", () => {
         expect(getByText(inputContentArea, "As Text")).toBeInTheDocument();
         expect(getByText(inputContentArea, "As JSON")).toBeInTheDocument();
         expect(
-            getByDisplayValue(inputContentArea, queryContentAsHex),
+            getByDisplayValue(inputContentArea, queryContentAsHex)
         ).toBeInTheDocument();
     });
 
@@ -56,7 +56,7 @@ describe("Rollups InputDetails", () => {
             <InputDetailsE>
                 <InputContent content={queryContentAsHex} contentType="raw" />
                 <VoucherContent content={jsonWithdraw0} contentType="json" />
-            </InputDetailsE>,
+            </InputDetailsE>
         );
 
         expect(screen.getByText("Reports")).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("Rollups InputDetails", () => {
                         total: 3,
                     }}
                 />
-            </InputDetailsE>,
+            </InputDetailsE>
         );
 
         act(() => {
@@ -90,23 +90,23 @@ describe("Rollups InputDetails", () => {
 
         await waitFor(() =>
             expect(screen.getByTestId("panel-vouchers")).not.toHaveStyle(
-                "display: none",
-            ),
+                "display: none"
+            )
         );
 
         const voucherPanel = screen.getByTestId("panel-vouchers");
 
         expect(getByText(voucherPanel, "1 of 3")).toBeInTheDocument();
         expect(
-            getByLabelText(voucherPanel, "Button to load the previous content"),
+            getByLabelText(voucherPanel, "Button to load the previous content")
         ).toBeInTheDocument();
 
         expect(
-            getByLabelText(voucherPanel, "Button to load the previous content"),
+            getByLabelText(voucherPanel, "Button to load the previous content")
         ).toBeDisabled();
 
         expect(
-            getByLabelText(voucherPanel, "Button to load the next content"),
+            getByLabelText(voucherPanel, "Button to load the next content")
         ).toBeInTheDocument();
     });
 
@@ -121,7 +121,7 @@ describe("Rollups InputDetails", () => {
                     content={jsonWithdraw0}
                     contentType="json"
                 />
-            </InputDetailsE>,
+            </InputDetailsE>
         );
 
         act(() => {
@@ -130,8 +130,8 @@ describe("Rollups InputDetails", () => {
 
         await waitFor(() =>
             expect(screen.getByTestId("panel-vouchers")).not.toHaveStyle(
-                "display: none",
-            ),
+                "display: none"
+            )
         );
 
         const voucherPanel = screen.getByTestId("panel-vouchers");
@@ -158,7 +158,7 @@ describe("Rollups InputDetails", () => {
                     contentType="json"
                 />
                 <ReportContent content="" contentType="raw" isLoading={true} />
-            </InputDetailsE>,
+            </InputDetailsE>
         );
 
         const panelName = "panel-vouchers";
@@ -169,14 +169,14 @@ describe("Rollups InputDetails", () => {
 
         await waitFor(() =>
             expect(screen.getByTestId(panelName)).not.toHaveStyle(
-                "display: none",
-            ),
+                "display: none"
+            )
         );
 
         const voucherPanel = screen.getByTestId(panelName);
 
         expect(
-            getByTestId(voucherPanel, "loading-overlay-vouchercontent"),
+            getByTestId(voucherPanel, "loading-overlay-vouchercontent")
         ).toBeInTheDocument();
     });
 });

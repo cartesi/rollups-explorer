@@ -47,7 +47,7 @@ export const transactionButtonState = (
     execute: TransactionStageStatus,
     wait: TransactionStageStatus,
     write?: () => void,
-    disableOnSuccess: boolean = true,
+    disableOnSuccess: boolean = true
 ) => {
     const loading =
         prepare.status === "loading" ||
@@ -73,7 +73,7 @@ export interface ApplicationAutocompleteProps {
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props,
+    props
 ) => {
     const { applications, application, onChange } = props;
 
@@ -122,7 +122,7 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
                 rightSection={isLoading && <Loader size="xs" />}
                 onChange={(nextValue) => {
                     const formattedValue = nextValue.substring(
-                        nextValue.indexOf("0x"),
+                        nextValue.indexOf("0x")
                     );
                     onChange(formattedValue);
                 }}
@@ -246,7 +246,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             approve,
             approveWait,
             approve.write,
-            false,
+            false
         );
     const { disabled: depositDisabled, loading: depositLoading } =
         transactionButtonState(
@@ -254,7 +254,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             deposit,
             depositWait,
             deposit.write,
-            true,
+            true
         );
 
     return (
