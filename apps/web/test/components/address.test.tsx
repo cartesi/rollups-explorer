@@ -41,13 +41,13 @@ describe("Address Component", () => {
             <AddressE
                 value={portalAddr}
                 href={`https://etherscan.io/address/${portalAddr}`}
-            />,
+            />
         );
 
         expect(screen.getByRole("link")).toBeInTheDocument();
         expect(screen.getByRole("link")).toHaveProperty(
             "href",
-            `https://etherscan.io/address/${portalAddr}`,
+            `https://etherscan.io/address/${portalAddr}`
         );
     });
 });
