@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import {
     useEtherPortalDepositEther,
     usePrepareEtherPortalDepositEther,
@@ -13,51 +13,11 @@ import {
     Textarea,
     Loader,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { TbCheck, TbAlertCircle } from "react-icons/tb";
 import { BaseError, getAddress, isAddress, isHex, toHex } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
-
-export interface ApplicationAutocompleteProps {
-    applications: string[];
-    application: string;
-    error?: string;
-    isLoading?: boolean;
-    onChange: (application: string) => void;
-}
-export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props,
-) => {
-    const {
-        applications,
-        application,
-        error,
-        isLoading = false,
-        onChange,
-    } = props;
-
-    return (
-        <>
-            <Autocomplete
-                label="Application"
-                description="The application smart contract address"
-                placeholder="0x"
-                data={applications}
-                value={application}
-                error={error}
-                withAsterisk
-                rightSection={isLoading && <Loader size="xs" />}
-                onChange={onChange}
-            />
-
-            {application !== "" && !applications.includes(application) && (
-                <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
-                    This is an undeployed application.
-                </Alert>
-            )}
-        </>
-    );
-};
 
 export interface EtherDepositFormProps {
     applications: string[];
@@ -66,26 +26,43 @@ export interface EtherDepositFormProps {
 
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const { applications, onSubmit } = props;
-    const [application, setApplication] = useState("");
-    const [execLayerData, setExecLayerData] = useState("0x");
-    const depositPrepare = usePrepareEtherPortalDepositEther({
-        args: [
-            isAddress(application) ? getAddress(application) : "0x1",
-            toHex(execLayerData),
-        ],
-        enabled: isAddress(application),
+    const form = useForm({
+        validateInputOnBlur: true,
+        initialValues: {
+            application: "",
+            execLayerData: "0x",
+        },
+        validate: {
+            application: (value) =>
+                value !== "" && isAddress(value) ? null : "Invalid application",
+            execLayerData: (value) =>
+                isHex(value) ? null : "Invalid hex string",
+        },
+        transformValues: (values) => ({
+            address: isAddress(values.application)
+                ? getAddress(values.application)
+                : "0x1",
+            hexExecLayerData: toHex(values.execLayerData),
+        }),
     });
-    const isValidInput = application !== "" && isHex(execLayerData);
+    const { address, hexExecLayerData } = form.getTransformedValues();
+    const application = form.getInputProps("application");
+    const depositPrepare = usePrepareEtherPortalDepositEther({
+        args: [address, hexExecLayerData],
+        enabled: isAddress(application.value),
+    });
     const deposit = useEtherPortalDepositEther(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
-    const canSubmit = isValidInput && depositPrepare.error === null;
+    const canSubmit =
+        form.isValid() &&
+        !depositPrepare.isLoading &&
+        depositPrepare.error === null;
     const loading =
         deposit.status === "loading" || depositWait.status === "loading";
 
     useEffect(() => {
         if (depositWait.status === "success") {
-            setApplication("");
-            setExecLayerData("0x");
+            form.reset();
             onSubmit();
         }
     }, [depositWait.status, onSubmit]);
@@ -93,22 +70,43 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     return (
         <form>
             <Stack>
-                <ApplicationAutocomplete
-                    application={application}
-                    applications={applications}
-                    error={(depositPrepare.error as BaseError)?.shortMessage}
-                    isLoading={depositPrepare.isLoading}
-                    onChange={setApplication}
+                <Autocomplete
+                    label="Application"
+                    description="The application smart contract address"
+                    placeholder="0x"
+                    data={applications}
+                    value={application.value}
+                    withAsterisk
+                    error={
+                        form.errors?.application ||
+                        (depositPrepare.error as BaseError)?.shortMessage
+                    }
+                    rightSection={
+                        depositPrepare.isLoading && <Loader size="xs" />
+                    }
+                    onChange={(application) => {
+                        form.setFieldValue("application", application);
+                        form.clearFieldError("application");
+                    }}
+                    onBlur={() => application.onBlur()}
                 />
+
+                {!form.errors.application &&
+                    isHex(application.value) &&
+                    !applications.includes(application.value) && (
+                        <Alert
+                            variant="light"
+                            color="yellow"
+                            icon={<TbAlertCircle />}
+                        >
+                            This is an undeployed application.
+                        </Alert>
+                    )}
 
                 <Textarea
                     label="Extra data"
                     description="Extra execution layer data handled by the application"
-                    value={execLayerData}
-                    error={
-                        isHex(execLayerData) ? undefined : "Invalid hex string"
-                    }
-                    onChange={(e) => setExecLayerData(e.target.value)}
+                    {...form.getInputProps("execLayerData")}
                 />
 
                 <Collapse

@@ -1,14 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
-import {
-    EtherDepositForm,
-    ApplicationAutocomplete,
-} from "../src/EtherDepositForm";
+import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
-
-const ApplicationAutoCompleteComponent = withMantineTheme(
-    ApplicationAutocomplete,
-);
 
 const Component = withMantineTheme(EtherDepositForm);
 
@@ -17,12 +10,6 @@ const applications = [
     "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
     "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
 ];
-
-const defaultApplicationProps = {
-    applications,
-    application: applications[0],
-    onChange: () => undefined,
-};
 
 const defaultProps = {
     applications,
@@ -89,6 +76,8 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
+            fireEvent.blur(textarea);
+
             expect(textarea.getAttribute("aria-invalid")).toBe("true");
             expect(screen.getByText("Invalid hex string")).toBeInTheDocument();
         });
@@ -150,21 +139,13 @@ describe("Rollups EtherDepositForm", () => {
 
     describe("ApplicationAutocomplete", () => {
         it("should display correct label", () => {
-            render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                />,
-            );
+            render(<Component {...defaultProps} />);
 
             expect(screen.getByText("Application")).toBeInTheDocument();
         });
 
         it("should display correct description", () => {
-            render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                />,
-            );
+            render(<Component {...defaultProps} />);
 
             expect(
                 screen.getByText("The application smart contract address"),
@@ -172,40 +153,25 @@ describe("Rollups EtherDepositForm", () => {
         });
 
         it("should display correct placeholder", () => {
-            const { container } = render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                />,
-            );
+            const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input");
 
             expect(input?.getAttribute("placeholder")).toBe("0x");
         });
 
         it("should display alert for unemployed application", () => {
-            render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                    application="undeployed-application"
-                />,
-            );
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+
+            fireEvent.change(input, {
+                target: {
+                    value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+                },
+            });
 
             expect(
                 screen.getByText("This is an undeployed application."),
             ).toBeInTheDocument();
-        });
-
-        it("should should set input value to selected application", () => {
-            const selectedApplication = applications[1];
-            const { container } = render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                    application={selectedApplication}
-                />,
-            );
-            const input = container.querySelector("input");
-
-            expect(input?.getAttribute("value")).toBe(selectedApplication);
         });
     });
 });
