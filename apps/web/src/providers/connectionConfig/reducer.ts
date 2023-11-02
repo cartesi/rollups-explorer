@@ -5,6 +5,7 @@ import { Connection, Reducer, State } from "./types";
 export const initialState = {
     connections: [],
     showConnectionModal: false,
+    connectionAddress: undefined,
 } satisfies State;
 
 const sortByTimestampDesc = sort<Connection>(
@@ -17,11 +18,13 @@ export const connectionConfigReducer: Reducer = (state, action): State => {
             return {
                 ...state,
                 showConnectionModal: true,
+                connectionAddress: action.payload?.address,
             };
         case "HIDE_CONNECTION_MODAL":
             return {
                 ...state,
                 showConnectionModal: false,
+                connectionAddress: undefined,
             };
         case "SET_CONNECTIONS":
             return {

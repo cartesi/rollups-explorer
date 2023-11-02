@@ -42,7 +42,10 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
                 onClose={closeModal}
                 title="Create App Connection"
             >
-                <AppConnectionForm onSubmitted={closeModal} />
+                <AppConnectionForm
+                    onSubmitted={closeModal}
+                    application={state.connectionAddress}
+                />
             </Modal>
         </ConnectionConfigContext.Provider>
     );

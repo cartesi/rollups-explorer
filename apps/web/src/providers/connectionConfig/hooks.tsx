@@ -11,9 +11,9 @@ import {
     propEq,
 } from "ramda";
 import { useContext } from "react";
-import { Address } from "viem";
+import { Address, isAddress } from "viem";
 import { ConnectionConfigContext } from "./connectionConfigContext";
-import { Connection, State, UseSelector } from "./types";
+import { Action, Connection, State, UseSelector } from "./types";
 
 const useSelector: UseSelector = (predicate) => {
     const state = useConnectionConfigState();
@@ -47,8 +47,12 @@ const useConnectionConfigActions = () => {
     const dispatch = useConnectionConfigDispatcher();
     const repository = useConnectionRepository();
     const actions = {
-        showConnectionModal() {
-            dispatch({ type: "SHOW_CONNECTION_MODAL" });
+        showConnectionModal(address?: Address) {
+            const action: Action = { type: "SHOW_CONNECTION_MODAL" };
+            if (address && isAddress(address)) {
+                action.payload = { address };
+            }
+            dispatch(action);
         },
         hideConnectionModal() {
             dispatch({ type: "HIDE_CONNECTION_MODAL" });

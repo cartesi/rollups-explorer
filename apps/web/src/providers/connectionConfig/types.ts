@@ -40,6 +40,9 @@ export type RemoveConnection = {
 
 export type ShowConnectionModal = {
     type: "SHOW_CONNECTION_MODAL";
+    payload?: {
+        address: Address;
+    };
 };
 
 export type HideConnectionModal = {
@@ -47,8 +50,13 @@ export type HideConnectionModal = {
 };
 
 export interface State {
+    /** list of connections */
     connections: Connection[];
+    /** controls visibility of the modal */
     showConnectionModal: boolean;
+    /** work in conjuction with the creation modal.
+     * When available it should pre-fill the form.*/
+    connectionAddress?: Address;
 }
 export type Action =
     | SetConnections

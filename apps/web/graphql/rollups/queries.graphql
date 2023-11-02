@@ -1,16 +1,21 @@
 
 query inputDetails (
-  $inputIdx: Int!
-  $first: Int!
+  $inputIdx: Int!  
+  $firstNotices: Int
+  $lastNotices: Int
   $noticesNextPage: String
   $noticesPrevPage: String
-  $reportNextPage: String
-  $reportPrevPage: String
-  $voucherNextPage: String
-  $voucherPrevPage: String
+  $firstReports: Int
+  $lastReports: Int
+  $reportsNextPage: String
+  $reportsPrevPage: String
+  $firstVouchers: Int
+  $lastVouchers: Int
+  $vouchersNextPage: String
+  $vouchersPrevPage: String
 ) {
   input(index: $inputIdx){    
-    vouchers(first: $first, after: $voucherNextPage, before: $voucherPrevPage) {
+    vouchers(first: $firstVouchers, after: $vouchersNextPage, before: $vouchersPrevPage, last: $lastVouchers) {
       totalCount
       edges {
         node {
@@ -26,7 +31,7 @@ query inputDetails (
         hasPreviousPage
       }
     }
-    notices(first: $first, after: $noticesNextPage, before: $noticesPrevPage){
+    notices(first: $firstNotices, after: $noticesNextPage, before: $noticesPrevPage, last: $lastNotices){
       totalCount
       edges {
         node {
@@ -42,7 +47,7 @@ query inputDetails (
         hasPreviousPage
       }
     }
-    reports(first: $first, after: $reportNextPage, before: $reportPrevPage) {
+    reports(first: $firstReports, after: $reportsNextPage, before: $reportsPrevPage, last: $lastReports) {
       totalCount
       edges {
         node {
