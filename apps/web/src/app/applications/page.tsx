@@ -138,7 +138,6 @@ const ApplicationsPage: FC<ApplicationsPageProps> = (props) => {
                             ),
                         )}
                     </Table.Tbody>
-                    <Table.Tfoot></Table.Tfoot>
                 </Table>
 
                 <Group justify="space-between" align="center">
