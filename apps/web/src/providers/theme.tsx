@@ -1,6 +1,12 @@
-import { MantineThemeOverride, Modal, createTheme } from "@mantine/core";
+import {
+    DEFAULT_THEME,
+    MantineThemeOverride,
+    Modal,
+    createTheme,
+    mergeMantineTheme,
+} from "@mantine/core";
 
-export const theme: MantineThemeOverride = createTheme({
+const themeOverride: MantineThemeOverride = createTheme({
     fontFamily: "Open Sans, sans-serif",
     primaryColor: "cyan",
     other: {
@@ -19,3 +25,5 @@ export const theme: MantineThemeOverride = createTheme({
         }),
     },
 });
+
+export const theme = mergeMantineTheme(DEFAULT_THEME, themeOverride);

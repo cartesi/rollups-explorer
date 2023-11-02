@@ -5,6 +5,8 @@
         "types": ["vitest/globals"]
     },
     "include": [
+        "src",
+        "mantine.d.ts",
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
