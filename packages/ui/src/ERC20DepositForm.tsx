@@ -49,7 +49,7 @@ export const transactionButtonState = (
     execute: TransactionStageStatus,
     wait: TransactionStageStatus,
     write?: () => void,
-    disableOnSuccess: boolean = true
+    disableOnSuccess: boolean = true,
 ) => {
     const loading =
         prepare.status === "loading" ||
@@ -225,7 +225,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             approve,
             approveWait,
             approve.write,
-            false
+            false,
         );
     const { disabled: depositDisabled, loading: depositLoading } =
         transactionButtonState(
@@ -233,7 +233,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             deposit,
             depositWait,
             deposit.write,
-            true
+            true,
         );
 
     return (
