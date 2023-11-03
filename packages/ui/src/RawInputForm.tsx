@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
@@ -13,12 +13,17 @@ import {
     Alert,
     Loader,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { TbCheck, TbAlertCircle } from "react-icons/tb";
-import { BaseError, isHex } from "viem";
+import {
+    getAddress,
+    isAddress,
+    isHex,
+    toHex,
+    zeroAddress,
+    BaseError,
+} from "viem";
 import { useWaitForTransaction } from "wagmi";
-import { cacheExchange, fetchExchange } from "@urql/core";
-import { withUrqlClient } from "next-urql";
-import { useApplicationsQuery } from "web/src/graphql";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface ApplicationAutocompleteProps {
@@ -29,7 +34,7 @@ export interface ApplicationAutocompleteProps {
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props
+    props,
 ) => {
     const {
         applications,
@@ -63,71 +68,100 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
 };
 
 export interface RawInputFormProps {
+    applications: string[];
     onSubmit: () => void;
 }
 
-export const RawInputForm = withUrqlClient((ssrExchange) => ({
-    url: process.env.NEXT_PUBLIC_EXPLORER_API_URL as string,
-    exchanges: [cacheExchange, ssrExchange, fetchExchange],
-}))((props: RawInputFormProps) => {
-    const { onSubmit } = props;
-    const [rawInput, setRawInput] = useState<string>("0x");
-    const [application, setApplication] = useState("");
-    const isValidInput = application !== "" && isHex(rawInput);
-    const [{ data: applicationData }] = useApplicationsQuery();
-    const applications = (applicationData?.applications ?? []).map((a) => a.id);
-    const addInputPrepare = usePrepareInputBoxAddInput({
-        args: [application as `0x${string}`, rawInput as `0x${string}`],
-        enabled: isValidInput,
+export const RawInputForm: FC<RawInputFormProps> = (
+    props: RawInputFormProps,
+) => {
+    const { applications, onSubmit } = props;
+    const form = useForm({
+        validateInputOnBlur: true,
+        initialValues: {
+            application: "",
+            rawInput: "0x",
+        },
+        validate: {
+            application: (value) =>
+                value !== "" && isAddress(value) ? null : "Invalid application",
+            rawInput: (value) => (isHex(value) ? null : "Invalid hex string"),
+        },
+        transformValues: (values) => ({
+            address: isAddress(values.application)
+                ? getAddress(values.application)
+                : zeroAddress,
+            rawInput: toHex(values.rawInput),
+        }),
     });
-    const canSubmit = isValidInput && addInputPrepare.error === null;
-    const addInput = useInputBoxAddInput(addInputPrepare.config);
-    const addInputWait = useWaitForTransaction(addInput.data);
-    const loading =
-        addInput.status === "loading" || addInputWait.status === "loading";
+    const { address, rawInput } = form.getTransformedValues();
+    const application = form.getInputProps("application");
+    const prepare = usePrepareInputBoxAddInput({
+        args: [address, rawInput],
+        enabled: form.isValid(),
+    });
+    const canSubmit = form.isValid() && prepare.error === null;
+    const execute = useInputBoxAddInput(prepare.config);
+    const wait = useWaitForTransaction(execute.data);
+    const loading = execute.status === "loading" || wait.status === "loading";
 
     useEffect(() => {
-        if (addInputWait.status === "success") {
-            setApplication("");
-            setRawInput("0x");
+        if (wait.status === "success") {
+            form.reset();
             onSubmit();
         }
-    }, [addInputWait.status, onSubmit]);
+    }, [wait.status, onSubmit]);
 
     return (
         <form>
             <Stack>
-                <ApplicationAutocomplete
-                    application={application}
-                    applications={applications}
-                    error={(addInputPrepare.error as BaseError)?.shortMessage}
-                    isLoading={addInputPrepare.isLoading}
-                    onChange={setApplication}
+                <Autocomplete
+                    label="Application"
+                    description="The application smart contract address"
+                    placeholder="0x"
+                    data={applications}
+                    withAsterisk
+                    rightSection={prepare.isLoading && <Loader size="xs" />}
+                    {...form.getInputProps("application")}
+                    error={
+                        form.errors.application ||
+                        (prepare.error as BaseError)?.shortMessage
+                    }
                 />
+
+                {!form.errors.application &&
+                    address !== zeroAddress &&
+                    !applications.includes(application.value) && (
+                        <Alert
+                            variant="light"
+                            color="yellow"
+                            icon={<TbAlertCircle />}
+                        >
+                            This is an undeployed application.
+                        </Alert>
+                    )}
 
                 <Textarea
                     label="Raw input"
                     description="Raw input for the application"
-                    value={rawInput}
-                    error={isHex(rawInput) ? undefined : "Invalid hex string"}
                     withAsterisk
-                    onChange={(e) => setRawInput(e.target.value)}
+                    {...form.getInputProps("rawInput")}
                 />
 
                 <Collapse
                     in={
-                        addInput.isLoading ||
-                        addInputWait.isLoading ||
-                        addInput.isSuccess ||
-                        addInput.isError
+                        execute.isLoading ||
+                        wait.isLoading ||
+                        execute.isSuccess ||
+                        execute.isError
                     }
                 >
                     <TransactionProgress
-                        prepare={addInputPrepare}
-                        execute={addInput}
-                        wait={addInputWait}
+                        prepare={prepare}
+                        execute={execute}
+                        wait={wait}
                         confirmationMessage="Raw input sent successfully!"
-                        defaultErrorMessage={addInput.error?.message}
+                        defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
 
@@ -137,7 +171,7 @@ export const RawInputForm = withUrqlClient((ssrExchange) => ({
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={addInput.write}
+                        onClick={execute.write}
                     >
                         Send
                     </Button>
@@ -145,4 +179,4 @@ export const RawInputForm = withUrqlClient((ssrExchange) => ({
             </Stack>
         </form>
     );
-});
+};
