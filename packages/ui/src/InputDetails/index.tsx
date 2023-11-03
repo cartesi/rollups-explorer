@@ -55,7 +55,7 @@ const MemoTabs = memo(function MemoTabs({ isSmallDevice }: MemoTabsProps) {
                         <Text ref={ref} size={isSmallDevice ? "xs" : "md"}>
                             {item.label}
                         </Text>
-                    )
+                    ),
                 );
                 const TabText = hasContent
                     ? CText
@@ -128,7 +128,7 @@ const Details: FC<InputDetailsProps> = (props) => {
                 prev[k] = cur;
                 return prev;
             },
-            {} as OptionalContents
+            {} as OptionalContents,
         );
     }, [props.children]);
 
