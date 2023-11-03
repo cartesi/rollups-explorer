@@ -14,8 +14,21 @@ import {
     Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { TbCheck, TbAlertCircle } from "react-icons/tb";
-import { BaseError, getAddress, isAddress, isHex, toHex } from "viem";
+import { useDisclosure } from "@mantine/hooks";
+import {
+    TbCheck,
+    TbAlertCircle,
+    TbChevronUp,
+    TbChevronDown,
+} from "react-icons/tb";
+import {
+    BaseError,
+    getAddress,
+    isAddress,
+    isHex,
+    toHex,
+    zeroAddress,
+} from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
@@ -26,6 +39,7 @@ export interface EtherDepositFormProps {
 
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const { applications, onSubmit } = props;
+    const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -41,31 +55,28 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         transformValues: (values) => ({
             address: isAddress(values.application)
                 ? getAddress(values.application)
-                : "0x1",
-            hexExecLayerData: toHex(values.execLayerData),
+                : zeroAddress,
+            execLayerData: toHex(values.execLayerData),
         }),
     });
-    const { address, hexExecLayerData } = form.getTransformedValues();
+    const { address, execLayerData } = form.getTransformedValues();
     const application = form.getInputProps("application");
-    const depositPrepare = usePrepareEtherPortalDepositEther({
-        args: [address, hexExecLayerData],
+    const prepare = usePrepareEtherPortalDepositEther({
+        args: [address, execLayerData],
         enabled: isAddress(application.value),
     });
-    const deposit = useEtherPortalDepositEther(depositPrepare.config);
-    const depositWait = useWaitForTransaction(deposit.data);
+    const execute = useEtherPortalDepositEther(prepare.config);
+    const wait = useWaitForTransaction(execute.data);
     const canSubmit =
-        form.isValid() &&
-        !depositPrepare.isLoading &&
-        depositPrepare.error === null;
-    const loading =
-        deposit.status === "loading" || depositWait.status === "loading";
+        form.isValid() && !prepare.isLoading && prepare.error === null;
+    const loading = execute.status === "loading" || wait.status === "loading";
 
     useEffect(() => {
-        if (depositWait.status === "success") {
+        if (wait.status === "success") {
             form.reset();
             onSubmit();
         }
-    }, [depositWait.status, onSubmit]);
+    }, [wait.status, onSubmit]);
 
     return (
         <form>
@@ -75,24 +86,17 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     description="The application smart contract address"
                     placeholder="0x"
                     data={applications}
-                    value={application.value}
                     withAsterisk
+                    rightSection={prepare.isLoading && <Loader size="xs" />}
+                    {...form.getInputProps("application")}
                     error={
                         form.errors?.application ||
-                        (depositPrepare.error as BaseError)?.shortMessage
+                        (prepare.error as BaseError)?.shortMessage
                     }
-                    rightSection={
-                        depositPrepare.isLoading && <Loader size="xs" />
-                    }
-                    onChange={(application) => {
-                        form.setFieldValue("application", application);
-                        form.clearFieldError("application");
-                    }}
-                    onBlur={() => application.onBlur()}
                 />
 
                 {!form.errors.application &&
-                    isHex(application.value) &&
+                    address != zeroAddress &&
                     !applications.includes(application.value) && (
                         <Alert
                             variant="light"
@@ -103,36 +107,50 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         </Alert>
                     )}
 
-                <Textarea
-                    label="Extra data"
-                    description="Extra execution layer data handled by the application"
-                    {...form.getInputProps("execLayerData")}
-                />
+                <Collapse in={advanced}>
+                    <Textarea
+                        label="Extra data"
+                        description="Extra execution layer data handled by the application"
+                        {...form.getInputProps("execLayerData")}
+                    />
+                </Collapse>
 
                 <Collapse
                     in={
-                        deposit.isLoading ||
-                        depositWait.isLoading ||
-                        deposit.isSuccess ||
-                        deposit.isError
+                        execute.isLoading ||
+                        wait.isLoading ||
+                        execute.isSuccess ||
+                        execute.isError
                     }
                 >
                     <TransactionProgress
-                        prepare={depositPrepare}
-                        execute={deposit}
-                        wait={depositWait}
-                        confirmationMessage="Ether deposited successfully!"
-                        defaultErrorMessage={deposit.error?.message}
+                        prepare={prepare}
+                        execute={execute}
+                        wait={wait}
+                        confirmationMessage="Ether executeed successfully!"
+                        defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
 
                 <Group justify="right">
                     <Button
+                        leftSection={
+                            advanced ? <TbChevronUp /> : <TbChevronDown />
+                        }
+                        size="xs"
+                        visibleFrom="sm"
+                        variant="transparent"
+                        onClick={toggleAdvanced}
+                    >
+                        Advanced
+                    </Button>
+
+                    <Button
                         variant="filled"
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={deposit.write}
+                        onClick={execute.write}
                     >
                         Deposit
                     </Button>
