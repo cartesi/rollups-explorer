@@ -55,8 +55,8 @@ const methodResolver: MethodResolver = (input) => {
     }
     return undefined;
 };
-export const decodePayload = (payload: Hex): string => {
-    const isERC20Method = slice(payload, 0, 1) === "0x01";
+export const decodePayload = (payload: Hex, msgSender: Hex): string => {
+    const isERC20Method = getAddress(msgSender) === erc20PortalAddress;
     if (isERC20Method) {
         const _ret = hexToBool(slice(payload, 0, 1));
         const _token = slice(payload, 4, 21);
@@ -176,7 +176,10 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                             <Tabs.Panel value="text">
                                 <Textarea
                                     rows={10}
-                                    value={decodePayload(input.payload as Hex)}
+                                    value={decodePayload(
+                                        input.payload as Hex,
+                                        input.msgSender as Hex,
+                                    )}
                                     readOnly
                                 />
                             </Tabs.Panel>
@@ -184,7 +187,10 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                             <Tabs.Panel value="json">
                                 <JsonInput
                                     rows={10}
-                                    value={decodePayload(input.payload as Hex)}
+                                    value={decodePayload(
+                                        input.payload as Hex,
+                                        input.msgSender as Hex,
+                                    )}
                                 />
                             </Tabs.Panel>
                         </Tabs>

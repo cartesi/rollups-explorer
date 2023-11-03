@@ -61,7 +61,10 @@ describe("InputRow Component", () => {
             expect(screen.getByText("depositERC20Tokens")).toBeInTheDocument();
         });
         it("should display the payload data tabs", async () => {
-            const decode = decodePayload(depositERC20Method.payload as Hex);
+            const decode = decodePayload(
+                depositERC20Method.payload as Hex,
+                depositERC20Method.msgSender as Hex,
+            );
             const { container } = render(
                 <InputRowE input={depositERC20Method} />,
             );
