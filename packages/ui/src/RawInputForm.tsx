@@ -26,14 +26,6 @@ import {
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
-export interface ApplicationAutocompleteProps {
-    applications: string[];
-    application: string;
-    error?: string;
-    isLoading?: boolean;
-    onChange: (application: string) => void;
-}
-
 export interface RawInputFormProps {
     applications: string[];
     onSubmit: () => void;
