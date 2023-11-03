@@ -33,39 +33,6 @@ export interface ApplicationAutocompleteProps {
     isLoading?: boolean;
     onChange: (application: string) => void;
 }
-export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props,
-) => {
-    const {
-        applications,
-        application,
-        error,
-        isLoading = false,
-        onChange,
-    } = props;
-
-    return (
-        <>
-            <Autocomplete
-                label="Application"
-                description="The application smart contract address"
-                placeholder="0x"
-                data={applications}
-                value={application}
-                error={error}
-                withAsterisk
-                rightSection={isLoading && <Loader size="xs" />}
-                onChange={onChange}
-            />
-
-            {application !== "" && !applications.includes(application) && (
-                <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
-                    This is an undeployed application.
-                </Alert>
-            )}
-        </>
-    );
-};
 
 export interface RawInputFormProps {
     applications: string[];
