@@ -16,7 +16,7 @@ export type InputRowProps = {
 };
 
 export type MethodResolver = (
-    input: InputItemFragment
+    input: InputItemFragment,
 ) => string | undefined | false;
 
 const etherDepositResolver: MethodResolver = (input) =>
@@ -43,7 +43,7 @@ const InputRow: FC<InputRowProps> = ({ input, timeType }) => {
             <Text size="xs">
                 {formatUnits(
                     input.erc20Deposit.amount,
-                    input.erc20Deposit.token.decimals
+                    input.erc20Deposit.token.decimals,
                 )}{" "}
                 {input.erc20Deposit.token.symbol}
             </Text>
