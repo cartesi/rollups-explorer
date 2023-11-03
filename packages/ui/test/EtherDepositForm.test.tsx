@@ -84,22 +84,22 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Send button", () => {
-        it("should be disabled when raw input is not hex", () => {
+        it("should be disabled when extra data is not hex", () => {
             const { container } = render(<Component {...defaultProps} />);
             const textarea = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
-            const button = container.querySelector(
-                "button",
-            ) as HTMLButtonElement;
+            const buttons = container.querySelectorAll("button");
+            const submitButton = buttons[1] as HTMLButtonElement;
 
             fireEvent.change(textarea, {
                 target: {
                     value: "",
                 },
             });
+            fireEvent.blur(textarea);
 
-            expect(button.hasAttribute("disabled")).toBe(true);
+            expect(submitButton.hasAttribute("disabled")).toBe(true);
         });
 
         it("should invoke write function when send button is clicked", async () => {
@@ -118,9 +118,8 @@ describe("Rollups EtherDepositForm", () => {
             });
 
             const { container } = render(<Component {...defaultProps} />);
-            const button = container.querySelector(
-                "button",
-            ) as HTMLButtonElement;
+            const buttons = container.querySelectorAll("button");
+            const submitButton = buttons[1] as HTMLButtonElement;
 
             const input = container.querySelector("input") as HTMLInputElement;
             input.setAttribute("value", selectedApplication);
@@ -131,8 +130,8 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.click(button);
-            expect(button.hasAttribute("disabled")).toBe(false);
+            fireEvent.click(submitButton);
+            expect(submitButton.hasAttribute("disabled")).toBe(false);
             expect(mockedWrite).toHaveBeenCalled();
         });
     });
