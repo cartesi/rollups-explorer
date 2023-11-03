@@ -110,6 +110,7 @@ describe("Rollups EtherDepositForm", () => {
                 .fn()
                 .mockReturnValue({
                     ...rollupsWagmi.usePrepareEtherPortalDepositEther,
+                    loading: false,
                     error: null,
                 });
             rollupsWagmi.useEtherPortalDepositEther = vi.fn().mockReturnValue({
@@ -138,8 +139,10 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.click(submitButton);
+            fireEvent.blur(amountInput);
             expect(submitButton.hasAttribute("disabled")).toBe(false);
+
+            fireEvent.click(submitButton);
             expect(mockedWrite).toHaveBeenCalled();
         });
     });

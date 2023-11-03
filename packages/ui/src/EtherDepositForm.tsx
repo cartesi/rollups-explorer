@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import {
     useEtherPortalDepositEther,
     usePrepareEtherPortalDepositEther,
@@ -36,11 +36,15 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface EtherDepositFormProps {
     applications: string[];
-    onSubmit: () => void;
 }
 
-export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
-    const { applications, onSubmit } = props;
+export const EtherDepositForm: FC<EtherDepositFormProps> = ({
+    applications,
+}) => {
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const form = useForm({
         validateInputOnBlur: true,
@@ -53,7 +57,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             application: (value) =>
                 value !== "" && isAddress(value) ? null : "Invalid application",
             amount: (value) =>
-                value !== "" && Number(value) <= 0 ? null : "Invalid amount",
+                value !== "" && Number(value) > 0 ? null : "Invalid amount",
             execLayerData: (value) =>
                 isHex(value) ? null : "Invalid hex string",
         },
@@ -83,9 +87,8 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     useEffect(() => {
         if (wait.status === "success") {
             form.reset();
-            onSubmit();
         }
-    }, [wait.status, onSubmit]);
+    }, [wait.status]);
 
     return (
         <form>
@@ -105,8 +108,8 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                 />
 
                 {!form.errors.application &&
-                    address != zeroAddress &&
-                    !applications.includes(application.value) && (
+                    address !== zeroAddress &&
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
