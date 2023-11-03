@@ -121,12 +121,20 @@ describe("Rollups EtherDepositForm", () => {
             const buttons = container.querySelectorAll("button");
             const submitButton = buttons[1] as HTMLButtonElement;
 
-            const input = container.querySelector("input") as HTMLInputElement;
-            input.setAttribute("value", selectedApplication);
+            const inputs = container.querySelectorAll("input");
+            const applicationInput = inputs[0] as HTMLInputElement;
+            const amountInput = inputs[1] as HTMLInputElement;
+            applicationInput.setAttribute("value", selectedApplication);
 
-            fireEvent.change(input, {
+            fireEvent.change(applicationInput, {
                 target: {
                     value: selectedApplication,
+                },
+            });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "1",
                 },
             });
 

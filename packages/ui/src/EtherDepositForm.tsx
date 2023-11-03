@@ -12,6 +12,8 @@ import {
     Alert,
     Textarea,
     Loader,
+    Text,
+    TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -44,11 +46,14 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         validateInputOnBlur: true,
         initialValues: {
             application: "",
+            amount: "",
             execLayerData: "0x",
         },
         validate: {
             application: (value) =>
                 value !== "" && isAddress(value) ? null : "Invalid application",
+            amount: (value) =>
+                value !== "" && Number(value) <= 0 ? null : "Invalid amount",
             execLayerData: (value) =>
                 isHex(value) ? null : "Invalid hex string",
         },
@@ -56,14 +61,18 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             address: isAddress(values.application)
                 ? getAddress(values.application)
                 : zeroAddress,
+            amountBigint:
+                values.amount !== "" ? BigInt(values.amount) : undefined,
             execLayerData: toHex(values.execLayerData),
         }),
     });
-    const { address, execLayerData } = form.getTransformedValues();
+    const { address, amountBigint, execLayerData } =
+        form.getTransformedValues();
     const application = form.getInputProps("application");
     const prepare = usePrepareEtherPortalDepositEther({
         args: [address, execLayerData],
-        enabled: isAddress(application.value),
+        value: amountBigint,
+        enabled: form.isValid(),
     });
     const execute = useEtherPortalDepositEther(prepare.config);
     const wait = useWaitForTransaction(execute.data);
@@ -107,6 +116,19 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         </Alert>
                     )}
 
+                <TextInput
+                    type="number"
+                    step="1"
+                    min={0}
+                    label="Amount"
+                    description="Amount of ether to deposit"
+                    placeholder="0"
+                    rightSectionWidth={60}
+                    rightSection={<Text>ETH</Text>}
+                    withAsterisk
+                    {...form.getInputProps("amount")}
+                />
+
                 <Collapse in={advanced}>
                     <Textarea
                         label="Extra data"
@@ -127,7 +149,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         prepare={prepare}
                         execute={execute}
                         wait={wait}
-                        confirmationMessage="Ether executeed successfully!"
+                        confirmationMessage="Ether deposited successfully!"
                         defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
