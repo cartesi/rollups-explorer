@@ -60,3 +60,29 @@ query tokens($where: TokenWhereInput) {
         symbol
     }
 }
+
+fragment ApplicationItem on Application {
+    id
+    owner
+    factory {
+        id
+    }
+}
+
+query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $factoryId: String) {
+    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {factory: {id_startsWith: $factoryId}}) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...ApplicationItem
+            }
+        }
+    }
+}
+

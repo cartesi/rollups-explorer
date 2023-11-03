@@ -64,7 +64,9 @@ const ApplicationPage: FC<ApplicationPageProps> = ({ params }) => {
                 <Anchor href="/" component={Link}>
                     Home
                 </Anchor>
-                <Anchor>Applications</Anchor>
+                <Anchor href="/applications" component={Link}>
+                    Applications
+                </Anchor>
                 <Address value={params.address as Address} icon />
             </Breadcrumbs>
             <Group ref={targetRef}>
