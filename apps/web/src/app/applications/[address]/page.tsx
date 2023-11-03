@@ -40,7 +40,7 @@ const ApplicationPage: FC<ApplicationPageProps> = ({ params }) => {
     const totalInputs = data?.inputsConnection.totalCount ?? 1;
     const totalPages = Math.ceil(totalInputs / limit);
     const [activePage, setActivePage] = useState(
-        page > totalPages ? totalPages : page
+        page > totalPages ? totalPages : page,
     );
     const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
         duration: 700,

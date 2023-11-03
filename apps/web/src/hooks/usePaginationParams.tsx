@@ -12,7 +12,7 @@ export type LimitBound = (typeof limitBounds)[keyof typeof limitBounds];
 
 export type UsePaginationReturn = [
     { limit: LimitBound; page: number },
-    (page: number, limit: LimitBound) => void
+    (page: number, limit: LimitBound) => void,
 ];
 
 export const usePaginationParams = (): UsePaginationReturn => {
@@ -36,7 +36,7 @@ export const usePaginationParams = (): UsePaginationReturn => {
                 scroll: false,
             });
         },
-        [router, pathName]
+        [router, pathName],
     );
 
     return [{ page, limit }, updateParams];

@@ -4,7 +4,7 @@ import { RawInputForm, ApplicationAutocomplete } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
 const ApplicationAutoCompleteComponent = withMantineTheme(
-    ApplicationAutocomplete
+    ApplicationAutocomplete,
 );
 
 const Component = withMantineTheme(RawInputForm);
@@ -60,14 +60,14 @@ describe("Rollups RawInputForm", () => {
             render(<Component {...defaultProps} />);
 
             expect(
-                screen.getByText("Raw input for the application")
+                screen.getByText("Raw input for the application"),
             ).toBeInTheDocument();
         });
 
         it("should display error when value is not hex", () => {
             const { container } = render(<Component {...defaultProps} />);
             const textarea = container.querySelector(
-                "textarea"
+                "textarea",
             ) as HTMLTextAreaElement;
 
             fireEvent.change(textarea, {
@@ -85,10 +85,10 @@ describe("Rollups RawInputForm", () => {
         it("should be disabled when raw input is not hex", () => {
             const { container } = render(<Component {...defaultProps} />);
             const textarea = container.querySelector(
-                "textarea"
+                "textarea",
             ) as HTMLTextAreaElement;
             const button = container.querySelector(
-                "button"
+                "button",
             ) as HTMLButtonElement;
 
             fireEvent.change(textarea, {
@@ -115,7 +115,7 @@ describe("Rollups RawInputForm", () => {
 
             const { container } = render(<Component {...defaultProps} />);
             const button = container.querySelector(
-                "button"
+                "button",
             ) as HTMLButtonElement;
 
             const input = container.querySelector("input") as HTMLInputElement;
@@ -138,7 +138,7 @@ describe("Rollups RawInputForm", () => {
             render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />
+                />,
             );
 
             expect(screen.getByText("Application")).toBeInTheDocument();
@@ -148,11 +148,11 @@ describe("Rollups RawInputForm", () => {
             render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />
+                />,
             );
 
             expect(
-                screen.getByText("The application smart contract address")
+                screen.getByText("The application smart contract address"),
             ).toBeInTheDocument();
         });
 
@@ -160,7 +160,7 @@ describe("Rollups RawInputForm", () => {
             const { container } = render(
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
-                />
+                />,
             );
             const input = container.querySelector("input");
 
@@ -172,11 +172,11 @@ describe("Rollups RawInputForm", () => {
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
                     application="undeployed-application"
-                />
+                />,
             );
 
             expect(
-                screen.getByText("This is an undeployed application.")
+                screen.getByText("This is an undeployed application."),
             ).toBeInTheDocument();
         });
 
@@ -186,7 +186,7 @@ describe("Rollups RawInputForm", () => {
                 <ApplicationAutoCompleteComponent
                     {...defaultApplicationProps}
                     application={selectedApplication}
-                />
+                />,
             );
             const input = container.querySelector("input");
 
