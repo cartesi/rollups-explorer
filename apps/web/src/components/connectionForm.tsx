@@ -5,16 +5,23 @@ import {
     Button,
     Flex,
     List,
+    Loader,
     Text,
     TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { isEmpty } from "ramda";
 import React, { FC, useState } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import { UseQueryExecute, UseQueryState, useQuery } from "urql";
 import { Address, isAddress } from "viem";
-import { useApplicationsQuery } from "../graphql";
+import {
+    ApplicationsDocument,
+    ApplicationsQuery,
+    ApplicationsQueryVariables,
+} from "../graphql";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
@@ -26,6 +33,11 @@ interface AppConnectionFormProps {
     application?: Address;
     onSubmitted?: () => void;
 }
+
+type UseSearchApplications = (params: {
+    address: Address;
+    limit?: number;
+}) => [{ applications: string[]; fetching: boolean }, UseQueryExecute];
 
 interface DisplayQueryResultProps {
     result: UseQueryState<CheckStatusQuery, CheckStatusQueryVariables>;
@@ -72,15 +84,29 @@ const DisplayQueryResult: FC<DisplayQueryResultProps> = ({ result }) => {
     );
 };
 
-const useApplications = (): [string[], UseQueryExecute] => {
-    const [result, executeQuery] = useApplicationsQuery();
+const useSearchApplications: UseSearchApplications = ({
+    address,
+    limit,
+}): [{ applications: string[]; fetching: boolean }, UseQueryExecute] => {
+    const [result, executeQuery] = useQuery<
+        ApplicationsQuery,
+        ApplicationsQueryVariables
+    >({
+        query: ApplicationsDocument,
+        variables: {
+            limit: limit ?? 10,
+            where: {
+                id_containsInsensitive: address ?? "",
+            },
+        },
+    });
     const data = result.data;
     const applications = React.useMemo(
         () => (data?.applications ?? []).map((a) => a.id),
         [data],
     );
 
-    return [applications, executeQuery];
+    return [{ applications, fetching: result.fetching }, executeQuery];
 };
 
 const AppConnectionForm: FC<AppConnectionFormProps> = ({
@@ -88,8 +114,6 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     onSubmitted,
 }) => {
     const { addConnection, hasConnection } = useConnectionConfig();
-    const [applications] = useApplications();
-
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -98,6 +122,8 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
         },
         validate: {
             address: (v) => {
+                if (isEmpty(v)) return `Address is a required field!`;
+
                 if (!isAddress(v)) {
                     return `It is not a valid address format.`;
                 }
@@ -108,17 +134,25 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
 
                 return null;
             },
+            url: (v) => {
+                if (isEmpty(v)) return "URL is a required field!";
+            },
         },
         transformValues: (values) => ({
             address: values.address as Address,
             url: values.url,
         }),
     });
-
     const [submitting, setSubmitting] = useState(false);
 
-    const { url } = form.getTransformedValues();
+    const { url, address } = form.getTransformedValues();
+    const [debouncedAddress] = useDebouncedValue(address, 400);
 
+    const [{ applications, fetching }] = useSearchApplications({
+        address: debouncedAddress,
+    });
+
+    const showLoader = !isEmpty(debouncedAddress) && fetching;
     const hasURL = url && url.trim().length > 0 ? true : false;
 
     const [result, executeQuery] = useQuery<
@@ -172,10 +206,23 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                     withAsterisk
                     label="Address"
                     description="The application smart contract address."
+                    rightSection={showLoader ? <Loader size="sm" /> : ""}
                     placeholder="0x"
                     data={applications}
                     {...form.getInputProps("address")}
                 />
+
+                {isAddress(address) && !applications.length && !fetching && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        <Text>
+                            This is the address of an undeployed application.
+                        </Text>
+                    </Alert>
+                )}
 
                 <TextInput
                     label="URL"

@@ -6,6 +6,7 @@ import {
     ScrollArea,
     Text,
     Title,
+    VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure, useViewportSize } from "@mantine/hooks";
@@ -33,6 +34,7 @@ const ConnectionView = () => {
                         onClick={() => showConnectionModal()}
                     >
                         <TbPlus />
+                        <VisuallyHidden>Create connection</VisuallyHidden>
                     </Button>
                     <Title size="h2">Connections</Title>
                     {hasConnections && (
@@ -43,9 +45,15 @@ const ConnectionView = () => {
                 </Group>
                 <Button variant="transparent" onClick={toggleConnectionList}>
                     {showConnectionList ? (
-                        <TbChevronUp size={theme.other.iconSize} />
+                        <>
+                            <TbChevronUp size={theme.other.iconSize} />
+                            <VisuallyHidden>Hide connections</VisuallyHidden>
+                        </>
                     ) : (
-                        <TbChevronDown size={theme.other.iconSize} />
+                        <>
+                            <TbChevronDown size={theme.other.iconSize} />
+                            <VisuallyHidden>Show connections</VisuallyHidden>
+                        </>
                     )}
                 </Button>
             </Group>

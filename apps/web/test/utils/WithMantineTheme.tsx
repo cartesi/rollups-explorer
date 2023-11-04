@@ -1,10 +1,15 @@
 import { MantineProvider } from "@mantine/core";
-import { FC } from "react";
+import { FC, FunctionComponent } from "react";
 import { theme } from "../../src/providers/theme";
 
-export const withMantineTheme = <T,>(Component: FC<T>): FC<T> => {
+export const withMantineTheme = <T,>(
+    Component: FunctionComponent<T>,
+): FC<T> => {
     const NewComp: FC<T> = (props: T) => (
-        <MantineProvider theme={theme}>{Component(props)}</MantineProvider>
+        <MantineProvider defaultColorScheme="dark" theme={theme}>
+            {/* @ts-ignore */}
+            <Component {...props} />
+        </MantineProvider>
     );
 
     NewComp.displayName = Component.displayName;

@@ -47,8 +47,8 @@ query stats($applicationId: String) {
     }
 }
 
-query applications($where: ApplicationWhereInput) {
-    applications(where: $where) {
+query applications($limit: Int, $where: ApplicationWhereInput) {
+    applications(where: $where, limit: $limit) {
         id
     }
 }
