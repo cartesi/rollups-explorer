@@ -37,7 +37,7 @@
             ]
         },
         "test:ci": {
-            "dependsOn": ["^build"],
+            "dependsOn": ["build"],
             "outputs": ["coverage/**"],
             "inputs": [
                 "src/**/*.ts",
