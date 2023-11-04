@@ -1,10 +1,6 @@
-import { MantineProvider, createTheme } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { FC } from "react";
-
-const theme = createTheme({
-    fontFamily: "Open Sans, sans-serif",
-    primaryColor: "cyan",
-});
+import { theme } from "../../src/providers/theme";
 
 export const withMantineTheme = <T,>(Component: FC<T>): FC<T> => {
     const NewComp: FC<T> = (props: T) => (

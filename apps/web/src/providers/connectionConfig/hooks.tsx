@@ -39,8 +39,8 @@ const useConnectionRepository = () => {
 
 type ActionLifecycle = {
     onSuccess?: () => void;
-    onFailure?: () => void;
-    onFinished: () => void;
+    onFailure?: (reason?: any) => void;
+    onFinished?: () => void;
 };
 
 const useConnectionConfigActions = () => {
@@ -73,7 +73,7 @@ const useConnectionConfigActions = () => {
                         `Problem trying to persist/add connection: ${reason}`,
                     );
 
-                    opt?.onFailure && opt.onFailure();
+                    opt?.onFailure && opt.onFailure(reason);
                 })
                 .finally(() => opt?.onFinished && opt.onFinished());
         },
@@ -93,7 +93,7 @@ const useConnectionConfigActions = () => {
                         `Problem trying to remove connection: ${reason}`,
                     );
 
-                    opt?.onFailure && opt?.onFailure();
+                    opt?.onFailure && opt?.onFailure(reason);
                 })
                 .finally(() => opt?.onFinished && opt.onFinished());
         },
