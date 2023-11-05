@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
@@ -30,12 +30,14 @@ import { useApplicationsQuery } from "web/src/graphql";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
-    onSubmit: () => void;
-}
-
+    applications: string[];
 }
 
 export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -89,9 +91,7 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !applications.some(
-                        (a) => a.toLowerCase() === address.toLowerCase(),
-                    ) && (
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
