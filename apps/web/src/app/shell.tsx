@@ -35,7 +35,6 @@ import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
 
 const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
-    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
@@ -99,10 +98,7 @@ const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
                 onClose={closeRawInput}
                 title="Send raw input"
             >
-                <RawInputForm
-                    applications={applications}
-                    onSubmit={router.refresh}
-                />
+                <RawInputForm applications={applications} />
             </Modal>
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
