@@ -5,24 +5,24 @@ import {
     Breadcrumbs,
     Group,
     Loader,
-    Stack,
-    Table,
-    Title,
-    Tooltip,
     Pagination,
     Select,
+    Stack,
+    Table,
     Text,
+    Title,
+    Tooltip,
 } from "@mantine/core";
-import Link from "next/link";
-import { FC, useEffect, useState } from "react";
 import { useScrollIntoView } from "@mantine/hooks";
+import Link from "next/link";
 import { pathOr } from "ramda";
+import { FC, useEffect, useState } from "react";
+import { TbApps, TbInbox } from "react-icons/tb";
+import Address from "../../components/address";
 import {
     ApplicationOrderByInput,
     useApplicationsConnectionQuery,
 } from "../../graphql";
-import { TbApps, TbInbox } from "react-icons/tb";
-import Address from "../../components/address";
 import {
     limitBounds,
     usePaginationParams,
@@ -157,7 +157,7 @@ const ApplicationsPage: FC<ApplicationsPageProps> = (props) => {
                                 limitBounds[30].toString(),
                             ]}
                         />
-                        <Text>inputs</Text>
+                        <Text>Applications</Text>
                     </Group>
                     <Pagination
                         styles={{ root: { alignSelf: "flex-end" } }}

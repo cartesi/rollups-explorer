@@ -1,4 +1,5 @@
 "use client";
+import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
 import {
     AppShell,
     Burger,
@@ -11,13 +12,12 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ReactNode, FC } from "react";
-import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
 import Link from "next/link";
-import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
+import { FC, ReactNode } from "react";
+import { TbApps, TbHome, TbMoonStars, TbPigMoney, TbSun } from "react-icons/tb";
 import { useAccount } from "wagmi";
+import CartesiLogo from "../components/cartesiLogo";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
@@ -67,6 +67,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                     leftSection={<TbHome />}
                                 >
                                     Home
+                                </Button>
+                            </Link>
+                            <Link href="/applications">
+                                <Button
+                                    variant="subtle"
+                                    leftSection={<TbApps />}
+                                >
+                                    Applications
                                 </Button>
                             </Link>
                             <Button
