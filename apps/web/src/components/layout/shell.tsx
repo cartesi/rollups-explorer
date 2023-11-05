@@ -31,7 +31,6 @@ import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
 const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
-    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [
