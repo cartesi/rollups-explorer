@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
@@ -28,13 +28,13 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
-    onSubmit: () => void;
 }
 
-export const RawInputForm: FC<RawInputFormProps> = (
-    props: RawInputFormProps,
-) => {
-    const { applications, onSubmit } = props;
+export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -54,22 +54,20 @@ export const RawInputForm: FC<RawInputFormProps> = (
         }),
     });
     const { address, rawInput } = form.getTransformedValues();
-    const application = form.getInputProps("application");
     const prepare = usePrepareInputBoxAddInput({
         args: [address, rawInput],
         enabled: form.isValid(),
     });
-    const canSubmit = form.isValid() && prepare.error === null;
     const execute = useInputBoxAddInput(prepare.config);
     const wait = useWaitForTransaction(execute.data);
     const loading = execute.status === "loading" || wait.status === "loading";
+    const canSubmit = form.isValid() && prepare.error === null;
 
     useEffect(() => {
         if (wait.status === "success") {
             form.reset();
-            onSubmit();
         }
-    }, [wait.status, onSubmit]);
+    }, [wait.status]);
 
     return (
         <form>
@@ -90,7 +88,7 @@ export const RawInputForm: FC<RawInputFormProps> = (
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !applications.includes(application.value) && (
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
