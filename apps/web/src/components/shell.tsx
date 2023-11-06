@@ -35,7 +35,7 @@ import ConnectionView from "./connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "./footer";
 
-const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
+const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
