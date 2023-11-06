@@ -30,7 +30,7 @@ import ConnectionView from "../../components/connection/connectionView";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
-const Shell: FC<{ children: React.ReactNode }> = ({ children }) => {
+const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [
