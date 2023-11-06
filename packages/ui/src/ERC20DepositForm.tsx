@@ -292,6 +292,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             rightSection={<Text>{symbol}</Text>}
                         />
                         <TextInput
+                            type="number"
+                            min={0}
+                            step={1}
                             label="Amount"
                             description="Amount of tokens to deposit"
                             placeholder="0"
@@ -299,6 +302,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             rightSection={<Text>{symbol}</Text>}
                             onChange={(e) => setAmount(e.target.value)}
                             withAsterisk
+                            data-testid="amount-input"
                         />
                     </Stack>
                 </Collapse>
