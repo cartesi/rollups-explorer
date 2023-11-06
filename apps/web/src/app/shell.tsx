@@ -1,5 +1,8 @@
 "use client";
-import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
+import {
+    ERC20DepositForm,
+    EtherDepositForm,
+} from "@cartesi/rollups-explorer-ui";
 import {
     AppShell,
     Burger,
@@ -12,7 +15,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ReactNode, FC } from "react";
+import { FC, ReactNode } from "react";
 import CartesiLogo from "../components/cartesiLogo";
 import { useRouter } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
