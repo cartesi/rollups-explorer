@@ -264,8 +264,6 @@ describe("Rollups ERC20DepositForm", () => {
                         element.getAttribute("data-testid") === "amount-input",
                 );
             expect(matchingInputs.length).toBe(1);
-
-            // expect(screen.getByDisplayValue("") === amountInput).toBe(true);
         });
 
         it("should allow digit symbols", async () => {
