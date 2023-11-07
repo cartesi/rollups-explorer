@@ -6,4 +6,9 @@ export default defineConfig({
     dts: true,
     external: ["react"],
     sourcemap: true,
+    esbuildOptions(options, context) {
+        options.banner = {
+            js: '"use client";',
+        };
+    },
 });
