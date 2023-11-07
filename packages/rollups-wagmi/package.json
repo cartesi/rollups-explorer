@@ -1,15 +1,21 @@
 {
     "name": "@cartesi/rollups-wagmi",
     "version": "0.0.0",
-    "main": "./dist/index.js",
+    "main": "./dist/index.cjs",
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
     "sideEffects": false,
     "license": "Apache-2.0",
-    "files": [
-        "dist/**"
-    ],
     "scripts": {
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
