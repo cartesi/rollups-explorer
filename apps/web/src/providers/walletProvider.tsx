@@ -15,21 +15,32 @@ import {
     ledgerWallet,
     trustWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { foundry, mainnet, sepolia } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
-import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Image from "next/image";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
+import {
+    ChainProviderFn,
+    WagmiConfig,
+    configureChains,
+    createConfig,
+} from "wagmi";
+import { foundry, mainnet, sepolia } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const chain =
     [foundry, mainnet, sepolia].find((c) => c.id == chainId) || foundry;
+
+const providers: ChainProviderFn<typeof chain>[] = alchemyApiKey
+    ? [alchemyProvider({ apiKey: alchemyApiKey }), publicProvider()]
+    : [publicProvider()];
 
 // only 1 chain is enabled, based on env var
 const { chains, publicClient, webSocketPublicClient } = configureChains(
     [chain],
-    [publicProvider()],
+    providers,
 );
 
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
