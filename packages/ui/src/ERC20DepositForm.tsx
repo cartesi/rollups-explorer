@@ -69,90 +69,10 @@ export interface ERC20DepositFormProps {
     tokens: string[];
 }
 
-export interface ApplicationAutocompleteProps {
-    applications: string[];
-    application: string;
-    onChange: (application: string) => void;
-}
-export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
-    props,
-) => {
-    const { applications, application, onChange } = props;
-
-    return (
-        <>
-            <Autocomplete
-                label="Application"
-                description="The application smart contract address"
-                placeholder="0x"
-                data={applications}
-                value={application}
-                withAsterisk
-                onChange={onChange}
-            />
-
-            {application !== "" && !applications.includes(application) && (
-                <Alert variant="light" color="yellow" icon={<TbAlertCircle />}>
-                    This is a deposit to an undeployed application.
-                </Alert>
-            )}
-        </>
-    );
-};
-
-export interface TokensAutocompleteProps {
-    tokens: string[];
-    erc20Address: string;
-    error: string;
-    isLoading?: boolean;
-    onChange: (erc20Address: string) => void;
-}
-
-export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
-    const { tokens, erc20Address, error, isLoading = false, onChange } = props;
-
-    return (
-        <>
-            <Autocomplete
-                label="ERC-20"
-                description="The ERC-20 smart contract address"
-                placeholder="0x"
-                data={tokens}
-                value={erc20Address}
-                error={error}
-                withAsterisk
-                rightSection={isLoading && <Loader size="xs" />}
-                onChange={(nextValue) => {
-                    const formattedValue = nextValue.substring(
-                        nextValue.indexOf("0x"),
-                    );
-                    onChange(formattedValue);
-                }}
-                data-testid="token-input"
-            />
-
-            {erc20Address !== "" &&
-                !tokens.some((t) => t.includes(erc20Address)) && (
-                    <Alert
-                        variant="light"
-                        color="yellow"
-                        icon={<TbAlertCircle />}
-                    >
-                        This is the first deposit of that token.
-                    </Alert>
-                )}
-        </>
-    );
-};
-
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
     applications,
     tokens,
 }) => {
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
     const tokenAddresses = useMemo(
         () =>
             tokens.map((token) => {
@@ -320,12 +240,17 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
                     placeholder="0x"
                     data={applications}
                     withAsterisk
+                    data-testid="application"
                     {...form.getInputProps("application")}
                 />
 
                 {!form.errors.application &&
                     applicationAddress !== zeroAddress &&
-                    !addresses.includes(applicationAddress) && (
+                    !applications.some(
+                        (a) =>
+                            a.toLowerCase() ===
+                            applicationAddress.toLowerCase(),
+                    ) && (
                         <Alert
                             variant="light"
                             color="yellow"
@@ -341,6 +266,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
                     placeholder="0x"
                     data={tokens}
                     withAsterisk
+                    data-testid="erc20Address"
                     rightSection={erc20.isLoading && <Loader size="xs" />}
                     {...form.getInputProps("erc20Address")}
                     error={erc20Errors[0] || form.errors.erc20Address}
