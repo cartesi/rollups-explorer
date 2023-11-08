@@ -8,6 +8,7 @@ import {
     Skeleton,
     Stack,
     Text,
+    VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
 import { allPass, complement, isEmpty, isNotNil } from "ramda";
@@ -129,6 +130,9 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                             disabled={pageNumber === 1}
                                             aria-label="Button to load the previous content"
                                         >
+                                            <VisuallyHidden>
+                                                Previous content
+                                            </VisuallyHidden>
                                             <TbChevronLeft />
                                         </ActionIcon>
                                         <Text>
@@ -142,6 +146,9 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                             }
                                             aria-label="Button to load the next content"
                                         >
+                                            <VisuallyHidden>
+                                                Next content
+                                            </VisuallyHidden>
                                             <TbChevronRight />
                                         </ActionIcon>
                                     </Group>
