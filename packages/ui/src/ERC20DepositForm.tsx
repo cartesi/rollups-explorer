@@ -21,7 +21,8 @@ import {
     UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, useState } from "react";
+import { useForm } from "@mantine/form";
+import { FC, useState, useMemo, useEffect } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -37,6 +38,7 @@ import {
     isHex,
     parseUnits,
     toHex,
+    zeroAddress,
 } from "viem";
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
@@ -143,23 +145,79 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
     );
 };
 
-export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
-    const { applications, tokens } = props;
+export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
+    applications,
+    tokens,
+}) => {
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
+    const tokenAddresses = useMemo(
+        () =>
+            tokens.map((token) => {
+                const addressIndex = token.indexOf("0x");
+                const address = getAddress(token.substring(addressIndex));
+                return `${token.substring(0, addressIndex)}${address}`;
+            }),
+        [tokens],
+    );
+
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
     // connected account
     const { address } = useAccount();
 
-    // state variable for the ERC-20 address
-    const [erc20Address, setErc20Address] = useState<string>("");
+    const [decimals, setDecimals] = useState<number | undefined>();
 
-    // execLayerData state variable
-    const [execLayerData, setExecLayerData] = useState<string>("0x");
+    const form = useForm({
+        validateInputOnBlur: true,
+        initialValues: {
+            application: "",
+            erc20Address: "",
+            amount: "",
+            execLayerData: "0x",
+        },
+        validate: {
+            application: (value) =>
+                value !== "" && isAddress(value) ? null : "Invalid application",
+            erc20Address: (value) =>
+                value !== "" ? null : "Invalid ERC20 address",
+            amount: (value) =>
+                value !== "" && Number(value) > 0 ? null : "Invalid amount",
+            execLayerData: (value) =>
+                isHex(value) ? null : "Invalid hex string",
+        },
+        transformValues: (values) => ({
+            address: isAddress(values.application)
+                ? getAddress(values.application)
+                : zeroAddress,
+            erc20Address: isAddress(values.erc20Address)
+                ? getAddress(values.erc20Address)
+                : zeroAddress,
+            erc20ContractAddress: isAddress(values.erc20Address)
+                ? getAddress(values.erc20Address)
+                : undefined,
+            amountBigint:
+                values.amount !== "" && decimals
+                    ? parseUnits(values.amount, decimals)
+                    : undefined,
+            execLayerData: toHex(values.execLayerData),
+        }),
+    });
+
+    const {
+        address: applicationAddress,
+        erc20Address,
+        erc20ContractAddress,
+        execLayerData,
+        amountBigint,
+    } = form.getTransformedValues();
 
     // query token information in a multicall
     const erc20Contract = {
         abi: erc20ABI,
-        address: isAddress(erc20Address) ? getAddress(erc20Address) : undefined,
+        address: erc20ContractAddress,
     };
     const erc20 = useContractReads({
         contracts: [
@@ -174,7 +232,13 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         ],
         watch: true,
     });
-    const decimals = erc20.data?.[0].result as number | undefined;
+
+    useEffect(() => {
+        if (erc20.data?.[0]?.result) {
+            setDecimals(erc20.data?.[0].result as number | undefined);
+        }
+    }, [erc20.data]);
+
     const symbol = erc20.data?.[1].result as string | undefined;
     const allowance = erc20.data?.[2].result as bigint | undefined;
     const balance = erc20.data?.[3].result as bigint | undefined;
@@ -185,21 +249,14 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                   return (d.error as BaseError).shortMessage;
               })
         : [];
-    // token amount to deposit
-    const [amount, setAmount] = useState<string>("");
-    const amountBigint =
-        decimals && amount ? parseUnits(amount, decimals) : undefined;
-
-    // state variable for the application address
-    const [application, setApplication] = useState("");
 
     // prepare approve transaction
     const approvePrepare = usePrepareErc20Approve({
-        address: isAddress(erc20Address) ? getAddress(erc20Address) : undefined,
-        args: [erc20PortalAddress, parseUnits(amount, decimals!)],
+        address: erc20Address,
+        args: [erc20PortalAddress, amountBigint!],
         enabled:
-            amountBigint != undefined &&
-            allowance != undefined &&
+            amountBigint !== undefined &&
+            allowance !== undefined &&
             amountBigint > allowance,
     });
     const approve = useErc20Approve(approvePrepare.config);
@@ -207,18 +264,13 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
 
     // prepare deposit transaction
     const depositPrepare = usePrepareErc20PortalDepositErc20Tokens({
-        args: [
-            isAddress(erc20Address) ? getAddress(erc20Address) : "0x",
-            isAddress(application) ? getAddress(application) : "0x",
-            amountBigint!,
-            toHex(execLayerData),
-        ],
+        args: [erc20Address, applicationAddress, amountBigint!, execLayerData],
         enabled:
-            amountBigint != undefined &&
-            balance != undefined &&
-            allowance != undefined &&
-            isAddress(erc20Address) &&
-            isAddress(application) &&
+            amountBigint !== undefined &&
+            balance !== undefined &&
+            allowance !== undefined &&
+            !form.errors.erc20Address &&
+            !form.errors.application &&
             isHex(execLayerData) &&
             amountBigint <= balance &&
             amountBigint <= allowance,
@@ -228,17 +280,19 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
 
     // true if current allowance is less than the amount to deposit
     const needApproval =
-        allowance != undefined &&
-        decimals != undefined &&
-        allowance < parseUnits(amount, decimals);
+        allowance !== undefined &&
+        decimals !== undefined &&
+        amountBigint !== undefined &&
+        allowance < amountBigint;
 
     const canDeposit =
-        allowance != undefined &&
-        balance != undefined &&
-        decimals != undefined &&
-        parseUnits(amount, decimals) > 0 &&
-        parseUnits(amount, decimals) <= allowance &&
-        parseUnits(amount, decimals) <= balance;
+        allowance !== undefined &&
+        balance !== undefined &&
+        decimals !== undefined &&
+        amountBigint !== undefined &&
+        amountBigint > 0 &&
+        amountBigint <= allowance &&
+        amountBigint <= balance;
 
     const { disabled: approveDisabled, loading: approveLoading } =
         transactionButtonState(
@@ -260,19 +314,55 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     return (
         <form>
             <Stack>
-                <ApplicationAutocomplete
-                    applications={applications}
-                    application={application}
-                    onChange={setApplication}
+                <Autocomplete
+                    label="Application"
+                    description="The application smart contract address"
+                    placeholder="0x"
+                    data={applications}
+                    withAsterisk
+                    {...form.getInputProps("application")}
                 />
 
-                <TokenAutocomplete
-                    tokens={tokens}
-                    erc20Address={erc20Address}
-                    error={erc20Errors[0]}
-                    isLoading={erc20.isLoading}
-                    onChange={setErc20Address}
+                {!form.errors.application &&
+                    applicationAddress !== zeroAddress &&
+                    !addresses.includes(applicationAddress) && (
+                        <Alert
+                            variant="light"
+                            color="yellow"
+                            icon={<TbAlertCircle />}
+                        >
+                            This is a deposit to an undeployed application.
+                        </Alert>
+                    )}
+
+                <Autocomplete
+                    label="ERC-20"
+                    description="The ERC-20 smart contract address"
+                    placeholder="0x"
+                    data={tokens}
+                    withAsterisk
+                    rightSection={erc20.isLoading && <Loader size="xs" />}
+                    {...form.getInputProps("erc20Address")}
+                    error={erc20Errors[0] || form.errors.erc20Address}
+                    onChange={(nextValue) => {
+                        const formattedValue = nextValue.substring(
+                            nextValue.indexOf("0x"),
+                        );
+                        form.setFieldValue("erc20Address", formattedValue);
+                    }}
                 />
+
+                {!form.errors.erc20Address &&
+                    erc20Address !== zeroAddress &&
+                    !tokenAddresses.some((t) => t.includes(erc20Address)) && (
+                        <Alert
+                            variant="light"
+                            color="yellow"
+                            icon={<TbAlertCircle />}
+                        >
+                            This is the first deposit of that token.
+                        </Alert>
+                    )}
 
                 <Collapse in={erc20.isSuccess && erc20Errors.length == 0}>
                     <Stack>
@@ -289,6 +379,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             value={amount}
                             withAsterisk
                             data-testid="amount-input"
+                            {...form.getInputProps("amount")}
                         />
                         <Flex
                             mt="-sm"
@@ -338,13 +429,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     <Textarea
                         label="Extra data"
                         description="Extra execution layer data handled by the application"
-                        value={execLayerData}
-                        error={
-                            isHex(execLayerData)
-                                ? undefined
-                                : "Invalid hex string"
-                        }
-                        onChange={(e) => setExecLayerData(e.target.value)}
+                        {...form.getInputProps("execLayerData")}
                     />
                 </Collapse>
                 <Collapse in={approve.isLoading || approveWait.isLoading}>
@@ -385,7 +470,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     </Button>
                     <Button
                         variant="filled"
-                        disabled={depositDisabled || !canDeposit}
+                        disabled={
+                            depositDisabled || !canDeposit || !form.isValid()
+                        }
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
                         onClick={deposit.write}
