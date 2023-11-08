@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect } from "react";
 import {
     useEtherPortalDepositEther,
     usePrepareEtherPortalDepositEther,
@@ -41,10 +41,6 @@ export interface EtherDepositFormProps {
 export const EtherDepositForm: FC<EtherDepositFormProps> = ({
     applications,
 }) => {
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const form = useForm({
         validateInputOnBlur: true,
@@ -72,7 +68,6 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
     });
     const { address, amountBigint, execLayerData } =
         form.getTransformedValues();
-    const application = form.getInputProps("application");
     const prepare = usePrepareEtherPortalDepositEther({
         args: [address, execLayerData],
         value: amountBigint,
@@ -109,7 +104,9 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !addresses.includes(address) && (
+                    !applications.some(
+                        (a) => a.toLowerCase() === address.toLowerCase(),
+                    ) && (
                         <Alert
                             variant="light"
                             color="yellow"
