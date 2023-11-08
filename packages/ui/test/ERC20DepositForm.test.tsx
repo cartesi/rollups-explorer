@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
 import { isObject } from "@vitest/utils";
 import {
@@ -7,7 +7,6 @@ import {
     TokenAutocomplete,
 } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
-import { useAccount } from "wagmi";
 
 const Component = withMantineTheme(ERC20DepositForm);
 
