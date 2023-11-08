@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
@@ -31,10 +31,6 @@ export interface RawInputFormProps {
 }
 
 export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -88,7 +84,9 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !addresses.includes(address) && (
+                    !applications.some(
+                        (a) => a.toLowerCase() === address.toLowerCase(),
+                    ) && (
                         <Alert
                             variant="light"
                             color="yellow"
