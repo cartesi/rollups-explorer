@@ -17,7 +17,6 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { FC, ReactNode } from "react";
 import CartesiLogo from "../components/cartesiLogo";
-import { useRouter } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
@@ -35,7 +34,6 @@ import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
-    const router = useRouter();
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =

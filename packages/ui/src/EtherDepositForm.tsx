@@ -4,34 +4,35 @@ import {
     usePrepareEtherPortalDepositEther,
 } from "@cartesi/rollups-wagmi";
 import {
+    Alert,
+    Autocomplete,
     Button,
     Collapse,
     Group,
-    Stack,
-    Autocomplete,
-    Alert,
-    Textarea,
     Loader,
+    Stack,
     Text,
+    Textarea,
     TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import {
-    TbCheck,
     TbAlertCircle,
-    TbChevronUp,
+    TbCheck,
     TbChevronDown,
+    TbChevronUp,
 } from "react-icons/tb";
 import {
     BaseError,
     getAddress,
     isAddress,
     isHex,
+    parseUnits,
     toHex,
     zeroAddress,
 } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useNetwork, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface EtherDepositFormProps {
@@ -42,6 +43,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
     applications,
 }) => {
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
+    const { chain } = useNetwork();
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -61,16 +63,20 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
             address: isAddress(values.application)
                 ? getAddress(values.application)
                 : zeroAddress,
-            amountBigint:
-                values.amount !== "" ? BigInt(values.amount) : undefined,
+            amount:
+                values.amount !== ""
+                    ? parseUnits(
+                          values.amount,
+                          chain?.nativeCurrency.decimals ?? 18,
+                      )
+                    : undefined,
             execLayerData: toHex(values.execLayerData),
         }),
     });
-    const { address, amountBigint, execLayerData } =
-        form.getTransformedValues();
+    const { address, amount, execLayerData } = form.getTransformedValues();
     const prepare = usePrepareEtherPortalDepositEther({
         args: [address, execLayerData],
-        value: amountBigint,
+        value: amount,
         enabled: form.isValid(),
     });
     const execute = useEtherPortalDepositEther(prepare.config);
@@ -83,6 +89,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
         if (wait.status === "success") {
             form.reset();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wait.status]);
 
     return (
