@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
 import { isObject } from "@vitest/utils";
 import {
-    ERC20DepositForm,
     ApplicationAutocomplete,
+    ERC20DepositForm,
     TokenAutocomplete,
 } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";

@@ -7,6 +7,7 @@ import {
     usePrepareErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
+    Alert,
     Autocomplete,
     Button,
     Collapse,
@@ -14,18 +15,17 @@ import {
     Loader,
     Stack,
     Text,
-    TextInput,
     Textarea,
-    Alert,
+    TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, useState } from "react";
 import {
+    TbAlertCircle,
+    TbCheck,
     TbChevronDown,
     TbChevronUp,
-    TbCheck,
     TbPigMoney,
-    TbAlertCircle,
 } from "react-icons/tb";
 import {
     BaseError,
