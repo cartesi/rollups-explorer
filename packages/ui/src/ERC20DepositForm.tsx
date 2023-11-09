@@ -22,7 +22,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { FC, useState, useMemo, useEffect } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
     TbAlertCircle,
     TbCheck,
