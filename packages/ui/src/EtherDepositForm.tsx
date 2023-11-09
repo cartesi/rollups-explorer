@@ -119,7 +119,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
                             color="yellow"
                             icon={<TbAlertCircle />}
                         >
-                            This is an undeployed application.
+                            This is a deposit to an undeployed application.
                         </Alert>
                     )}
 
