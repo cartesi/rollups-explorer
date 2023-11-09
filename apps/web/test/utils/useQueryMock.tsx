@@ -34,7 +34,7 @@ type InputDetailsData =
 type MockResult<T> =
     | {
           fetching?: boolean;
-          data: T;
+          data: T | undefined;
           error?: never;
           url?: string;
       }

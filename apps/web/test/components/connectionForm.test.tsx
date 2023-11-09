@@ -1,5 +1,7 @@
+import { notifications } from "@mantine/notifications";
 import {
     cleanup,
+    findByTestId,
     fireEvent,
     render,
     screen,
@@ -16,10 +18,12 @@ import { queryMockImplBuilder } from "../utils/useQueryMock";
 vi.mock("urql");
 vi.mock("../../src/graphql");
 vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("@mantine/notifications");
 
 const AppConnectionFormE = withMantineTheme(AppConnectionForm);
 const useQueryMock = vi.mocked(useQuery, true);
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
+const notificationsMock = vi.mocked(notifications, true);
 
 describe("connectionForm", () => {
     beforeEach(() => {
@@ -53,12 +57,7 @@ describe("connectionForm", () => {
             screen.getByText("The rollups graphQL endpoint"),
         ).toBeInTheDocument();
 
-        expect(screen.getByText("Test Connection")).toBeInTheDocument();
-
-        expect(
-            screen.getByText("Test Connection").closest("button"),
-        ).toHaveProperty("disabled", true);
-
+        expect(screen.getByTestId("icon-test-inactive")).toBeInTheDocument();
         expect(screen.getByText("Save")).toBeInTheDocument();
     });
 
@@ -124,6 +123,35 @@ describe("connectionForm", () => {
         ).toBeInTheDocument();
     });
 
+    it("should display a loader inside the URL input when fetching information from a valid URL", async () => {
+        const url = "http://localhost:8000/graphql";
+        useQueryMock.mockImplementation(
+            queryMockImplBuilder({
+                checkStatus: {
+                    url,
+                    fetching: true,
+                    data: undefined,
+                },
+            }),
+        );
+
+        render(<AppConnectionFormE />);
+
+        const urlInput = screen.getByPlaceholderText(
+            "https://app-hostname/graphql",
+        );
+
+        fireEvent.change(urlInput, {
+            target: { value: url },
+        });
+
+        const inputURLWrapper = urlInput.closest("div");
+
+        expect(
+            await findByTestId(inputURLWrapper!, "icon-test-loading"),
+        ).toBeInTheDocument();
+    });
+
     it("should display successful response from test connection", async () => {
         const url = "http://localhost:8000/graphql";
         useQueryMock.mockImplementation(
@@ -146,9 +174,7 @@ describe("connectionForm", () => {
         });
 
         await waitFor(() =>
-            expect(
-                screen.getByText("Test Connection").closest("button"),
-            ).toHaveProperty("disabled", false),
+            expect(screen.getByTestId("icon-test-success")).toBeInTheDocument(),
         );
 
         expect(
@@ -186,9 +212,7 @@ describe("connectionForm", () => {
         });
 
         await waitFor(() =>
-            expect(
-                screen.getByText("Test Connection").closest("button"),
-            ).toHaveProperty("disabled", false),
+            expect(screen.getByTestId("icon-test-failed")).toBeInTheDocument(),
         );
 
         expect(screen.getByText("Something went wrong")).toBeInTheDocument();
@@ -247,5 +271,46 @@ describe("connectionForm", () => {
                 onFinished: expect.any(Function),
             },
         );
+    });
+
+    it("should notify and not allow to save when test-connection failed", () => {
+        const url = "http://unavailablehost/graphql";
+        useQueryMock.mockImplementation(
+            queryMockImplBuilder({
+                checkStatus: {
+                    error: {
+                        graphQLErrors: [],
+                        message: "[NETWORK] 503 service unavailable",
+                        name: "",
+                    },
+                    url,
+                },
+            }),
+        );
+        const addConnection = vi.mocked(
+            useConnectionConfigMock().addConnection,
+            true,
+        );
+
+        const address = "0x60a7048c3136293071605a4eaffef49923e981cd";
+
+        render(<AppConnectionFormE application={address} />);
+
+        const urlInput = screen.getByPlaceholderText(
+            "https://app-hostname/graphql",
+        );
+
+        fireEvent.change(urlInput, {
+            target: { value: url },
+        });
+
+        fireEvent.click(screen.getByText("Save"));
+
+        expect(addConnection).not.toHaveBeenCalled();
+        expect(notificationsMock.show).toHaveBeenCalledWith({
+            color: "orange",
+            message: "To save a connection the endpoint needs to be working",
+            withBorder: true,
+        });
     });
 });

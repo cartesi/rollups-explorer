@@ -8,13 +8,19 @@ import {
     Loader,
     Text,
     TextInput,
+    useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { isEmpty } from "ramda";
 import React, { FC, useState } from "react";
-import { TbAlertCircle, TbCheck } from "react-icons/tb";
+import {
+    TbAlertCircle,
+    TbCheck,
+    TbPlugConnected,
+    TbPlugConnectedX,
+} from "react-icons/tb";
 import { UseQueryExecute, UseQueryState, useQuery } from "urql";
 import { Address, isAddress } from "viem";
 import {
@@ -84,6 +90,23 @@ const DisplayQueryResult: FC<DisplayQueryResultProps> = ({ result }) => {
     );
 };
 
+const checkURL = (url: string) => {
+    try {
+        const result = new URL(url);
+        return {
+            validURL: true,
+            result,
+            url,
+        };
+    } catch (error: any) {
+        return {
+            validURL: false,
+            error: error as TypeError,
+            url,
+        };
+    }
+};
+
 const useSearchApplications: UseSearchApplications = ({
     address,
     limit,
@@ -114,6 +137,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     onSubmitted,
 }) => {
     const { addConnection, hasConnection } = useConnectionConfig();
+    const theme = useMantineTheme();
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -147,25 +171,34 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
 
     const { url, address } = form.getTransformedValues();
     const [debouncedAddress] = useDebouncedValue(address, 400);
+    const [debouncedUrl] = useDebouncedValue(url, 300);
 
     const [{ applications, fetching }] = useSearchApplications({
         address: debouncedAddress,
     });
 
     const showLoader = !isEmpty(debouncedAddress) && fetching;
-    const hasURL = url && url.trim().length > 0 ? true : false;
 
-    const [result, executeQuery] = useQuery<
-        CheckStatusQuery,
-        CheckStatusQueryVariables
-    >({
+    const { validURL } = React.useMemo(
+        () => checkURL(debouncedUrl),
+        [debouncedUrl],
+    );
+
+    const [result] = useQuery<CheckStatusQuery, CheckStatusQueryVariables>({
         query: CheckStatusDocument,
-        pause: true,
-        requestPolicy: "network-only",
+        pause: !validURL,
+        context: React.useMemo(
+            () => ({
+                url: debouncedUrl,
+                requestPolicy: "network-only",
+            }),
+            [debouncedUrl],
+        ),
     });
 
     const { operation } = result;
     const displayQueryResult = url === operation?.context?.url;
+    const testSuccess = !result.fetching && !result.stale && !result.error;
 
     const onSuccess = () => {
         const { address } = form.getTransformedValues();
@@ -193,12 +226,21 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     return (
         <form
             onSubmit={form.onSubmit((values) => {
-                setSubmitting(true);
-                addConnection(values, {
-                    onFinished,
-                    onSuccess,
-                    onFailure,
-                });
+                if (testSuccess) {
+                    setSubmitting(true);
+                    addConnection(values, {
+                        onFinished,
+                        onSuccess,
+                        onFailure,
+                    });
+                } else {
+                    notifications.show({
+                        message:
+                            "To save a connection the endpoint needs to be working",
+                        color: "orange",
+                        withBorder: true,
+                    });
+                }
             })}
         >
             <Flex direction="column" gap="sm">
@@ -229,20 +271,37 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                     withAsterisk
                     placeholder="https://app-hostname/graphql"
                     description="The rollups graphQL endpoint"
+                    rightSectionPointerEvents="none"
+                    rightSection={
+                        result.fetching || result.stale ? (
+                            <Loader data-testid="icon-test-loading" size="sm" />
+                        ) : !validURL || !url ? (
+                            <TbPlugConnected
+                                data-testid="icon-test-inactive"
+                                size={theme.other.iconSize}
+                                color={theme.colors.gray[5]}
+                            />
+                        ) : validURL && !testSuccess ? (
+                            <TbPlugConnectedX
+                                data-testid="icon-test-failed"
+                                size={theme.other.iconSize}
+                                color="red"
+                            />
+                        ) : (
+                            <TbPlugConnected
+                                data-testid="icon-test-success"
+                                size={theme.other.iconSize}
+                                color={theme.primaryColor}
+                            />
+                        )
+                    }
                     {...form.getInputProps("url")}
                 />
-                <Button
-                    disabled={!hasURL}
-                    onClick={() => executeQuery({ url })}
-                    loading={result.fetching}
-                >
-                    Test Connection
-                </Button>
 
                 {displayQueryResult && <DisplayQueryResult result={result} />}
             </Flex>
 
-            <Flex direction="row" justify="flex-end" align="center" pt={8}>
+            <Flex direction="row" justify="flex-end" align="center" pt="xl">
                 <Button type="submit" loading={submitting}>
                     Save
                 </Button>
