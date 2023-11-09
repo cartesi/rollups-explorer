@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
+import { useNetwork } from "wagmi";
 
 const Component = withMantineTheme(EtherDepositForm);
 
@@ -31,6 +32,13 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 vi.mock("wagmi", async () => {
     return {
         useWaitForTransaction: () => ({}),
+        useNetwork: () => ({
+            chain: {
+                nativeCurrency: {
+                    decimals: 18,
+                },
+            },
+        }),
     };
 });
 
