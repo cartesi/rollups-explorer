@@ -53,8 +53,8 @@ query applications($limit: Int, $where: ApplicationWhereInput) {
     }
 }
 
-query tokens($where: TokenWhereInput) {
-    tokens(where: $where) {
+query tokens($limit: Int, $where: TokenWhereInput) {
+    tokens(limit: $limit, where: $where) {
         id
         name
         symbol

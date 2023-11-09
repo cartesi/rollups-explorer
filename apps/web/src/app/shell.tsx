@@ -43,9 +43,17 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data: applicationData }] = useApplicationsQuery();
+    const [{ data: applicationData }] = useApplicationsQuery({
+        variables: {
+            limit: 1000,
+        },
+    });
     const applications = (applicationData?.applications ?? []).map((a) => a.id);
-    const [{ data: tokenData }] = useTokensQuery();
+    const [{ data: tokenData }] = useTokensQuery({
+        variables: {
+            limit: 1000,
+        },
+    });
     const tokens = (tokenData?.tokens ?? []).map(
         (a) => `${a.symbol} - ${a.name} - ${a.id}`,
     );
