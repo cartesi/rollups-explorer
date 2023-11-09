@@ -10,10 +10,8 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import AppConnectionForm from "../../src/components/connectionForm";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../utils/WithMantineTheme";
-import {
-    checkStatusSample,
-    queryMockImplBuilder,
-} from "../utils/connectionHelpers";
+import { checkStatusSample } from "../utils/dataSamples";
+import { queryMockImplBuilder } from "../utils/useQueryMock";
 
 vi.mock("urql");
 vi.mock("../../src/graphql");
