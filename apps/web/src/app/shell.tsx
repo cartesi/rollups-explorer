@@ -4,6 +4,7 @@ import {
     EtherDepositForm,
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
+import { ERC20DepositForm, RawInputForm } from "@cartesi/rollups-explorer-ui";
 import {
     AppShell,
     Burger,
