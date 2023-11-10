@@ -4,7 +4,6 @@ import {
     AppShell,
     Burger,
     Button,
-    Drawer,
     Group,
     Modal,
     NavLink,
@@ -31,7 +30,7 @@ import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
-    const [menu, { open: openMenu, close: closeMenu }] = useDisclosure(false);
+    const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
     const theme = useMantineTheme();
@@ -44,15 +43,23 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         (a) => `${a.symbol} - ${a.name} - ${a.id}`,
     );
 
+    const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
+
     return (
         <AppShell
-            header={{ height: 60 }}
+            header={themeDefaultProps.header}
             navbar={{
-                width: 300,
-                breakpoint: "sm",
+                ...themeDefaultProps?.navbar,
                 collapsed: {
                     desktop: true,
                     mobile: !opened,
+                },
+            }}
+            aside={{
+                ...themeDefaultProps?.aside,
+                collapsed: {
+                    desktop: !menuOpened,
+                    mobile: !menuOpened,
                 },
             }}
             padding="md"
@@ -112,14 +119,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             />
                         </Group>
                     </Group>
-                    <Button variant="subtle" onClick={openMenu}>
+                    <Button variant="subtle" onClick={toggleMenu}>
                         <TbDotsVertical size={theme.other.iconSize} />
                     </Button>
-                    <Drawer opened={menu} onClose={closeMenu} position="right">
-                        <ConnectionView />
-                    </Drawer>
                 </Group>
             </AppShell.Header>
+            <AppShell.Aside p="md">
+                <ConnectionView />
+            </AppShell.Aside>
             <AppShell.Navbar py="md" px={4}>
                 <NavLink label="Home" href="/" leftSection={<TbHome />} />
                 <NavLink

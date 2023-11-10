@@ -1,4 +1,5 @@
 import {
+    AppShell,
     DEFAULT_THEME,
     MantineThemeOverride,
     Modal,
@@ -20,6 +21,19 @@ const themeOverride: MantineThemeOverride = createTheme({
                 overlayProps: {
                     backgroundOpacity: 0.55,
                     blur: 3,
+                },
+            },
+        }),
+        AppShell: AppShell.extend({
+            defaultProps: {
+                header: { height: 60 },
+                navbar: {
+                    width: 300,
+                    breakpoint: "sm",
+                },
+                aside: {
+                    width: 400,
+                    breakpoint: "sm",
                 },
             },
         }),
