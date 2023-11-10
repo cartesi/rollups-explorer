@@ -1,29 +1,14 @@
 "use client";
 import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
-import {
-    ActionIcon,
-    Badge,
-    Collapse,
-    Group,
-    JsonInput,
-    Table,
-    Tabs,
-    Text,
-    Textarea,
-} from "@mantine/core";
+import { ActionIcon, Badge, Collapse, Group, Table, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
-import {
-    TbAlphabetLatin,
-    TbArrowRight,
-    TbFileText,
-    TbJson,
-    TbX,
-} from "react-icons/tb";
-import { Hex, formatUnits, getAddress, hexToString } from "viem";
+import { TbArrowRight, TbFileText, TbX } from "react-icons/tb";
+import { Address as AddressType, formatUnits, getAddress } from "viem";
 import { InputItemFragment } from "../graphql";
 import Address from "./address";
+import InputDetailsView from "./inputDetailsView";
 
 export type InputCardProps = {
     input: InputItemFragment;
@@ -55,8 +40,8 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
         verbose: true,
     });
 
-    const from = input.msgSender as Address;
-    const to = input.application.id as Address;
+    const from = input.msgSender as AddressType;
+    const to = input.application.id as AddressType;
 
     const erc20Deposit = (input: InputItemFragment) =>
         input.erc20Deposit ? (
@@ -83,7 +68,7 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                     {input.erc20Deposit ? (
                         <Group>
                             <Address
-                                value={input.erc20Deposit.from as Address}
+                                value={input.erc20Deposit.from as AddressType}
                                 icon
                                 shorten
                             />
@@ -125,48 +110,7 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
             <Table.Tr>
                 <Table.Td colSpan={8} p={0}>
                     <Collapse in={opened}>
-                        <Tabs defaultValue="raw">
-                            <Tabs.List>
-                                <Tabs.Tab
-                                    value="raw"
-                                    leftSection={<TbFileText />}
-                                >
-                                    Raw
-                                </Tabs.Tab>
-                                <Tabs.Tab
-                                    value="text"
-                                    leftSection={<TbAlphabetLatin />}
-                                >
-                                    As Text
-                                </Tabs.Tab>
-                                <Tabs.Tab value="json" leftSection={<TbJson />}>
-                                    As JSON
-                                </Tabs.Tab>
-                            </Tabs.List>
-
-                            <Tabs.Panel value="raw">
-                                <Textarea
-                                    rows={10}
-                                    value={input.payload}
-                                    readOnly
-                                />
-                            </Tabs.Panel>
-
-                            <Tabs.Panel value="text">
-                                <Textarea
-                                    rows={10}
-                                    value={hexToString(input.payload as Hex)}
-                                    readOnly
-                                />
-                            </Tabs.Panel>
-
-                            <Tabs.Panel value="json">
-                                <JsonInput
-                                    rows={10}
-                                    value={hexToString(input.payload as Hex)}
-                                />
-                            </Tabs.Panel>
-                        </Tabs>
+                        {opened && <InputDetailsView input={input} />}
                     </Collapse>
                 </Table.Td>
             </Table.Tr>

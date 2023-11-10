@@ -22,13 +22,44 @@ const config = {
 
 console.info(`Codegen will use schema URL: ${schema}`);
 
+const rollupsSchema = "./graphql/rollups/schema.graphql";
+const rollupsDocuments = "./graphql/rollups/queries.graphql";
+
 const codegenConfig: CodegenConfig = {
-    schema,
-    documents: "./graphql/queries.graphql",
     generates: {
         "src/graphql/index.tsx": {
+            schema,
+            documents: "./graphql/queries.graphql",
             plugins,
             config,
+        },
+        "src/graphql/rollups/types.ts": {
+            schema: rollupsSchema,
+            documents: rollupsDocuments,
+            plugins: ["typescript"],
+        },
+        "src/graphql/rollups/operations.ts": {
+            schema: rollupsSchema,
+            documents: rollupsDocuments,
+            preset: "import-types",
+            plugins: ["typescript-operations", "typescript-urql"],
+            presetConfig: {
+                typesPath: "./types",
+            },
+            config: {
+                withHooks: false,
+            },
+        },
+        "src/graphql/rollups/hooks/queries.tsx": {
+            schema: rollupsSchema,
+            documents: rollupsDocuments,
+            plugins: ["typescript-urql"],
+            config: {
+                withHooks: true,
+                importOperationTypesFrom: "Operations",
+                documentMode: "external",
+                importDocumentNodeExternallyFrom: "../operations.tsx",
+            },
         },
     },
 };

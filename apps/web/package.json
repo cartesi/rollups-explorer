@@ -40,11 +40,11 @@
         "wagmi": "^1"
     },
     "devDependencies": {
-        "@cartesi/rollups": "^1.0",
         "@cartesi/tsconfig": "*",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
+        "@graphql-codegen/import-types-preset": "^3.0.0",
         "@graphql-codegen/typed-document-node": "^5",
         "@graphql-codegen/typescript": "^4",
         "@graphql-codegen/typescript-operations": "^4",

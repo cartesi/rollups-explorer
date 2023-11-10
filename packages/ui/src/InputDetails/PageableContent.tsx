@@ -8,6 +8,7 @@ import {
     Skeleton,
     Stack,
     Text,
+    VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
 import { allPass, complement, isEmpty, isNotNil } from "ramda";
@@ -59,9 +60,7 @@ const Connect: FC<ConnectProps> = ({ onConnect }) => {
                 radius="xl"
             />
             <Group justify="center">
-                <Button size="compact-lg" onClick={() => onConnect()}>
-                    Connect
-                </Button>
+                <Button onClick={() => onConnect()}>Connect</Button>
             </Group>
         </Stack>
     );
@@ -129,6 +128,9 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                             disabled={pageNumber === 1}
                                             aria-label="Button to load the previous content"
                                         >
+                                            <VisuallyHidden>
+                                                Previous content
+                                            </VisuallyHidden>
                                             <TbChevronLeft />
                                         </ActionIcon>
                                         <Text>
@@ -142,6 +144,9 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                             }
                                             aria-label="Button to load the next content"
                                         >
+                                            <VisuallyHidden>
+                                                Next content
+                                            </VisuallyHidden>
                                             <TbChevronRight />
                                         </ActionIcon>
                                     </Group>
