@@ -39,6 +39,8 @@ import Footer from "../components/footer";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
+    const [rawInput, { open: openRawInput, close: closeRawInput }] =
+        useDisclosure(false);
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
@@ -56,21 +58,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const { isConnected } = useAccount();
     const { chain } = useNetwork();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data: applicationData }] = useApplicationsQuery({
-        variables: {
-            limit: 1000,
-        },
-    });
-    const applications = (applicationData?.applications ?? []).map((a) => a.id);
-    const [{ data: tokenData }] = useTokensQuery({
-        variables: {
-            limit: 1000,
-        },
-    });
-    const tokens = (tokenData?.tokens ?? []).map(
-        (a) => `${a.symbol} - ${a.name} - ${a.id}`,
-    );
-
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (
