@@ -11,12 +11,14 @@ import {
     Autocomplete,
     Button,
     Collapse,
+    Flex,
     Group,
     Loader,
     Stack,
     Text,
-    Textarea,
     TextInput,
+    Textarea,
+    UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, useState } from "react";
@@ -37,8 +39,8 @@ import {
     toHex,
 } from "viem";
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
-import { TransactionStageStatus } from "./TransactionStatus";
 import { TransactionProgress } from "./TransactionProgress";
+import { TransactionStageStatus } from "./TransactionStatus";
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
@@ -275,23 +277,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                 <Collapse in={erc20.isSuccess && erc20Errors.length == 0}>
                     <Stack>
                         <TextInput
-                            label="Max amount"
-                            description={`Token balance of ${address}`}
-                            value={
-                                balance != undefined && decimals
-                                    ? formatUnits(balance, decimals)
-                                    : ""
-                            }
-                            readOnly
-                            error={
-                                balance === 0n
-                                    ? "Insufficient balance"
-                                    : undefined
-                            }
-                            rightSectionWidth={60}
-                            rightSection={<Text>{symbol}</Text>}
-                        />
-                        <TextInput
                             type="number"
                             min={0}
                             step={1}
@@ -301,9 +286,46 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             rightSectionWidth={60}
                             rightSection={<Text>{symbol}</Text>}
                             onChange={(e) => setAmount(e.target.value)}
+                            value={amount}
                             withAsterisk
                             data-testid="amount-input"
                         />
+                        <Flex
+                            mt={"-sm"}
+                            justify={"space-between"}
+                            direction={"row"}
+                        >
+                            <Flex rowGap={6} c={"dark.2"}>
+                                <Text fz="xs">Balance:</Text>
+                                <Text fz="xs" mx={4}>
+                                    {" "}
+                                    {balance != undefined && decimals
+                                        ? formatUnits(balance, decimals)
+                                        : ""}
+                                </Text>
+                                {balance != undefined && decimals && (
+                                    <UnstyledButton
+                                        fz={"xs"}
+                                        c={"cyan"}
+                                        onClick={() =>
+                                            setAmount(
+                                                formatUnits(balance, decimals),
+                                            )
+                                        }
+                                    >
+                                        Max
+                                    </UnstyledButton>
+                                )}
+                            </Flex>
+                            <Flex rowGap={6} c={"dark.2"}>
+                                <Text size="xs">Allowance:</Text>
+                                <Text ml={4} fz="xs">
+                                    {allowance != undefined && decimals
+                                        ? formatUnits(allowance, decimals)
+                                        : ""}
+                                </Text>
+                            </Flex>
+                        </Flex>
                     </Stack>
                 </Collapse>
                 <Collapse in={advanced}>
