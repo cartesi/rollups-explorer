@@ -19,7 +19,6 @@ import { FC, ReactNode } from "react";
 import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { FC, ReactNode } from "react";
 import {
     TbApps,
     TbDotsVertical,
@@ -29,7 +28,6 @@ import {
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
-import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
