@@ -36,6 +36,7 @@ const tokens = [
 const defaultApplicationProps = {
     applications,
     application: applications[0],
+    isLoading: false,
     onChange: () => undefined,
 };
 

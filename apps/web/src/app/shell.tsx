@@ -29,18 +29,16 @@ import {
     TbMoonStars,
     TbPigMoney,
     TbSun,
-    TbInbox,
 } from "react-icons/tb";
 import { useAccount, useNetwork } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
+import Deposit from "../components/deposit";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
-    const [rawInput, { open: openRawInput, close: closeRawInput }] =
-        useDisclosure(false);
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
@@ -80,35 +78,9 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             padding="md"
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
-                <ERC20DepositForm applications={applications} tokens={tokens} />
+                <Deposit />
             </Modal>
-            <Modal
-                opened={etherDeposit}
-                onClose={closeEtherDeposit}
-                title="Deposit Ether"
-            >
-                <EtherDepositForm applications={applications} />
-                opened={rawInput}
-                onClose={closeRawInput}
-                title="Send raw input"
-            >
-                <RawInputForm applications={applications} />
-            </Modal>
-            <Modal
-                opened={rawInput}
-                onClose={closeRawInput}
-                title="Send raw input"
-            >
-                <RawInputForm applications={applications} />
-            </Modal>
-            <Modal
-                opened={rawInput}
-                onClose={closeRawInput}
-                title="Send raw input"
-            >
-                <RawInputForm applications={applications} />
-            </Modal>
-            <AppShell.Header data-testid="header">
+            <AppShell.Header>
                 <Group h="100%" px="md">
                     <Burger
                         opened={opened}
@@ -131,38 +103,30 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Deposit
                             </Button>
+                                component={Link}
+                                href="/"
+                                variant="subtle"
+                                leftSection={<TbHome />}
+                            >
+                                Home
+                            </Button>
+                            <Button
+                                component={Link}
+                                href="/applications"
+                                variant="subtle"
+                                leftSection={<TbApps />}
+                            >
+                                Applications
+                            </Button>
                             <Button
                                 variant="subtle"
                                 leftSection={<TbPigMoney />}
-                                onClick={openEtherDeposit}
-                                disabled={!isConnected}
-                                visibleFrom="sm"
-                                data-testid="deposit-ether-button"
-                            >
-                                Deposit Ether
-                                leftSection={<TbInbox />}
-                                onClick={openRawInput}
+                                onClick={openDeposit}
                                 disabled={!isConnected}
                             >
-                                Send raw input
+                                Deposit
                             </Button>
-                            <Button
-                                variant="subtle"
-                                leftSection={<TbInbox />}
-                                onClick={openRawInput}
-                                disabled={!isConnected}
-                            >
-                                Send raw input
-                            </Button>
-                            <Button
-                                variant="subtle"
-                                leftSection={<TbInbox />}
-                                onClick={openRawInput}
-                                disabled={!isConnected}
-                            >
-                                Send raw input
-                            </Button>
-                            {!isSmallDevice && <ConnectButton />}
+                            <ConnectButton />
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}

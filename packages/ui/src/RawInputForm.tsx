@@ -4,6 +4,8 @@ import {
     usePrepareInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
+    Alert,
+    Autocomplete,
     Button,
     Collapse,
     Group,
@@ -12,19 +14,17 @@ import {
     Text,
     TextInput,
     Textarea,
-    Autocomplete,
-    Alert,
 } from "@mantine/core";
-import { FC, useEffect, useState } from "react";
-import { TbCheck } from "react-icons/tb";
+import { useForm } from "@mantine/form";
+import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
-    formatUnits,
     getAddress,
     isAddress,
     isHex,
     parseUnits,
     toHex,
+    zeroAddress,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { cacheExchange, fetchExchange } from "@urql/core";
@@ -34,6 +34,10 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
+}
+
 }
 
 export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
@@ -59,29 +63,46 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
             rawInput: toHex(values.rawInput),
         }),
     });
-
-    const addInput = useInputBoxAddInput({
-        args: [
-            application as `0x${string}`, // isAddress(application) ? getAddress(application) : "0x",
-            rawInput as `0x${string}`,
-        ],
+    const { address, rawInput } = form.getTransformedValues();
+    const prepare = usePrepareInputBoxAddInput({
+        args: [address, rawInput],
+        enabled: form.isValid(),
     });
-    const addInputWait = useWaitForTransaction(addInput.data);
-    const canSubmitInput = application !== "" && isHex(rawInput);
-    const { disabled, loading } = transactionButtonState(
-        addInput,
-        addInputWait,
-        addInput.write,
-        false,
-    );
+    const execute = useInputBoxAddInput(prepare.config);
+    const wait = useWaitForTransaction(execute.data);
+    const loading = execute.status === "loading" || wait.status === "loading";
+    const canSubmit = form.isValid() && prepare.error === null;
+
+    useEffect(() => {
+        if (wait.status === "success") {
+            form.reset();
+        }
+        // eslint-disable-next-line
+    }, [wait.status]);
 
     return (
         <form>
             <Stack>
-                <ApplicationAutocomplete
-                    application={application}
-                    applications={applications}
-                    onChange={setApplication}
+                <Autocomplete
+                    label="Application"
+                    description="The application smart contract address"
+                    placeholder="0x"
+                    data={applications}
+                    withAsterisk
+                    rightSection={
+                        (isLoadingApplications || prepare.isLoading) && (
+                            <Loader size="xs" />
+                        )
+                    }
+                    {...form.getInputProps("application")}
+                    error={
+                        form.errors.application ||
+                        (prepare.error as BaseError)?.shortMessage
+                    }
+                    onChange={(nextValue) => {
+                        form.setFieldValue("application", nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 {!form.errors.application &&

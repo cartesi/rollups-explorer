@@ -64,18 +64,21 @@ export const transactionButtonState = (
 
 export interface ERC20DepositFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
     tokens: string[];
 }
 
 export interface ApplicationAutocompleteProps {
     applications: string[];
     application: string;
+    isLoading: boolean;
     onChange: (application: string) => void;
 }
 export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
     props,
 ) => {
-    const { applications, application, onChange } = props;
+    const { applications, application, isLoading, onChange } = props;
 
     return (
         <>
@@ -86,6 +89,7 @@ export const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (
                 data={applications}
                 value={application}
                 withAsterisk
+                rightSection={isLoading && <Loader size="xs" />}
                 onChange={onChange}
             />
 
@@ -144,7 +148,12 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
 };
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
-    const { applications, tokens } = props;
+    const {
+        applications,
+        isLoadingApplications,
+        onSearchApplications,
+        tokens,
+    } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
     // connected account
@@ -263,7 +272,11 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                 <ApplicationAutocomplete
                     applications={applications}
                     application={application}
-                    onChange={setApplication}
+                    isLoading={isLoadingApplications}
+                    onChange={(nextValue) => {
+                        setApplication(nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 <TokenAutocomplete
