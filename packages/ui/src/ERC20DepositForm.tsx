@@ -7,6 +7,7 @@ import {
     usePrepareErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
+    Alert,
     Autocomplete,
     Button,
     Collapse,
@@ -14,18 +15,17 @@ import {
     Loader,
     Stack,
     Text,
-    TextInput,
     Textarea,
-    Alert,
+    TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, useState } from "react";
 import {
+    TbAlertCircle,
+    TbCheck,
     TbChevronDown,
     TbChevronUp,
-    TbCheck,
     TbPigMoney,
-    TbAlertCircle,
 } from "react-icons/tb";
 import {
     BaseError,
@@ -292,6 +292,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             rightSection={<Text>{symbol}</Text>}
                         />
                         <TextInput
+                            type="number"
+                            min={0}
+                            step={1}
                             label="Amount"
                             description="Amount of tokens to deposit"
                             placeholder="0"
@@ -299,6 +302,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             rightSection={<Text>{symbol}</Text>}
                             onChange={(e) => setAmount(e.target.value)}
                             withAsterisk
+                            data-testid="amount-input"
                         />
                     </Stack>
                 </Collapse>

@@ -1,8 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
 import { isObject } from "@vitest/utils";
-import { ApplicationAutocomplete, TokenAutocomplete } from "../src";
+import {
+    ApplicationAutocomplete,
+    ERC20DepositForm,
+    TokenAutocomplete,
+} from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
+
+const Component = withMantineTheme(ERC20DepositForm);
 
 const ApplicationAutoCompleteComponent = withMantineTheme(
     ApplicationAutocomplete,
@@ -35,6 +41,71 @@ const defaultTokenProps = {
     isLoading: false,
     onChange: () => undefined,
 };
+
+const defaultProps = {
+    applications,
+    tokens,
+};
+
+vi.mock("@cartesi/rollups-wagmi", async () => {
+    const actual = await vi.importActual("@cartesi/rollups-wagmi");
+    return {
+        ...(actual as any),
+        usePrepareErc20Approve: () => ({
+            config: {},
+        }),
+        useErc20Approve: () => ({
+            data: {},
+            wait: vi.fn(),
+        }),
+        usePrepareErc20PortalDepositErc20Tokens: () => ({
+            config: {},
+        }),
+        useErc20PortalDepositErc20Tokens: () => ({
+            data: {},
+            wait: vi.fn(),
+        }),
+    };
+});
+
+vi.mock("wagmi", async () => {
+    return {
+        useContractReads: () => ({
+            isLoading: false,
+            isSuccess: true,
+            data: [
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+            ],
+        }),
+        useAccount: () => ({
+            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
+        }),
+        useWaitForTransaction: () => ({}),
+    };
+});
+
+vi.mock("viem", async () => {
+    const actual = await vi.importActual("viem");
+    return {
+        ...(actual as any),
+        getAddress: (address: string) => address,
+    };
+});
 
 describe("Rollups ERC20DepositForm", () => {
     describe("ApplicationAutocomplete", () => {
@@ -171,6 +242,43 @@ describe("Rollups ERC20DepositForm", () => {
             );
 
             expect(isObject(rightSlot)).toBe(true);
+        });
+    });
+
+    describe("Amount input", () => {
+        it("should not allow non-digit symbols", () => {
+            render(<Component {...defaultProps} />);
+            const amountInput = screen.getByTestId("amount-input");
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "abc",
+                },
+            });
+
+            const matchingInputs = screen
+                .getAllByDisplayValue("")
+                .filter(
+                    (element) =>
+                        element.getAttribute("data-testid") === "amount-input",
+                );
+            expect(matchingInputs.length).toBe(1);
+        });
+
+        it("should allow digit symbols", async () => {
+            render(<Component {...defaultProps} />);
+            const amountInput = screen.getByTestId(
+                "amount-input",
+            ) as HTMLInputElement;
+            const value = "123";
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value,
+                },
+            });
+
+            expect(screen.getByDisplayValue(value) === amountInput).toBe(true);
         });
     });
 });
