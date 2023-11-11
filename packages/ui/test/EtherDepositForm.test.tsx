@@ -1,8 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
-import { useNetwork } from "wagmi";
 
 const Component = withMantineTheme(EtherDepositForm);
 
