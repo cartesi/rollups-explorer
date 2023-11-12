@@ -101,7 +101,7 @@ describe("Deposit component", () => {
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
     });
 
-    it("should initially query 10 applications no predefined search", async () => {
+    it("should initially query 10 applications with no predefined search", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         const graphqlModule = await import("../../src/graphql");
         graphqlModule.useApplicationsQuery = vi
@@ -120,7 +120,7 @@ describe("Deposit component", () => {
         });
     });
 
-    it("should query applications with given search id using debouncing", async () => {
+    it("should query applications with given search id, using debouncing", async () => {
         render(<Component initialDepositType="input" />);
 
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
@@ -141,6 +141,15 @@ describe("Deposit component", () => {
         fireEvent.change(applicationInput, {
             target: {
                 value: search,
+            },
+        });
+
+        expect(mockedFn).toHaveBeenCalledWith({
+            variables: {
+                limit: 10,
+                where: {
+                    id_containsInsensitive: "",
+                },
             },
         });
 
