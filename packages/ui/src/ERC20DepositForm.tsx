@@ -119,6 +119,7 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
                 label="ERC-20"
                 description="The ERC-20 smart contract address"
                 placeholder="0x"
+                data-testid="token-autocomplete"
                 data={tokens}
                 value={erc20Address}
                 error={error}
@@ -267,7 +268,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         );
 
     return (
-        <form>
+        <form data-testid="erc20-deposit-form">
             <Stack>
                 <ApplicationAutocomplete
                     applications={applications}

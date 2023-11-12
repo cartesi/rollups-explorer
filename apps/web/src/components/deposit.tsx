@@ -7,8 +7,13 @@ import { useDebouncedValue } from "@mantine/hooks";
 
 export type DepositType = "erc20" | "input" | "ether";
 
-const Deposit: FC = (props) => {
-    const [depositType, setDepositType] = useState<DepositType>("erc20");
+interface DepositProps {
+    initialDepositType?: DepositType;
+}
+
+const Deposit: FC<DepositProps> = ({ initialDepositType = "erc20" }) => {
+    const [depositType, setDepositType] =
+        useState<DepositType>(initialDepositType);
     const [applicationId, setApplicationId] = useState("");
     const [debouncedApplicationId] = useDebouncedValue(applicationId, 400);
     const [{ data: applicationData, fetching }] = useApplicationsQuery({
@@ -41,7 +46,6 @@ const Deposit: FC = (props) => {
             <Select
                 label="Type"
                 placeholder="Select deposit type"
-                data-testid="deposit-type"
                 data={[
                     { value: "erc20", label: "ERC20" },
                     { value: "input", label: "Raw input" },
@@ -56,9 +60,9 @@ const Deposit: FC = (props) => {
 
             {depositType === "erc20" ? (
                 <ERC20DepositForm
+                    tokens={tokens}
                     applications={applications}
                     isLoadingApplications={fetching}
-                    tokens={tokens}
                     onSearchApplications={setApplicationId}
                 />
             ) : depositType === "input" ? (
