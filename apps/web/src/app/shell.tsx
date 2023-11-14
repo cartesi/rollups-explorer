@@ -96,24 +96,26 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         size="sm"
                     />
                     <Group justify="space-between" style={{ flex: 1 }}>
-                        <CartesiLogo height={40} />
+                        <Link href="/">
+                            <CartesiLogo height={40} />
+                        </Link>
                         <Group ml="xl" gap="md" visibleFrom="sm">
-                            <Link href="/">
-                                <Button
-                                    variant="subtle"
-                                    leftSection={<TbHome />}
-                                >
-                                    Home
-                                </Button>
-                            </Link>
-                            <Link href="/applications">
-                                <Button
-                                    variant="subtle"
-                                    leftSection={<TbApps />}
-                                >
-                                    Applications
-                                </Button>
-                            </Link>
+                            <Button
+                                component={Link}
+                                href="/"
+                                variant="subtle"
+                                leftSection={<TbHome />}
+                            >
+                                Home
+                            </Button>
+                            <Button
+                                component={Link}
+                                href="/applications"
+                                variant="subtle"
+                                leftSection={<TbApps />}
+                            >
+                                Applications
+                            </Button>
                             <Button
                                 variant="subtle"
                                 leftSection={<TbPigMoney />}
