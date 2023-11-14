@@ -23,7 +23,6 @@ import {
     TbInbox,
     TbMoonStars,
     TbSun,
-    TbInbox,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
