@@ -5,6 +5,7 @@ import {
     ApplicationAutocomplete,
     ERC20DepositForm,
     TokenAutocomplete,
+    ERC20DepositForm,
 } from "../src/ERC20DepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
