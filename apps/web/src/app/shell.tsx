@@ -1,5 +1,8 @@
 "use client";
-import { ERC20DepositForm } from "@cartesi/rollups-explorer-ui";
+import {
+    ERC20DepositForm,
+    EtherDepositForm,
+} from "@cartesi/rollups-explorer-ui";
 import {
     AppShell,
     Burger,
@@ -12,9 +15,10 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { FC, ReactNode } from "react";
+import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { FC, ReactNode } from "react";
 import {
     TbApps,
     TbDotsVertical,
@@ -24,7 +28,6 @@ import {
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
-import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
@@ -33,12 +36,22 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
+    const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
+        useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data: applicationData }] = useApplicationsQuery();
+    const [{ data: applicationData }] = useApplicationsQuery({
+        variables: {
+            limit: 1000,
+        },
+    });
     const applications = (applicationData?.applications ?? []).map((a) => a.id);
-    const [{ data: tokenData }] = useTokensQuery();
+    const [{ data: tokenData }] = useTokensQuery({
+        variables: {
+            limit: 1000,
+        },
+    });
     const tokens = (tokenData?.tokens ?? []).map(
         (a) => `${a.symbol} - ${a.name} - ${a.id}`,
     );
@@ -66,6 +79,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
                 <ERC20DepositForm applications={applications} tokens={tokens} />
+            </Modal>
+            <Modal
+                opened={etherDeposit}
+                onClose={closeEtherDeposit}
+                title="Deposit Ether"
+            >
+                <EtherDepositForm applications={applications} />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
@@ -101,6 +121,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 disabled={!isConnected}
                             >
                                 Deposit
+                            </Button>
+                            <Button
+                                variant="subtle"
+                                leftSection={<TbPigMoney />}
+                                onClick={openEtherDeposit}
+                                disabled={!isConnected}
+                            >
+                                Deposit Ether
                             </Button>
                             <ConnectButton />
                             <Switch
