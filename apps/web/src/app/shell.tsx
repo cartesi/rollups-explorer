@@ -1,11 +1,5 @@
 "use client";
 import {
-    ERC20DepositForm,
-    EtherDepositForm,
-    RawInputForm,
-} from "@cartesi/rollups-explorer-ui";
-import { ERC20DepositForm, RawInputForm } from "@cartesi/rollups-explorer-ui";
-import {
     AppShell,
     Burger,
     Button,
@@ -41,15 +35,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
-        useDisclosure(false);
-    const [navDepositOpened, { toggle: toggleNavDeposit }] =
-        useDisclosure(false);
-    const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
-    const [rawInput, { open: openRawInput, close: closeRawInput }] =
-        useDisclosure(false);
-    const [rawInput, { open: openRawInput, close: closeRawInput }] =
-        useDisclosure(false);
-    const [rawInput, { open: openRawInput, close: closeRawInput }] =
         useDisclosure(false);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);

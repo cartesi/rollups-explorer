@@ -7,9 +7,6 @@ import {
     TokenAutocomplete,
     ERC20DepositForm,
     TokenAutocomplete,
-} from "../src";
-import { ApplicationAutocomplete, TokenAutocomplete } from "../src/ERC20DepositForm";
-    TokenAutocomplete,
 } from "../src/ERC20DepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
@@ -51,6 +48,8 @@ const defaultTokenProps = {
 const defaultProps = {
     applications,
     tokens,
+    isLoadingApplications: false,
+    onSearchApplications: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
