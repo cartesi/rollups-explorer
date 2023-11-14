@@ -2,6 +2,7 @@
 import {
     ERC20DepositForm,
     EtherDepositForm,
+    RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
 import {
     AppShell,
@@ -43,6 +44,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [navDepositOpened, { toggle: toggleNavDeposit }] =
         useDisclosure(false);
     const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
+        useDisclosure(false);
     const [rawInput, { open: openRawInput, close: closeRawInput }] =
         useDisclosure(false);
     const theme = useMantineTheme();
@@ -95,6 +97,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 title="Deposit Ether"
             >
                 <EtherDepositForm applications={applications} />
+            </Modal>
+            <Modal
                 opened={rawInput}
                 onClose={closeRawInput}
                 title="Send raw input"
@@ -133,6 +137,9 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 data-testid="deposit-ether-button"
                             >
                                 Deposit Ether
+                            </Button>
+                            <Button
+                                variant="subtle"
                                 leftSection={<TbInbox />}
                                 onClick={openRawInput}
                                 disabled={!isConnected}
