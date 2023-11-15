@@ -10,24 +10,26 @@ import {
     Group,
     Modal,
     NavLink,
+    Stack,
     Switch,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, ReactNode } from "react";
-import CartesiLogo from "../components/cartesiLogo";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import { FC, ReactNode } from "react";
 import {
     TbApps,
     TbDotsVertical,
     TbHome,
+    TbMoneybag,
     TbMoonStars,
     TbPigMoney,
     TbSun,
 } from "react-icons/tb";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
+import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 
@@ -36,10 +38,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [deposit, { open: openDeposit, close: closeDeposit }] =
         useDisclosure(false);
+    const [navDepositOpened, { toggle: toggleNavDeposit }] =
+        useDisclosure(false);
     const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
         useDisclosure(false);
     const theme = useMantineTheme();
     const { isConnected } = useAccount();
+    const { chain } = useNetwork();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const [{ data: applicationData }] = useApplicationsQuery({
         variables: {
@@ -158,14 +163,42 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 <ConnectionView />
             </AppShell.Aside>
             <AppShell.Navbar py="md" px={4}>
-                <NavLink label="Home" href="/" leftSection={<TbHome />} />
-                <NavLink
-                    disabled
-                    label="Deposit"
-                    href="/deposit"
-                    leftSection={<TbPigMoney />}
-                />
-                <ConnectButton />
+                <Stack px={13}>
+                    <NavLink label="Home" href="/" leftSection={<TbHome />} />
+
+                    <NavLink
+                        label="Applications"
+                        href="/applications"
+                        leftSection={<TbApps />}
+                    />
+
+                    <NavLink
+                        label="Deposit"
+                        leftSection={<TbMoneybag />}
+                        disabled={!isConnected}
+                        opened={isConnected && navDepositOpened}
+                        onClick={toggleNavDeposit}
+                    >
+                        <NavLink
+                            active={isConnected}
+                            label="ERC-20"
+                            variant="subtle"
+                            component="button"
+                            onClick={openDeposit}
+                            leftSection={<TbPigMoney />}
+                        />
+                        <NavLink
+                            active={isConnected}
+                            variant="subtle"
+                            component="button"
+                            label={chain?.nativeCurrency.name ?? "Ether"}
+                            onClick={openEtherDeposit}
+                            leftSection={<TbPigMoney />}
+                        />
+                    </NavLink>
+
+                    <ConnectButton />
+                </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
         </AppShell>
