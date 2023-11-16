@@ -116,7 +116,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 onClick={openDeposit}
                                 disabled={!isConnected}
                             >
-                                SendTransaction
+                                Send Transaction
                             </Button>
                             <ConnectButton />
                             <Switch

@@ -9,7 +9,7 @@ import { Select } from "@mantine/core";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import { useDebouncedValue } from "@mantine/hooks";
 
-export type DepositType = "erc20" | "input" | "ether";
+export type DepositType = "erc20" | "ether" | "input";
 
 interface DepositProps {
     initialDepositType?: DepositType;
@@ -72,14 +72,14 @@ const SendTransaction: FC<DepositProps> = ({
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                 />
-            ) : depositType === "input" ? (
-                <RawInputForm
+            ) : depositType === "ether" ? (
+                <EtherDepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                 />
-            ) : depositType === "ether" ? (
-                <EtherDepositForm
+            ) : depositType === "input" ? (
+                <RawInputForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}

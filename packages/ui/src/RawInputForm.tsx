@@ -69,7 +69,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     }, [wait.status]);
 
     return (
-        <form>
+        <form data-testid="raw-input-form">
             <Stack>
                 <Autocomplete
                     label="Application"
