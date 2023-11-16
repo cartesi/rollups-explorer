@@ -13,7 +13,8 @@ const applications = [
 
 const defaultProps = {
     applications,
-    onSubmit: () => undefined,
+    isLoadingApplications: false,
+    onSearchApplications: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
