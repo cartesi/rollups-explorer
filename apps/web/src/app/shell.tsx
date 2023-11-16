@@ -69,6 +69,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 opened={deposit}
                 onClose={closeDeposit}
                 title="Send Transaction"
+                size="xl"
             >
                 <SendTransaction />
             </Modal>

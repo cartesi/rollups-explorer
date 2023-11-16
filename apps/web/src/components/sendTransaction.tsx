@@ -5,18 +5,25 @@ import {
     EtherDepositForm,
 } from "@cartesi/rollups-explorer-ui";
 import { FC, useMemo, useState } from "react";
-import { Select } from "@mantine/core";
+import { Select, SegmentedControl } from "@mantine/core";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import { useDebouncedValue } from "@mantine/hooks";
+import { ContentType } from "@cartesi/rollups-explorer-ui/src/InputDetails/Content";
 
-export type DepositType = "erc20" | "ether" | "input";
+export type DepositType =
+    | "ether"
+    | "erc20"
+    | "erc721"
+    | "erc1155"
+    | "relay"
+    | "input";
 
 interface DepositProps {
     initialDepositType?: DepositType;
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc20",
+    initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -49,13 +56,60 @@ const SendTransaction: FC<DepositProps> = ({
 
     return (
         <>
+            {/*<SegmentedControl*/}
+            {/*    value={depositType}*/}
+            {/*    onChange={(nextValue: DepositType) => {*/}
+            {/*        setDepositType(nextValue);*/}
+            {/*        setApplicationId("");*/}
+            {/*    }}*/}
+            {/*    data={[*/}
+            {/*        {*/}
+            {/*            value: "ether",*/}
+            {/*            label: "Ether Deposit",*/}
+            {/*        },*/}
+            {/*        {*/}
+            {/*            value: "erc20",*/}
+            {/*            label: "ERC-20 Deposit",*/}
+            {/*        },*/}
+            {/*        {*/}
+            {/*            value: "erc721",*/}
+            {/*            label: "ERC-721 Deposit",*/}
+            {/*        },*/}
+            {/*        {*/}
+            {/*            value: "erc1155",*/}
+            {/*            label: "ERC-1155 Deposit",*/}
+            {/*        },*/}
+            {/*        {*/}
+            {/*            value: "relay",*/}
+            {/*            label: "Address Relay",*/}
+            {/*        },*/}
+            {/*        {*/}
+            {/*            value: "input",*/}
+            {/*            label: "Raw Input",*/}
+            {/*        },*/}
+            {/*    ]}*/}
+            {/*    styles={{ root: { width: "100%" } }}*/}
+            {/*/>*/}
             <Select
                 label="Type"
                 placeholder="Select deposit type"
                 data={[
-                    { value: "erc20", label: "ERC20" },
-                    { value: "ether", label: "Ether" },
-                    { value: "input", label: "Raw input" },
+                    {
+                        group: "Deposit",
+                        items: [
+                            { value: "ether", label: "Ether" },
+                            { value: "erc20", label: "ERC-20" },
+                            { value: "erc721", label: "ERC-721" },
+                            { value: "erc1155", label: "ERC-1155" },
+                        ],
+                    },
+                    {
+                        group: "Other",
+                        items: [
+                            { value: "input", label: "Raw Input" },
+                            { value: "relay", label: "Address Relay" },
+                        ],
+                    },
                 ]}
                 value={depositType}
                 onChange={(nextValue: DepositType) => {
@@ -63,6 +117,7 @@ const SendTransaction: FC<DepositProps> = ({
                     setApplicationId("");
                 }}
             />
+            <br />
             <br />
 
             {depositType === "erc20" ? (
