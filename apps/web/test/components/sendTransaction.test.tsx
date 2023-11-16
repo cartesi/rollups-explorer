@@ -83,6 +83,7 @@ vi.mock("wagmi", async () => {
         usePrepareContractWrite: () => ({}),
         useWaitForTransaction: () => ({}),
         useContractWrite: () => ({}),
+        useNetwork: () => ({}),
     };
 });
 

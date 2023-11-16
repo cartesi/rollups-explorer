@@ -8,7 +8,6 @@ import { FC, useMemo, useState } from "react";
 import { Select, SegmentedControl } from "@mantine/core";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import { useDebouncedValue } from "@mantine/hooks";
-import { ContentType } from "@cartesi/rollups-explorer-ui/src/InputDetails/Content";
 
 export type DepositType =
     | "ether"
