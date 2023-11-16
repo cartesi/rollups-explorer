@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { RawInputForm } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
@@ -13,8 +13,7 @@ const applications = [
 
 const defaultProps = {
     applications,
-    isLoadingApplications: false,
-    onSearchApplications: () => undefined,
+    onSubmit: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {

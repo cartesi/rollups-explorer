@@ -4,36 +4,32 @@ import {
     usePrepareInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
-    Alert,
-    Autocomplete,
     Button,
     Collapse,
     Group,
-    Loader,
     Stack,
-    Text,
-    TextInput,
     Textarea,
+    Autocomplete,
+    Alert,
+    Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { TbAlertCircle, TbCheck } from "react-icons/tb";
+import { TbCheck, TbAlertCircle } from "react-icons/tb";
 import {
-    BaseError,
     getAddress,
     isAddress,
     isHex,
-    parseUnits,
     toHex,
     zeroAddress,
+    BaseError,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
-import { cacheExchange, fetchExchange } from "@urql/core";
-import { withUrqlClient } from "next-urql";
-import { useApplicationsQuery } from "web/src/graphql";
 import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
+}
+
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
 }
@@ -77,11 +73,10 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
         if (wait.status === "success") {
             form.reset();
         }
-        // eslint-disable-next-line
     }, [wait.status]);
 
     return (
-        <form data-testid="raw-input-form">
+        <form>
             <Stack>
                 <Autocomplete
                     label="Application"
@@ -89,20 +84,12 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
                     placeholder="0x"
                     data={applications}
                     withAsterisk
-                    rightSection={
-                        (isLoadingApplications || prepare.isLoading) && (
-                            <Loader size="xs" />
-                        )
-                    }
+                    rightSection={prepare.isLoading && <Loader size="xs" />}
                     {...form.getInputProps("application")}
                     error={
                         form.errors.application ||
                         (prepare.error as BaseError)?.shortMessage
                     }
-                    onChange={(nextValue) => {
-                        form.setFieldValue("application", nextValue);
-                        onSearchApplications(nextValue);
-                    }}
                 />
 
                 {!form.errors.application &&
@@ -120,25 +107,31 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
                 <Textarea
                     label="Raw input"
                     description="Raw input for the application"
-                    value={rawInput}
-                    error={isHex(rawInput) ? undefined : "Invalid hex string"}
                     withAsterisk
-                    onChange={(e) => setRawInput(e.target.value)}
+                    {...form.getInputProps("rawInput")}
                 />
 
-                <Collapse in={addInput.isLoading || addInputWait.isLoading}>
+                <Collapse
+                    in={
+                        execute.isLoading ||
+                        wait.isLoading ||
+                        execute.isSuccess ||
+                        execute.isError
+                    }
+                >
                     <TransactionProgress
-                        prepare={addInput}
-                        execute={addInput}
-                        wait={addInputWait}
+                        prepare={prepare}
+                        execute={execute}
+                        wait={wait}
                         confirmationMessage="Raw input sent successfully!"
+                        defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
 
                 <Group justify="right">
                     <Button
                         variant="filled"
-                        disabled={!canSubmitInput}
+                        disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
                         onClick={execute.write}
