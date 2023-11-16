@@ -34,8 +34,10 @@ import Deposit from "../components/deposit";
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
-    const [deposit, { open: openDeposit, close: closeDeposit }] =
-        useDisclosure(false);
+    const [
+        deposit,
+        { open: openDeposit, close: closeDeposit, toggle: toggleNavDeposit },
+    ] = useDisclosure(false);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const { isConnected } = useAccount();
@@ -156,7 +158,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Deposit"
                         leftSection={<TbMoneybag />}
                         disabled={!isConnected}
-                        opened={isConnected && navDepositOpened}
+                        opened={isConnected && deposit}
                         onClick={toggleNavDeposit}
                         hiddenFrom="sm"
                     >
@@ -169,14 +171,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             leftSection={<TbPigMoney />}
                             hiddenFrom="sm"
                         />
-                        <NavLink
-                            active={isConnected}
-                            variant="subtle"
-                            component="button"
-                            label={chain?.nativeCurrency.name ?? "Ether"}
-                            onClick={openEtherDeposit}
-                            leftSection={<TbPigMoney />}
-                            hiddenFrom="sm"
                         />
                     </NavLink>
 
