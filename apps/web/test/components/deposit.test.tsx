@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../utils/WithMantineTheme";
-import Deposit from "../../src/components/deposit";
+import SendTransaction from "../../src/components/sendTransaction";
 
-const Component = withMantineTheme(Deposit);
+const Component = withMantineTheme(SendTransaction);
 
 vi.mock("../../src/graphql", async () => {
     return {
@@ -86,7 +86,7 @@ vi.mock("wagmi", async () => {
     };
 });
 
-describe("Deposit component", () => {
+describe("SendTransaction component", () => {
     afterAll(() => {
         vi.restoreAllMocks();
     });

@@ -28,19 +28,12 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
-}
-
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
 }
 
-}
-
-export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
+export const RawInputForm: FC<RawInputFormProps> = (props) => {
+    const { applications, isLoadingApplications, onSearchApplications } = props;
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -84,12 +77,20 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
                     placeholder="0x"
                     data={applications}
                     withAsterisk
-                    rightSection={prepare.isLoading && <Loader size="xs" />}
+                    rightSection={
+                        (prepare.isLoading || isLoadingApplications) && (
+                            <Loader size="xs" />
+                        )
+                    }
                     {...form.getInputProps("application")}
                     error={
                         form.errors.application ||
                         (prepare.error as BaseError)?.shortMessage
                     }
+                    onChange={(nextValue) => {
+                        form.setFieldValue("application", nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 {!form.errors.application &&

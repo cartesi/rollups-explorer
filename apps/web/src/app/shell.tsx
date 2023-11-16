@@ -30,6 +30,7 @@ import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
 import Deposit from "../components/deposit";
+import SendTransaction from "../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
@@ -64,8 +65,12 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             }}
             padding="md"
         >
-            <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
-                <Deposit />
+            <Modal
+                opened={deposit}
+                onClose={closeDeposit}
+                title="Send Transaction"
+            >
+                <SendTransaction />
             </Modal>
             <AppShell.Header>
                 <Group h="100%" px="md">
@@ -111,7 +116,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 onClick={openDeposit}
                                 disabled={!isConnected}
                             >
-                                Deposit
+                                SendTransaction
                             </Button>
                             <ConnectButton />
                             <Switch
@@ -155,7 +160,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
-                        label="Deposit"
+                        label="SendTransaction"
                         leftSection={<TbMoneybag />}
                         disabled={!isConnected}
                         opened={isConnected && deposit}

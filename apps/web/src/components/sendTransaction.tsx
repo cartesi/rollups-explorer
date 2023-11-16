@@ -1,5 +1,9 @@
 "use client";
-import { ERC20DepositForm, RawInputForm } from "@cartesi/rollups-explorer-ui";
+import {
+    ERC20DepositForm,
+    RawInputForm,
+    EtherDepositForm,
+} from "@cartesi/rollups-explorer-ui";
 import { FC, useMemo, useState } from "react";
 import { Select } from "@mantine/core";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
@@ -11,7 +15,9 @@ interface DepositProps {
     initialDepositType?: DepositType;
 }
 
-const Deposit: FC<DepositProps> = ({ initialDepositType = "erc20" }) => {
+const SendTransaction: FC<DepositProps> = ({
+    initialDepositType = "erc20",
+}) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
     const [applicationId, setApplicationId] = useState("");
@@ -48,6 +54,7 @@ const Deposit: FC<DepositProps> = ({ initialDepositType = "erc20" }) => {
                 placeholder="Select deposit type"
                 data={[
                     { value: "erc20", label: "ERC20" },
+                    { value: "ether", label: "Ether" },
                     { value: "input", label: "Raw input" },
                 ]}
                 value={depositType}
@@ -71,8 +78,14 @@ const Deposit: FC<DepositProps> = ({ initialDepositType = "erc20" }) => {
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                 />
+            ) : depositType === "ether" ? (
+                <EtherDepositForm
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                />
             ) : null}
         </>
     );
 };
-export default Deposit;
+export default SendTransaction;
