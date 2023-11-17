@@ -118,7 +118,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
             erc20ContractAddress: isAddress(values.erc20Address)
                 ? getAddress(values.erc20Address)
                 : undefined,
-            amountBigint:
+            amountBigInt:
                 values.amount !== "" && decimals
                     ? parseUnits(values.amount, decimals)
                     : undefined,
@@ -131,7 +131,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
         erc20Address,
         erc20ContractAddress,
         execLayerData,
-        amountBigint,
+        amountBigInt,
     } = form.getTransformedValues();
 
     // query token information in a multicall
@@ -173,27 +173,27 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
     // prepare approve transaction
     const approvePrepare = usePrepareErc20Approve({
         address: erc20Address,
-        args: [erc20PortalAddress, amountBigint!],
+        args: [erc20PortalAddress, amountBigInt!],
         enabled:
-            amountBigint !== undefined &&
+            amountBigInt !== undefined &&
             allowance !== undefined &&
-            amountBigint > allowance,
+            amountBigInt > allowance,
     });
     const approve = useErc20Approve(approvePrepare.config);
     const approveWait = useWaitForTransaction(approve.data);
 
     // prepare deposit transaction
     const depositPrepare = usePrepareErc20PortalDepositErc20Tokens({
-        args: [erc20Address, applicationAddress, amountBigint!, execLayerData],
+        args: [erc20Address, applicationAddress, amountBigInt!, execLayerData],
         enabled:
-            amountBigint !== undefined &&
+            amountBigInt !== undefined &&
             balance !== undefined &&
             allowance !== undefined &&
             !form.errors.erc20Address &&
             !form.errors.application &&
             isHex(execLayerData) &&
-            amountBigint <= balance &&
-            amountBigint <= allowance,
+            amountBigInt <= balance &&
+            amountBigInt <= allowance,
     });
     const deposit = useErc20PortalDepositErc20Tokens(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
@@ -202,17 +202,17 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
     const needApproval =
         allowance !== undefined &&
         decimals !== undefined &&
-        amountBigint !== undefined &&
-        allowance < amountBigint;
+        amountBigInt !== undefined &&
+        allowance < amountBigInt;
 
     const canDeposit =
         allowance !== undefined &&
         balance !== undefined &&
         decimals !== undefined &&
-        amountBigint !== undefined &&
-        amountBigint > 0 &&
-        amountBigint <= allowance &&
-        amountBigint <= balance;
+        amountBigInt !== undefined &&
+        amountBigInt > 0 &&
+        amountBigInt <= allowance &&
+        amountBigInt <= balance;
 
     const { disabled: approveDisabled, loading: approveLoading } =
         transactionButtonState(
