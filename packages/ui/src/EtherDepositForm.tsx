@@ -94,7 +94,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     }, [wait.status]);
 
     return (
-        <form>
+        <form data-testid="ether-deposit-form">
             <Stack>
                 <Autocomplete
                     label="Application"

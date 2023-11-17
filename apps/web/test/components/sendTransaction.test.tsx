@@ -97,9 +97,14 @@ describe("SendTransaction component", () => {
         expect(screen.getByTestId("erc20-deposit-form")).toBeInTheDocument();
     });
 
-    it("should show raw input form", () => {
+    it("should show Raw input form", () => {
         render(<Component initialDepositType="input" />);
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
+    });
+
+    it("should show Ether deposit form", () => {
+        render(<Component initialDepositType="ether" />);
+        expect(screen.getByTestId("ether-deposit-form")).toBeInTheDocument();
     });
 
     it("should initially query 10 applications with no predefined search", async () => {
