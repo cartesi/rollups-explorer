@@ -24,7 +24,7 @@ import {
     TbPigMoney,
     TbSun,
 } from "react-icons/tb";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
@@ -36,13 +36,16 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [
-        deposit,
-        { open: openDeposit, close: closeDeposit, toggle: toggleNavDeposit },
+        transaction,
+        {
+            open: openTransaction,
+            close: closeTransaction,
+            toggle: toggleTransaction,
+        },
     ] = useDisclosure(false);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const { isConnected } = useAccount();
-    const { chain } = useNetwork();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
@@ -66,8 +69,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             padding="md"
         >
             <Modal
-                opened={deposit}
-                onClose={closeDeposit}
+                opened={transaction}
+                onClose={closeTransaction}
                 title="Send Transaction"
                 size="xl"
             >
@@ -114,7 +117,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             <Button
                                 variant="subtle"
                                 leftSection={<TbPigMoney />}
-                                onClick={openDeposit}
+                                onClick={openTransaction}
                                 disabled={!isConnected}
                             >
                                 Send Transaction
@@ -164,16 +167,15 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="SendTransaction"
                         leftSection={<TbMoneybag />}
                         disabled={!isConnected}
-                        opened={isConnected && deposit}
-                        onClick={toggleNavDeposit}
-                        hiddenFrom="sm"
+                        opened={isConnected && transaction}
+                        onClick={toggleTransaction}
                     >
                         <NavLink
                             active={isConnected}
                             label="ERC-20"
                             variant="subtle"
                             component="button"
-                            onClick={openDeposit}
+                            onClick={openTransaction}
                             leftSection={<TbPigMoney />}
                             hiddenFrom="sm"
                         />
