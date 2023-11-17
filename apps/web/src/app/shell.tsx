@@ -164,7 +164,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
-                        label="SendTransaction"
+                        label="Send Transaction"
                         leftSection={<TbMoneybag />}
                         disabled={!isConnected}
                         opened={isConnected && transaction}
