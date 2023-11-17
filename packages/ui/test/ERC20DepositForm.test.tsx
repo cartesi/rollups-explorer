@@ -82,11 +82,6 @@ vi.mock("viem", async () => {
     };
 });
 
-const defaultProps = {
-    applications,
-    tokens,
-};
-
 vi.mock("@cartesi/rollups-wagmi", async () => {
     const actual = await vi.importActual("@cartesi/rollups-wagmi");
     return {
