@@ -16,6 +16,14 @@ interface ContentTypeGroupedButtons {
     onTypeChange: (v: ContentType) => void;
 }
 
+type SegmentControlData = { label: string; value: ContentType };
+
+const segmentControlData: SegmentControlData[] = [
+    { label: "Raw", value: "raw" },
+    { label: "As Text", value: "text" },
+    { label: "As JSON", value: "json" },
+];
+
 export const ContentTypeControl = ({
     type,
     onTypeChange,
@@ -23,12 +31,8 @@ export const ContentTypeControl = ({
     return (
         <SegmentedControl
             value={type}
-            onChange={(v: ContentType) => onTypeChange(v)}
-            data={[
-                { label: "Raw", value: "raw" },
-                { label: "As Text", value: "text" },
-                { label: "As JSON", value: "json" },
-            ]}
+            onChange={(v: string) => onTypeChange(v as ContentType)}
+            data={segmentControlData}
         />
     );
 };
