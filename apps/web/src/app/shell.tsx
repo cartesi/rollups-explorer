@@ -112,6 +112,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 onClick={openDeposit}
                                 disabled={!isConnected}
                                 visibleFrom="sm"
+                                data-testid="deposit-button"
                             >
                                 Deposit
                             </Button>
@@ -121,6 +122,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 onClick={openEtherDeposit}
                                 disabled={!isConnected}
                                 visibleFrom="sm"
+                                data-testid="deposit-ether-button"
                             >
                                 Deposit Ether
                             </Button>
@@ -151,12 +153,18 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             </AppShell.Aside>
             <AppShell.Navbar py="md" px={4}>
                 <Stack px={13}>
-                    <NavLink label="Home" href="/" leftSection={<TbHome />} />
+                    <NavLink
+                        label="Home"
+                        href="/"
+                        leftSection={<TbHome />}
+                        data-testid="home-link"
+                    />
 
                     <NavLink
                         label="Applications"
                         href="/applications"
                         leftSection={<TbApps />}
+                        data-testid="applications-link"
                     />
 
                     <NavLink

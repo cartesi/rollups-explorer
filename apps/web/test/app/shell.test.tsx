@@ -120,4 +120,57 @@ describe("Shell component", () => {
             expect(logoLink.getAttribute("href")).toBe("/");
         });
     });
+
+    describe("Header", () => {
+        it("should display deposit links in header", () => {
+            const { container } = render(<Component>Children</Component>);
+            const header = container.querySelector("header") as HTMLDivElement;
+            const depositButton = header.querySelector(
+                '[data-testid="deposit-button"]',
+            );
+            const depositEtherButton = header.querySelector(
+                '[data-testid="deposit-ether-button"]',
+            );
+
+            expect(depositButton !== null).toBe(true);
+            expect(depositEtherButton !== null).toBe(true);
+        });
+
+        it("should not display home and applications links in header", () => {
+            const { container } = render(<Component>Children</Component>);
+            const header = container.querySelector("header") as HTMLDivElement;
+            const homeLink = header.querySelector('[data-testid="home-link"]');
+            const applicationsLink = header.querySelector(
+                '[data-testid="applications-link"]',
+            );
+
+            expect(homeLink === null).toBe(true);
+            expect(applicationsLink === null).toBe(true);
+        });
+    });
+
+    describe("Navbar", () => {
+        it("should display home and applications links in navbar", () => {
+            const { container } = render(<Component>Children</Component>);
+            const navbar = container.querySelector(
+                ".mantine-AppShell-navbar",
+            ) as HTMLDivElement;
+            const homeLink = navbar.querySelector('[data-testid="home-link"]');
+            const applicationsLink = navbar.querySelector(
+                '[data-testid="applications-link"]',
+            );
+
+            expect(homeLink !== null).toBe(true);
+            expect(applicationsLink !== null).toBe(true);
+        });
+
+        it("should display navbar on desktop", () => {
+            const { container } = render(<Component>Children</Component>);
+            const navbar = container.querySelector(
+                ".mantine-AppShell-navbar",
+            ) as HTMLDivElement;
+
+            expect(navbar).toBeVisible();
+        });
+    });
 });
