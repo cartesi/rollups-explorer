@@ -20,7 +20,7 @@
         "@mantine/form": "^7.2.2",
         "@mantine/hooks": "^7.2.2",
         "@mantine/notifications": "^7.2.2",
-        "@rainbow-me/rainbowkit": "^1.0.11",
+        "@rainbow-me/rainbowkit": "1.2.0",
         "@react-spring/web": "^9.7.3",
         "abitype": "^0.9",
         "encoding": "^0.1",
