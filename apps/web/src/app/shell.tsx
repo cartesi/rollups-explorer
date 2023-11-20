@@ -15,7 +15,7 @@ import {
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
@@ -43,6 +43,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
         useDisclosure(false);
     const theme = useMantineTheme();
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const { isConnected } = useAccount();
     const { chain } = useNetwork();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
@@ -68,8 +69,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             header={themeDefaultProps.header}
             navbar={{
                 ...themeDefaultProps?.navbar,
+                width: 180,
                 collapsed: {
-                    desktop: true,
                     mobile: !opened,
                 },
             }}
@@ -104,28 +105,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Link href="/">
                             <CartesiLogo height={40} />
                         </Link>
-                        <Group ml="xl" gap="md" visibleFrom="sm">
-                            <Button
-                                component={Link}
-                                href="/"
-                                variant="subtle"
-                                leftSection={<TbHome />}
-                            >
-                                Home
-                            </Button>
-                            <Button
-                                component={Link}
-                                href="/applications"
-                                variant="subtle"
-                                leftSection={<TbApps />}
-                            >
-                                Applications
-                            </Button>
+                        <Group ml="xl" gap="md">
                             <Button
                                 variant="subtle"
                                 leftSection={<TbPigMoney />}
                                 onClick={openDeposit}
                                 disabled={!isConnected}
+                                visibleFrom="sm"
                             >
                                 Deposit
                             </Button>
@@ -134,10 +120,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 leftSection={<TbPigMoney />}
                                 onClick={openEtherDeposit}
                                 disabled={!isConnected}
+                                visibleFrom="sm"
                             >
                                 Deposit Ether
                             </Button>
-                            <ConnectButton />
+                            {!isSmallDevice && <ConnectButton />}
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
@@ -178,6 +165,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         disabled={!isConnected}
                         opened={isConnected && navDepositOpened}
                         onClick={toggleNavDeposit}
+                        hiddenFrom="sm"
                     >
                         <NavLink
                             active={isConnected}
@@ -197,7 +185,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         />
                     </NavLink>
 
-                    <ConnectButton />
+                    {isSmallDevice && <ConnectButton showBalance />}
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
