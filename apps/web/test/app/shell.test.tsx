@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../utils/WithMantineTheme";
 import Shell from "../../src/app/shell";
@@ -123,45 +123,47 @@ describe("Shell component", () => {
 
     describe("Header", () => {
         it("should display deposit links in header", () => {
-            const { container } = render(<Component>Children</Component>);
-            const header = container.querySelector("header") as HTMLDivElement;
-            const depositButton = header.querySelector(
-                '[data-testid="deposit-button"]',
-            );
-            const depositEtherButton = header.querySelector(
-                '[data-testid="deposit-ether-button"]',
-            );
+            render(<Component>Children</Component>);
 
-            expect(depositButton !== null).toBe(true);
-            expect(depositEtherButton !== null).toBe(true);
+            expect(
+                within(screen.getByTestId("header")).getByTestId(
+                    "deposit-button",
+                ),
+            ).toBeInTheDocument();
+            expect(
+                within(screen.getByTestId("header")).getByTestId(
+                    "deposit-ether-button",
+                ),
+            ).toBeInTheDocument();
         });
 
         it("should not display home and applications links in header", () => {
-            const { container } = render(<Component>Children</Component>);
-            const header = container.querySelector("header") as HTMLDivElement;
-            const homeLink = header.querySelector('[data-testid="home-link"]');
-            const applicationsLink = header.querySelector(
-                '[data-testid="applications-link"]',
-            );
+            render(<Component>Children</Component>);
 
-            expect(homeLink === null).toBe(true);
-            expect(applicationsLink === null).toBe(true);
+            expect(() =>
+                within(screen.getByTestId("header")).getByTestId("home-link"),
+            ).toThrow("Unable to find an element");
+
+            expect(() =>
+                within(screen.getByTestId("header")).getByTestId(
+                    "applications-link",
+                ),
+            ).toThrow("Unable to find an element");
         });
     });
 
     describe("Navbar", () => {
         it("should display home and applications links in navbar", () => {
-            const { container } = render(<Component>Children</Component>);
-            const navbar = container.querySelector(
-                ".mantine-AppShell-navbar",
-            ) as HTMLDivElement;
-            const homeLink = navbar.querySelector('[data-testid="home-link"]');
-            const applicationsLink = navbar.querySelector(
-                '[data-testid="applications-link"]',
-            );
+            render(<Component>Children</Component>);
 
-            expect(homeLink !== null).toBe(true);
-            expect(applicationsLink !== null).toBe(true);
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId("home-link"),
+            ).toBeInTheDocument();
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId(
+                    "applications-link",
+                ),
+            ).toBeInTheDocument();
         });
 
         it("should display navbar on desktop", () => {

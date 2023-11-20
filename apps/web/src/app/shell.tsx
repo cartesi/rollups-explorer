@@ -93,7 +93,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             >
                 <EtherDepositForm applications={applications} />
             </Modal>
-            <AppShell.Header>
+            <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
                     <Burger
                         opened={opened}
@@ -151,7 +151,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             <AppShell.Aside p="md">
                 <ConnectionView />
             </AppShell.Aside>
-            <AppShell.Navbar py="md" px={4}>
+            <AppShell.Navbar py="md" px={4} data-testid="navbar">
                 <Stack px={13}>
                     <NavLink
                         label="Home"
