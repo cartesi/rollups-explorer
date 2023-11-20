@@ -174,6 +174,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             component="button"
                             onClick={openDeposit}
                             leftSection={<TbPigMoney />}
+                            hiddenFrom="sm"
                         />
                         <NavLink
                             active={isConnected}
@@ -182,6 +183,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             label={chain?.nativeCurrency.name ?? "Ether"}
                             onClick={openEtherDeposit}
                             leftSection={<TbPigMoney />}
+                            hiddenFrom="sm"
                         />
                     </NavLink>
 
