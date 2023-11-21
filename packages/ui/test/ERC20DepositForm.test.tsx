@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, it } from "vitest";
 import { isObject } from "@vitest/utils";
+import { describe, it } from "vitest";
 import {
     ApplicationAutocomplete,
     ERC20DepositForm,
@@ -279,6 +279,93 @@ describe("Rollups ERC20DepositForm", () => {
             });
 
             expect(screen.getByDisplayValue(value) === amountInput).toBe(true);
+        });
+    });
+    describe("Max Amount Button", () => {
+        vi.mock("wagmi", async () => {
+            return {
+                useContractReads: () => ({
+                    isLoading: false,
+                    isSuccess: true,
+                    data: [
+                        {
+                            result: 18,
+                            status: "success",
+                        },
+                        {
+                            result: "KNI",
+                            status: "success",
+                        },
+                        {
+                            result: 0n,
+                            status: "success",
+                        },
+                        {
+                            result: 50000000000000000000n,
+                            status: "success",
+                        },
+                    ],
+                }),
+                useAccount: () => ({
+                    address: "0xaBe5271e041df23C9f7C0461Df5D340A0C1C36F4",
+                }),
+                useWaitForTransaction: () => ({}),
+            };
+        });
+        it("should display max button when the balance is more than 0", () => {
+            vi.mock("wagmi", async () => {
+                return {
+                    useContractReads: () => ({
+                        isLoading: false,
+                        isSuccess: true,
+                        data: [
+                            {
+                                result: 18,
+                                status: "success",
+                            },
+                            {
+                                result: "KNI",
+                                status: "success",
+                            },
+                            {
+                                result: 0n,
+                                status: "success",
+                            },
+                            {
+                                result: 50000000000000000000n,
+                                status: "success",
+                            },
+                        ],
+                    }),
+                    useAccount: () => ({
+                        address: "0xaBe5271e041df23C9f7C0461Df5D340A0C1C36F4",
+                    }),
+                    useWaitForTransaction: () => ({}),
+                };
+            });
+            render(<Component {...defaultProps} />);
+            const tokenInput = screen.getByTestId(
+                "token-input",
+            ) as HTMLInputElement;
+            const value = "0x3Ea829Fd1b0798edF21D7b0aa7cd720e5faa4f7b";
+
+            fireEvent.change(tokenInput, {
+                target: {
+                    value,
+                },
+            });
+            expect(screen.getByText(50)).toBeInTheDocument();
+            expect(screen.getByText("KNI")).toBeInTheDocument();
+            expect(screen.getByText("Max")).toBeInTheDocument();
+        });
+        it("sets the input value to match the balance when the max button is clicked", () => {
+            render(<Component {...defaultProps} />);
+            const amountInput = screen.getByTestId(
+                "amount-input",
+            ) as HTMLInputElement;
+            const maxButton = screen.getByTestId("max-button");
+            fireEvent.click(maxButton);
+            expect(amountInput.value).toBe("50");
         });
     });
 });
