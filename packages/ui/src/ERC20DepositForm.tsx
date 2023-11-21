@@ -126,6 +126,7 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
                     );
                     onChange(formattedValue);
                 }}
+                data-testid="token-input"
             />
 
             {erc20Address !== "" &&
@@ -184,7 +185,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                   return (d.error as BaseError).shortMessage;
               })
         : [];
-
     // token amount to deposit
     const [amount, setAmount] = useState<string>("");
     const amountBigint =
@@ -291,31 +291,37 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             data-testid="amount-input"
                         />
                         <Flex
-                            mt={"-sm"}
+                            mt="-sm"
                             justify={"space-between"}
                             direction={"row"}
                         >
                             <Flex rowGap={6} c={"dark.2"}>
                                 <Text fz="xs">Balance:</Text>
-                                <Text fz="xs" mx={4}>
+                                <Text id="token-balance" fz="xs" mx={4}>
                                     {" "}
-                                    {balance != undefined && decimals
+                                    {balance !== undefined && decimals
                                         ? formatUnits(balance, decimals)
                                         : ""}
                                 </Text>
-                                {balance != undefined && decimals && (
-                                    <UnstyledButton
-                                        fz={"xs"}
-                                        c={"cyan"}
-                                        onClick={() =>
-                                            setAmount(
-                                                formatUnits(balance, decimals),
-                                            )
-                                        }
-                                    >
-                                        Max
-                                    </UnstyledButton>
-                                )}
+                                {balance !== undefined &&
+                                    balance > 0 &&
+                                    decimals && (
+                                        <UnstyledButton
+                                            fz={"xs"}
+                                            c={"cyan"}
+                                            onClick={() =>
+                                                setAmount(
+                                                    formatUnits(
+                                                        balance,
+                                                        decimals,
+                                                    ),
+                                                )
+                                            }
+                                            data-testid="max-button"
+                                        >
+                                            Max
+                                        </UnstyledButton>
+                                    )}
                             </Flex>
                             <Flex rowGap={6} c={"dark.2"}>
                                 <Text size="xs">Allowance:</Text>
