@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../utils/WithMantineTheme";
 import Shell from "../../src/app/shell";
@@ -118,6 +118,61 @@ describe("Shell component", () => {
             const logoLink = logo.closest("a") as HTMLAnchorElement;
 
             expect(logoLink.getAttribute("href")).toBe("/");
+        });
+    });
+
+    describe("Header", () => {
+        it("should display deposit links in header", () => {
+            render(<Component>Children</Component>);
+
+            expect(
+                within(screen.getByTestId("header")).getByTestId(
+                    "deposit-button",
+                ),
+            ).toBeInTheDocument();
+            expect(
+                within(screen.getByTestId("header")).getByTestId(
+                    "deposit-ether-button",
+                ),
+            ).toBeInTheDocument();
+        });
+
+        it("should not display home and applications links in header", () => {
+            render(<Component>Children</Component>);
+
+            expect(() =>
+                within(screen.getByTestId("header")).getByTestId("home-link"),
+            ).toThrow("Unable to find an element");
+
+            expect(() =>
+                within(screen.getByTestId("header")).getByTestId(
+                    "applications-link",
+                ),
+            ).toThrow("Unable to find an element");
+        });
+    });
+
+    describe("Navbar", () => {
+        it("should display home and applications links in navbar", () => {
+            render(<Component>Children</Component>);
+
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId("home-link"),
+            ).toBeInTheDocument();
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId(
+                    "applications-link",
+                ),
+            ).toBeInTheDocument();
+        });
+
+        it("should display navbar on desktop", () => {
+            const { container } = render(<Component>Children</Component>);
+            const navbar = container.querySelector(
+                ".mantine-AppShell-navbar",
+            ) as HTMLDivElement;
+
+            expect(navbar).toBeVisible();
         });
     });
 });
