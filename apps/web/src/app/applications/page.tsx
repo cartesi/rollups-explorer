@@ -1,6 +1,5 @@
 "use client";
 import {
-    ActionIcon,
     Anchor,
     Breadcrumbs,
     Group,
@@ -11,15 +10,14 @@ import {
     Table,
     Text,
     Title,
-    Tooltip,
 } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import Link from "next/link";
 import { pathOr } from "ramda";
 import { FC, useEffect, useState } from "react";
-import { TbApps, TbInbox } from "react-icons/tb";
-import Address from "../../components/address";
+import { TbApps } from "react-icons/tb";
 import {
+    Application,
     ApplicationOrderByInput,
     useApplicationsConnectionQuery,
 } from "../../graphql";
@@ -27,6 +25,7 @@ import {
     limitBounds,
     usePaginationParams,
 } from "../../hooks/usePaginationParams";
+import ApplicationRow from "../../components/applicationRow";
 
 export type ApplicationsPageProps = {};
 
@@ -86,6 +85,7 @@ const ApplicationsPage: FC<ApplicationsPageProps> = (props) => {
                         <Table.Tr>
                             <Table.Th>Id</Table.Th>
                             <Table.Th>Owner</Table.Th>
+                            <Table.Th>URL</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -106,35 +106,12 @@ const ApplicationsPage: FC<ApplicationsPageProps> = (props) => {
                         )}
                         {query.data?.applicationsConnection.edges.map(
                             ({ node }) => (
-                                <Table.Tr key={node.id}>
-                                    <Table.Td>
-                                        <Address
-                                            value={node.id as Address}
-                                            icon
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        {node.owner ? (
-                                            <Address
-                                                value={node.owner as Address}
-                                                icon
-                                            />
-                                        ) : (
-                                            "N/A"
-                                        )}
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <Tooltip label="Inputs">
-                                            <Link
-                                                href={`/applications/${node.id}`}
-                                            >
-                                                <ActionIcon variant="default">
-                                                    <TbInbox />
-                                                </ActionIcon>
-                                            </Link>
-                                        </Tooltip>
-                                    </Table.Td>
-                                </Table.Tr>
+                                <ApplicationRow
+                                    key={node.id}
+                                    application={
+                                        node as Omit<Application, "inputs">
+                                    }
+                                />
                             ),
                         )}
                     </Table.Tbody>
