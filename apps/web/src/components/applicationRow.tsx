@@ -6,7 +6,7 @@ import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
 import { Application } from "../graphql";
 import { useConnectionConfig } from "../providers/connectionConfig/hooks";
 
-interface ApplicationRowProps {
+export interface ApplicationRowProps {
     application: Omit<Application, "inputs">;
 }
 
@@ -40,7 +40,10 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
             <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
             <Table.Td>
                 <Tooltip label="Inputs">
-                    <Link href={`/applications/${appId}`}>
+                    <Link
+                        href={`/applications/${appId}`}
+                        data-testid="applications-link"
+                    >
                         <ActionIcon variant="default">
                             <TbInbox />
                         </ActionIcon>
@@ -49,6 +52,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
                 {hasConnection(appId) ? (
                     <Tooltip label="Remove connection">
                         <ActionIcon
+                            data-testid="remove-connection"
                             variant="default"
                             ml={4}
                             onClick={() => removeConnection(appId)}
@@ -59,6 +63,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
                 ) : (
                     <Tooltip label="Add a connection">
                         <ActionIcon
+                            data-testid="add-connection"
                             variant="default"
                             ml={4}
                             onClick={() => showConnectionModal(appId)}
