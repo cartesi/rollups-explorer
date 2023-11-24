@@ -32,6 +32,7 @@ import { useAccount, useNetwork } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
+import Footer from "../components/footer";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
@@ -80,6 +81,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     desktop: !menuOpened,
                     mobile: !menuOpened,
                 },
+            }}
+            footer={{
+                ...themeDefaultProps?.footer,
+                position: "relative",
+                zIndex: 102,
             }}
             padding="md"
         >
@@ -199,6 +205,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
+            <Footer />
         </AppShell>
     );
 };
