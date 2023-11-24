@@ -82,11 +82,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     mobile: !menuOpened,
                 },
             }}
-            footer={{
-                ...themeDefaultProps?.footer,
-                position: "relative",
-                zIndex: 102,
-            }}
             padding="md"
         >
             <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
