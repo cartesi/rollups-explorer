@@ -63,7 +63,10 @@ const Footer: FC = () => {
                 justify="space-between"
                 direction={isSmallDevice ? "column" : "row"}
             >
-                <Box mr="2rem" style={{ order: isSmallDevice ? 2 : 1 }}>
+                <Box
+                    mr={isSmallDevice ? 0 : "2rem"}
+                    style={{ order: isSmallDevice ? 2 : 1 }}
+                >
                     <CartesiLogo height={40} />
                     <Text mt={12}>
                         CartesiScan is a tool for inspecting and analyzing
@@ -72,7 +75,7 @@ const Footer: FC = () => {
                         Blockchain explorer for Ethereum Networks.
                     </Text>
 
-                    <Text mt={20}>
+                    <Text mt={20} data-testid="app-copyright">
                         (c) Cartesi and individual authors (see{" "}
                         <FooterLink
                             href="https://github.com/cartesi/rollups-explorer/blob/main/AUTHORS"
@@ -96,6 +99,7 @@ const Footer: FC = () => {
                 <Flex
                     justify="space-between"
                     direction={isSmallDevice ? "column" : "row"}
+                    mr={isSmallDevice ? 0 : "4rem"}
                     style={{ order: isSmallDevice ? 1 : 2 }}
                 >
                     <Box w="14rem">
