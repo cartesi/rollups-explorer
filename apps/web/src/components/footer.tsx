@@ -107,22 +107,55 @@ const Footer: FC = () => {
                             CartesiScan
                         </Text>
                         <List>
-                            <List.Item icon={<TbBug size={20} />}>
+                            <List.Item
+                                icon={
+                                    <Flex>
+                                        <TbBug size={20} />
+                                    </Flex>
+                                }
+                            >
                                 <FooterLink href="https://github.com/cartesi/rollups-explorer/issues/new?assignees=&labels=Type%3A+Bug%2CStatus%3A+Needs+triage&projects=&template=2-bug.md&title=">
                                     Report a bug
                                 </FooterLink>
                             </List.Item>
-                            <List.Item icon={<TbMessage2Code size={20} />}>
+                            <List.Item
+                                icon={
+                                    <Flex>
+                                        <TbMessage2Code
+                                            size={20}
+                                            style={{ display: "flex" }}
+                                        />
+                                    </Flex>
+                                }
+                            >
                                 <FooterLink href="https://github.com/cartesi/rollups-explorer/issues/new?assignees=&labels=Type%3A+Feature%2CStatus%3A+Needs+triage&projects=&template=1-feature.md&title=">
                                     Feature request
                                 </FooterLink>
                             </List.Item>
-                            <List.Item icon={<TbBrandGithub size={20} />}>
+                            <List.Item
+                                icon={
+                                    <Flex>
+                                        <TbBrandGithub
+                                            size={20}
+                                            style={{ display: "flex" }}
+                                        />
+                                    </Flex>
+                                }
+                            >
                                 <FooterLink href="https://github.com/cartesi/rollups-explorer/blob/main/CONTRIBUTING.md">
                                     Contribute
                                 </FooterLink>
                             </List.Item>
-                            <List.Item icon={<TbBrandDiscord size={20} />}>
+                            <List.Item
+                                icon={
+                                    <Flex>
+                                        <TbBrandDiscord
+                                            size={20}
+                                            style={{ display: "flex" }}
+                                        />
+                                    </Flex>
+                                }
+                            >
                                 <FooterLink href="https://discord.com/invite/pfXMwXDDfW">
                                     Discord
                                 </FooterLink>
