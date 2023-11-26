@@ -1,6 +1,7 @@
 import {
     AppShell,
     DEFAULT_THEME,
+    List,
     MantineThemeOverride,
     Modal,
     createTheme,
@@ -35,6 +36,12 @@ const themeOverride: MantineThemeOverride = createTheme({
                     width: 400,
                     breakpoint: "sm",
                 },
+            },
+        }),
+        List: List.extend({
+            defaultProps: {
+                center: true,
+                spacing: "0.5rem",
             },
         }),
     },
