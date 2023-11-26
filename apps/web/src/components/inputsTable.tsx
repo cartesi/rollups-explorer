@@ -2,19 +2,13 @@
 import { Table, UnstyledButton } from "@mantine/core";
 import { FC, useCallback, useState } from "react";
 import InputRow from "../components/inputRow";
-import { InputOrderByInput, useInputsQuery } from "../graphql";
-import { usePaginationParams } from "../hooks/usePaginationParams";
+import type { InputItemFragment } from "../graphql";
 
-const Explorer: FC = (props) => {
-    const [{ limit, page }, updateParams] = usePaginationParams();
-    const after = page === 1 ? undefined : ((page - 1) * limit).toString();
-    const [{ data, fetching }] = useInputsQuery({
-        variables: {
-            orderBy: InputOrderByInput.TimestampDesc,
-            limit,
-            after,
-        },
-    });
+export interface InputsTableProps {
+    inputs: InputItemFragment[];
+}
+
+const InputsTable: FC<InputsTableProps> = ({ inputs }) => {
     const [timeType, setTimeType] = useState("age");
 
     const onChangeTimeColumnType = useCallback(() => {
@@ -45,7 +39,7 @@ const Explorer: FC = (props) => {
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-                {data?.inputsConnection.edges.map(({ node: input }) => (
+                {inputs.map((input) => (
                     <InputRow
                         key={input.id}
                         input={input}
@@ -57,4 +51,4 @@ const Explorer: FC = (props) => {
     );
 };
 
-export default Explorer;
+export default InputsTable;
