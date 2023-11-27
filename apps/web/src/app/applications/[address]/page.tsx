@@ -6,7 +6,6 @@ import {
     Pagination,
     Select,
     Stack,
-    Table,
     Text,
     Title,
 } from "@mantine/core";
@@ -16,12 +15,12 @@ import { pathOr } from "ramda";
 import { FC, useEffect, useState } from "react";
 import { TbInbox } from "react-icons/tb";
 import Address from "../../../components/address";
-import InputRow from "../../../components/inputRow";
 import { InputOrderByInput, useInputsQuery } from "../../../graphql";
 import {
     limitBounds,
     usePaginationParams,
 } from "../../../hooks/usePaginationParams";
+import InputsTable from "../../../components/inputsTable";
 
 export type ApplicationPageProps = {
     params: { address: string };
@@ -42,6 +41,7 @@ const ApplicationPage: FC<ApplicationPageProps> = ({ params }) => {
     const [activePage, setActivePage] = useState(
         page > totalPages ? totalPages : page,
     );
+    const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
     const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
         duration: 700,
         offset: 150,
@@ -82,24 +82,8 @@ const ApplicationPage: FC<ApplicationPageProps> = ({ params }) => {
                         updateParams(pageN, limit);
                     }}
                 />
-                <Table>
-                    <Table.Thead>
-                        <Table.Tr>
-                            <Table.Th>From</Table.Th>
-                            <Table.Th></Table.Th>
-                            <Table.Th>To</Table.Th>
-                            <Table.Th>Method</Table.Th>
-                            <Table.Th>Index</Table.Th>
-                            <Table.Th>Age</Table.Th>
-                            <Table.Th>Data</Table.Th>
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                        {data?.inputsConnection.edges.map(({ node: input }) => (
-                            <InputRow key={input.id} input={input} />
-                        ))}
-                    </Table.Tbody>
-                </Table>
+
+                <InputsTable inputs={inputs} />
 
                 <Group justify="space-between" align="center">
                     <Group>
