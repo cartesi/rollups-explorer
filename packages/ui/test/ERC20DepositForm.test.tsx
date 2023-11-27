@@ -341,7 +341,7 @@ describe("Rollups ERC20DepositForm", () => {
             });
             render(<Component {...defaultProps} />);
             const tokenInput = screen.getByTestId(
-                "token-input",
+                "erc20Address",
             ) as HTMLInputElement;
             const value = "0x3Ea829Fd1b0798edF21D7b0aa7cd720e5faa4f7b";
 

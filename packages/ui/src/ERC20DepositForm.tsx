@@ -301,8 +301,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
                             placeholder="0"
                             rightSectionWidth={60}
                             rightSection={<Text>{symbol}</Text>}
-                            onChange={(e) => setAmount(e.target.value)}
-                            value={amount}
                             withAsterisk
                             data-testid="amount-input"
                             {...form.getInputProps("amount")}
@@ -326,14 +324,15 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
                                         <UnstyledButton
                                             fz={"xs"}
                                             c={"cyan"}
-                                            onClick={() =>
-                                                setAmount(
+                                            onClick={() => {
+                                                form.setFieldValue(
+                                                    "amount",
                                                     formatUnits(
                                                         balance,
                                                         decimals,
                                                     ),
-                                                )
-                                            }
+                                                );
+                                            }}
                                             data-testid="max-button"
                                         >
                                             Max
