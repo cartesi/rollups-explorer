@@ -34,6 +34,10 @@ export interface RawInputFormProps {
 
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -143,4 +147,4 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             </Stack>
         </form>
     );
-});
+};

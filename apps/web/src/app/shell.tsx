@@ -27,9 +27,7 @@ import {
 import { useAccount } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
-import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import Footer from "../components/footer";
-import Deposit from "../components/deposit";
 import SendTransaction from "../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
@@ -54,7 +52,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             header={themeDefaultProps.header}
             navbar={{
                 ...themeDefaultProps?.navbar,
-                width: 180,
+                width: 200,
                 collapsed: {
                     mobile: !opened,
                 },
@@ -76,7 +74,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             >
                 <SendTransaction />
             </Modal>
-            <AppShell.Header>
+            <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
                     <Burger
                         opened={opened}
@@ -89,31 +87,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             <CartesiLogo height={40} />
                         </Link>
                         <Group ml="xl" gap="md">
-                            <Button
-                                variant="subtle"
-                                leftSection={<TbPigMoney />}
-                                onClick={openDeposit}
-                                disabled={!isConnected}
-                                visibleFrom="sm"
-                                data-testid="deposit-button"
-                            >
-                                Deposit
-                            </Button>
-                                component={Link}
-                                href="/"
-                                variant="subtle"
-                                leftSection={<TbHome />}
-                            >
-                                Home
-                            </Button>
-                            <Button
-                                component={Link}
-                                href="/applications"
-                                variant="subtle"
-                                leftSection={<TbApps />}
-                            >
-                                Applications
-                            </Button>
                             <Button
                                 variant="subtle"
                                 leftSection={<TbPigMoney />}
@@ -169,18 +142,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         disabled={!isConnected}
                         opened={isConnected && transaction}
                         onClick={toggleTransaction}
-                    >
-                        <NavLink
-                            active={isConnected}
-                            label="ERC-20"
-                            variant="subtle"
-                            component="button"
-                            onClick={openTransaction}
-                            leftSection={<TbPigMoney />}
-                            hiddenFrom="sm"
-                        />
-                        />
-                    </NavLink>
+                    />
 
                     {isSmallDevice && <ConnectButton showBalance />}
                 </Stack>

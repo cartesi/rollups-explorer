@@ -111,8 +111,8 @@ const SendTransaction: FC<DepositProps> = ({
                     },
                 ]}
                 value={depositType}
-                onChange={(nextValue: DepositType) => {
-                    setDepositType(nextValue);
+                onChange={(nextValue) => {
+                    setDepositType(nextValue as DepositType);
                     setApplicationId("");
                 }}
             />

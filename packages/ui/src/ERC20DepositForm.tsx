@@ -119,7 +119,7 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
                 label="ERC-20"
                 description="The ERC-20 smart contract address"
                 placeholder="0x"
-                data-testid="token-autocomplete"
+                data-testid="token-input"
                 data={tokens}
                 value={erc20Address}
                 error={error}
@@ -131,7 +131,6 @@ export const TokenAutocomplete: FC<TokensAutocompleteProps> = (props) => {
                     );
                     onChange(formattedValue);
                 }}
-                data-testid="token-input"
             />
 
             {erc20Address !== "" &&
