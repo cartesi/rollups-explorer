@@ -5,7 +5,7 @@ import {
     ApplicationAutocomplete,
     ERC20DepositForm,
     TokenAutocomplete,
-} from "../src";
+} from "../src/ERC20DepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
 const Component = withMantineTheme(ERC20DepositForm);
