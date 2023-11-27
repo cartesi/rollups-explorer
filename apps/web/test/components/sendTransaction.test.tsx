@@ -195,7 +195,7 @@ describe("SendTransaction component", () => {
         render(<Component initialDepositType="erc20" />);
 
         const tokenAutocomplete = screen.queryByTestId(
-            "token-autocomplete",
+            "token-input",
         ) as HTMLFormElement;
 
         fireEvent.change(tokenAutocomplete, {

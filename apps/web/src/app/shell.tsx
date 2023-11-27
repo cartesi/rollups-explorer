@@ -92,7 +92,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 onClick={openTransaction}
                                 disabled={!isConnected}
                                 visibleFrom="sm"
-                                data-testid="deposit-button"
+                                data-testid="transaction-button"
                             >
                                 Send Transaction
                             </Button>

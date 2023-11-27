@@ -122,17 +122,12 @@ describe("Shell component", () => {
     });
 
     describe("Header", () => {
-        it("should display deposit links in header", () => {
+        it("should display transaction link in header", () => {
             render(<Component>Children</Component>);
 
             expect(
                 within(screen.getByTestId("header")).getByTestId(
-                    "deposit-button",
-                ),
-            ).toBeInTheDocument();
-            expect(
-                within(screen.getByTestId("header")).getByTestId(
-                    "deposit-ether-button",
+                    "transaction-button",
                 ),
             ).toBeInTheDocument();
         });
