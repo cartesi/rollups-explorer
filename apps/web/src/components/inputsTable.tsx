@@ -1,5 +1,5 @@
 "use client";
-import { Table, UnstyledButton } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
 import { FC, useCallback, useState } from "react";
 import InputRow from "../components/inputRow";
 import type { InputItemFragment } from "../graphql";
@@ -25,15 +25,13 @@ const InputsTable: FC<InputsTableProps> = ({ inputs }) => {
                     <Table.Th>Method</Table.Th>
                     <Table.Th>Index</Table.Th>
                     <Table.Th>
-                        <UnstyledButton
-                            c="cyan"
-                            style={{
-                                fontSize: "var(--mantine-font-size-sm)",
-                            }}
+                        <Button
+                            variant="transparent"
+                            px={0}
                             onClick={onChangeTimeColumnType}
                         >
                             {timeType === "age" ? "Age" : "Timestamp (UTC)"}
-                        </UnstyledButton>
+                        </Button>
                     </Table.Th>
                     <Table.Th>Data</Table.Th>
                 </Table.Tr>
