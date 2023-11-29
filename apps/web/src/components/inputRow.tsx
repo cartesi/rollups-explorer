@@ -10,8 +10,9 @@ import { InputItemFragment } from "../graphql";
 import Address from "./address";
 import InputDetailsView from "./inputDetailsView";
 
-export type InputCardProps = {
+export type InputRowProps = {
     input: InputItemFragment;
+    timeType: string;
 };
 
 export type MethodResolver = (
@@ -32,14 +33,8 @@ const methodResolver: MethodResolver = (input) => {
     return undefined;
 };
 
-const InputRow: FC<InputCardProps> = ({ input }) => {
+const InputRow: FC<InputRowProps> = ({ input, timeType }) => {
     const [opened, { toggle }] = useDisclosure(false);
-    const age = prettyMilliseconds(Date.now() - input.timestamp * 1000, {
-        unitCount: 2,
-        secondsDecimalDigits: 0,
-        verbose: true,
-    });
-
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
 
@@ -98,7 +93,18 @@ const InputRow: FC<InputCardProps> = ({ input }) => {
                     <Text>{input.index}</Text>
                 </Table.Td>
                 <Table.Td>
-                    <Text>{age} ago</Text>
+                    <Text>
+                        {timeType === "age"
+                            ? `${prettyMilliseconds(
+                                  Date.now() - input.timestamp * 1000,
+                                  {
+                                      unitCount: 2,
+                                      secondsDecimalDigits: 0,
+                                      verbose: true,
+                                  },
+                              )} ago`
+                            : new Date(input.timestamp * 1000).toISOString()}
+                    </Text>
                 </Table.Td>
                 <Table.Td>
                     <ActionIcon variant="default" onClick={toggle}>
