@@ -28,7 +28,6 @@
         "graphql-tag": "^2",
         "lokijs": "^1",
         "next": "^13",
-        "next-urql": "^5.0.2",
         "pino-pretty": "^10",
         "pretty-ms": "^8",
         "ramda": "^0.29.0",
