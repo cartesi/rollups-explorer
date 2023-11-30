@@ -1,11 +1,11 @@
 "use client";
 import {
     ERC20DepositForm,
-    RawInputForm,
     EtherDepositForm,
+    RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
 import { FC, useMemo, useState } from "react";
-import { Select, SegmentedControl } from "@mantine/core";
+import { Select } from "@mantine/core";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import { useDebouncedValue } from "@mantine/hooks";
 
@@ -55,59 +55,21 @@ const SendTransaction: FC<DepositProps> = ({
 
     return (
         <>
-            {/*<SegmentedControl*/}
-            {/*    value={depositType}*/}
-            {/*    onChange={(nextValue: DepositType) => {*/}
-            {/*        setDepositType(nextValue);*/}
-            {/*        setApplicationId("");*/}
-            {/*    }}*/}
-            {/*    data={[*/}
-            {/*        {*/}
-            {/*            value: "ether",*/}
-            {/*            label: "Ether Deposit",*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "erc20",*/}
-            {/*            label: "ERC-20 Deposit",*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "erc721",*/}
-            {/*            label: "ERC-721 Deposit",*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "erc1155",*/}
-            {/*            label: "ERC-1155 Deposit",*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "relay",*/}
-            {/*            label: "Address Relay",*/}
-            {/*        },*/}
-            {/*        {*/}
-            {/*            value: "input",*/}
-            {/*            label: "Raw Input",*/}
-            {/*        },*/}
-            {/*    ]}*/}
-            {/*    styles={{ root: { width: "100%" } }}*/}
-            {/*/>*/}
             <Select
                 label="Type"
                 placeholder="Select deposit type"
+                mb={16}
                 data={[
                     {
                         group: "Deposit",
                         items: [
-                            { value: "ether", label: "Ether" },
-                            { value: "erc20", label: "ERC-20" },
-                            { value: "erc721", label: "ERC-721" },
-                            { value: "erc1155", label: "ERC-1155" },
+                            { value: "ether", label: "Ether Deposit" },
+                            { value: "erc20", label: "ERC-20 Deposit" },
                         ],
                     },
                     {
                         group: "Other",
-                        items: [
-                            { value: "input", label: "Raw Input" },
-                            { value: "relay", label: "Address Relay" },
-                        ],
+                        items: [{ value: "input", label: "Raw Input" }],
                     },
                 ]}
                 value={depositType}
@@ -116,8 +78,6 @@ const SendTransaction: FC<DepositProps> = ({
                     setApplicationId("");
                 }}
             />
-            <br />
-            <br />
 
             {depositType === "erc20" ? (
                 <ERC20DepositForm
