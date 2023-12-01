@@ -64,6 +64,7 @@ query tokens($limit: Int, $where: TokenWhereInput) {
 fragment ApplicationItem on Application {
     id
     owner
+    timestamp
     factory {
         id
     }
