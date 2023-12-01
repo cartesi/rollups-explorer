@@ -1,7 +1,8 @@
 "use client";
-import { Card, Group, Text } from "@mantine/core";
+import { Group, Text } from "@mantine/core";
 import { FC } from "react";
 import { IconType } from "react-icons";
+import { Card } from "./Card";
 import TweenedNumber from "./TweenedNumber";
 
 export type SummaryCardProps = {
