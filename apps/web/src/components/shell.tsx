@@ -23,6 +23,7 @@ import {
     TbApps,
     TbDotsVertical,
     TbHome,
+    TbInbox,
     TbMoneybag,
     TbMoonStars,
     TbPigMoney,
@@ -155,6 +156,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
                 <Stack px={13}>
                     <NavLink
+                        component={Link}
                         label="Home"
                         href="/"
                         leftSection={<TbHome />}
@@ -162,10 +164,19 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
+                        component={Link}
                         label="Applications"
                         href="/applications"
                         leftSection={<TbApps />}
                         data-testid="applications-link"
+                    />
+
+                    <NavLink
+                        component={Link}
+                        label="Inputs"
+                        href="/inputs"
+                        leftSection={<TbInbox />}
+                        data-testid="inputs-link"
                     />
 
                     <NavLink
