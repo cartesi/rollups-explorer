@@ -1,6 +1,6 @@
 "use client";
 import { Card } from "@cartesi/rollups-explorer-ui";
-import { Button, Grid, Group, Text } from "@mantine/core";
+import { Button, Grid, Group, Text, useMantineTheme } from "@mantine/core";
 import type { FC } from "react";
 import Link from "next/link";
 import { TbApps, TbInbox } from "react-icons/tb";
@@ -13,6 +13,7 @@ import {
 } from "../graphql";
 import type { Address as AddressType } from "abitype/dist/types/abi";
 import { IconType } from "react-icons";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface LatestEntriesCard {
     title: string;
@@ -34,9 +35,11 @@ export const LatestEntriesCard: FC<LatestEntriesCard> = (props) => {
         viewAllText,
         viewAllHref,
     } = props;
+    const theme = useMantineTheme();
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
 
     return (
-        <Card>
+        <Card h="100%">
             <Group gap={5} align="center">
                 <Icon size={20} />
                 <Text c="dimmed" lh={1}>
@@ -52,13 +55,14 @@ export const LatestEntriesCard: FC<LatestEntriesCard> = (props) => {
                 />
             </Group>
 
-            <Group gap={5}>
+            <Group gap={5} mt="auto">
                 <Button
                     component={Link}
                     href={viewAllHref}
                     variant="light"
-                    fullWidth
+                    fullWidth={isSmallDevice}
                     mt="md"
+                    mx="auto"
                     radius="md"
                     tt="uppercase"
                 >
