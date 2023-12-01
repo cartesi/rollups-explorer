@@ -1,5 +1,5 @@
-import { describe, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, it } from "vitest";
 import InputsTable, {
     InputsTableProps,
 } from "../../src/components/inputsTable";
@@ -26,7 +26,14 @@ const defaultProps: InputsTableProps = {
     fetching: false,
     totalCount: 1,
 };
+const IntersectionObserverMock = vi.fn(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    takeRecords: vi.fn(),
+    unobserve: vi.fn(),
+}));
 
+vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
 describe("InputsTable component", () => {
     it("should display time column with age label", () => {
         render(<Component {...defaultProps} />);
