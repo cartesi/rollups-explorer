@@ -79,8 +79,8 @@ const InputRow: FC<InputRowProps> = ({
         <>
             <Table.Tr>
                 <Table.Td>
-                    {input.erc20Deposit ? (
-                        <Box style={{ minWidth: "max-content" }}>
+                    <Box style={{ minWidth: "max-content" }}>
+                        {input.erc20Deposit ? (
                             <Group>
                                 <Address
                                     value={
@@ -92,10 +92,10 @@ const InputRow: FC<InputRowProps> = ({
                                 <TbArrowRight />
                                 <Address value={from} icon shorten />
                             </Group>
-                        </Box>
-                    ) : (
-                        <Address value={from} icon shorten />
-                    )}
+                        ) : (
+                            <Address value={from} icon shorten />
+                        )}
+                    </Box>
                 </Table.Td>
                 <Table.Td>
                     <Box style={{ minWidth: "max-content" }}>
@@ -106,7 +106,7 @@ const InputRow: FC<InputRowProps> = ({
                     </Box>
                 </Table.Td>
                 <Table.Td>
-                    <Box style={{ minWidth: "320px" }}>
+                    <Box style={{ minWidth: "max-content" }}>
                         <Address
                             value={to}
                             icon
