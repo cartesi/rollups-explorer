@@ -23,6 +23,8 @@ const defaultProps: InputsTableProps = {
             erc20Deposit: null,
         },
     ],
+    fetching: false,
+    totalCount: 1,
 };
 
 describe("InputsTable component", () => {
@@ -38,5 +40,15 @@ describe("InputsTable component", () => {
         fireEvent.click(timeTypeButton);
 
         expect(screen.getByText("Timestamp (UTC)")).toBeInTheDocument();
+    });
+
+    it("should display spinner when fetching data", () => {
+        render(<Component {...defaultProps} fetching />);
+        expect(screen.getByTestId("inputs-table-spinner")).toBeInTheDocument();
+    });
+
+    it("should display correct label when no inputs are fetched", () => {
+        render(<Component inputs={[]} fetching={false} totalCount={0} />);
+        expect(screen.getByText("No inputs")).toBeInTheDocument();
     });
 });

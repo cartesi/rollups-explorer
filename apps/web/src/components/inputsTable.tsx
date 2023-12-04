@@ -46,7 +46,7 @@ const InputsTable: FC<InputsTableProps> = ({
                 {fetching ? (
                     <Table.Tr>
                         <Table.Td align="center" colSpan={7}>
-                            <Loader />
+                            <Loader data-testid="inputs-table-spinner" />
                         </Table.Td>
                     </Table.Tr>
                 ) : (
