@@ -29,6 +29,7 @@ const defaultProps: ApplicationRowProps = {
             id: "0x7122cd1221c20892234186facfe8615e6743ab02",
             applications: [],
         },
+        timestamp: 1700593992,
     },
 };
 
