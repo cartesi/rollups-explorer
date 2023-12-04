@@ -11,13 +11,13 @@ export interface Entry {
     href: string;
 }
 
-export interface InputsTableProps {
+export interface LatestEntriesTableProps {
     entries: Entry[];
     fetching: boolean;
     totalCount: number;
 }
 
-const InputsTable: FC<InputsTableProps> = ({
+const LatestEntriesTable: FC<LatestEntriesTableProps> = ({
     entries,
     fetching,
     totalCount,
@@ -48,7 +48,7 @@ const InputsTable: FC<InputsTableProps> = ({
                 {fetching ? (
                     <Table.Tr>
                         <Table.Td align="center" colSpan={2}>
-                            <Loader />
+                            <Loader data-testid="inputs-table-spinner" />
                         </Table.Td>
                     </Table.Tr>
                 ) : (
@@ -61,7 +61,7 @@ const InputsTable: FC<InputsTableProps> = ({
                     )
                 )}
                 {entries.map((entry) => (
-                    <Table.Tr key={entry.appId}>
+                    <Table.Tr key={`${entry.appId}-${entry.timestamp}`}>
                         <Table.Td>
                             <Address
                                 value={entry.appId}
@@ -93,4 +93,4 @@ const InputsTable: FC<InputsTableProps> = ({
     );
 };
 
-export default InputsTable;
+export default LatestEntriesTable;
