@@ -17,17 +17,17 @@ import Link from "next/link";
 import { FC, ReactNode } from "react";
 import {
     TbApps,
+    TbArrowsDownUp,
     TbDotsVertical,
     TbHome,
-    TbMoneybag,
     TbMoonStars,
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../components/cartesiLogo";
 import ConnectionView from "../components/connectionView";
-import SendTransaction from "../components/sendTransaction";
 import Footer from "../components/footer";
+import SendTransaction from "../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
@@ -88,7 +88,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Group ml="xl" gap="md">
                             <Button
                                 variant="subtle"
-                                leftSection={<TbMoneybag />}
+                                leftSection={<TbArrowsDownUp />}
                                 onClick={openTransaction}
                                 disabled={!isConnected}
                                 visibleFrom="sm"
@@ -139,7 +139,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
 
                     <NavLink
                         label="Send Transaction"
-                        leftSection={<TbMoneybag />}
+                        leftSection={<TbArrowsDownUp />}
                         disabled={!isConnected}
                         opened={isConnected && transaction}
                         onClick={toggleTransaction}
