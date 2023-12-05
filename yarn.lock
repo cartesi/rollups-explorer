@@ -2518,7 +2518,7 @@
     react-textarea-autosize "8.5.3"
     type-fest "^3.13.1"
 
-"@mantine/form@^7.2.2":
+"@mantine/form@^7.3.0":
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/@mantine/form/-/form-7.3.0.tgz#af26621f05b0ca0e7a67bf22ec6f999ce13001b3"
   integrity sha512-+nuS8AKtREodu1CvdBuGoYGCahQN1YpbgW9yHThHewQ+GZMZkJo0b3qZ1zV2In6S3swK2Xv47X0f7kPQfrePdg==
@@ -2531,7 +2531,7 @@
   resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.3.0.tgz#82a3b2df51cac1a9c5ea416f60162cf879928254"
   integrity sha512-TL/9o4SpJogW5dJ4qvsZImsha6mOsCirIHlGP8dR00K72NjFgEqFPAy85HU68LQTG+GtMFRwk3tjpKneHF3uEA==
 
-"@mantine/notifications@^7.2.2":
+"@mantine/notifications@^7.3.0":
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.3.0.tgz#fb5178f5681e6a9fd358be47d815f3790e120e08"
   integrity sha512-c9zkhf5xzQbGLVv2woBOkzk3ov6ItXSm7i3giBd2kFchKKq7zaZPrNsKB1+90q6mzpYri7s5ibGsdrG4uzc3Hg==
