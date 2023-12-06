@@ -237,7 +237,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         );
 
     return (
-        <form>
+        <form data-testid="erc20-deposit-form">
             <Stack>
                 <Autocomplete
                     label="Application"
