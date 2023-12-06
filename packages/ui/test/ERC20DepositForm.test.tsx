@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { isObject } from "@vitest/utils";
 import { describe, it } from "vitest";
-import { ERC20DepositForm } from "../src/ERC20DepositForm";
+import { ERC20DepositForm } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
 
 const Component = withMantineTheme(ERC20DepositForm);
@@ -18,27 +17,72 @@ const tokens = [
     "SIM20 - SimpleERC20 - 0xa46e0a31a1c248160acba9dd354c72e52c92c9f2",
 ];
 
-const defaultApplicationProps = {
-    applications,
-    application: applications[0],
-    isLoading: false,
-    onChange: () => undefined,
-};
-
-const defaultTokenProps = {
-    tokens,
-    erc20Address: tokens[0],
-    error: "",
-    isLoading: false,
-    onChange: () => undefined,
-};
-
 const defaultProps = {
     applications,
     tokens,
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
 };
+
+vi.mock("@cartesi/rollups-wagmi", async () => {
+    const actual = await vi.importActual("@cartesi/rollups-wagmi");
+    return {
+        ...(actual as any),
+        usePrepareErc20Approve: () => ({
+            config: {},
+        }),
+        useErc20Approve: () => ({
+            data: {},
+            wait: vi.fn(),
+        }),
+        usePrepareErc20PortalDepositErc20Tokens: () => ({
+            config: {},
+        }),
+        useErc20PortalDepositErc20Tokens: () => ({
+            data: {},
+            wait: vi.fn(),
+        }),
+    };
+});
+
+vi.mock("wagmi", async () => {
+    return {
+        useContractReads: () => ({
+            isLoading: false,
+            isSuccess: true,
+            data: [
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+                {
+                    result: undefined,
+                    error: undefined,
+                },
+            ],
+        }),
+        useAccount: () => ({
+            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
+        }),
+        useWaitForTransaction: () => ({}),
+    };
+});
+
+vi.mock("viem", async () => {
+    const actual = await vi.importActual("viem");
+    return {
+        ...(actual as any),
+        getAddress: (address: string) => address,
+    };
+});
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
     const actual = await vi.importActual("@cartesi/rollups-wagmi");
@@ -124,31 +168,20 @@ describe("Rollups ERC20DepositForm", () => {
         });
 
         it("should display alert for unemployed application", () => {
-            render(
-                <Component
-                    {...defaultApplicationProps}
-                    application="undeployed-application"
-                />,
-            );
+            const { container } = render(<Component {...defaultProps} />);
+            const input = screen.getByTestId("application") as HTMLInputElement;
+
+            fireEvent.change(input, {
+                target: {
+                    value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+                },
+            });
 
             expect(
                 screen.getByText(
                     "This is a deposit to an undeployed application.",
                 ),
             ).toBeInTheDocument();
-        });
-
-        it("should should set input value to selected application", () => {
-            const selectedApplication = applications[1];
-            const { container } = render(
-                <ApplicationAutoCompleteComponent
-                    {...defaultApplicationProps}
-                    application={selectedApplication}
-                />,
-            );
-            const input = container.querySelector("input");
-
-            expect(input?.getAttribute("value")).toBe(selectedApplication);
         });
     });
 
@@ -175,47 +208,38 @@ describe("Rollups ERC20DepositForm", () => {
         });
 
         it("should display alert for first deposit of the selected token", () => {
-            render(
-                <Component
-                    {...defaultTokenProps}
-                    erc20Address="undeployed-address"
-                />,
-            );
+            const { container } = render(<Component {...defaultProps} />);
+            const input = screen.getByTestId(
+                "erc20Address",
+            ) as HTMLInputElement;
+
+            fireEvent.change(input, {
+                target: {
+                    value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+                },
+            });
 
             expect(
                 screen.getByText("This is the first deposit of that token."),
             ).toBeInTheDocument();
         });
 
-        it("should should set input value to selected application", () => {
-            const selectedToken = tokens[1].substring(tokens[1].indexOf("0x"));
-            const { container } = render(
-                <Component
-                    {...defaultTokenProps}
-                    erc20Address={selectedToken}
-                />,
-            );
-            const input = container.querySelector("input");
+        it("should display error for invalid address", () => {
+            render(<Component {...defaultProps} />);
+            const input = screen.getByTestId(
+                "erc20Address",
+            ) as HTMLInputElement;
 
-            expect(input?.getAttribute("value")).toBe(selectedToken);
-        });
+            fireEvent.change(input, {
+                target: {
+                    value: "",
+                },
+            });
 
-        it("should display error", () => {
-            const error = "Some error";
-            render(<Component {...defaultProps} error={error} />);
-
-            expect(screen.getByText(error)).toBeInTheDocument();
-        });
-
-        it("should display spinner while loading", () => {
-            const { container } = render(
-                <Component {...defaultProps} isLoading />,
-            );
-            const rightSlot = container.querySelector(
-                '[data-position="right"]',
-            );
-
-            expect(isObject(rightSlot)).toBe(true);
+            fireEvent.blur(input);
+            expect(
+                screen.getByText("Invalid ERC20 address"),
+            ).toBeInTheDocument();
         });
     });
 
@@ -319,7 +343,7 @@ describe("Rollups ERC20DepositForm", () => {
             });
             render(<Component {...defaultProps} />);
             const tokenInput = screen.getByTestId(
-                "token-input",
+                "erc20Address",
             ) as HTMLInputElement;
             const value = "0x3Ea829Fd1b0798edF21D7b0aa7cd720e5faa4f7b";
 
