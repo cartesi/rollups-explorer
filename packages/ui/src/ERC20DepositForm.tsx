@@ -87,11 +87,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             }),
         [tokens],
     );
-    );
-};
-
-export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
-    const { applications, tokens } = props;
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
@@ -242,7 +237,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         );
 
     return (
-        <form data-testid="erc20-deposit-form">
+        <form>
             <Stack>
                 <Autocomplete
                     label="Application"
