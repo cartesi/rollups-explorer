@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../utils/WithMantineTheme";
-import Shell from "../../src/app/shell";
+import Shell from "../../src/components/shell";
 
 const Component = withMantineTheme(Shell);
 
