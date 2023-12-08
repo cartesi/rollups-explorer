@@ -1,5 +1,3 @@
-"use client";
-
 import { FC } from "react";
 import { Button, Flex, Text } from "@mantine/core";
 
