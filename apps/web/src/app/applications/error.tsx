@@ -1,7 +1,7 @@
 "use client";
 
 import type { FC } from "react";
-import PageError from "../components/pageError";
+import PageError from "../../components/pageError";
 
 interface PageErrorProps {
     reset: () => void;
