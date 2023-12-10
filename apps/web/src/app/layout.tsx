@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     },
     description:
         "CartesiScan is a tool for inspecting and analyzing Cartesi rollups applications. Blockchain explorer for Ethereum Networks.",
+    icons: {
+        icon: "/favicon.ico",
+    },
 };
 
 interface LayoutProps {
@@ -28,7 +31,6 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         <html lang="en">
             <head>
                 <ColorSchemeScript />
-                <link rel="shortcut icon" href="/favicon.ico" />
             </head>
             <body>
                 <Providers>
