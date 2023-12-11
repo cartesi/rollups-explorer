@@ -1,14 +1,10 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import React, { FC } from "react";
+import type { FC, ReactNode } from "react";
 import { Metadata } from "next";
 import { ColorSchemeScript } from "@mantine/core";
 import { Providers } from "../providers/providers";
 import Shell from "../components/shell";
-
-interface LayoutProps {
-    children: React.ReactNode;
-}
 
 export const metadata: Metadata = {
     title: {
@@ -23,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 interface LayoutProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 const Layout: FC<LayoutProps> = ({ children }) => {
