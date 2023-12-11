@@ -1,11 +1,13 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-
 import React, { FC } from "react";
-
 import { ColorSchemeScript } from "@mantine/core";
 import { Providers } from "../providers/providers";
-import Shell from "./shell";
+import Shell from "../components/shell";
+
+interface LayoutProps {
+    children: React.ReactNode;
+}
 
 const Layout: FC<{ children: React.ReactNode }> = ({ children }) => {
     return (

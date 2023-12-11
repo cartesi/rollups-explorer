@@ -29,10 +29,10 @@ import {
     TbSun,
 } from "react-icons/tb";
 import { useAccount, useNetwork } from "wagmi";
-import CartesiLogo from "../components/cartesiLogo";
-import ConnectionView from "../components/connectionView";
+import CartesiLogo from "./cartesiLogo";
+import ConnectionView from "./connectionView";
 import { useApplicationsQuery, useTokensQuery } from "../graphql";
-import Footer from "../components/footer";
+import Footer from "./footer";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
