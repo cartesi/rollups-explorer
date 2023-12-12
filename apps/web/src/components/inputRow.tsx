@@ -52,7 +52,6 @@ const InputRow: FC<InputRowProps> = ({
 }) => {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
-    const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
@@ -141,20 +140,20 @@ const InputRow: FC<InputRowProps> = ({
                     pos={keepDataColVisible ? "initial" : "sticky"}
                     top={0}
                     right={0}
-                    bg={bgColor}
-                    p={keepDataColVisible ? theme.spacing.xs : 0}
+                    p={0}
+                    bg={theme.white}
                 >
-                    {keepDataColVisible ? (
+                    <Paper
+                        shadow={keepDataColVisible ? undefined : "xl"}
+                        style={{
+                            borderRadius: 0,
+                            padding: `var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))`,
+                        }}
+                    >
                         <ActionIcon variant="default" onClick={toggle}>
                             {opened ? <TbX /> : <TbFileText />}
                         </ActionIcon>
-                    ) : (
-                        <Paper shadow="xl" p={"lg"}>
-                            <ActionIcon variant="default" onClick={toggle}>
-                                {opened ? <TbX /> : <TbFileText />}
-                            </ActionIcon>
-                        </Paper>
-                    )}
+                    </Paper>
                 </Table.Td>
             </Table.Tr>
             <Table.Tr></Table.Tr>

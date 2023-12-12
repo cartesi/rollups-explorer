@@ -3,13 +3,14 @@ import {
     Button,
     Loader,
     Table,
+    Transition,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
-import { useIntersection } from "@mantine/hooks";
 import { FC, useCallback, useRef, useState } from "react";
 import InputRow from "../components/inputRow";
 import type { InputItemFragment } from "../graphql";
+import { useElementVisibility } from "../hooks/useElementVisibility";
 import { TableResponsiveWrapper } from "./tableResponsiveWrapper";
 
 export interface InputsTableProps {
@@ -31,12 +32,9 @@ const InputsTable: FC<InputsTableProps> = ({
         setTimeType((timeType) => (timeType === "age" ? "timestamp" : "age"));
     }, []);
     const tableRowRef = useRef<HTMLDivElement>(null);
-    const { ref, entry } = useIntersection({
-        root: tableRowRef.current,
-        rootMargin: "20px",
-        threshold: 0.5,
+    const { childrenRef, isVisible } = useElementVisibility({
+        element: tableRowRef,
     });
-    const isVisible = (entry?.intersectionRatio ?? 10) < 0.5;
 
     return (
         <TableResponsiveWrapper ref={tableRowRef}>
@@ -57,13 +55,29 @@ const InputsTable: FC<InputsTableProps> = ({
                                 {timeType === "age" ? "Age" : "Timestamp (UTC)"}
                             </Button>
                         </Table.Th>
-                        <Table.Th ref={ref}>Data</Table.Th>
-                        <Table.Th>
-                            <Button>
-                                {timeType === "age" ? "Age" : "Timestamp (UTC)"}
-                            </Button>
-                        </Table.Th>
-                        <Table.Th>Data</Table.Th>
+                        <Table.Th ref={childrenRef}>Data</Table.Th>
+                        <Transition
+                            mounted={isVisible}
+                            transition="scale-x"
+                            duration={500}
+                            timingFunction="ease-out"
+                        >
+                            {(styles) => (
+                                <th
+                                    style={{
+                                        ...styles,
+                                        position: "sticky",
+                                        top: 0,
+                                        right: 0,
+                                        backgroundColor: bgColor,
+                                        padding:
+                                            "var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-lg))",
+                                    }}
+                                >
+                                    Data
+                                </th>
+                            )}
+                        </Transition>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
