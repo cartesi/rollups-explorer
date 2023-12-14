@@ -10,11 +10,7 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
 import "@rainbow-me/rainbowkit/styles.css";
-import {
-    argentWallet,
-    ledgerWallet,
-    trustWallet,
-} from "@rainbow-me/rainbowkit/wallets";
+import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
 import Image from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import {
@@ -60,7 +56,6 @@ const connectors = connectorsForWallets([
     {
         groupName: "Other",
         wallets: [
-            argentWallet({ chains, projectId }),
             trustWallet({ chains, projectId }),
             ledgerWallet({ chains, projectId }),
         ],
