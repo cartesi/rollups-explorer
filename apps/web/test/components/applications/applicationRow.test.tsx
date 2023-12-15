@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import ApplicationRow, {
     ApplicationRowProps,
-} from "../../src/components/applicationRow";
+} from "../../src/components/applications/applicationRow";
 import { withMantineTheme } from "../utils/WithMantineTheme";
 import { Table } from "@mantine/core";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
@@ -25,6 +25,7 @@ const defaultProps: ApplicationRowProps = {
     application: {
         id: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
         owner: "0x74d093f6911ac080897c3145441103dabb869307",
+        timestamp: Math.floor(new Date().getTime() / 1000),
         factory: {
             id: "0x7122cd1221c20892234186facfe8615e6743ab02",
             applications: [],

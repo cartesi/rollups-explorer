@@ -9,7 +9,7 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import AppConnectionForm from "../../src/components/connectionForm";
+import AppConnectionForm from "../../src/components/connection/connectionForm";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../utils/WithMantineTheme";
 import { checkStatusSample } from "../utils/dataSamples";

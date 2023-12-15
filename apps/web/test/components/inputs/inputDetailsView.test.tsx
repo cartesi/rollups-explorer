@@ -8,7 +8,7 @@ import {
 import { useQuery } from "urql";
 import { Address } from "viem";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import InputDetailsView from "../../src/components/inputDetailsView";
+import InputDetailsView from "../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../utils/WithMantineTheme";
 import { useConnectionConfigReturnStub } from "../utils/connectionHelpers";

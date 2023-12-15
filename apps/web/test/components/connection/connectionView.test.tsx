@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import ConnectionView from "../../src/components/connectionView";
+import ConnectionView from "../../src/components/connection/connectionView";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
 import { connections } from "../providers/connectionConfig/mocks";
 import withMantineTheme from "../utils/WithMantineTheme";
