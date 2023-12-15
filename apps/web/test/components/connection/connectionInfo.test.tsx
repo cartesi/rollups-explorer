@@ -1,11 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
-import ConnectionInfo from "../../src/components/connection/connectionInfo";
-import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
-import StyleProvider from "../../src/providers/styleProvider";
-import { connections } from "../providers/connectionConfig/mocks";
+import ConnectionInfo from "../../../src/components/connection/connectionInfo";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import StyleProvider from "../../../src/providers/styleProvider";
+import { connections } from "../../providers/connectionConfig/mocks";
 
-vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("../../../src/providers/connectionConfig/hooks");
 
 const useConnMock = vi.mocked(useConnectionConfig, true);
 

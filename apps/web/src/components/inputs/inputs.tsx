@@ -4,9 +4,12 @@ import { Group, Pagination, Select, Stack, Text } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
 import { FC, useEffect, useState } from "react";
-import { InputOrderByInput, useInputsQuery } from "../graphql";
-import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
-import InputsTable from "../components/inputsTable";
+import { InputOrderByInput, useInputsQuery } from "../../graphql";
+import {
+    limitBounds,
+    usePaginationParams,
+} from "../../hooks/usePaginationParams";
+import InputsTable from "./inputsTable";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;

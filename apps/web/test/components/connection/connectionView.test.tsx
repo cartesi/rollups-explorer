@@ -1,12 +1,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import ConnectionView from "../../src/components/connection/connectionView";
-import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
-import { connections } from "../providers/connectionConfig/mocks";
-import withMantineTheme from "../utils/WithMantineTheme";
-import { useConnectionConfigReturnStub } from "../utils/connectionHelpers";
+import ConnectionView from "../../../src/components/connection/connectionView";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import { connections } from "../../providers/connectionConfig/mocks";
+import withMantineTheme from "../../utils/WithMantineTheme";
+import { useConnectionConfigReturnStub } from "../../utils/connectionHelpers";
 
-vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("../../../src/providers/connectionConfig/hooks");
 
 const View = withMantineTheme(ConnectionView);
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);

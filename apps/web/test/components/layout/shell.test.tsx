@@ -1,11 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
-import withMantineTheme from "../utils/WithMantineTheme";
-import Shell from "../../src/components/layout/shell";
+import withMantineTheme from "../../utils/WithMantineTheme";
+import Shell from "../../../src/components/layout/shell";
 
 const Component = withMantineTheme(Shell);
 
-vi.mock("../../src/graphql", async () => {
+vi.mock("../../../src/graphql", async () => {
     return {
         useApplicationsQuery: () => [{ data: {}, fetching: false }],
         useTokensQuery: () => [{ data: {}, fetching: false }],

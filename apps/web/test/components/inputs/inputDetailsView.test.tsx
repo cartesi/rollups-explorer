@@ -8,18 +8,18 @@ import {
 import { useQuery } from "urql";
 import { Address } from "viem";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import InputDetailsView from "../../src/components/inputs/inputDetailsView";
-import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
-import withMantineTheme from "../utils/WithMantineTheme";
-import { useConnectionConfigReturnStub } from "../utils/connectionHelpers";
+import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import withMantineTheme from "../../utils/WithMantineTheme";
+import { useConnectionConfigReturnStub } from "../../utils/connectionHelpers";
 import {
     inputDetailsSample,
     inputDetailsSampleForPaging,
     inputSample,
-} from "../utils/dataSamples";
-import { queryMockImplBuilder } from "../utils/useQueryMock";
+} from "../../utils/dataSamples";
+import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
-vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("urql");
 
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);

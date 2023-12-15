@@ -3,12 +3,12 @@ import type { FC } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import ApplicationRow, {
     ApplicationRowProps,
-} from "../../src/components/applications/applicationRow";
-import { withMantineTheme } from "../utils/WithMantineTheme";
+} from "../../../src/components/applications/applicationRow";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { Table } from "@mantine/core";
-import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 
-vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 
 const TableComponent: FC<ApplicationRowProps> = (props) => (

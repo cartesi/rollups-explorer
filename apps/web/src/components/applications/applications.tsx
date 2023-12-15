@@ -1,24 +1,18 @@
 "use client";
 
-import {
-    Group,
-    Loader,
-    Pagination,
-    Select,
-    Stack,
-    Table,
-    Text,
-} from "@mantine/core";
+import { Group, Pagination, Select, Stack, Text } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
 import { FC, useEffect, useState } from "react";
 import {
-    Application,
     ApplicationOrderByInput,
     useApplicationsConnectionQuery,
-} from "../graphql";
-import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
-import ApplicationRow from "../components/applicationRow";
+} from "../../graphql";
+import {
+    limitBounds,
+    usePaginationParams,
+} from "../../hooks/usePaginationParams";
+import ApplicationsTable from "./applicationsTable";
 
 const Applications: FC = () => {
     const [{ limit, page }, updateParams] = usePaginationParams();
@@ -31,7 +25,8 @@ const Applications: FC = () => {
     const [activePage, setActivePage] = useState(
         page > totalPages ? totalPages : page,
     );
-
+    const applications =
+        query.data?.applicationsConnection.edges.map((edge) => edge.node) ?? [];
     const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({
         duration: 700,
         offset: 150,
@@ -60,41 +55,12 @@ const Applications: FC = () => {
                     updateParams(pageN, limit);
                 }}
             />
-            <Table>
-                <Table.Thead>
-                    <Table.Tr>
-                        <Table.Th>Id</Table.Th>
-                        <Table.Th>Owner</Table.Th>
-                        <Table.Th>URL</Table.Th>
-                    </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                    {query.fetching && (
-                        <Table.Tr>
-                            <Table.Td align="center" colSpan={3}>
-                                <Loader />
-                            </Table.Td>
-                        </Table.Tr>
-                    )}
-                    {query.data?.applicationsConnection.totalCount === 0 && (
-                        <Table.Tr>
-                            <Table.Td colSpan={3} align="center">
-                                No applications
-                            </Table.Td>
-                        </Table.Tr>
-                    )}
-                    {query.data?.applicationsConnection.edges.map(
-                        ({ node }) => (
-                            <ApplicationRow
-                                key={node.id}
-                                application={
-                                    node as Omit<Application, "inputs">
-                                }
-                            />
-                        ),
-                    )}
-                </Table.Tbody>
-            </Table>
+
+            <ApplicationsTable
+                applications={applications}
+                fetching={query.fetching}
+                totalCount={query.data?.applicationsConnection.totalCount ?? 0}
+            />
 
             <Group justify="space-between" align="center">
                 <Group>

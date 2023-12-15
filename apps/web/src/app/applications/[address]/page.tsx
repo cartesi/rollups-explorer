@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import Address from "../../../components/address";
+import Inputs from "../../../components/inputs/inputs";
 import Breadcrumbs from "../../../components/breadcrumbs";
-import Inputs from "../../../components/inputs";
 
 export type ApplicationPageProps = {
     params: { address: string };
