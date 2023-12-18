@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
-import withMantineTheme from "../utils/WithMantineTheme";
 import SendTransaction from "../../src/components/sendTransaction";
+import withMantineTheme from "../utils/WithMantineTheme";
 
 const Component = withMantineTheme(SendTransaction);
 

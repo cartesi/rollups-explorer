@@ -98,9 +98,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !applications.some(
-                        (a) => a.toLowerCase() === address.toLowerCase(),
-                    ) && (
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
