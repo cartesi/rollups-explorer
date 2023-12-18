@@ -1,5 +1,5 @@
 "use client";
-import { descend, prop, propEq, reject, sort } from "ramda";
+import { descend, propEq, propOr, reject, sort } from "ramda";
 import { Connection, Reducer, State } from "./types";
 
 export const initialState = {
@@ -9,7 +9,7 @@ export const initialState = {
 } satisfies State;
 
 const sortByTimestampDesc = sort<Connection>(
-    descend(prop<number>("timestamp")),
+    descend<Connection>(propOr<number>(0, "timestamp")),
 );
 
 export const connectionConfigReducer: Reducer = (state, action): State => {

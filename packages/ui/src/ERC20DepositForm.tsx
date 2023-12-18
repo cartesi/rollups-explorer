@@ -66,6 +66,8 @@ export const transactionButtonState = (
 
 export interface ERC20DepositFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
     tokens: string[];
 }
 
@@ -237,7 +239,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         );
 
     return (
-        <form>
+        <form data-testid="erc20-deposit-form">
             <Stack>
                 <Autocomplete
                     label="Application"

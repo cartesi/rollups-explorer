@@ -37,11 +37,12 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface EtherDepositFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
 }
 
-export const EtherDepositForm: FC<EtherDepositFormProps> = ({
-    applications,
-}) => {
+export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
+    const { applications, isLoadingApplications, onSearchApplications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { chain } = useNetwork();
     const form = useForm({
@@ -93,7 +94,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
     }, [wait.status]);
 
     return (
-        <form>
+        <form data-testid="ether-deposit-form">
             <Stack>
                 <Autocomplete
                     label="Application"
@@ -101,12 +102,20 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = ({
                     placeholder="0x"
                     data={applications}
                     withAsterisk
-                    rightSection={prepare.isLoading && <Loader size="xs" />}
+                    rightSection={
+                        (prepare.isLoading || isLoadingApplications) && (
+                            <Loader size="xs" />
+                        )
+                    }
                     {...form.getInputProps("application")}
                     error={
                         form.errors?.application ||
                         (prepare.error as BaseError)?.shortMessage
                     }
+                    onChange={(nextValue) => {
+                        form.setFieldValue("application", nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 {!form.errors.application &&

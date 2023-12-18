@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
@@ -28,9 +28,16 @@ import { TransactionProgress } from "./TransactionProgress";
 
 export interface RawInputFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
 }
 
-export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
+export const RawInputForm: FC<RawInputFormProps> = (props) => {
+    const { applications, isLoadingApplications, onSearchApplications } = props;
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -66,7 +73,7 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
     }, [wait.status]);
 
     return (
-        <form>
+        <form data-testid="raw-input-form">
             <Stack>
                 <Autocomplete
                     label="Application"
@@ -74,19 +81,25 @@ export const RawInputForm: FC<RawInputFormProps> = ({ applications }) => {
                     placeholder="0x"
                     data={applications}
                     withAsterisk
-                    rightSection={prepare.isLoading && <Loader size="xs" />}
+                    rightSection={
+                        (prepare.isLoading || isLoadingApplications) && (
+                            <Loader size="xs" />
+                        )
+                    }
                     {...form.getInputProps("application")}
                     error={
                         form.errors.application ||
                         (prepare.error as BaseError)?.shortMessage
                     }
+                    onChange={(nextValue) => {
+                        form.setFieldValue("application", nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !applications.some(
-                        (a) => a.toLowerCase() === address.toLowerCase(),
-                    ) && (
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
