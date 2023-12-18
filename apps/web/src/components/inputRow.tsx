@@ -9,8 +9,6 @@ import {
     Paper,
     Table,
     Text,
-    useMantineColorScheme,
-    useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
@@ -50,8 +48,6 @@ const InputRow: FC<InputRowProps> = ({
     timeType,
     keepDataColVisible,
 }) => {
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
@@ -141,14 +137,11 @@ const InputRow: FC<InputRowProps> = ({
                     top={0}
                     right={0}
                     p={0}
-                    bg={theme.white}
                 >
                     <Paper
                         shadow={keepDataColVisible ? undefined : "xl"}
-                        style={{
-                            borderRadius: 0,
-                            padding: `var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))`,
-                        }}
+                        radius={0}
+                        p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
                     >
                         <ActionIcon variant="default" onClick={toggle}>
                             {opened ? <TbX /> : <TbFileText />}

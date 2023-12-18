@@ -1,4 +1,5 @@
 import { useIntersection } from "@mantine/hooks";
+import { useMemo } from "react";
 type UseElementVisibilityParamsProps<T extends Element> = {
     element: React.RefObject<T>;
     threshold?: number;
@@ -13,5 +14,8 @@ export const useElementVisibility = <T extends Element>({
         threshold,
     });
     const isVisible = (entry?.intersectionRatio ?? 1) < threshold;
-    return { childrenRef, isVisible };
+    return useMemo(
+        () => ({ childrenRef, isVisible }),
+        [childrenRef, isVisible],
+    );
 };
