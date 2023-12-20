@@ -1,100 +1,79 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import {
-    useEtherPortalDepositEther,
-    usePrepareEtherPortalDepositEther,
+    useInputBoxAddInput,
+    usePrepareInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
-    Alert,
-    Autocomplete,
     Button,
     Collapse,
     Group,
-    Loader,
     Stack,
-    Text,
     Textarea,
-    TextInput,
+    Autocomplete,
+    Alert,
+    Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
+import { TbCheck, TbAlertCircle } from "react-icons/tb";
 import {
-    TbAlertCircle,
-    TbCheck,
-    TbChevronDown,
-    TbChevronUp,
-} from "react-icons/tb";
-import {
-    BaseError,
     getAddress,
     isAddress,
     isHex,
-    parseUnits,
     toHex,
     zeroAddress,
+    BaseError,
 } from "viem";
-import { useNetwork, useWaitForTransaction } from "wagmi";
+import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 
-export interface EtherDepositFormProps {
+export interface RawInputFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
 }
 
-export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
+export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
-    const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
-    const { chain } = useNetwork();
+    const addresses = useMemo(
+        () => applications.map(getAddress),
+        [applications],
+    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
             application: "",
-            amount: "",
-            execLayerData: "0x",
+            rawInput: "0x",
         },
         validate: {
             application: (value) =>
                 value !== "" && isAddress(value) ? null : "Invalid application",
-            amount: (value) =>
-                value !== "" && Number(value) > 0 ? null : "Invalid amount",
-            execLayerData: (value) =>
-                isHex(value) ? null : "Invalid hex string",
+            rawInput: (value) => (isHex(value) ? null : "Invalid hex string"),
         },
         transformValues: (values) => ({
             address: isAddress(values.application)
                 ? getAddress(values.application)
                 : zeroAddress,
-            amount:
-                values.amount !== ""
-                    ? parseUnits(
-                          values.amount,
-                          chain?.nativeCurrency.decimals ?? 18,
-                      )
-                    : undefined,
-            execLayerData: toHex(values.execLayerData),
+            rawInput: toHex(values.rawInput),
         }),
     });
-    const { address, amount, execLayerData } = form.getTransformedValues();
-    const prepare = usePrepareEtherPortalDepositEther({
-        args: [address, execLayerData],
-        value: amount,
+    const { address, rawInput } = form.getTransformedValues();
+    const prepare = usePrepareInputBoxAddInput({
+        args: [address, rawInput],
         enabled: form.isValid(),
     });
-    const execute = useEtherPortalDepositEther(prepare.config);
+    const execute = useInputBoxAddInput(prepare.config);
     const wait = useWaitForTransaction(execute.data);
-    const canSubmit =
-        form.isValid() && !prepare.isLoading && prepare.error === null;
     const loading = execute.status === "loading" || wait.status === "loading";
+    const canSubmit = form.isValid() && prepare.error === null;
 
     useEffect(() => {
         if (wait.status === "success") {
             form.reset();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wait.status]);
 
     return (
-        <form data-testid="ether-deposit-form">
+        <form data-testid="raw-input-form">
             <Stack>
                 <Autocomplete
                     label="Application"
@@ -109,7 +88,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     }
                     {...form.getInputProps("application")}
                     error={
-                        form.errors?.application ||
+                        form.errors.application ||
                         (prepare.error as BaseError)?.shortMessage
                     }
                     onChange={(nextValue) => {
@@ -120,38 +99,22 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
 
                 {!form.errors.application &&
                     address !== zeroAddress &&
-                    !applications.some(
-                        (a) => a.toLowerCase() === address.toLowerCase(),
-                    ) && (
+                    !addresses.includes(address) && (
                         <Alert
                             variant="light"
                             color="yellow"
                             icon={<TbAlertCircle />}
                         >
-                            This is a deposit to an undeployed application.
+                            This is an undeployed application.
                         </Alert>
                     )}
 
-                <TextInput
-                    type="number"
-                    step="1"
-                    min={0}
-                    label="Amount"
-                    description="Amount of ether to deposit"
-                    placeholder="0"
-                    rightSectionWidth={60}
-                    rightSection={<Text>ETH</Text>}
+                <Textarea
+                    label="Raw input"
+                    description="Raw input for the application"
                     withAsterisk
-                    {...form.getInputProps("amount")}
+                    {...form.getInputProps("rawInput")}
                 />
-
-                <Collapse in={advanced}>
-                    <Textarea
-                        label="Extra data"
-                        description="Extra execution layer data handled by the application"
-                        {...form.getInputProps("execLayerData")}
-                    />
-                </Collapse>
 
                 <Collapse
                     in={
@@ -165,24 +128,12 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         prepare={prepare}
                         execute={execute}
                         wait={wait}
-                        confirmationMessage="Ether deposited successfully!"
+                        confirmationMessage="Raw input sent successfully!"
                         defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
 
                 <Group justify="right">
-                    <Button
-                        leftSection={
-                            advanced ? <TbChevronUp /> : <TbChevronDown />
-                        }
-                        size="xs"
-                        visibleFrom="sm"
-                        variant="transparent"
-                        onClick={toggleAdvanced}
-                    >
-                        Advanced
-                    </Button>
-
                     <Button
                         variant="filled"
                         disabled={!canSubmit}
@@ -190,7 +141,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         loading={loading}
                         onClick={execute.write}
                     >
-                        Deposit
+                        Send
                     </Button>
                 </Group>
             </Stack>

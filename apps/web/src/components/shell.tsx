@@ -1,9 +1,5 @@
 "use client";
 import {
-    ERC20DepositForm,
-    EtherDepositForm,
-} from "@cartesi/rollups-explorer-ui";
-import {
     AppShell,
     Burger,
     Button,
@@ -21,48 +17,34 @@ import Link from "next/link";
 import { FC, ReactNode } from "react";
 import {
     TbApps,
+    TbArrowsDownUp,
     TbDotsVertical,
     TbHome,
     TbInbox,
-    TbMoneybag,
     TbMoonStars,
-    TbPigMoney,
     TbSun,
 } from "react-icons/tb";
-import { useAccount, useNetwork } from "wagmi";
-import CartesiLogo from "./cartesiLogo";
-import ConnectionView from "./connectionView";
-import { useApplicationsQuery, useTokensQuery } from "../graphql";
-import Footer from "./footer";
+import { useAccount } from "wagmi";
+import CartesiLogo from "../components/cartesiLogo";
+import ConnectionView from "../components/connectionView";
+import Footer from "../components/footer";
+import SendTransaction from "../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
     const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
-    const [deposit, { open: openDeposit, close: closeDeposit }] =
-        useDisclosure(false);
-    const [navDepositOpened, { toggle: toggleNavDeposit }] =
-        useDisclosure(false);
-    const [etherDeposit, { open: openEtherDeposit, close: closeEtherDeposit }] =
-        useDisclosure(false);
+    const [
+        transaction,
+        {
+            open: openTransaction,
+            close: closeTransaction,
+            toggle: toggleTransaction,
+        },
+    ] = useDisclosure(false);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const { isConnected } = useAccount();
-    const { chain } = useNetwork();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const [{ data: applicationData }] = useApplicationsQuery({
-        variables: {
-            limit: 1000,
-        },
-    });
-    const applications = (applicationData?.applications ?? []).map((a) => a.id);
-    const [{ data: tokenData }] = useTokensQuery({
-        variables: {
-            limit: 1000,
-        },
-    });
-    const tokens = (tokenData?.tokens ?? []).map(
-        (a) => `${a.symbol} - ${a.name} - ${a.id}`,
-    );
 
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
@@ -85,15 +67,12 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             }}
             padding="md"
         >
-            <Modal opened={deposit} onClose={closeDeposit} title="Deposit">
-                <ERC20DepositForm applications={applications} tokens={tokens} />
-            </Modal>
             <Modal
-                opened={etherDeposit}
-                onClose={closeEtherDeposit}
-                title="Deposit Ether"
+                opened={transaction}
+                onClose={closeTransaction}
+                title="Send Transaction"
             >
-                <EtherDepositForm applications={applications} />
+                <SendTransaction />
             </Modal>
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
@@ -110,23 +89,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Group ml="xl" gap="md">
                             <Button
                                 variant="subtle"
-                                leftSection={<TbPigMoney />}
-                                onClick={openDeposit}
+                                leftSection={<TbArrowsDownUp />}
+                                onClick={openTransaction}
                                 disabled={!isConnected}
                                 visibleFrom="sm"
-                                data-testid="deposit-button"
+                                data-testid="transaction-button"
                             >
-                                Deposit
-                            </Button>
-                            <Button
-                                variant="subtle"
-                                leftSection={<TbPigMoney />}
-                                onClick={openEtherDeposit}
-                                disabled={!isConnected}
-                                visibleFrom="sm"
-                                data-testid="deposit-ether-button"
-                            >
-                                Deposit Ether
+                                Send Transaction
                             </Button>
                             {!isSmallDevice && <ConnectButton />}
                             <Switch
@@ -180,32 +149,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
-                        label="Deposit"
-                        leftSection={<TbMoneybag />}
+                        label="Send Transaction"
+                        leftSection={<TbArrowsDownUp />}
                         disabled={!isConnected}
-                        opened={isConnected && navDepositOpened}
-                        onClick={toggleNavDeposit}
+                        opened={isConnected && transaction}
+                        onClick={toggleTransaction}
                         hiddenFrom="sm"
-                    >
-                        <NavLink
-                            active={isConnected}
-                            label="ERC-20"
-                            variant="subtle"
-                            component="button"
-                            onClick={openDeposit}
-                            leftSection={<TbPigMoney />}
-                            hiddenFrom="sm"
-                        />
-                        <NavLink
-                            active={isConnected}
-                            variant="subtle"
-                            component="button"
-                            label={chain?.nativeCurrency.name ?? "Ether"}
-                            onClick={openEtherDeposit}
-                            leftSection={<TbPigMoney />}
-                            hiddenFrom="sm"
-                        />
-                    </NavLink>
+                    />
 
                     {isSmallDevice && <ConnectButton showBalance />}
                 </Stack>

@@ -20,6 +20,8 @@ const tokens = [
 const defaultProps = {
     applications,
     tokens,
+    isLoadingApplications: false,
+    onSearchApplications: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {

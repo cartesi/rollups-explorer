@@ -1,9 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
-import { EtherDepositForm } from "../src/EtherDepositForm";
+import { RawInputForm } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 
-const Component = withMantineTheme(EtherDepositForm);
+const Component = withMantineTheme(RawInputForm);
 
 const applications = [
     "0x60a7048c3136293071605a4eaffef49923e981cc",
@@ -19,10 +19,10 @@ const defaultProps = {
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
     return {
-        usePrepareEtherPortalDepositEther: () => ({
+        usePrepareInputBoxAddInput: () => ({
             config: {},
         }),
-        useEtherPortalDepositEther: () => ({
+        useInputBoxAddInput: () => ({
             data: {},
             wait: vi.fn(),
         }),
@@ -32,13 +32,6 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 vi.mock("wagmi", async () => {
     return {
         useWaitForTransaction: () => ({}),
-        useNetwork: () => ({
-            chain: {
-                nativeCurrency: {
-                    decimals: 18,
-                },
-            },
-        }),
     };
 });
 
@@ -50,7 +43,7 @@ vi.mock("viem", async () => {
     };
 });
 
-describe("Rollups EtherDepositForm", () => {
+describe("Rollups RawInputForm", () => {
     afterAll(() => {
         vi.restoreAllMocks();
     });
@@ -59,16 +52,14 @@ describe("Rollups EtherDepositForm", () => {
         it("should display correct label", () => {
             render(<Component {...defaultProps} />);
 
-            expect(screen.getByText("Extra data")).toBeInTheDocument();
+            expect(screen.getByText("Raw input")).toBeInTheDocument();
         });
 
         it("should display correct description", () => {
             render(<Component {...defaultProps} />);
 
             expect(
-                screen.getByText(
-                    "Extra execution layer data handled by the application",
-                ),
+                screen.getByText("Raw input for the application"),
             ).toBeInTheDocument();
         });
 
@@ -92,65 +83,53 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Send button", () => {
-        it("should be disabled when extra data is not hex", () => {
+        it("should be disabled when raw input is not hex", () => {
             const { container } = render(<Component {...defaultProps} />);
             const textarea = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
+            const button = container.querySelector(
+                "button",
+            ) as HTMLButtonElement;
 
             fireEvent.change(textarea, {
                 target: {
                     value: "",
                 },
             });
-            fireEvent.blur(textarea);
 
-            expect(submitButton.hasAttribute("disabled")).toBe(true);
+            expect(button.hasAttribute("disabled")).toBe(true);
         });
 
         it("should invoke write function when send button is clicked", async () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.usePrepareEtherPortalDepositEther = vi
-                .fn()
-                .mockReturnValue({
-                    ...rollupsWagmi.usePrepareEtherPortalDepositEther,
-                    loading: false,
-                    error: null,
-                });
-            rollupsWagmi.useEtherPortalDepositEther = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useEtherPortalDepositEther,
+            rollupsWagmi.usePrepareInputBoxAddInput = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                error: null,
+            });
+            rollupsWagmi.useInputBoxAddInput = vi.fn().mockReturnValue({
+                ...rollupsWagmi.useInputBoxAddInput,
                 write: mockedWrite,
             });
 
             const { container } = render(<Component {...defaultProps} />);
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
+            const button = container.querySelector(
+                "button",
+            ) as HTMLButtonElement;
 
-            const inputs = container.querySelectorAll("input");
-            const applicationInput = inputs[0] as HTMLInputElement;
-            const amountInput = inputs[1] as HTMLInputElement;
-            applicationInput.setAttribute("value", selectedApplication);
+            const input = container.querySelector("input") as HTMLInputElement;
+            input.setAttribute("value", selectedApplication);
 
-            fireEvent.change(applicationInput, {
+            fireEvent.change(input, {
                 target: {
                     value: selectedApplication,
                 },
             });
 
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "1",
-                },
-            });
-
-            fireEvent.blur(amountInput);
-            expect(submitButton.hasAttribute("disabled")).toBe(false);
-
-            fireEvent.click(submitButton);
+            fireEvent.click(button);
+            expect(button.hasAttribute("disabled")).toBe(false);
             expect(mockedWrite).toHaveBeenCalled();
         });
     });
@@ -188,9 +167,7 @@ describe("Rollups EtherDepositForm", () => {
             });
 
             expect(
-                screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
+                screen.getByText("This is an undeployed application."),
             ).toBeInTheDocument();
         });
     });

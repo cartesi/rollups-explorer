@@ -66,13 +66,18 @@ export const transactionButtonState = (
 
 export interface ERC20DepositFormProps {
     applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
     tokens: string[];
 }
 
-export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
-    applications,
-    tokens,
-}) => {
+export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
+    const {
+        applications,
+        isLoadingApplications,
+        onSearchApplications,
+        tokens,
+    } = props;
     const tokenAddresses = useMemo(
         () =>
             tokens.map((token) => {
@@ -232,7 +237,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
         );
 
     return (
-        <form>
+        <form data-testid="erc20-deposit-form">
             <Stack>
                 <Autocomplete
                     label="Application"
@@ -241,7 +246,12 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = ({
                     data={applications}
                     withAsterisk
                     data-testid="application"
+                    rightSection={isLoadingApplications && <Loader size="xs" />}
                     {...form.getInputProps("application")}
+                    onChange={(nextValue) => {
+                        form.setFieldValue("application", nextValue);
+                        onSearchApplications(nextValue);
+                    }}
                 />
 
                 {!form.errors.application &&
