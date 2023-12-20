@@ -60,7 +60,11 @@ const Inputs: FC<InputsProps> = ({
                 }}
             />
 
-            <InputsTable inputs={inputs} />
+            <InputsTable
+                inputs={inputs}
+                fetching={fetching}
+                totalCount={data?.inputsConnection.totalCount ?? 0}
+            />
 
             <Group justify="space-between" align="center">
                 <Group>

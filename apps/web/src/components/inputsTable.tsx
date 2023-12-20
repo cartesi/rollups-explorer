@@ -1,14 +1,20 @@
 "use client";
-import { Button, Table } from "@mantine/core";
+import { Button, Loader, Table } from "@mantine/core";
 import { FC, useCallback, useState } from "react";
 import InputRow from "../components/inputRow";
 import type { InputItemFragment } from "../graphql";
 
 export interface InputsTableProps {
     inputs: InputItemFragment[];
+    fetching: boolean;
+    totalCount: number;
 }
 
-const InputsTable: FC<InputsTableProps> = ({ inputs }) => {
+const InputsTable: FC<InputsTableProps> = ({
+    inputs,
+    fetching,
+    totalCount,
+}) => {
     const [timeType, setTimeType] = useState("age");
 
     const onChangeTimeColumnType = useCallback(() => {
@@ -37,6 +43,21 @@ const InputsTable: FC<InputsTableProps> = ({ inputs }) => {
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
+                {fetching ? (
+                    <Table.Tr>
+                        <Table.Td align="center" colSpan={7}>
+                            <Loader data-testid="inputs-table-spinner" />
+                        </Table.Td>
+                    </Table.Tr>
+                ) : (
+                    totalCount === 0 && (
+                        <Table.Tr>
+                            <Table.Td colSpan={3} align="center">
+                                No inputs
+                            </Table.Td>
+                        </Table.Tr>
+                    )
+                )}
                 {inputs.map((input) => (
                     <InputRow
                         key={input.id}

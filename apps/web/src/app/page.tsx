@@ -1,8 +1,7 @@
-import { Group, Stack, Title } from "@mantine/core";
-import { TbInbox } from "react-icons/tb";
-import Inputs from "../components/inputs";
-import EntriesSummary from "../components/entriesSummary";
+import { Stack } from "@mantine/core";
 import Breadcrumbs from "../components/breadcrumbs";
+import EntriesSummary from "../components/entriesSummary";
+import LatestEntries from "../components/latestEntries";
 
 export default function HomePage() {
     return (
@@ -17,13 +16,7 @@ export default function HomePage() {
             />
 
             <EntriesSummary />
-
-            <Group>
-                <TbInbox size={40} />
-                <Title order={2}>Inputs</Title>
-            </Group>
-
-            <Inputs />
+            <LatestEntries />
         </Stack>
     );
 }
