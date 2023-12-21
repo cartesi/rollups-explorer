@@ -1,7 +1,7 @@
 import { Group, Stack, Title } from "@mantine/core";
 import { TbInbox } from "react-icons/tb";
 import { Metadata } from "next";
-import Inputs from "../../components/inputs";
+import Inputs from "../../components/inputs/inputs";
 import Breadcrumbs from "../../components/breadcrumbs";
 
 export const metadata: Metadata = {
