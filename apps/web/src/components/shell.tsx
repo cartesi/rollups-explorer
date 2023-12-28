@@ -14,7 +14,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import {
     TbApps,
     TbArrowsDownUp,

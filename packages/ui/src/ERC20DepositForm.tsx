@@ -66,13 +66,11 @@ export const transactionButtonState = (
 };
 
 export interface ERC20DepositFormProps {
+    tokens: string[];
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSearchTokens: (tokenId: string) => void;
-    tokens: string[];
-    tokensQuery: (address: string) => void;
-    applicationsQuery: (address: string) => void;
 }
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
@@ -82,8 +80,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         onSearchApplications,
         onSearchTokens,
         tokens,
-        tokensQuery,
-        applicationsQuery,
     } = props;
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
@@ -261,7 +257,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     onChange={(nextValue) => {
                         form.setFieldValue("application", nextValue);
                         onSearchApplications(nextValue);
-                        applicationsQuery(nextValue);
                     }}
                 />
 
