@@ -75,11 +75,11 @@ export interface ERC20DepositFormProps {
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const {
+        tokens,
         applications,
         isLoadingApplications,
         onSearchApplications,
         onSearchTokens,
-        tokens,
     } = props;
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
