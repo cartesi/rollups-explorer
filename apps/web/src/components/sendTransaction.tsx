@@ -4,10 +4,11 @@ import {
     EtherDepositForm,
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
-import { FC, useMemo, useState } from "react";
 import { Select } from "@mantine/core";
-import { useApplicationsQuery, useTokensQuery } from "../graphql";
 import { useDebouncedValue } from "@mantine/hooks";
+import { FC, useState } from "react";
+import { useSearchApplications } from "../hooks/useSearchApplications";
+import { useSearchTokens } from "../hooks/useSearchTokens";
 
 export type DepositType =
     | "ether"
@@ -22,36 +23,20 @@ interface DepositProps {
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "ether",
+    initialDepositType = "erc20",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
-    const [applicationId, setApplicationId] = useState("");
+    const [applicationId, setApplicationId] = useState<string>("");
+    const [tokenId, setTokenId] = useState<string>("");
     const [debouncedApplicationId] = useDebouncedValue(applicationId, 400);
-    const [{ data: applicationData, fetching }] = useApplicationsQuery({
-        variables: {
-            limit: 10,
-            where: {
-                id_containsInsensitive: debouncedApplicationId ?? "",
-            },
-        },
+    const [debouncedTokenId] = useDebouncedValue(tokenId, 400);
+    const { applications, fetching } = useSearchApplications({
+        address: debouncedApplicationId,
     });
-    const applications = useMemo(
-        () => (applicationData?.applications ?? []).map((a) => a.id),
-        [applicationData],
-    );
-    const [{ data: tokenData }] = useTokensQuery({
-        variables: {
-            limit: 100,
-        },
+    const { tokens } = useSearchTokens({
+        address: debouncedTokenId,
     });
-    const tokens = useMemo(
-        () =>
-            (tokenData?.tokens ?? []).map(
-                (a) => `${a.symbol} - ${a.name} - ${a.id}`,
-            ),
-        [tokenData],
-    );
 
     return (
         <>
@@ -85,6 +70,7 @@ const SendTransaction: FC<DepositProps> = ({
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                    onSearchTokens={setTokenId}
                 />
             ) : depositType === "ether" ? (
                 <EtherDepositForm

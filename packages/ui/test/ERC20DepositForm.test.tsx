@@ -17,11 +17,17 @@ const tokens = [
     "SIM20 - SimpleERC20 - 0xa46e0a31a1c248160acba9dd354c72e52c92c9f2",
 ];
 
+const mockChangeTokenQuery = vi.fn();
+const mockChangeApplicationQuery = vi.fn();
+
 const defaultProps = {
     applications,
     tokens,
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
+    onSearchTokens: () => undefined,
+    tokensQuery: mockChangeTokenQuery,
+    applicationsQuery: mockChangeApplicationQuery,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
@@ -167,8 +173,9 @@ describe("Rollups ERC20DepositForm", () => {
             expect(input?.getAttribute("placeholder")).toBe("0x");
         });
 
-        it("should display alert for unemployed application", () => {
-            const { container } = render(<Component {...defaultProps} />);
+        it("should display alert for undeployed application", () => {
+            const customProps = { ...defaultProps, applications: [] };
+            const { container } = render(<Component {...customProps} />);
             const input = screen.getByTestId("application") as HTMLInputElement;
 
             fireEvent.change(input, {
@@ -208,7 +215,8 @@ describe("Rollups ERC20DepositForm", () => {
         });
 
         it("should display alert for first deposit of the selected token", () => {
-            const { container } = render(<Component {...defaultProps} />);
+            const customProps = { ...defaultProps, tokens: [] };
+            const { container } = render(<Component {...customProps} />);
             const input = screen.getByTestId(
                 "erc20Address",
             ) as HTMLInputElement;
@@ -232,7 +240,7 @@ describe("Rollups ERC20DepositForm", () => {
 
             fireEvent.change(input, {
                 target: {
-                    value: "",
+                    value: "0x777",
                 },
             });
 

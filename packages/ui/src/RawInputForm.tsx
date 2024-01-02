@@ -1,27 +1,27 @@
-import { FC, useEffect, useMemo } from "react";
 import {
     useInputBoxAddInput,
     usePrepareInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
+    Alert,
+    Autocomplete,
     Button,
     Collapse,
     Group,
+    Loader,
     Stack,
     Textarea,
-    Autocomplete,
-    Alert,
-    Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { TbCheck, TbAlertCircle } from "react-icons/tb";
+import { FC, useEffect, useMemo } from "react";
+import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
+    BaseError,
     getAddress,
     isAddress,
     isHex,
     toHex,
     zeroAddress,
-    BaseError,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
