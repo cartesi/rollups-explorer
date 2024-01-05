@@ -90,66 +90,6 @@ vi.mock("viem", async () => {
     };
 });
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    const actual = await vi.importActual("@cartesi/rollups-wagmi");
-    return {
-        ...(actual as any),
-        usePrepareErc20Approve: () => ({
-            config: {},
-        }),
-        useErc20Approve: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        usePrepareErc20PortalDepositErc20Tokens: () => ({
-            config: {},
-        }),
-        useErc20PortalDepositErc20Tokens: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-    };
-});
-
-vi.mock("wagmi", async () => {
-    return {
-        useContractReads: () => ({
-            isLoading: false,
-            isSuccess: true,
-            data: [
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-            ],
-        }),
-        useAccount: () => ({
-            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
-        }),
-        useWaitForTransaction: () => ({}),
-    };
-});
-
-vi.mock("viem", async () => {
-    const actual = await vi.importActual("viem");
-    return {
-        ...(actual as any),
-        getAddress: (address: string) => address,
-    };
-});
-
 describe("Rollups ERC20DepositForm", () => {
     describe("ApplicationAutocomplete", () => {
         it("should display correct label", () => {
