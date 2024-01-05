@@ -22,7 +22,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -46,7 +46,6 @@ import {
 } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
-import { DepositType } from "web/src/components/sendTransaction";
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
@@ -68,13 +67,7 @@ export const transactionButtonState = (
     return { loading, disabled };
 };
 
-export interface ERC721DepositFormProps {
-    applications: string[];
-    isLoadingApplications: boolean;
-    onSearchApplications: (applicationId: string) => void;
-}
-
-export const useTokenOfOwnerByIndex = (
+export const useTokensOfOwnerByIndex = (
     erc721ContractAddress: Address,
     ownerAddress: Address,
 ) => {
@@ -103,7 +96,7 @@ export const useTokenOfOwnerByIndex = (
     });
     const tokenOfOwnerByIndex = erc721.data?.[0];
 
-    useEffect(() => {
+    const onChange = useCallback(() => {
         const isExisting =
             erc721ContractAddress === lastErc721ContractAddress.current &&
             ownerAddress === lastOwnerAddress.current;
@@ -126,6 +119,10 @@ export const useTokenOfOwnerByIndex = (
         }
     }, [tokenOfOwnerByIndex, erc721ContractAddress, ownerAddress]);
 
+    useEffect(() => {
+        onChange();
+    }, [onChange]);
+
     return useMemo(
         () => ({
             tokenIds,
@@ -135,12 +132,16 @@ export const useTokenOfOwnerByIndex = (
     );
 };
 
+export interface ERC721DepositFormProps {
+    applications: string[];
+    isLoadingApplications: boolean;
+    onSearchApplications: (applicationId: string) => void;
+}
+
 export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
-    const account = useAccount();
-    const { address, connector } = account;
-    const nativeCurrency = connector?.chains[0]?.nativeCurrency;
+    const { address } = useAccount();
 
     const form = useForm({
         validateInputOnBlur: true,
@@ -201,30 +202,25 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         watch: true,
     });
 
-    const tokensOfOwnerByIndex = useTokenOfOwnerByIndex(
+    const tokensOfOwnerByIndex = useTokensOfOwnerByIndex(
         erc721ContractAddress!,
         address!,
     );
 
-    useEffect(() => {
-        if (!tokensOfOwnerByIndex.fetching) {
-            console.log("tokenIds::", tokensOfOwnerByIndex.tokenIds);
-        }
-    }, [tokensOfOwnerByIndex]);
-
-    const symbol = erc721.data?.[0].result as string | undefined;
+    const symbol = (erc721.data?.[0].result as string | undefined) ?? "";
     const balance = erc721.data?.[1].result as bigint | undefined;
     const erc721Errors = erc721.data
         ? erc721.data
               .filter((d) => d.error instanceof Error)
               .map((d) => (d.error as BaseError).shortMessage)
         : [];
+    const hasPositiveBalance = balance !== undefined && balance > 0;
 
     // prepare approve transaction
     const approvePrepare = usePrepareErc721Approve({
         address: erc721Address,
         args: [erc721PortalAddress, tokenIdBigInt!],
-        enabled: tokenIdBigInt !== undefined,
+        enabled: tokenIdBigInt !== undefined && hasPositiveBalance,
     });
     const approve = useErc721Approve(approvePrepare.config);
     const approveWait = useWaitForTransaction(approve.data);
@@ -240,23 +236,18 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         ],
         enabled:
             tokenIdBigInt !== undefined &&
-            balance !== undefined &&
+            hasPositiveBalance &&
             !form.errors.erc721Address &&
             !form.errors.application &&
             isHex(baseLayerData) &&
-            isHex(execLayerData),
+            isHex(execLayerData) &&
+            approve.status === "success",
     });
     const deposit = useErc721PortalDepositErc721Token(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
-
-    // true if current allowance is less than the tokenId to deposit
     const needApproval = tokenIdBigInt !== undefined;
-
     const canDeposit =
-        balance !== undefined &&
-        tokenIdBigInt !== undefined &&
-        tokenIdBigInt > 0 &&
-        tokenIdBigInt <= balance;
+        hasPositiveBalance && tokenIdBigInt !== undefined && tokenIdBigInt > 0;
 
     const { disabled: approveDisabled, loading: approveLoading } =
         transactionButtonState(
@@ -274,15 +265,6 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             deposit.write,
             true,
         );
-
-    useEffect(() => {
-        const gg = tokensOfOwnerByIndex.tokenIds.map((tokenId) => ({
-            value: String(tokenId),
-            label: String(tokenId),
-        }));
-
-        console.log("gg::", gg);
-    }, [tokensOfOwnerByIndex]);
 
     return (
         <form data-testid="erc721-deposit-form">
@@ -328,16 +310,15 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                     {...form.getInputProps("erc721Address")}
                     error={erc721Errors[0] || form.errors.erc721Address}
                 />
-
                 <Collapse in={erc721.isSuccess && erc721Errors.length == 0}>
                     <Stack>
                         {tokensOfOwnerByIndex.tokenIds.length > 0 ? (
                             <Select
                                 label="Token ID"
                                 description="Token ID to deposit"
-                                placeholder="0"
+                                placeholder="Token ID"
                                 withAsterisk
-                                data-testid="token-id-input"
+                                data-testid="token-id-select"
                                 data={tokensOfOwnerByIndex.tokenIds.map(
                                     (tokenId) => ({
                                         value: String(tokenId),
@@ -350,9 +331,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                             <TextInput
                                 label="Token ID"
                                 description="Token ID to deposit"
-                                placeholder="0"
+                                placeholder="Token ID"
                                 withAsterisk
                                 data-testid="token-id-input"
+                                disabled={!hasPositiveBalance}
                                 {...form.getInputProps("tokenId")}
                             />
                         )}
@@ -363,12 +345,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                             direction={"row"}
                         >
                             <Flex rowGap={6} c="dark.2">
-                                <Text fz="xs">Balance:</Text>
                                 <Text id="token-balance" fz="xs" mx={4}>
-                                    {" "}
-                                    {Number(balance)}
+                                    Balance: {Number(balance)} {symbol}
                                 </Text>
-                                {symbol !== "" && <Text fz="xs">{symbol}</Text>}
                             </Flex>
                         </Flex>
                     </Stack>
