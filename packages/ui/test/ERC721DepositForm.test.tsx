@@ -197,7 +197,7 @@ describe("ERC721DepositForm", () => {
             });
         });
 
-        it("should return an empty list when data for token ids contain no entries", () => {
+        it("should return an empty list when data for token ids contains no entries", () => {
             const [erc721ContractAddress] = contracts;
             const [address] = defaultProps.applications;
 
