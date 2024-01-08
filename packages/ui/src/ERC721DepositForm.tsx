@@ -87,7 +87,7 @@ export const useTokensOfOwnerByIndex = (
         contracts: [
             {
                 ...erc721Contract,
-                functionName: "tokenOfOwnerByIndex",
+                functionName: "tokenOfOwnerByIndex" as any,
                 args: [ownerAddress!, BigInt(index)],
             },
         ],
