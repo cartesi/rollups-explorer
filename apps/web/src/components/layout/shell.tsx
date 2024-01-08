@@ -85,7 +85,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Link href="/">
                             <CartesiLogo height={40} />
                         </Link>
-                        <Group ml="xl" gap="md">
+                        <Group ml={{ lg: "xl" }} gap="md">
                             <Button
                                 variant="subtle"
                                 leftSection={<TbArrowsDownUp />}
@@ -156,7 +156,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         hiddenFrom="sm"
                     />
 
-                    {isSmallDevice && <ConnectButton showBalance />}
+                    {isSmallDevice && <ConnectButton accountStatus="avatar" />}
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
