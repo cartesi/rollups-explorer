@@ -96,6 +96,16 @@ describe("SendTransaction component", () => {
         expect(screen.getByTestId("erc20-deposit-form")).toBeInTheDocument();
     });
 
+    it("should show ERC20 deposit form", async () => {
+        render(<Component initialDepositType="erc721" />);
+        expect(screen.getByTestId("erc721-deposit-form")).toBeInTheDocument();
+    });
+
+    it("should show Ether deposit form", () => {
+        render(<Component initialDepositType="ether" />);
+        expect(screen.getByTestId("ether-deposit-form")).toBeInTheDocument();
+    });
+
     it("should show Raw input form", () => {
         render(<Component initialDepositType="input" />);
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
