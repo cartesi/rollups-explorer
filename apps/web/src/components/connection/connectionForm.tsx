@@ -27,13 +27,13 @@ import {
     ApplicationsDocument,
     ApplicationsQuery,
     ApplicationsQueryVariables,
-} from "../graphql";
+} from "../../graphql";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
     CheckStatusQueryVariables,
-} from "../graphql/rollups/operations";
-import { useConnectionConfig } from "../providers/connectionConfig/hooks";
+} from "../../graphql/rollups/operations";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 interface AppConnectionFormProps {
     application?: Address;

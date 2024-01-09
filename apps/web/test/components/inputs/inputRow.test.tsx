@@ -1,8 +1,10 @@
 import { describe, it } from "vitest";
 import type { FC } from "react";
 import { render, screen } from "@testing-library/react";
-import InputRow, { InputRowProps } from "../../src/components/inputRow";
-import { withMantineTheme } from "../utils/WithMantineTheme";
+import InputRow, {
+    InputRowProps,
+} from "../../../src/components/inputs/inputRow";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { Table } from "@mantine/core";
 import prettyMilliseconds from "pretty-ms";
 

@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useViewportSize } from "@mantine/hooks";
 import { TbChevronDown, TbChevronUp, TbPlus } from "react-icons/tb";
-import { useConnectionConfig } from "../providers/connectionConfig/hooks";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionInfo from "./connectionInfo";
 
 const ConnectionView = () => {

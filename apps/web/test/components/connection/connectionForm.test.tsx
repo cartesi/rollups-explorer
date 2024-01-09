@@ -9,15 +9,15 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import AppConnectionForm from "../../src/components/connectionForm";
-import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
-import withMantineTheme from "../utils/WithMantineTheme";
-import { checkStatusSample } from "../utils/dataSamples";
-import { queryMockImplBuilder } from "../utils/useQueryMock";
+import AppConnectionForm from "../../../src/components/connection/connectionForm";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import withMantineTheme from "../../utils/WithMantineTheme";
+import { checkStatusSample } from "../../utils/dataSamples";
+import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
 vi.mock("urql");
-vi.mock("../../src/graphql");
-vi.mock("../../src/providers/connectionConfig/hooks");
+vi.mock("../../../src/graphql");
+vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("@mantine/notifications");
 
 const AppConnectionFormE = withMantineTheme(AppConnectionForm);

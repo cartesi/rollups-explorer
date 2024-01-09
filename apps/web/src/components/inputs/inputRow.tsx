@@ -15,8 +15,8 @@ import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
 import { TbArrowRight, TbFileText, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits, getAddress } from "viem";
-import { InputItemFragment } from "../graphql";
-import Address from "./address";
+import { InputItemFragment } from "../../graphql";
+import Address from "../address";
 import InputDetailsView from "./inputDetailsView";
 
 export type InputRowProps = {

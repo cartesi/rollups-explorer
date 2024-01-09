@@ -8,10 +8,10 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
-import InputRow from "../components/inputRow";
-import type { InputItemFragment } from "../graphql";
-import { useElementVisibility } from "../hooks/useElementVisibility";
-import { TableResponsiveWrapper } from "./tableResponsiveWrapper";
+import InputRow from "./inputRow";
+import type { InputItemFragment } from "../../graphql";
+import { useElementVisibility } from "../../hooks/useElementVisibility";
+import { TableResponsiveWrapper } from "../tableResponsiveWrapper";
 
 export interface InputsTableProps {
     inputs: InputItemFragment[];

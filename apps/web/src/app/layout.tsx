@@ -4,7 +4,7 @@ import type { FC, ReactNode } from "react";
 import { Metadata } from "next";
 import { ColorSchemeScript } from "@mantine/core";
 import { Providers } from "../providers/providers";
-import Shell from "../components/shell";
+import Shell from "../components/layout/shell";
 
 export const metadata: Metadata = {
     title: {

@@ -16,7 +16,7 @@ import {
     TbBug,
     TbMessage2Code,
 } from "react-icons/tb";
-import CartesiLogo from "./cartesiLogo";
+import CartesiLogo from "../cartesiLogo";
 
 interface FooterLinkProps {
     children: ReactNode;

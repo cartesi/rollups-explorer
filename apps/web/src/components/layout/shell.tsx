@@ -25,10 +25,10 @@ import {
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
-import CartesiLogo from "../components/cartesiLogo";
-import ConnectionView from "../components/connectionView";
-import Footer from "../components/footer";
-import SendTransaction from "../components/sendTransaction";
+import CartesiLogo from "../../components/cartesiLogo";
+import ConnectionView from "../../components/connection/connectionView";
+import Footer from "../../components/layout/footer";
+import SendTransaction from "../../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
@@ -45,7 +45,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (

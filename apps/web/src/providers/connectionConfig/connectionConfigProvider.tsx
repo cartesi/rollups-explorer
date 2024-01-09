@@ -1,7 +1,7 @@
 "use client";
 import { Modal } from "@mantine/core";
 import React, { FC, useEffect, useReducer } from "react";
-import AppConnectionForm from "../../components/connectionForm";
+import AppConnectionForm from "../../components/connection/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import localRepository from "./localRepository";

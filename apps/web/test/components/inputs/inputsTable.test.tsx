@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
 import InputsTable, {
     InputsTableProps,
-} from "../../src/components/inputsTable";
-import { withMantineTheme } from "../utils/WithMantineTheme";
+} from "../../../src/components/inputs/inputsTable";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 const Component = withMantineTheme(InputsTable);
 

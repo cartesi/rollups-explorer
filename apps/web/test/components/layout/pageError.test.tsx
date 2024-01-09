@@ -1,7 +1,7 @@
 import { describe, it } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { withMantineTheme } from "../utils/WithMantineTheme";
-import PageError from "../../src/components/pageError";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
+import PageError from "../../../src/components/layout/pageError";
 
 const Component = withMantineTheme(PageError);
 const props = {

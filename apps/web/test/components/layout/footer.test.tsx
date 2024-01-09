@@ -1,7 +1,7 @@
 import { describe, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { withMantineTheme } from "../utils/WithMantineTheme";
-import Footer from "../../src/components/footer";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
+import Footer from "../../../src/components/layout/footer";
 
 const Component = withMantineTheme(Footer);
 

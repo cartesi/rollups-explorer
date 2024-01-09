@@ -5,13 +5,13 @@ import { omit, pathOr } from "ramda";
 import { FC, useEffect, useState } from "react";
 import { useQuery } from "urql";
 import { Address } from "viem";
-import { InputItemFragment } from "../graphql";
+import { InputItemFragment } from "../../graphql";
 import {
     InputDetailsDocument,
     InputDetailsQuery,
     InputDetailsQueryVariables,
-} from "../graphql/rollups/operations";
-import { useConnectionConfig } from "../providers/connectionConfig/hooks";
+} from "../../graphql/rollups/operations";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 interface ApplicationInputDataProps {
     input: InputItemFragment;

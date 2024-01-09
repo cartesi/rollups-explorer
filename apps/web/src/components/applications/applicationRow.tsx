@@ -1,10 +1,10 @@
 import React, { FC } from "react";
 import { ActionIcon, Table, Tooltip } from "@mantine/core";
-import Address from "./address";
+import Address from "../address";
 import Link from "next/link";
 import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
-import { Application } from "../graphql";
-import { useConnectionConfig } from "../providers/connectionConfig/hooks";
+import { Application } from "../../graphql";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 export interface ApplicationRowProps {
     application: Omit<Application, "inputs">;
