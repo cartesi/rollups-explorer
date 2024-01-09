@@ -1,17 +1,14 @@
-import { FC } from "react";
-import { Client, Provider, cacheExchange, fetchExchange } from "urql";
-export type GraphQLProviderProps = {
-    children?: React.ReactNode;
-};
+import { FC, ReactNode } from "react";
+import { Provider } from "urql";
+import { getUrqlClient } from "../lib/urql";
 
-const url = process.env.NEXT_PUBLIC_EXPLORER_API_URL ?? "";
+export type GraphQLProviderProps = {
+    children?: ReactNode;
+};
 
 const GraphQLProvider: FC<GraphQLProviderProps> = (props) => {
     // TODO: change according to selected chain
-    const client = new Client({
-        url,
-        exchanges: [cacheExchange, fetchExchange],
-    });
+    const client = getUrqlClient();
     return <Provider value={client}>{props.children}</Provider>;
 };
 
