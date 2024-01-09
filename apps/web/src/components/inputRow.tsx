@@ -1,6 +1,15 @@
 "use client";
 import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
-import { ActionIcon, Badge, Collapse, Group, Table, Text } from "@mantine/core";
+import {
+    ActionIcon,
+    Badge,
+    Box,
+    Collapse,
+    Group,
+    Paper,
+    Table,
+    Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
@@ -13,6 +22,7 @@ import InputDetailsView from "./inputDetailsView";
 export type InputRowProps = {
     input: InputItemFragment;
     timeType: string;
+    keepDataColVisible: boolean;
 };
 
 export type MethodResolver = (
@@ -33,7 +43,11 @@ const methodResolver: MethodResolver = (input) => {
     return undefined;
 };
 
-const InputRow: FC<InputRowProps> = ({ input, timeType }) => {
+const InputRow: FC<InputRowProps> = ({
+    input,
+    timeType,
+    keepDataColVisible,
+}) => {
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
@@ -60,56 +74,79 @@ const InputRow: FC<InputRowProps> = ({ input, timeType }) => {
         <>
             <Table.Tr>
                 <Table.Td>
-                    {input.erc20Deposit ? (
-                        <Group>
-                            <Address
-                                value={input.erc20Deposit.from as AddressType}
-                                icon
-                                shorten
-                            />
-                            <TbArrowRight />
+                    <Box style={{ minWidth: "max-content" }}>
+                        {input.erc20Deposit ? (
+                            <Group>
+                                <Address
+                                    value={
+                                        input.erc20Deposit.from as AddressType
+                                    }
+                                    icon
+                                    shorten
+                                />
+                                <TbArrowRight />
+                                <Address value={from} icon shorten />
+                            </Group>
+                        ) : (
                             <Address value={from} icon shorten />
+                        )}
+                    </Box>
+                </Table.Td>
+                <Table.Td>
+                    <Box style={{ minWidth: "max-content" }}>
+                        <Group justify="right">
+                            {erc20Deposit(input)}
+                            <TbArrowRight />
                         </Group>
-                    ) : (
-                        <Address value={from} icon shorten />
-                    )}
+                    </Box>
                 </Table.Td>
                 <Table.Td>
-                    <Group justify="right">
-                        {erc20Deposit(input)}
-                        <TbArrowRight />
-                    </Group>
-                </Table.Td>
-                <Table.Td>
-                    <Address
-                        value={to}
-                        icon
-                        href={`/applications/${to}`}
-                        shorten
-                    />
+                    <Box style={{ minWidth: "max-content" }}>
+                        <Address
+                            value={to}
+                            icon
+                            href={`/applications/${to}`}
+                            shorten
+                        />
+                    </Box>
                 </Table.Td>
                 <Table.Td>{method}</Table.Td>
                 <Table.Td>
                     <Text>{input.index}</Text>
                 </Table.Td>
                 <Table.Td>
-                    <Text>
-                        {timeType === "age"
-                            ? `${prettyMilliseconds(
-                                  Date.now() - input.timestamp * 1000,
-                                  {
-                                      unitCount: 2,
-                                      secondsDecimalDigits: 0,
-                                      verbose: true,
-                                  },
-                              )} ago`
-                            : new Date(input.timestamp * 1000).toISOString()}
-                    </Text>
+                    <Box style={{ minWidth: "max-content" }}>
+                        <Text>
+                            {timeType === "age"
+                                ? `${prettyMilliseconds(
+                                      Date.now() - input.timestamp * 1000,
+                                      {
+                                          unitCount: 2,
+                                          secondsDecimalDigits: 0,
+                                          verbose: true,
+                                      },
+                                  )} ago`
+                                : new Date(
+                                      input.timestamp * 1000,
+                                  ).toISOString()}
+                        </Text>
+                    </Box>
                 </Table.Td>
-                <Table.Td>
-                    <ActionIcon variant="default" onClick={toggle}>
-                        {opened ? <TbX /> : <TbFileText />}
-                    </ActionIcon>
+                <Table.Td
+                    pos={keepDataColVisible ? "initial" : "sticky"}
+                    top={0}
+                    right={0}
+                    p={0}
+                >
+                    <Paper
+                        shadow={keepDataColVisible ? undefined : "xl"}
+                        radius={0}
+                        p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
+                    >
+                        <ActionIcon variant="default" onClick={toggle}>
+                            {opened ? <TbX /> : <TbFileText />}
+                        </ActionIcon>
+                    </Paper>
                 </Table.Td>
             </Table.Tr>
             <Table.Tr></Table.Tr>
