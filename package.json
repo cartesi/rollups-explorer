@@ -17,11 +17,13 @@
         "test:ci": "turbo run test:ci",
         "changeset": "changeset",
         "version-packages": "changeset version",
-        "release": "turbo run build && changeset publish"
+        "release": "turbo run build && changeset publish",
+        "coveralls": "mkdir coverage && ./node_modules/.bin/lcov-result-merger './!(node_modules)**/**/coverage/lcov.info' './coverage/lcov.info' --prepend-source-files"
     },
     "devDependencies": {
         "@changesets/cli": "^2.26.2",
         "eslint-config-cartesi": "*",
+        "lcov-result-merger": "4.1.0",
         "prettier": "3.0.3",
         "turbo": "^1.10.13"
     },

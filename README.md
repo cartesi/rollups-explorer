@@ -1,5 +1,7 @@
 # Rollups Explorer
 
+[![Coverage Status](https://coveralls.io/repos/github/cartesi/rollups-explorer/badge.svg?branch=feature/97-upload-test-coverage-to-coveralls)](https://coveralls.io/github/cartesi/rollups-explorer?branch=feature/97-upload-test-coverage-to-coveralls)
+
 This is a monorepo holding up two web applications. One is called [web](./apps//web/) and is the UI for the rollups explorer and the second is called [workshop](./apps/workshop/) that is a storybook to support fast development iteration and showcase. The repository also holds a few packages more on these below.
 
 ## What's inside?
