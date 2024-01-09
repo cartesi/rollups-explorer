@@ -30,7 +30,7 @@ async function getApplication(address: string) {
         `,
         {
             where: {
-                id_containsInsensitive: address,
+                id_eq: address.toLowerCase(),
             },
         },
     );
