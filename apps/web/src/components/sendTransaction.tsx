@@ -1,6 +1,7 @@
 "use client";
 import {
     ERC20DepositForm,
+    ERC721DepositForm,
     EtherDepositForm,
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
@@ -65,6 +66,7 @@ const SendTransaction: FC<DepositProps> = ({
                         items: [
                             { value: "ether", label: "Ether Deposit" },
                             { value: "erc20", label: "ERC-20 Deposit" },
+                            { value: "erc721", label: "ERC-721 Deposit" },
                         ],
                     },
                     {
@@ -79,15 +81,21 @@ const SendTransaction: FC<DepositProps> = ({
                 }}
             />
 
-            {depositType === "erc20" ? (
+            {depositType === "ether" ? (
+                <EtherDepositForm
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                />
+            ) : depositType === "erc20" ? (
                 <ERC20DepositForm
                     tokens={tokens}
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                 />
-            ) : depositType === "ether" ? (
-                <EtherDepositForm
+            ) : depositType === "erc721" ? (
+                <ERC721DepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
