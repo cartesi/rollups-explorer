@@ -48,10 +48,8 @@ describe("PageNotFound component", () => {
 
         render(<Component />);
 
-        const button = screen.getByText("Go back")
-            .parentElement as HTMLButtonElement;
-        fireEvent.click(button);
+        const link = screen.getByText("Go back") as HTMLAnchorElement;
 
-        expect(mockedBackFn).toHaveBeenCalled();
+        expect(link.getAttribute("href")).toBe("/");
     });
 });
