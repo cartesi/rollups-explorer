@@ -1,12 +1,8 @@
-"use client";
-
 import { FC } from "react";
-import { Button, Flex, Text } from "@mantine/core";
-import { useRouter } from "next/navigation";
+import { Anchor, Flex, Text } from "@mantine/core";
+import Link from "next/link";
 
 const PageNotFound: FC = () => {
-    const router = useRouter();
-
     return (
         <Flex
             w="100%"
@@ -19,10 +15,12 @@ const PageNotFound: FC = () => {
                 <Text size="xl" fw={600} mb={2}>
                     404 Not Found
                 </Text>
-                <Text size="md" fw={500} mb={18}>
+                <Text size="md" fw={500} mb={8}>
                     Could not find the requested resource.
                 </Text>
-                <Button onClick={router.back}>Go back</Button>
+                <Anchor href="/" component={Link}>
+                    Go back
+                </Anchor>
             </Flex>
         </Flex>
     );
