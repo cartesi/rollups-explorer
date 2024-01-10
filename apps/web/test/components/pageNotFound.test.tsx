@@ -40,7 +40,7 @@ describe("PageNotFound component", () => {
         expect(screen.getByText("Go back")).toBeInTheDocument();
     });
 
-    it("should invoke router.back function when button is clicked", () => {
+    it("should display a link with href to home page", () => {
         const mockedBackFn = vi.fn();
         useRouterMock.mockReturnValue({
             back: mockedBackFn,
