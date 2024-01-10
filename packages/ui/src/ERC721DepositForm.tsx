@@ -47,6 +47,31 @@ import {
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
 
+const erc721AbiEnumerable = [
+    ...erc721ABI,
+    {
+        stateMutability: "view",
+        type: "function",
+        inputs: [
+            {
+                name: "owner",
+                type: "address",
+            },
+            {
+                name: "index",
+                type: "uint256",
+            },
+        ],
+        name: "tokenOfOwnerByIndex",
+        outputs: [
+            {
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+    },
+] as const;
+
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
     execute: TransactionStageStatus,
@@ -77,7 +102,7 @@ export const useTokensOfOwnerByIndex = (
     const lastErc721ContractAddress = useRef(erc721ContractAddress);
     const lastOwnerAddress = useRef(ownerAddress);
     const erc721Contract = {
-        abi: erc721ABI,
+        abi: erc721AbiEnumerable,
         address: erc721ContractAddress,
     };
     const isEnabled =
@@ -87,7 +112,7 @@ export const useTokensOfOwnerByIndex = (
         contracts: [
             {
                 ...erc721Contract,
-                functionName: "tokenOfOwnerByIndex" as any,
+                functionName: "tokenOfOwnerByIndex",
                 args: [ownerAddress!, BigInt(index)],
             },
         ],
