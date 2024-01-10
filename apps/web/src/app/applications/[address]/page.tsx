@@ -1,13 +1,17 @@
 import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { FC } from "react";
-import gql from "graphql-tag";
 import { TbInbox } from "react-icons/tb";
+import { notFound } from "next/navigation";
 import Address from "../../../components/address";
 import Inputs from "../../../components/inputs/inputs";
 import Breadcrumbs from "../../../components/breadcrumbs";
 import { getUrqlClient } from "../../../lib/urql";
-import { notFound } from "next/navigation";
+import {
+    ApplicationByIdDocument,
+    ApplicationByIdQuery,
+    ApplicationByIdQueryVariables,
+} from "../../../graphql/explorer/operations";
 
 export async function generateMetadata({
     params,
@@ -19,21 +23,14 @@ export async function generateMetadata({
 
 async function getApplication(address: string) {
     const client = getUrqlClient();
-    const result = await client.query(
-        gql`
-            query applications($where: ApplicationWhereInput) {
-                applications(where: $where, limit: 1) {
-                    id
-                }
-            }
-        `,
-        {
-            where: {
-                id_eq: address.toLowerCase(),
-            },
-        },
-    );
-    return result.data.applications?.[0];
+    const result = await client.query<
+        ApplicationByIdQuery,
+        ApplicationByIdQueryVariables
+    >(ApplicationByIdDocument, {
+        id: address.toLowerCase(),
+    });
+
+    return result.data?.applicationById;
 }
 
 export type ApplicationPageProps = {
