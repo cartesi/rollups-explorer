@@ -87,3 +87,8 @@ query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int,
     }
 }
 
+query applicationById($id: String!) {
+    applicationById(id: $id) {
+        ...ApplicationItem
+    }
+}
