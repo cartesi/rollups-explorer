@@ -14,11 +14,11 @@ import {
     Flex,
     Group,
     Loader,
+    Select,
     Stack,
     Text,
-    TextInput,
     Textarea,
-    Select,
+    TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
@@ -266,7 +266,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             !form.errors.application &&
             isHex(baseLayerData) &&
             isHex(execLayerData) &&
-            approve.status === "success",
+            approveWait.status === "success",
     });
     const deposit = useErc721PortalDepositErc721Token(depositPrepare.config);
     const depositWait = useWaitForTransaction(deposit.data);
