@@ -2,9 +2,9 @@
 
 import { Stack } from "@mantine/core";
 import { FC, useCallback, useEffect, useState } from "react";
-import { InputOrderByInput, useInputsQuery } from "../graphql";
-import InputsTable from "../components/inputsTable";
-import Paginated from "./paginated";
+import { InputOrderByInput, useInputsQuery } from "../../graphql";
+import InputsTable from "../inputs/inputsTable";
+import Paginated from "../paginated";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
