@@ -42,7 +42,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         },
     ] = useDisclosure(false);
     const theme = useMantineTheme();
-    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
+    const isMediumDevice = useMediaQuery(`(max-width:${theme.breakpoints.md})`);
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
@@ -96,7 +96,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Send Transaction
                             </Button>
-                            {!isSmallDevice && <ConnectButton />}
+                            {!isMediumDevice && <ConnectButton />}
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
@@ -118,7 +118,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     </Button>
                 </Group>
             </AppShell.Header>
-            <AppShell.Aside p="md">
+            <AppShell.Aside p="md" zIndex={102}>
                 <ConnectionView />
             </AppShell.Aside>
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
@@ -156,7 +156,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         hiddenFrom="sm"
                     />
 
-                    {isSmallDevice && <ConnectButton accountStatus="avatar" />}
+                    {isMediumDevice && <ConnectButton accountStatus="avatar" />}
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
