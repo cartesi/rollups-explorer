@@ -54,17 +54,6 @@ describe("Paginated component", () => {
         cleanup();
     });
 
-    it("should display children", () => {
-        const text = "Content inside Paginated";
-        render(
-            <Component {...defaultProps}>
-                <span>{text}</span>
-            </Component>,
-        );
-
-        expect(screen.getByText(text)).toBeInTheDocument();
-    });
-
     it("should display two pagination elements", () => {
         const { container } = render(
             <Component {...defaultProps}>Children</Component>,
@@ -74,6 +63,17 @@ describe("Paginated component", () => {
         );
 
         expect(paginationElements.length).toBe(2);
+    });
+
+    it("should display children", () => {
+        const text = "Content inside Paginated";
+        render(
+            <Component {...defaultProps}>
+                <span>{text}</span>
+            </Component>,
+        );
+
+        expect(screen.getByText(text)).toBeInTheDocument();
     });
 
     it("should invoke updateParams function when top pagination prev page button is clicked", async () => {
