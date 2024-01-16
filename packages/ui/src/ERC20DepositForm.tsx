@@ -125,7 +125,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                 : undefined,
             amountBigInt:
                 values.amount !== "" && decimals
-                    ? parseUnits(values.amount, decimals)
+                    ? parseUnits(Number(values.amount).toString(), decimals)
                     : undefined,
             execLayerData: toHex(values.execLayerData),
         }),
