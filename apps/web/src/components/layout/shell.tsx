@@ -42,11 +42,16 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         },
     ] = useDisclosure(false);
     const theme = useMantineTheme();
-    const isMediumDevice = useMediaQuery(`(max-width:${theme.breakpoints.md})`);
+    const showWalletNavbar = useMediaQuery(
+        `(min-width:${theme.breakpoints.sm})`,
+    );
+    const showWalletSidebar = useMediaQuery(`(max-width:${767}px)`);
+    const hideBalanceViewport = useMediaQuery(
+        `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
+    );
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
-
     return (
         <AppShell
             header={themeDefaultProps.header}
@@ -96,7 +101,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Send Transaction
                             </Button>
-                            {!isMediumDevice && <ConnectButton />}
+                            {showWalletNavbar && (
+                                <ConnectButton
+                                    showBalance={!hideBalanceViewport}
+                                />
+                            )}
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
@@ -156,7 +165,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         hiddenFrom="sm"
                     />
 
-                    {isMediumDevice && <ConnectButton accountStatus="avatar" />}
+                    {showWalletSidebar && <ConnectButton showBalance />}
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
