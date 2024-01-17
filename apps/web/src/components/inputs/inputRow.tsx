@@ -74,7 +74,14 @@ const InputRow: FC<InputRowProps> = ({
         <>
             <Table.Tr>
                 <Table.Td>
-                    <Box style={{ minWidth: "max-content" }}>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         {input.erc20Deposit ? (
                             <Group>
                                 <Address
@@ -93,7 +100,14 @@ const InputRow: FC<InputRowProps> = ({
                     </Box>
                 </Table.Td>
                 <Table.Td>
-                    <Box style={{ minWidth: "max-content" }}>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Group justify="right">
                             {erc20Deposit(input)}
                             <TbArrowRight />
@@ -101,7 +115,14 @@ const InputRow: FC<InputRowProps> = ({
                     </Box>
                 </Table.Td>
                 <Table.Td>
-                    <Box style={{ minWidth: "max-content" }}>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Address
                             value={to}
                             icon
@@ -115,7 +136,14 @@ const InputRow: FC<InputRowProps> = ({
                     <Text>{input.index}</Text>
                 </Table.Td>
                 <Table.Td>
-                    <Box style={{ minWidth: "max-content" }}>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Text>
                             {timeType === "age"
                                 ? `${prettyMilliseconds(
