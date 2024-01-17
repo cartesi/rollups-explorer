@@ -42,11 +42,16 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         },
     ] = useDisclosure(false);
     const theme = useMantineTheme();
-    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
+    const showWalletNavbar = useMediaQuery(
+        `(min-width:${theme.breakpoints.sm})`,
+    );
+    const showWalletSidebar = useMediaQuery(`(max-width:${767}px)`);
+    const hideBalanceViewport = useMediaQuery(
+        `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
+    );
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
-
     return (
         <AppShell
             header={themeDefaultProps.header}
@@ -85,7 +90,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Link href="/">
                             <CartesiLogo height={40} />
                         </Link>
-                        <Group ml="xl" gap="md">
+                        <Group ml={{ lg: "xl" }} gap="md">
                             <Button
                                 variant="subtle"
                                 leftSection={<TbArrowsDownUp />}
@@ -96,7 +101,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Send Transaction
                             </Button>
-                            {!isSmallDevice && <ConnectButton />}
+                            {showWalletNavbar && (
+                                <ConnectButton
+                                    showBalance={!hideBalanceViewport}
+                                />
+                            )}
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
@@ -118,7 +127,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     </Button>
                 </Group>
             </AppShell.Header>
-            <AppShell.Aside p="md">
+            <AppShell.Aside p="md" zIndex={102}>
                 <ConnectionView />
             </AppShell.Aside>
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
@@ -156,7 +165,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         hiddenFrom="sm"
                     />
 
-                    {isSmallDevice && <ConnectButton showBalance />}
+                    {showWalletSidebar && <ConnectButton showBalance />}
                 </Stack>
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
