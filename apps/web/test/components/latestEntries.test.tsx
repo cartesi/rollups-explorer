@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { withMantineTheme } from "../utils/WithMantineTheme";
 import LatestEntries from "../../src/components/latestEntries";
 
@@ -196,8 +196,10 @@ const applications = [
     },
 ];
 
-vi.mock("../../src/graphql", async () => {
-    const actual = await vi.importActual("../../src/graphql");
+vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
+    const actual = await vi.importActual(
+        "../../src/graphql/explorer/hooks/queries",
+    );
     return {
         ...(actual as any),
         useInputsQuery: () => [
