@@ -5,7 +5,7 @@ import SendTransaction from "../../src/components/sendTransaction";
 
 const Component = withMantineTheme(SendTransaction);
 
-vi.mock("../../src/graphql", async () => {
+vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
     return {
         useApplicationsQuery: () => [{ data: {}, fetching: false }],
         useTokensQuery: () => [{ data: {}, fetching: false }],
@@ -109,7 +109,9 @@ describe("SendTransaction component", () => {
 
     it("should initially query 10 applications with no predefined search", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
-        const graphqlModule = await import("../../src/graphql");
+        const graphqlModule = await import(
+            "../../src/graphql/explorer/hooks/queries"
+        );
         graphqlModule.useApplicationsQuery = vi
             .fn()
             .mockImplementation(mockedFn);
@@ -130,7 +132,9 @@ describe("SendTransaction component", () => {
         render(<Component initialDepositType="input" />);
 
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
-        const graphqlModule = await import("../../src/graphql");
+        const graphqlModule = await import(
+            "../../src/graphql/explorer/hooks/queries"
+        );
         graphqlModule.useApplicationsQuery = vi
             .fn()
             .mockImplementation(mockedFn);
@@ -175,7 +179,9 @@ describe("SendTransaction component", () => {
 
     it("should initially query 100 tokens", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
-        const graphqlModule = await import("../../src/graphql");
+        const graphqlModule = await import(
+            "../../src/graphql/explorer/hooks/queries"
+        );
         graphqlModule.useTokensQuery = vi.fn().mockImplementation(mockedFn);
 
         render(<Component />);
@@ -189,7 +195,9 @@ describe("SendTransaction component", () => {
 
     it("should not query tokens more than once", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
-        const graphqlModule = await import("../../src/graphql");
+        const graphqlModule = await import(
+            "../../src/graphql/explorer/hooks/queries"
+        );
         graphqlModule.useTokensQuery = vi.fn().mockImplementation(mockedFn);
 
         render(<Component initialDepositType="erc20" />);
