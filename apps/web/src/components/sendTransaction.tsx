@@ -6,7 +6,10 @@ import {
 } from "@cartesi/rollups-explorer-ui";
 import { FC, useMemo, useState } from "react";
 import { Select } from "@mantine/core";
-import { useApplicationsQuery, useTokensQuery } from "../graphql";
+import {
+    useApplicationsQuery,
+    useTokensQuery,
+} from "../graphql/explorer/hooks/queries";
 import { useDebouncedValue } from "@mantine/hooks";
 
 export type DepositType =

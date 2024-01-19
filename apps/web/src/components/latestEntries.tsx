@@ -8,9 +8,11 @@ import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 import {
     ApplicationOrderByInput,
     InputOrderByInput,
+} from "../graphql/explorer/types";
+import {
     useApplicationsConnectionQuery,
     useInputsQuery,
-} from "../graphql";
+} from "../graphql/explorer/hooks/queries";
 import type { Address as AddressType } from "abitype/dist/types/abi";
 import { IconType } from "react-icons";
 import { useMediaQuery } from "@mantine/hooks";

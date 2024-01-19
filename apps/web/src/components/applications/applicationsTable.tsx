@@ -3,8 +3,8 @@
 import { Loader, Table } from "@mantine/core";
 import { FC } from "react";
 import ApplicationRow from "./applicationRow";
-import type { ApplicationItemFragment } from "../../graphql";
-import { Application } from "../../graphql";
+import { ApplicationItemFragment } from "../../graphql/explorer/operations";
+import { Application } from "../../graphql/explorer/types";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];

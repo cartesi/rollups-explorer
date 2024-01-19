@@ -2,7 +2,7 @@ import { Group, Paper, Stack, Text } from "@mantine/core";
 import { FC } from "react";
 import prettyMilliseconds from "pretty-ms";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { InputItemFragment } from "../../graphql";
+import { InputItemFragment } from "../../graphql/explorer/operations";
 
 export type InputCardProps = {
     input: InputItemFragment;

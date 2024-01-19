@@ -27,7 +27,7 @@ import {
     ApplicationsDocument,
     ApplicationsQuery,
     ApplicationsQueryVariables,
-} from "../../graphql";
+} from "../../graphql/explorer/operations";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
