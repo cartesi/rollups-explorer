@@ -2,7 +2,7 @@
 
 import { Summary } from "@cartesi/rollups-explorer-ui";
 import { FC } from "react";
-import { useStatsQuery } from "../graphql";
+import { useStatsQuery } from "../graphql/explorer/hooks/queries";
 
 const EntriesSummary: FC = () => {
     const [{ data: stats }] = useStatsQuery();
