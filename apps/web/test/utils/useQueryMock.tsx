@@ -9,7 +9,7 @@ import {
     ApplicationsDocument,
     ApplicationsQuery,
     ApplicationsQueryVariables,
-} from "../../src/graphql";
+} from "../../src/graphql/explorer/operations";
 import {
     CheckStatusDocument,
     CheckStatusQuery,

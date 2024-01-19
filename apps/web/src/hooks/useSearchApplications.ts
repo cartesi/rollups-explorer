@@ -1,5 +1,5 @@
 import React from "react";
-import { useApplicationsQuery } from "../graphql";
+import { useApplicationsQuery } from "../graphql/explorer/hooks/queries";
 
 export const useSearchApplications = ({
     address,
