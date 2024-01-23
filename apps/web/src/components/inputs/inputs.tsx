@@ -1,15 +1,10 @@
 "use client";
 
-import { Group, Pagination, Select, Stack, Text } from "@mantine/core";
-import { useScrollIntoView } from "@mantine/hooks";
-import { pathOr } from "ramda";
-import { FC, useEffect, useState } from "react";
+import { Stack } from "@mantine/core";
+import { FC, useCallback, useEffect, useState } from "react";
 import { InputOrderByInput, useInputsQuery } from "../../graphql";
-import {
-    limitBounds,
-    usePaginationParams,
-} from "../../hooks/usePaginationParams";
-import InputsTable from "./inputsTable";
+import InputsTable from "../inputs/inputsTable";
+import Paginated from "../paginated";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
@@ -20,7 +15,8 @@ const Inputs: FC<InputsProps> = ({
     orderBy = InputOrderByInput.TimestampDesc,
     applicationId,
 }) => {
-    const [{ limit, page }, updateParams] = usePaginationParams();
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
     const [{ data, fetching }] = useInputsQuery({
         variables: {
@@ -30,74 +26,26 @@ const Inputs: FC<InputsProps> = ({
             after,
         },
     });
-    const totalInputs = data?.inputsConnection.totalCount ?? 1;
-    const totalPages = Math.ceil(totalInputs / limit);
-    const [activePage, setActivePage] = useState(
-        page > totalPages ? totalPages : page,
-    );
     const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
-    const { scrollIntoView } = useScrollIntoView<HTMLDivElement>({
-        duration: 700,
-        offset: 150,
-        cancelable: true,
-    });
 
-    if (!fetching && page > totalPages) {
-        updateParams(totalPages, limit);
-    }
-
-    useEffect(() => {
-        setActivePage((n) => {
-            return n !== page ? page : n;
-        });
-    }, [page]);
+    const onChangePagination = useCallback((limit: number, page: number) => {
+        setLimit(limit);
+        setPage(page);
+    }, []);
 
     return (
         <Stack>
-            <Pagination
-                styles={{ root: { alignSelf: "flex-end" } }}
-                value={activePage}
-                total={totalPages}
-                onChange={(pageN) => {
-                    updateParams(pageN, limit);
-                }}
-            />
-
-            <InputsTable
-                inputs={inputs}
+            <Paginated
                 fetching={fetching}
-                totalCount={data?.inputsConnection.totalCount ?? 0}
-            />
-
-            <Group justify="space-between" align="center">
-                <Group>
-                    <Text>Show:</Text>
-                    <Select
-                        style={{ width: "5rem" }}
-                        value={limit.toString()}
-                        onChange={(val) => {
-                            const entry = val ?? limit;
-                            const l = pathOr(limit, [entry], limitBounds);
-                            updateParams(page, l);
-                        }}
-                        data={[
-                            limitBounds[10].toString(),
-                            limitBounds[20].toString(),
-                            limitBounds[30].toString(),
-                        ]}
-                    />
-                    <Text>inputs</Text>
-                </Group>
-                <Pagination
-                    styles={{ root: { alignSelf: "flex-end" } }}
-                    value={activePage}
-                    total={totalPages}
-                    onChange={(pageN) => {
-                        updateParams(pageN, limit);
-                        scrollIntoView({ alignment: "center" });
-                    }}
+                totalCount={data?.inputsConnection.totalCount}
+                onChange={onChangePagination}
+            >
+                <InputsTable
+                    inputs={inputs}
+                    fetching={fetching}
+                    totalCount={data?.inputsConnection.totalCount ?? 0}
                 />
-            </Group>
+            </Paginated>
         </Stack>
     );
 };
