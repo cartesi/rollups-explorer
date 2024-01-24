@@ -287,7 +287,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             nextValue.indexOf("0x"),
                         );
                         form.setFieldValue("erc20Address", formattedValue);
-                        onSearchTokens(nextValue);
+                        onSearchTokens(formattedValue);
                     }}
                 />
 
