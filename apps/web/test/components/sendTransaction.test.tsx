@@ -201,10 +201,11 @@ describe("SendTransaction component", () => {
         ) as HTMLFormElement;
         const search =
             "SIM20 - SimpleERC20 - 0x059c7507b973d1512768c06f32a813bc93d83eb2";
+        const formattedValue = search.substring(search.indexOf("0x"));
 
         fireEvent.change(tokenInputForm, {
             target: {
-                value: search,
+                value: formattedValue,
             },
         });
 
@@ -225,7 +226,7 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: search,
+                    id_containsInsensitive: formattedValue,
                 },
             },
         });
