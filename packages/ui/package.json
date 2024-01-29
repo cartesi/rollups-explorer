@@ -26,8 +26,8 @@
     },
     "dependencies": {
         "@cartesi/rollups-wagmi": "*",
-        "@mantine/core": "^7.3.0",
-        "@mantine/hooks": "^7.3.0",
+        "@mantine/core": "^7.5.0",
+        "@mantine/hooks": "^7.5.0",
         "@react-spring/web": "^9.7.3",
         "ramda": "^0.29.0",
         "react-icons": "^4",
