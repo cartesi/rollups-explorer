@@ -1,10 +1,10 @@
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
-import { FC } from "react";
+import type { FC, ReactNode } from "react";
 import { theme } from "./theme";
 
 export type StyleProviderProps = {
-    children?: React.ReactNode;
+    children?: ReactNode;
 };
 
 const StyleProvider: FC<StyleProviderProps> = (props) => {
