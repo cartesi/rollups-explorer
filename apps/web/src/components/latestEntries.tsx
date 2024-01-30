@@ -1,6 +1,12 @@
 "use client";
-import { Card } from "@cartesi/rollups-explorer-ui";
-import { Button, Grid, Group, Text, useMantineTheme } from "@mantine/core";
+import {
+    Button,
+    Card,
+    Grid,
+    Group,
+    Text,
+    useMantineTheme,
+} from "@mantine/core";
 import type { FC } from "react";
 import Link from "next/link";
 import { TbApps, TbInbox } from "react-icons/tb";
