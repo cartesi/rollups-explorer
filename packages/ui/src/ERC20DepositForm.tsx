@@ -20,9 +20,10 @@ import {
     Textarea,
     UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
-import { FC, useEffect, useMemo, useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import { isEmpty } from "ramda";
+import { FC, useEffect, useState } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -65,28 +66,21 @@ export const transactionButtonState = (
 };
 
 export interface ERC20DepositFormProps {
+    tokens: string[];
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
-    tokens: string[];
+    onSearchTokens: (tokenId: string) => void;
 }
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const {
+        tokens,
         applications,
         isLoadingApplications,
         onSearchApplications,
-        tokens,
+        onSearchTokens,
     } = props;
-    const tokenAddresses = useMemo(
-        () =>
-            tokens.map((token) => {
-                const addressIndex = token.indexOf("0x");
-                const address = getAddress(token.substring(addressIndex));
-                return `${token.substring(0, addressIndex)}${address}`;
-            }),
-        [tokens],
-    );
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
 
@@ -96,7 +90,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const [decimals, setDecimals] = useState<number | undefined>();
 
     const form = useForm({
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: {
             application: "",
             erc20Address: "",
@@ -104,10 +98,20 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             execLayerData: "0x",
         },
         validate: {
-            application: (value) =>
-                value !== "" && isAddress(value) ? null : "Invalid application",
-            erc20Address: (value) =>
-                value !== "" ? null : "Invalid ERC20 address",
+            application: (value) => {
+                if (isEmpty(value)) return `Please input ERC20 Address`;
+                if (!isAddress(value)) {
+                    return `Invalid Application address`;
+                }
+                return null;
+            },
+            erc20Address: (value) => {
+                if (isEmpty(value)) return `Please input ERC20 Address`;
+                if (!isAddress(value)) {
+                    return `Invalid ERC20 address`;
+                }
+                return null;
+            },
             amount: (value) =>
                 value !== "" && Number(value) > 0 ? null : "Invalid amount",
             execLayerData: (value) =>
@@ -163,6 +167,8 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             setDecimals(erc20.data?.[0].result as number | undefined);
         }
     }, [erc20.data]);
+
+    useEffect(() => {}, [tokens]);
 
     const symbol = erc20.data?.[1].result as string | undefined;
     const allowance = erc20.data?.[2].result as bigint | undefined;
@@ -254,13 +260,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     }}
                 />
 
-                {!form.errors.application &&
+                {isAddress(applicationAddress) &&
                     applicationAddress !== zeroAddress &&
-                    !applications.some(
-                        (a) =>
-                            a.toLowerCase() ===
-                            applicationAddress.toLowerCase(),
-                    ) && (
+                    !applications.length && (
                         <Alert
                             variant="light"
                             color="yellow"
@@ -285,12 +287,14 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                             nextValue.indexOf("0x"),
                         );
                         form.setFieldValue("erc20Address", formattedValue);
+                        onSearchTokens(formattedValue);
                     }}
                 />
 
-                {!form.errors.erc20Address &&
+                {isAddress(erc20Address) &&
                     erc20Address !== zeroAddress &&
-                    !tokenAddresses.some((t) => t.includes(erc20Address)) && (
+                    !tokens.length &&
+                    !erc20.isLoading && (
                         <Alert
                             variant="light"
                             color="yellow"

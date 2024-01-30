@@ -1,8 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
-import withMantineTheme from "../utils/WithMantineTheme";
 import SendTransaction from "../../src/components/sendTransaction";
-
+import withMantineTheme from "../utils/WithMantineTheme";
 const Component = withMantineTheme(SendTransaction);
 
 vi.mock("../../src/graphql", async () => {
@@ -173,37 +172,63 @@ describe("SendTransaction component", () => {
         });
     });
 
-    it("should initially query 100 tokens", async () => {
+    it("should initially query 10 tokens with no predefined search", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         const graphqlModule = await import("../../src/graphql");
         graphqlModule.useTokensQuery = vi.fn().mockImplementation(mockedFn);
 
-        render(<Component />);
+        render(<Component initialDepositType="input" />);
 
         expect(mockedFn).toHaveBeenCalledWith({
             variables: {
-                limit: 100,
+                limit: 10,
+                where: {
+                    id_containsInsensitive: "",
+                },
             },
         });
     });
 
-    it("should not query tokens more than once", async () => {
+    it("should query tokens with given search id, using debouncing", async () => {
+        render(<Component initialDepositType="erc20" />);
+
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         const graphqlModule = await import("../../src/graphql");
         graphqlModule.useTokensQuery = vi.fn().mockImplementation(mockedFn);
 
-        render(<Component initialDepositType="erc20" />);
-
-        const tokenAutocomplete = screen.queryByTestId(
+        const tokenInputForm = screen.queryByTestId(
             "erc20Address",
         ) as HTMLFormElement;
+        const search =
+            "SIM20 - SimpleERC20 - 0x059c7507b973d1512768c06f32a813bc93d83eb2";
+        const formattedValue = search.substring(search.indexOf("0x"));
 
-        fireEvent.change(tokenAutocomplete, {
+        fireEvent.change(tokenInputForm, {
             target: {
-                value: "SIM20 - SimpleERC20 - 0x059c7507b973d1512768c06f32a813bc93d83eb2",
+                value: formattedValue,
             },
         });
 
-        expect(mockedFn).toHaveBeenCalledOnce();
+        expect(mockedFn).toHaveBeenCalledWith({
+            variables: {
+                limit: 10,
+                where: {
+                    id_containsInsensitive: "",
+                },
+            },
+        });
+
+        await waitFor(() => expect(mockedFn).toHaveBeenCalledTimes(2), {
+            timeout: 500,
+        });
+
+        expect(mockedFn).toHaveBeenCalledWith({
+            variables: {
+                limit: 10,
+                where: {
+                    id_containsInsensitive: formattedValue,
+                },
+            },
+        });
     });
 });
