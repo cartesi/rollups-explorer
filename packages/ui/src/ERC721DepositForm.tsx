@@ -291,6 +291,13 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             true,
         );
 
+    useEffect(() => {
+        if (tokensOfOwnerByIndex.tokenIds.length === 0) {
+            form.setFieldValue("tokenId", "");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tokensOfOwnerByIndex]);
+
     return (
         <form data-testid="erc721-deposit-form">
             <Stack>
