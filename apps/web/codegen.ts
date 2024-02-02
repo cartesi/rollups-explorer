@@ -3,21 +3,6 @@ import type { Types } from "@graphql-codegen/plugin-helpers";
 import { join, sep } from "path";
 
 const schema = "https://mainnet.api.cartesiscan.io/graphql";
-const plugins = [
-    {
-        add: {
-            content:
-                'import type { DocumentNode } from "graphql/language/ast";',
-        },
-    },
-    "typescript",
-    "typescript-operations",
-    "typescript-urql",
-];
-
-const config = {
-    withHooks: true,
-};
 
 console.info(`Codegen will use schema URL: ${schema}`);
 
@@ -92,15 +77,6 @@ const generateConfig = (configs: CommonConfig[]): Generates => {
 
 const codegenConfig: CodegenConfig = {
     generates: {
-        /**
-         * @deprecated Will be removed in future updates see {@link https://github.com/cartesi/rollups-explorer/issues/99}
-         */
-        "src/graphql/index.tsx": {
-            schema,
-            documents: "./graphql/queries.graphql",
-            plugins,
-            config,
-        },
         ...generateConfig(setup),
     },
 };

@@ -4,6 +4,7 @@ import {
     List,
     MantineThemeOverride,
     Modal,
+    Card,
     createTheme,
     mergeMantineTheme,
 } from "@mantine/core";
@@ -42,6 +43,12 @@ const themeOverride: MantineThemeOverride = createTheme({
             defaultProps: {
                 center: true,
                 spacing: "0.5rem",
+            },
+        }),
+        Card: Card.extend({
+            defaultProps: {
+                shadow: "sm",
+                withBorder: true,
             },
         }),
     },

@@ -1,4 +1,3 @@
-export { Card } from "./Card";
 export { ERC20DepositForm } from "./ERC20DepositForm";
 export { EtherDepositForm } from "./EtherDepositForm";
 export {

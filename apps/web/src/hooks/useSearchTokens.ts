@@ -1,5 +1,5 @@
 import React from "react";
-import { useTokensQuery } from "../graphql";
+import { useTokensQuery } from "../graphql/explorer/hooks/queries";
 
 export const useSearchTokens = ({
     address,

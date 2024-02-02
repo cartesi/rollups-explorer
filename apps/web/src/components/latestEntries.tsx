@@ -1,6 +1,12 @@
 "use client";
-import { Card } from "@cartesi/rollups-explorer-ui";
-import { Button, Grid, Group, Text, useMantineTheme } from "@mantine/core";
+import {
+    Button,
+    Card,
+    Grid,
+    Group,
+    Text,
+    useMantineTheme,
+} from "@mantine/core";
 import type { FC } from "react";
 import Link from "next/link";
 import { TbApps, TbInbox } from "react-icons/tb";
@@ -8,9 +14,11 @@ import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 import {
     ApplicationOrderByInput,
     InputOrderByInput,
+} from "../graphql/explorer/types";
+import {
     useApplicationsConnectionQuery,
     useInputsQuery,
-} from "../graphql";
+} from "../graphql/explorer/hooks/queries";
 import type { Address as AddressType } from "abitype/dist/types/abi";
 import { IconType } from "react-icons";
 import { useMediaQuery } from "@mantine/hooks";
