@@ -167,6 +167,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { address } = useAccount();
+    const resetTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const form = useForm({
         validateInputOnBlur: true,
@@ -301,9 +302,24 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     useEffect(() => {
         if (depositWait.status === "success") {
             form.reset();
+
+            const delay = 3000;
+            resetTimeout.current = setTimeout(() => {
+                approve.reset();
+                deposit.reset();
+            }, delay);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [depositWait.status]);
+
+    useEffect(() => {
+        const timeout = resetTimeout.current;
+        return () => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+        }
+    }, [])
 
     return (
         <form data-testid="erc721-deposit-form">
