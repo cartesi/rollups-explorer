@@ -318,8 +318,8 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             if (timeout) {
                 clearTimeout(timeout);
             }
-        }
-    }, [])
+        };
+    }, []);
 
     return (
         <form data-testid="erc721-deposit-form">
