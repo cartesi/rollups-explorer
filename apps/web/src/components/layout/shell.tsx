@@ -52,6 +52,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const { isConnected } = useAccount();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
+
     return (
         <AppShell
             header={themeDefaultProps.header}
@@ -137,12 +138,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Home"
                         href="/"
                         leftSection={<TbHome />}
+                        onClick={toggle}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
                         label="Applications"
+                        onClick={toggle}
                         href="/applications"
                         leftSection={<TbApps />}
                         data-testid="applications-link"
@@ -151,6 +154,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <NavLink
                         component={Link}
                         label="Inputs"
+                        onClick={toggle}
                         href="/inputs"
                         leftSection={<TbInbox />}
                         data-testid="inputs-link"
@@ -160,7 +164,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Send Transaction"
                         leftSection={<TbArrowsDownUp />}
                         disabled={!isConnected}
-                        opened={isConnected && transaction}
                         onClick={toggleTransaction}
                         hiddenFrom="sm"
                     />
