@@ -2,7 +2,8 @@
 
 import { Stack } from "@mantine/core";
 import { FC, useCallback, useState } from "react";
-import { InputOrderByInput, useInputsConnectionQuery } from "../../graphql";
+import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
+import { InputOrderByInput } from "../../graphql/explorer/types";
 import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";

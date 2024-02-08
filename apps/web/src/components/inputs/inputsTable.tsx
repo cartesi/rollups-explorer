@@ -8,7 +8,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
-import type { InputItemFragment } from "../../graphql";
+import type { InputItemFragment } from "../../graphql/explorer/operations";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
 import { TableResponsiveWrapper } from "../tableResponsiveWrapper";
 import InputRow from "./inputRow";
