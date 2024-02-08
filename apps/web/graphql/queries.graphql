@@ -38,6 +38,24 @@ query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String, $appl
     }
 }
 
+
+query inputsConnection($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String, $where: InputWhereInput ) {
+    inputsConnection(orderBy: $orderBy, first: $limit, after: $after, where: $where) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...InputItem
+            }
+        }
+    }
+}
+
 query stats($applicationId: String) {
     inputsConnection(orderBy: id_ASC, where: {application: {id_startsWith: $applicationId}}) {
         totalCount
