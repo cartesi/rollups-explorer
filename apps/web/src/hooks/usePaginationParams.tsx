@@ -29,10 +29,12 @@ export const usePaginationParams = (): UsePaginationReturn => {
     const updateParams = useCallback(
         (page: number, limit: number): void => {
             const urlSearchParams = new URLSearchParams({
-                query,
                 pg: page.toString(),
                 lt: limit.toString(),
             });
+            if (query !== "") {
+                urlSearchParams.append("query", query);
+            }
 
             router.push(`${pathName}?${urlSearchParams.toString()}`, {
                 scroll: false,

@@ -33,7 +33,10 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
 
     return (
         <>
-            <Box w={{ sm: "10%%", lg: "50%" }} mt={"sm"}>
+            <Box
+                w={{ sm: "10%%", lg: "50%" }}
+                mb={{ sm: "1rem", lg: "-3.25rem" }}
+            >
                 <TextInput
                     placeholder="Search by Address / Txn Hash / Index"
                     {...form.getInputProps("query")}
