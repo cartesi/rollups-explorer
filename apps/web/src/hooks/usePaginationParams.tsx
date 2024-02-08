@@ -24,10 +24,12 @@ export const usePaginationParams = (): UsePaginationReturn => {
     const lt = urlSearchParams.get("lt") ?? limitBounds[10];
     const limit = pathOr(limitBounds[10], [lt], limitBounds);
     const page = isNaN(pg) ? 1 : pg;
+    const query = urlSearchParams.get("query") ?? "";
 
     const updateParams = useCallback(
         (page: number, limit: number): void => {
             const urlSearchParams = new URLSearchParams({
+                query,
                 pg: page.toString(),
                 lt: limit.toString(),
             });
