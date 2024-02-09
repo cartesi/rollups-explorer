@@ -20,7 +20,15 @@ query inputDetails (
       edges {
         node {
           index
+          input {
+            index
+          }
           payload
+          proof {
+            validity {
+              outputIndexWithinInput
+            }
+          }
         }
         cursor
       }
