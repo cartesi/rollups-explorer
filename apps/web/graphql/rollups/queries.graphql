@@ -23,10 +23,19 @@ query inputDetails (
           input {
             index
           }
+          destination
           payload
           proof {
+            context
             validity {
+              inputIndexWithinEpoch
+              machineStateHash
+              noticesEpochRootHash
+              outputHashInOutputHashesSiblings
+              outputHashesInEpochSiblings
+              outputHashesRootHash
               outputIndexWithinInput
+              vouchersEpochRootHash
             }
           }
         }
