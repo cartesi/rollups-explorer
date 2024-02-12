@@ -1,16 +1,22 @@
 "use client";
-import { FC } from "react";
+import type { FC, ReactNode } from "react";
 import { PageableContent, PageableContentProps } from "./PageableContent";
 
-export interface VoucherContentType extends FC<PageableContentProps> {}
+export interface VoucherContentType extends PageableContentProps {
+    children: ReactNode;
+}
 
-const DISPLAY_NAME = "VoucherContent" as const;
+const VoucherContent: FC<VoucherContentType> = (props) => {
+    const { children, ...restProps } = props;
 
-const VoucherContent: VoucherContentType = (props) => {
-    PageableContent.displayName = DISPLAY_NAME;
-    return PageableContent(props);
+    return (
+        <div>
+            <PageableContent {...restProps as PageableContentProps} />
+            {children}
+        </div>
+    )
 };
 
-VoucherContent.displayName = DISPLAY_NAME;
+VoucherContent.displayName = "VoucherContent" as const;
 
 export default VoucherContent;
