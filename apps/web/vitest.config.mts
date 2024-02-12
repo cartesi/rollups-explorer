@@ -8,7 +8,7 @@ export default defineConfig({
         environment: "jsdom",
         setupFiles: "vitest-setup.ts",
         coverage: {
-            reporter: ['text', 'lcov']
-        }
+            reporter: ["text", "lcov"],
+        },
     },
 } as UserConfig);

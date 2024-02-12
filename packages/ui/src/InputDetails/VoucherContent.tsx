@@ -11,10 +11,10 @@ const VoucherContent: FC<VoucherContentType> = (props) => {
 
     return (
         <div>
-            <PageableContent {...restProps as PageableContentProps} />
+            <PageableContent {...(restProps as PageableContentProps)} />
             {children}
         </div>
-    )
+    );
 };
 
 VoucherContent.displayName = "VoucherContent" as const;

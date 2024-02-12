@@ -234,7 +234,10 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                     >
                         <VoucherExecution
                             appId={appId}
-                            vouchers={(vouchers?.edges?.map((e) => e.node) ?? []) as Partial<Voucher>[]}
+                            vouchers={
+                                (vouchers?.edges?.map((e) => e.node) ??
+                                    []) as Partial<Voucher>[]
+                            }
                         />
                     </InputDetails.VoucherContent>
                 )}
