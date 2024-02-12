@@ -8,7 +8,7 @@ export type SearchProps = {
 };
 
 const Search: React.FC<SearchProps> = ({ onSubmit }) => {
-    const [queryParam, updateQueryParams] = useQueryParams();
+    const { query, updateQueryParams } = useQueryParams();
 
     const form = useForm({
         initialValues: {
@@ -28,8 +28,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
     };
 
     useEffect(() => {
-        onSubmit(queryParam);
-    }, [queryParam, onSubmit]);
+        onSubmit(query);
+    }, [query, onSubmit]);
 
     return (
         <>
@@ -44,6 +44,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit }) => {
                     ref={inputRef}
                     error={form.errors.query}
                     size="md"
+                    data-testid="search-input"
                 />
             </Box>
         </>
