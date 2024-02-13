@@ -68,7 +68,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
         <div>
             {wasExecuted.isLoading ? (
                 <Flex justify="center" align="center" mt={6}>
-                    <Loader size={26} />
+                    <Loader data-testid="voucher-execution-loader" size={26} />
                 </Flex>
             ) : (
                 <Tooltip
@@ -77,7 +77,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                 >
                     <Button
                         mt={6}
-                        disabled={!hasVoucherProof || isExecuted}
+                        disabled={isExecuted || !hasVoucherProof}
                         loading={execute.isLoading}
                         onClick={onExecute}
                     >
