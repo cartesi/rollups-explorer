@@ -21,6 +21,16 @@ import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("urql");
+vi.mock("@cartesi/rollups-wagmi", async () => {
+    return {
+        useCartesiDAppWasVoucherExecuted: () => ({
+            data: {},
+        }),
+        useCartesiDAppExecuteVoucher: () => ({
+            data: {},
+        }),
+    };
+});
 
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const useQueryMock = vi.mocked(useQuery, true);

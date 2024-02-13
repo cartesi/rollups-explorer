@@ -82,6 +82,9 @@ export const inputDetailsSampleForPaging = {
                 {
                     node: {
                         index: 0,
+                        input: {
+                            index: 0,
+                        },
                         payload: "0x5168342b",
                     },
                     cursor: "MA==",
