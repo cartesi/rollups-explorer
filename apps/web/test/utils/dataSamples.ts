@@ -1,3 +1,5 @@
+import { VoucherEdge } from "../../src/graphql/rollups/types";
+
 /**
  * A list of applications with only id property
  */
@@ -88,7 +90,7 @@ export const inputDetailsSampleForPaging = {
                         payload: "0x5168342b",
                     },
                     cursor: "MA==",
-                },
+                } as VoucherEdge,
             ],
             pageInfo: {
                 startCursor: null,
