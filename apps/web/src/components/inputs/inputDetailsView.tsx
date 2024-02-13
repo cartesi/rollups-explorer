@@ -94,6 +94,10 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const showVouchers =
         !connection ||
         (connection && vouchers && payloadOrString(vouchers) !== "");
+    const vouchersForExecution = (vouchers?.edges?.map((e) => e.node) ??
+        []) as Partial<Voucher>[];
+    const showVoucherForExecution =
+        showVouchers && vouchersForExecution.length > 0;
 
     useEffect(() => {
         if (connection) execQuery({ url: connection.url });
@@ -232,13 +236,12 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                             },
                         }}
                     >
-                        <VoucherExecution
-                            appId={appId}
-                            vouchers={
-                                (vouchers?.edges?.map((e) => e.node) ??
-                                    []) as Partial<Voucher>[]
-                            }
-                        />
+                        {showVoucherForExecution && (
+                            <VoucherExecution
+                                appId={appId}
+                                vouchers={vouchersForExecution}
+                            />
+                        )}
                     </InputDetails.VoucherContent>
                 )}
             </InputDetails>
