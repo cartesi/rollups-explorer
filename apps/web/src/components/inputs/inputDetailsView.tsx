@@ -239,7 +239,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                         {showVoucherForExecution ? (
                             <VoucherExecution
                                 appId={appId}
-                                vouchers={vouchersForExecution}
+                                voucher={vouchersForExecution[0]}
                             />
                         ) : null}
                     </InputDetails.VoucherContent>

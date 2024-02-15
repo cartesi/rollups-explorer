@@ -34,12 +34,11 @@ const typeCastProof = (voucher: Partial<Voucher>) => ({
 
 export interface VoucherExecutionType {
     appId: Address;
-    vouchers: Partial<Voucher>[];
+    voucher: Partial<Voucher>;
 }
 
 const VoucherExecution: FC<VoucherExecutionType> = (props) => {
-    const { appId, vouchers } = props;
-    const [voucher] = vouchers;
+    const { appId, voucher } = props;
     const hasVoucherProof =
         typeof voucher?.proof === "object" && voucher?.proof !== null;
 
