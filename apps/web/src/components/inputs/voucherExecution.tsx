@@ -71,7 +71,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                 </Flex>
             ) : (
                 <Tooltip
-                    label={hasVoucherProof ? "" : "Voucher proof is pending"}
+                    label="Voucher proof is pending"
                     disabled={hasVoucherProof}
                 >
                     <Button
