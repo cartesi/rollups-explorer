@@ -166,4 +166,25 @@ describe("VoucherExecution component", () => {
         fireEvent.click(button);
         expect(mockedWrite).toHaveBeenCalledOnce();
     });
+
+    it("should display a loading button while executing voucher", () => {
+        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+            data: false,
+            isLoading: false,
+        } as any);
+
+        const mockedWrite = vi.fn();
+        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+            status: "idle",
+            isLoading: true,
+            write: mockedWrite,
+        } as any);
+
+        render(<Component {...defaultProps} />);
+
+        const button = screen
+            .getByText("Execute")
+            .closest("button") as HTMLButtonElement;
+        expect(button.getAttribute("data-loading")).toBe("true");
+    });
 });
