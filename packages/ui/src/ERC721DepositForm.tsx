@@ -425,7 +425,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         confirmationMessage="Approve transaction confirmed"
                     />
                 </Collapse>
-                <Collapse in={!deposit.isIdle}>
+                <Collapse in={!deposit.isIdle && !isDepositDisabled}>
                     <TransactionProgress
                         prepare={depositPrepare}
                         execute={deposit}
