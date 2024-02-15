@@ -161,13 +161,18 @@ export interface ERC721DepositFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
+    onDeposit: () => void;
 }
 
 export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
-    const { applications, isLoadingApplications, onSearchApplications } = props;
+    const {
+        applications,
+        isLoadingApplications,
+        onSearchApplications,
+        onDeposit,
+    } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { address } = useAccount();
-    const resetTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const form = useForm({
         validateInputOnBlur: true,
@@ -281,7 +286,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             approve,
             approveWait,
             approve.write,
-            false,
+            true,
         );
     const { disabled: depositDisabled, loading: depositLoading } =
         transactionButtonState(
@@ -291,6 +296,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             deposit.write,
             true,
         );
+    const isDepositDisabled = depositDisabled || !canDeposit || !form.isValid();
+    const isApproveDisabled =
+        approveDisabled || !needApproval || !isDepositDisabled;
 
     useEffect(() => {
         if (tokensOfOwnerByIndex.tokenIds.length === 0) {
@@ -302,24 +310,12 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     useEffect(() => {
         if (depositWait.status === "success") {
             form.reset();
-
-            const delay = 3000;
-            resetTimeout.current = setTimeout(() => {
-                approve.reset();
-                deposit.reset();
-            }, delay);
+            approve.reset();
+            deposit.reset();
+            onDeposit();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.status]);
-
-    useEffect(() => {
-        const timeout = resetTimeout.current;
-        return () => {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-        };
-    }, []);
+    }, [depositWait.status, onDeposit]);
 
     return (
         <form data-testid="erc721-deposit-form">
@@ -450,7 +446,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                     </Button>
                     <Button
                         variant="filled"
-                        disabled={approveDisabled || !needApproval}
+                        disabled={isApproveDisabled}
                         leftSection={<TbCheck />}
                         loading={approveLoading}
                         onClick={approve.write}
@@ -459,9 +455,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                     </Button>
                     <Button
                         variant="filled"
-                        disabled={
-                            depositDisabled || !canDeposit || !form.isValid()
-                        }
+                        disabled={isDepositDisabled}
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
                         onClick={deposit.write}

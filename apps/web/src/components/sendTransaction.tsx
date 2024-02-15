@@ -7,9 +7,10 @@ import {
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchTokens } from "../hooks/useSearchTokens";
+import { notifications } from "@mantine/notifications";
 
 export type DepositType =
     | "ether"
@@ -24,7 +25,7 @@ interface DepositProps {
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "ether",
+    initialDepositType = "erc721", // "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -38,6 +39,14 @@ const SendTransaction: FC<DepositProps> = ({
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
     });
+
+    const onDepositErc721 = useCallback(() => {
+        notifications.show({
+            message: "Token was deposited successfully",
+            color: "green",
+            withBorder: true,
+        });
+    }, []);
 
     return (
         <>
@@ -85,6 +94,7 @@ const SendTransaction: FC<DepositProps> = ({
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                    onDeposit={onDepositErc721}
                 />
             ) : depositType === "input" ? (
                 <RawInputForm
