@@ -85,7 +85,7 @@ export const transactionButtonState = (
         wait.status === "loading";
 
     const disabled =
-        prepare.error != null ||
+        prepare.error !== null ||
         (disableOnSuccess && wait.status === "success") ||
         !write;
 
@@ -296,7 +296,11 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             deposit.write,
             true,
         );
-    const isDepositDisabled = depositDisabled || !canDeposit || !form.isValid();
+    const isDepositDisabled =
+        depositDisabled ||
+        !canDeposit ||
+        !form.isValid() ||
+        approveWait.status !== "success";
     const isApproveDisabled =
         approveDisabled || !needApproval || !isDepositDisabled;
 
