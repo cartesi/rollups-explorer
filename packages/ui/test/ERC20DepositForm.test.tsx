@@ -374,4 +374,38 @@ describe("Rollups ERC20DepositForm", () => {
             expect(amountInput.value).toBe("50");
         });
     });
+
+    describe("Amount input", () => {
+        it("should correctly process small decimal numbers", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareErc20Approve,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareErc20Approve = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.0000001",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                address: "0x0000000000000000000000000000000000000000",
+                args: [
+                    "0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB",
+                    100000000000n,
+                ],
+                enabled: true,
+            });
+        });
+    });
 });
