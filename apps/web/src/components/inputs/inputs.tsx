@@ -41,13 +41,9 @@ const Inputs: FC<InputsProps> = ({
         setPage(page);
     }, []);
 
-    const onSubmitQuery = useCallback((query: string) => {
-        setQuery(query);
-    }, []);
-
     return (
         <Stack>
-            <Search onSubmit={onSubmitQuery} />
+            <Search isLoading={fetching} onChange={setQuery} />
             <Paginated
                 fetching={fetching}
                 totalCount={data?.inputsConnection.totalCount}
