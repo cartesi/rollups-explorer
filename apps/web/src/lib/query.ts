@@ -1,4 +1,10 @@
-// Define types for the return values
+/**
+ * @typedef {Object} QueryReturn
+ * @property {Array.<{msgSender_startsWith: string} | {application: {id_startsWith: string}}>} [OR]
+ * @property {Array.<{application: {id_startsWith: string}} | {msgSender_startsWith?: string; transactionHash_startsWith?: string; index_eq?: number;}>} [AND]
+ * @property {string} [transactionHash_startsWith]
+ * @property {number} [index_eq]
+ */
 type QueryReturn = {
     OR?: [
         { msgSender_startsWith: string },
@@ -18,11 +24,10 @@ type QueryReturn = {
 
 /**
  *
- * @param input
- * @param applicationId
- * @returns
+ * @param {string} input
+ * @param {string} applicationId
+ * @returns {QueryReturn}
  */
-
 export const checkQuery = (
     input: string,
     applicationId: string = "",
