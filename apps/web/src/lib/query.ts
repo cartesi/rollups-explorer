@@ -1,5 +1,3 @@
-import { isAddress } from "viem";
-
 // Define types for the return values
 type QueryReturn = {
     OR?: [
@@ -32,7 +30,10 @@ export const checkQuery = (
     if (!input) return {};
 
     if (!applicationId) {
-        if (isAddress(input)) {
+        if (input.startsWith("0x")) {
+            if (input.length === 66) {
+                return { transactionHash_startsWith: input };
+            }
             return {
                 OR: [
                     { msgSender_startsWith: input },
@@ -40,19 +41,16 @@ export const checkQuery = (
                 ],
             };
         }
-        if (input.startsWith("0x") && input.length === 66) {
-            return { transactionHash_startsWith: input };
-        }
         return { index_eq: parseInt(input) };
     }
 
     const common = { application: { id_startsWith: applicationId } };
 
-    if (isAddress(input)) {
+    if (input.startsWith("0x")) {
+        if (input.length === 66) {
+            return { AND: [common, { transactionHash_startsWith: input }] };
+        }
         return { AND: [common, { msgSender_startsWith: input }] };
-    }
-    if (input.startsWith("0x") && input.length === 66) {
-        return { AND: [common, { transactionHash_startsWith: input }] };
     }
     return { AND: [common, { index_eq: parseInt(input) }] };
 };
