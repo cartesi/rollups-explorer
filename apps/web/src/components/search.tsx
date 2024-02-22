@@ -1,53 +1,35 @@
-import { Box, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import React, { useEffect, useRef } from "react";
+import { Box, Loader, TextInput } from "@mantine/core";
+import { useDebouncedState } from "@mantine/hooks";
+import React, { useEffect } from "react";
+import { CiSearch } from "react-icons/ci";
 import { useQueryParams } from "../hooks/useQueryParams";
-
 export type SearchProps = {
-    onSubmit: (query: string) => void;
+    isLoading: Boolean;
+    onChange: (query: string) => void;
 };
 
-const Search: React.FC<SearchProps> = ({ onSubmit }) => {
+const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     const { query, updateQueryParams } = useQueryParams();
-
-    const form = useForm({
-        initialValues: {
-            query: "",
-        },
-    });
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
-            updateQueryParams(form.values.query);
-            form.onSubmit((values) => onSubmit(values.query))();
-            if (inputRef.current) {
-                inputRef.current.blur();
-            }
-        }
-    };
-
+    const [keyword, setKeyword] = useDebouncedState("", 500);
     useEffect(() => {
-        onSubmit(query);
-    }, [query, onSubmit]);
+        updateQueryParams(keyword);
+        onChange(keyword);
+    }, [query, onChange]);
 
     return (
-        <>
-            <Box
-                w={{ sm: "10%%", lg: "50%" }}
-                mb={{ sm: "1rem", lg: "-3.25rem" }}
-            >
-                <TextInput
-                    placeholder="Search by Address / Txn Hash / Index"
-                    {...form.getInputProps("query")}
-                    onKeyDown={handleKeyDown}
-                    ref={inputRef}
-                    error={form.errors.query}
-                    size="md"
-                    data-testid="search-input"
-                />
-            </Box>
-        </>
+        <Box w={{ sm: "10%%", lg: "50%" }} mb={{ sm: "1rem", lg: "-3.25rem" }}>
+            <TextInput
+                placeholder="Search by Address / Txn Hash / Index"
+                leftSection={<CiSearch />}
+                rightSection={keyword && isLoading && <Loader size={"xs"} />}
+                size="md"
+                data-testid="search-input"
+                defaultValue={query}
+                onChange={(event) => {
+                    setKeyword(event.target.value);
+                }}
+            />
+        </Box>
     );
 };
 
