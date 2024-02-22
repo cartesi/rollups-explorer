@@ -95,28 +95,25 @@ export const transactionButtonState = (
 export const useTokensOfOwnerByIndex = (
     erc721ContractAddress: Address,
     ownerAddress: Address,
+    depositedTokens: bigint[] = [],
 ) => {
     const [index, setIndex] = useState(0);
     const [tokenIds, setTokenIds] = useState<bigint[]>([]);
     const [fetching, setFetching] = useState(true);
     const lastErc721ContractAddress = useRef(erc721ContractAddress);
     const lastOwnerAddress = useRef(ownerAddress);
-    const erc721Contract = {
-        abi: erc721AbiEnumerable,
-        address: erc721ContractAddress,
-    };
-    const isEnabled =
-        erc721ContractAddress?.toString() !== "" &&
-        ownerAddress?.toString() !== "";
     const erc721 = useContractReads({
         contracts: [
             {
-                ...erc721Contract,
+                abi: erc721AbiEnumerable,
+                address: erc721ContractAddress,
                 functionName: "tokenOfOwnerByIndex",
                 args: [ownerAddress!, BigInt(index)],
             },
         ],
-        enabled: isEnabled,
+        enabled:
+            erc721ContractAddress?.toString() !== "" &&
+            ownerAddress?.toString() !== "",
         watch: true,
     });
     const tokenOfOwnerByIndex = erc721.data?.[0];
@@ -150,10 +147,12 @@ export const useTokensOfOwnerByIndex = (
 
     return useMemo(
         () => ({
-            tokenIds,
+            tokenIds: [...tokenIds]
+                .filter((tokenId) => !depositedTokens.includes(tokenId))
+                .sort(),
             fetching,
         }),
-        [tokenIds, fetching],
+        [tokenIds, fetching, depositedTokens],
     );
 };
 
@@ -173,6 +172,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { address } = useAccount();
+    const [depositedTokens, setDepositedTokens] = useState<bigint[]>([]);
 
     const form = useForm({
         validateInputOnBlur: true,
@@ -233,11 +233,6 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         watch: true,
     });
 
-    const tokensOfOwnerByIndex = useTokensOfOwnerByIndex(
-        erc721ContractAddress!,
-        address!,
-    );
-
     const symbol = (erc721.data?.[0].result as string | undefined) ?? "";
     const balance = erc721.data?.[1].result as bigint | undefined;
     const erc721Errors = erc721.data
@@ -280,6 +275,12 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     const canDeposit =
         hasPositiveBalance && tokenIdBigInt !== undefined && tokenIdBigInt > 0;
 
+    const tokensOfOwnerByIndex = useTokensOfOwnerByIndex(
+        erc721ContractAddress!,
+        address!,
+        depositedTokens,
+    );
+
     const { disabled: approveDisabled, loading: approveLoading } =
         transactionButtonState(
             approvePrepare,
@@ -313,13 +314,17 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
 
     useEffect(() => {
         if (depositWait.status === "success") {
+            setDepositedTokens((tokens) => [
+                ...tokens,
+                tokenIdBigInt as bigint,
+            ]);
             form.reset();
             approve.reset();
             deposit.reset();
             onDeposit();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.status, onDeposit]);
+    }, [depositWait.status, tokenIdBigInt, onDeposit]);
 
     return (
         <form data-testid="erc721-deposit-form">
@@ -380,7 +385,14 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                                         label: String(tokenId),
                                     }),
                                 )}
-                                {...form.getInputProps("tokenId")}
+                                onChange={(nextValue) => {
+                                    form.setFieldValue(
+                                        "tokenId",
+                                        nextValue ?? "",
+                                    );
+                                    approve.reset();
+                                    deposit.reset();
+                                }}
                             />
                         ) : (
                             <TextInput
