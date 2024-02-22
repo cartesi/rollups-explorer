@@ -194,4 +194,35 @@ describe("Rollups EtherDepositForm", () => {
             ).toBeInTheDocument();
         });
     });
+
+    describe("Amount input", () => {
+        it("should correctly process small decimal numbers", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareEtherPortalDepositEther,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.0000001",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", "0x3078"],
+                enabled: false,
+                value: 100000000000n,
+            });
+        });
+    });
 });

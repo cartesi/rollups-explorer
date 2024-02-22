@@ -67,7 +67,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             amount:
                 values.amount !== ""
                     ? parseUnits(
-                          Number(values.amount).toString(),
+                          values.amount,
                           chain?.nativeCurrency.decimals ?? 18,
                       )
                     : undefined,
