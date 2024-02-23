@@ -322,9 +322,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             approve.reset();
             deposit.reset();
             onDeposit();
+            onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.status, tokenIdBigInt, onDeposit]);
+    }, [depositWait.status, tokenIdBigInt, onDeposit, onSearchApplications]);
 
     return (
         <form data-testid="erc721-deposit-form">
