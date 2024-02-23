@@ -58,6 +58,7 @@ const defaultProps = {
     ],
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
+    onDeposit: () => undefined,
 };
 const contracts = [
     "0x569DABb4F67770cc094d09Fe4bf4202557d2f456",
@@ -71,6 +72,7 @@ describe("ERC721DepositForm", () => {
         mockUseErc721Approve.mockReturnValue({
             data: {},
             wait: vi.fn(),
+            reset: vi.fn(),
         } as any);
         mockUsePrepareErc721PortalDepositErc721Token.mockReturnValue({
             config: {},
@@ -78,6 +80,7 @@ describe("ERC721DepositForm", () => {
         mockUseErc721PortalDepositErc721Token.mockReturnValue({
             data: {},
             wait: vi.fn(),
+            reset: vi.fn(),
         } as any);
         mockUseContractReads.mockReturnValue({
             isLoading: false,
@@ -195,6 +198,52 @@ describe("ERC721DepositForm", () => {
             data.forEach((entry, entryIndex) => {
                 expect(entry.result).toBe(result.current.tokenIds[entryIndex]);
             });
+        });
+
+        it("should return a filtered list with token ids excluding already deposited tokens", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+            const data = [
+                {
+                    result: 1n,
+                    status: "success",
+                },
+                {
+                    result: 2n,
+                    status: "success",
+                },
+                {
+                    result: 3n,
+                    status: "success",
+                },
+            ];
+
+            const implementation = (config: any) => {
+                const [contractData] = config.contracts;
+                return {
+                    isLoading: false,
+                    isSuccess: true,
+                    data: [data[Number(contractData.args[1])]],
+                };
+            };
+            mockUseContractReads.mockImplementation(implementation as any);
+
+            const depositedToken = 1n;
+            const depositedTokens = [depositedToken];
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                    depositedTokens,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(data.length - 1);
+            expect(
+                result.current.tokenIds.find(
+                    (tokenId) => tokenId === depositedToken,
+                ),
+            ).toBe(undefined);
         });
 
         it("should return an empty list when data for token ids contains no entries", () => {
@@ -412,6 +461,39 @@ describe("ERC721DepositForm", () => {
             };
             mockUseContractReads.mockImplementation(implementation as any);
             expect(screen.getByTestId("token-id-input")).toBeInTheDocument();
+        });
+
+        it("should invoke onSearchApplications function after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            const onSearchApplicationsMock = vi.fn();
+            render(
+                <Component
+                    {...defaultProps}
+                    onSearchApplications={onSearchApplicationsMock}
+                />,
+            );
+
+            expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
+        });
+
+        it("should invoke onDeposit callback after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            const onDepositMock = vi.fn();
+            render(<Component {...defaultProps} onDeposit={onDepositMock} />);
+
+            expect(onDepositMock).toHaveBeenCalled();
         });
     });
 });
