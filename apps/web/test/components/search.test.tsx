@@ -1,4 +1,11 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import {
     ReadonlyURLSearchParams,
     usePathname,
@@ -23,7 +30,8 @@ const useQueryParamsMock = vi.mocked(useQueryParams, true);
 const Component = withMantineTheme(Search);
 const queryAddress = "0xF94C3d8dB01c4CF428d5DBeDC514B4c5f2FcE6F0";
 const defaultProps = {
-    onSubmit: () => vi.fn(),
+    isLoading: false,
+    onChange: () => vi.fn(),
 };
 
 describe("Search Component", () => {
@@ -50,7 +58,25 @@ describe("Search Component", () => {
         const searchInput = screen.getByTestId("search-input");
         expect(searchInput).toBeInTheDocument();
     });
-    it("should call onSubmit with input on Enter key press", async () => {
+
+    it("should display loader when fetching data", async () => {
+        const customProps = { ...defaultProps, isLoading: true };
+        render(<Component {...customProps} />);
+        const searchInput = screen.getByTestId("search-input");
+        fireEvent.focus(searchInput);
+        await waitFor(() => userEvent.type(searchInput, queryAddress));
+        await waitFor(
+            () =>
+                expect(
+                    screen.getByLabelText("loader-input"),
+                ).toBeInTheDocument(),
+            {
+                timeout: 500,
+            },
+        );
+    });
+
+    it("should call updateQueryParams hooks when input change", async () => {
         const mockedUpdateParams = vi.fn();
 
         useQueryParamsMock.mockReturnValue({
@@ -59,8 +85,13 @@ describe("Search Component", () => {
         });
         render(<Component {...defaultProps} />);
         const searchInput = screen.getByTestId("search-input");
-        fireEvent.change(searchInput, { target: { value: queryAddress } });
-        fireEvent.keyDown(searchInput, { key: "Enter", code: "Enter" });
-        expect(mockedUpdateParams).toHaveBeenCalledWith(queryAddress);
+        fireEvent.focus(searchInput);
+        await waitFor(() => userEvent.type(searchInput, queryAddress));
+        await waitFor(
+            () => expect(mockedUpdateParams).toHaveBeenCalledWith(queryAddress),
+            {
+                timeout: 500,
+            },
+        );
     });
 });

@@ -11,6 +11,7 @@ export type SearchProps = {
 const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     const { query, updateQueryParams } = useQueryParams();
     const [keyword, setKeyword] = useDebouncedState("", 500);
+
     useEffect(() => {
         updateQueryParams(keyword);
         onChange(keyword);
@@ -21,10 +22,15 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
             <TextInput
                 placeholder="Search by Address / Txn Hash / Index"
                 leftSection={<CiSearch />}
-                rightSection={keyword && isLoading && <Loader size={"xs"} />}
+                rightSection={
+                    keyword &&
+                    isLoading && (
+                        <Loader size={"xs"} aria-label="loader-input" />
+                    )
+                }
                 size="md"
                 data-testid="search-input"
-                defaultValue={query}
+                defaultValue={keyword}
                 onChange={(event) => {
                     setKeyword(event.target.value);
                 }}
