@@ -69,8 +69,10 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     useEffect(() => {
         if (wait.status === "success") {
             form.reset();
+            onSearchApplications("");
         }
-    }, [wait.status]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wait.status, onSearchApplications]);
 
     return (
         <form data-testid="raw-input-form">

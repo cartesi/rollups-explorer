@@ -16,8 +16,8 @@ import {
     Loader,
     Stack,
     Text,
-    TextInput,
     Textarea,
+    TextInput,
     UnstyledButton,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -168,8 +168,6 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         }
     }, [erc20.data]);
 
-    useEffect(() => {}, [tokens]);
-
     const symbol = erc20.data?.[1].result as string | undefined;
     const allowance = erc20.data?.[2].result as bigint | undefined;
     const balance = erc20.data?.[3].result as bigint | undefined;
@@ -241,6 +239,14 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             deposit.write,
             true,
         );
+
+    useEffect(() => {
+        if (depositWait.status === "success") {
+            form.reset();
+            onSearchApplications("");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [depositWait.status, onSearchApplications]);
 
     return (
         <form data-testid="erc20-deposit-form">
