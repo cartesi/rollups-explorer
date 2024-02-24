@@ -6,6 +6,7 @@
     },
     "include": [
         "src",
+        "additional.d.ts",
         "mantine.d.ts",
         "next-env.d.ts",
         "**/*.ts",
