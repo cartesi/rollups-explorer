@@ -1,17 +1,17 @@
 import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
-import { notFound } from "next/navigation";
 import Address from "../../../components/address";
-import Inputs from "../../../components/inputs/inputs";
 import Breadcrumbs from "../../../components/breadcrumbs";
-import { getUrqlClient } from "../../../lib/urql";
+import Inputs from "../../../components/inputs/inputs";
 import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
 } from "../../../graphql/explorer/operations";
+import { getUrqlServerClient } from "../../../lib/urql";
 
 export async function generateMetadata({
     params,
@@ -22,7 +22,7 @@ export async function generateMetadata({
 }
 
 async function getApplication(address: string) {
-    const client = getUrqlClient();
+    const client = getUrqlServerClient();
     const result = await client.query<
         ApplicationByIdQuery,
         ApplicationByIdQueryVariables
