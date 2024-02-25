@@ -1,6 +1,7 @@
 "use client";
-import { FC, useCallback } from "react";
-import { Button, Loader, Tooltip, Flex } from "@mantine/core";
+import { FC, useCallback, useEffect } from "react";
+import { Button, Flex, Loader, Tooltip } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { Address } from "wagmi";
 import {
     useCartesiDAppExecuteVoucher,
@@ -62,6 +63,16 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     const onExecute = useCallback(() => {
         execute.write();
     }, [execute]);
+
+    useEffect(() => {
+        if (execute.status === "success") {
+            notifications.show({
+                message: "Voucher executed successfully",
+                color: "green",
+                withBorder: true,
+            });
+        }
+    }, [execute.status]);
 
     return (
         <div>

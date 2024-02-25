@@ -1,14 +1,23 @@
 import { afterEach, describe, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import {
-    useCartesiDAppWasVoucherExecuted,
     useCartesiDAppExecuteVoucher,
+    useCartesiDAppWasVoucherExecuted,
 } from "@cartesi/rollups-wagmi";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
 
 vi.mock("@cartesi/rollups-wagmi");
+vi.mock("@mantine/notifications", async () => {
+    const actual = await vi.importActual("@mantine/notifications");
+    return {
+        ...(actual as any),
+        notifications: {
+            show: () => undefined,
+        },
+    };
+});
 const useCartesiDAppWasVoucherExecutedMock = vi.mocked(
     useCartesiDAppWasVoucherExecuted,
     true,
@@ -182,5 +191,27 @@ describe("VoucherExecution component", () => {
             .getByText("Execute")
             .closest("button") as HTMLButtonElement;
         expect(button.getAttribute("data-loading")).toBe("true");
+    });
+
+    it("should display a notification after voucher has been successfully executed", async () => {
+        const mantineNotifications = await import("@mantine/notifications");
+        const showMock = vi.fn();
+        mantineNotifications.notifications = {
+            ...mantineNotifications.notifications,
+            show: showMock,
+        } as any;
+
+        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+            status: "success",
+            isLoading: true,
+        } as any);
+
+        render(<Component {...defaultProps} />);
+
+        expect(showMock).toHaveBeenCalledWith({
+            message: "Voucher executed successfully",
+            color: "green",
+            withBorder: true,
+        });
     });
 });
