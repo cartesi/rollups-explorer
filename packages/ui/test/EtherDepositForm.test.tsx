@@ -219,9 +219,41 @@ describe("Rollups EtherDepositForm", () => {
             });
 
             expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", "0x3078"],
+                args: ["0x0000000000000000000000000000000000000000", "0x"],
                 enabled: false,
                 value: 100000000000n,
+            });
+        });
+    });
+
+    describe("Extra data input", () => {
+        it("should correctly format extra data", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareEtherPortalDepositEther,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const execLayerDataInput = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const hexValue = "0x123123";
+            fireEvent.change(execLayerDataInput, {
+                target: {
+                    value: hexValue,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", hexValue],
+                enabled: false,
+                value: undefined,
             });
         });
     });

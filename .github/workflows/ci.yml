@@ -3,6 +3,8 @@ on: [push]
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
+env:
+    NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
     ci:
         runs-on: ubuntu-latest
@@ -34,5 +36,5 @@ jobs:
             - name: Publish coveralls report
               uses: coverallsapp/github-action@master
               with:
-                path-to-lcov: 'coverage/lcov.info'
-                github-token: ${{ secrets.GITHUB_TOKEN }}
+                  path-to-lcov: "coverage/lcov.info"
+                  github-token: ${{ secrets.GITHUB_TOKEN }}

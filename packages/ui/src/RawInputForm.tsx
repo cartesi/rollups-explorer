@@ -18,9 +18,9 @@ import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
     getAddress,
+    Hex,
     isAddress,
     isHex,
-    toHex,
     zeroAddress,
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
@@ -53,7 +53,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             address: isAddress(values.application)
                 ? getAddress(values.application)
                 : zeroAddress,
-            rawInput: toHex(values.rawInput),
+            rawInput: values.rawInput as Hex,
         }),
     });
     const { address, rawInput } = form.getTransformedValues();

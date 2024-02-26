@@ -26,10 +26,10 @@ import {
 import {
     BaseError,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     parseUnits,
-    toHex,
     zeroAddress,
 } from "viem";
 import { useNetwork, useWaitForTransaction } from "wagmi";
@@ -71,7 +71,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                           chain?.nativeCurrency.decimals ?? 18,
                       )
                     : undefined,
-            execLayerData: toHex(values.execLayerData),
+            execLayerData: values.execLayerData as Hex,
         }),
     });
     const { address, amount, execLayerData } = form.getTransformedValues();

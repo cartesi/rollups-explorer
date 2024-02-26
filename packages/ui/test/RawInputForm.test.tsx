@@ -171,4 +171,36 @@ describe("Rollups RawInputForm", () => {
             ).toBeInTheDocument();
         });
     });
+
+    describe("Extra data input", () => {
+        it("should correctly format extra data", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareInputBoxAddInput = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const execLayerDataInput = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const hexValue = "0x123123";
+            fireEvent.change(execLayerDataInput, {
+                target: {
+                    value: hexValue,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", hexValue],
+                enabled: false,
+                value: undefined,
+            });
+        });
+    });
 });
