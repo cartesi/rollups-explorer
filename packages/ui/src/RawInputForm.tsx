@@ -17,8 +17,8 @@ import { FC, useEffect, useMemo } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
-    Hex,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     zeroAddress,
