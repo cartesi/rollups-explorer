@@ -1,21 +1,27 @@
 import { Box, Loader, TextInput } from "@mantine/core";
-import { useDebouncedState } from "@mantine/hooks";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useQueryParams } from "../hooks/useQueryParams";
 export type SearchProps = {
-    isLoading: Boolean;
+    isLoading: boolean;
     onChange: (query: string) => void;
 };
 
 const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     const { query, updateQueryParams } = useQueryParams();
-    const [keyword, setKeyword] = useDebouncedState("", 500);
+    const [keyword, setKeyword] = useState<string>("");
 
     useEffect(() => {
         updateQueryParams(keyword);
         onChange(keyword);
-    }, [query, onChange, keyword]);
+    }, [query, onChange, keyword, updateQueryParams]);
+
+    const onSearch = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            setKeyword(event.target.value);
+        },
+        [],
+    );
 
     return (
         <Box w={{ sm: "10%%", lg: "50%" }} mb={{ sm: "1rem", lg: "-3.25rem" }}>
@@ -30,10 +36,8 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
                 }
                 size="md"
                 data-testid="search-input"
-                defaultValue={keyword}
-                onChange={(event) => {
-                    setKeyword(event.target.value);
-                }}
+                value={keyword}
+                onChange={onSearch}
             />
         </Box>
     );

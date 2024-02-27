@@ -1,6 +1,7 @@
 "use client";
 
 import { Stack } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
@@ -23,13 +24,15 @@ const Inputs: FC<InputsProps> = ({
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
 
+    const [queryDebounced] = useDebouncedValue(query, 500);
+
     const [{ data: data, fetching: fetching }] = useInputsConnectionQuery({
         variables: {
             orderBy,
             limit,
             after,
             where: checkQuery(
-                query.toLowerCase(),
+                queryDebounced.toLowerCase(),
                 applicationId?.toLowerCase(),
             ),
         },
