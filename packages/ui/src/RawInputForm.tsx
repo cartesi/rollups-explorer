@@ -25,6 +25,7 @@ import {
 } from "viem";
 import { useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
+import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
 export interface RawInputFormProps {
     applications: string[];
@@ -65,6 +66,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const wait = useWaitForTransaction(execute.data);
     const loading = execute.status === "loading" || wait.status === "loading";
     const canSubmit = form.isValid() && prepare.error === null;
+    const isUndeployedApp = useUndeployedApplication(address, applications);
 
     useEffect(() => {
         if (wait.status === "success") {
@@ -99,17 +101,15 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                     }}
                 />
 
-                {!form.errors.application &&
-                    address !== zeroAddress &&
-                    !addresses.includes(address) && (
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            icon={<TbAlertCircle />}
-                        >
-                            This is an undeployed application.
-                        </Alert>
-                    )}
+                {!form.errors.application && isUndeployedApp && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        This is an undeployed application.
+                    </Alert>
+                )}
 
                 <Textarea
                     label="Raw input"
