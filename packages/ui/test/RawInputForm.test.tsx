@@ -132,6 +132,25 @@ describe("Rollups RawInputForm", () => {
             expect(button.hasAttribute("disabled")).toBe(false);
             expect(mockedWrite).toHaveBeenCalled();
         });
+
+        it("should invoke onSearchApplications function after successful submission", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            const onSearchApplicationsMock = vi.fn();
+            render(
+                <Component
+                    {...defaultProps}
+                    onSearchApplications={onSearchApplicationsMock}
+                />,
+            );
+
+            expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
+        });
     });
 
     describe("ApplicationAutocomplete", () => {

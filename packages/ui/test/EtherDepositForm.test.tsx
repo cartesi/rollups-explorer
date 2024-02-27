@@ -153,6 +153,44 @@ describe("Rollups EtherDepositForm", () => {
             fireEvent.click(submitButton);
             expect(mockedWrite).toHaveBeenCalled();
         });
+
+        it("should invoke onSearchApplications function after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            const onSearchApplicationsMock = vi.fn();
+            render(
+                <Component
+                    {...defaultProps}
+                    onSearchApplications={onSearchApplicationsMock}
+                />,
+            );
+
+            expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
+        });
+
+        it("should invoke onSearchApplications function after successful submission", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            const onSearchApplicationsMock = vi.fn();
+            render(
+                <Component
+                    {...defaultProps}
+                    onSearchApplications={onSearchApplicationsMock}
+                />,
+            );
+
+            expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
+        });
     });
 
     describe("ApplicationAutocomplete", () => {

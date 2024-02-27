@@ -89,9 +89,10 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     useEffect(() => {
         if (wait.status === "success") {
             form.reset();
+            onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.status]);
+    }, [wait.status, onSearchApplications]);
 
     return (
         <form data-testid="ether-deposit-form">
