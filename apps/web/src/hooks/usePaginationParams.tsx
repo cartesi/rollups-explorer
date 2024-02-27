@@ -1,7 +1,8 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { pathOr } from "ramda";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQueryParams } from "./useQueryParams";
+
 export const limitBounds = {
     "10": 10,
     "20": 20,
@@ -38,5 +39,8 @@ export const usePaginationParams = (): UsePaginationReturn => {
         },
         [query, router, pathName],
     );
-    return [{ page, limit }, updateParams];
+    return useMemo(
+        () => [{ page, limit }, updateParams],
+        [limit, page, updateParams],
+    );
 };
