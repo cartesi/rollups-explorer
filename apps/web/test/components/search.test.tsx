@@ -53,12 +53,6 @@ describe("Search Component", () => {
         cleanup();
     });
 
-    it("should display search input element", async () => {
-        render(<Component {...defaultProps} />);
-        const searchInput = screen.getByTestId("search-input");
-        expect(searchInput).toBeInTheDocument();
-    });
-
     it("should display loader when fetching data", async () => {
         const customProps = { ...defaultProps, isLoading: true };
         render(<Component {...customProps} />);

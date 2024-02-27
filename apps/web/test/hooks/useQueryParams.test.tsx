@@ -1,10 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import {
-    ReadonlyURLSearchParams,
-    usePathname,
-    useRouter,
-    useSearchParams,
-} from "next/navigation";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { describe, expect, it, vi } from "vitest";
 import { useQueryParams } from "../../src/hooks/useQueryParams";
 
@@ -21,8 +16,6 @@ vi.mock("next/navigation", async () => {
 });
 
 const queryAddress = "0xdd1f9B83507327f29C2C1Bb42011faD5fb482dc6";
-const mockedUsePathname = vi.mocked(usePathname);
-const mockedUseRouter = vi.mocked(useRouter);
 const mockedUseSearchParams = vi.mocked(useSearchParams);
 
 describe("useQueryParams", () => {
