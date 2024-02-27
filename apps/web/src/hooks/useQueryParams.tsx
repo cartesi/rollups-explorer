@@ -24,10 +24,10 @@ export const useQueryParams = (): UseQueryParamsReturn => {
                 scroll: false,
             });
         },
-        [router, pathName, searchParams],
+        [router, pathName],
     );
     return useMemo(
         () => ({ query, updateQueryParams }),
-        [query, updateQueryParams, searchParams],
+        [query, updateQueryParams],
     );
 };
