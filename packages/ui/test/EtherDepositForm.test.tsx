@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
@@ -376,7 +376,7 @@ describe("Rollups EtherDepositForm", () => {
             expect(input?.getAttribute("placeholder")).toBe("0x");
         });
 
-        it("should display alert for unemployed application", () => {
+        it("should display alert for unemployed application", async () => {
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
 
@@ -386,11 +386,17 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(
-                screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
-            ).toBeInTheDocument();
+            await waitFor(
+                () =>
+                    expect(
+                        screen.getByText(
+                            "This is a deposit to an undeployed application.",
+                        ),
+                    ).toBeInTheDocument(),
+                {
+                    timeout: 1100,
+                },
+            );
         });
 
         it("should display error when application is invalid", () => {
