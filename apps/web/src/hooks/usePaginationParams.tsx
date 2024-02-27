@@ -36,7 +36,7 @@ export const usePaginationParams = (): UsePaginationReturn => {
                 scroll: false,
             });
         },
-        [query, router, pathName, searchParams],
+        [query, router, pathName],
     );
     return [{ page, limit }, updateParams];
 };

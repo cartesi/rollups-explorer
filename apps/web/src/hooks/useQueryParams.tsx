@@ -24,7 +24,7 @@ export const useQueryParams = (): UseQueryParamsReturn => {
                 scroll: false,
             });
         },
-        [router, pathName],
+        [searchParams, router, pathName],
     );
     return useMemo(
         () => ({ query, updateQueryParams }),
