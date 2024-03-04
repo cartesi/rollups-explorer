@@ -17,11 +17,11 @@ import {
     Select,
     Stack,
     Text,
-    Textarea,
     TextInput,
+    Textarea,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     TbAlertCircle,
@@ -32,10 +32,10 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
+    Hex,
     getAddress,
     isAddress,
     isHex,
-    toHex,
     zeroAddress,
 } from "viem";
 import {
@@ -207,8 +207,12 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                 : undefined,
             tokenIdBigInt:
                 values.tokenId !== "" ? BigInt(values.tokenId) : undefined,
-            baseLayerData: toHex(values.baseLayerData),
-            execLayerData: toHex(values.execLayerData),
+            baseLayerData: values.baseLayerData
+                ? (values.baseLayerData as Hex)
+                : "0x",
+            execLayerData: values.execLayerData
+                ? (values.execLayerData as Hex)
+                : "0x",
         }),
     });
 

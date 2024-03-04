@@ -16,8 +16,8 @@ import {
     Loader,
     Stack,
     Text,
-    Textarea,
     TextInput,
+    Textarea,
     UnstyledButton,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -33,12 +33,12 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
+    Hex,
     formatUnits,
     getAddress,
     isAddress,
     isHex,
     parseUnits,
-    toHex,
     zeroAddress,
 } from "viem";
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
@@ -131,7 +131,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                 values.amount !== "" && decimals
                     ? parseUnits(values.amount, decimals)
                     : undefined,
-            execLayerData: toHex(values.execLayerData),
+            execLayerData: values.execLayerData
+                ? (values.execLayerData as Hex)
+                : "0x",
         }),
     });
 
