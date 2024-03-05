@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
+import { useAccount } from "wagmi";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
@@ -31,9 +32,11 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
         }),
     };
 });
+vi.mock("wagmi");
 
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const useQueryMock = vi.mocked(useQuery, true);
+const useAccountMock = vi.mocked(useAccount, true);
 
 const View = withMantineTheme(InputDetailsView);
 
@@ -44,6 +47,9 @@ describe("Input details view component", () => {
         useConnectionConfigReturnStub.getConnection.mockReturnValue(undefined);
         useConnectionConfigReturnStub.hasConnection.mockReturnValue(false);
         useConnectionConfigMock.mockReturnValue(useConnectionConfigReturnStub);
+        useAccountMock.mockReturnValue({
+            isConnected: true,
+        } as any);
     });
 
     afterEach(() => {
