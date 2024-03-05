@@ -21,7 +21,10 @@ export type PaginatedProps = {
 const Paginated: FC<PaginatedProps> = (props) => {
     const { children, totalCount, fetching, onChange } = props;
     const [{ limit, page }, updateParams] = usePaginationParams();
-    const totalPages = Math.ceil((totalCount ?? 1) / limit);
+    const totalPages = Math.ceil(
+        totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
+    );
+
     const [activePage, setActivePage] = useState(
         page > totalPages ? totalPages : page,
     );

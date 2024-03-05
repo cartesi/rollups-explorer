@@ -1,11 +1,14 @@
 "use client";
 
 import { Stack } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
+import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
-import { useInputsQuery } from "../../graphql/explorer/hooks/queries";
+import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
+import Search from "../search";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
@@ -16,15 +19,22 @@ const Inputs: FC<InputsProps> = ({
     orderBy = InputOrderByInput.TimestampDesc,
     applicationId,
 }) => {
+    const [query, setQuery] = useState("");
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
-    const [{ data, fetching }] = useInputsQuery({
+
+    const [queryDebounced] = useDebouncedValue(query, 500);
+
+    const [{ data: data, fetching: fetching }] = useInputsConnectionQuery({
         variables: {
             orderBy,
-            applicationId: applicationId?.toLowerCase(),
             limit,
             after,
+            where: checkQuery(
+                queryDebounced.toLowerCase(),
+                applicationId?.toLowerCase(),
+            ),
         },
     });
     const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
@@ -36,6 +46,7 @@ const Inputs: FC<InputsProps> = ({
 
     return (
         <Stack>
+            <Search isLoading={fetching} onChange={setQuery} />
             <Paginated
                 fetching={fetching}
                 totalCount={data?.inputsConnection.totalCount}
