@@ -4,6 +4,7 @@ import {
     useCartesiDAppExecuteVoucher,
     useCartesiDAppWasVoucherExecuted,
 } from "@cartesi/rollups-wagmi";
+import { useAccount } from "wagmi";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
@@ -18,6 +19,8 @@ vi.mock("@mantine/notifications", async () => {
         },
     };
 });
+vi.mock("wagmi");
+
 const useCartesiDAppWasVoucherExecutedMock = vi.mocked(
     useCartesiDAppWasVoucherExecuted,
     true,
@@ -26,6 +29,7 @@ const useCartesiDAppExecuteVoucherMock = vi.mocked(
     useCartesiDAppExecuteVoucher,
     true,
 );
+const useAccountMock = vi.mocked(useAccount, true);
 
 const Component = withMantineTheme(VoucherExecution);
 const defaultProps = {
@@ -73,6 +77,9 @@ describe("VoucherExecution component", () => {
             status: "idle",
             isLoading: false,
             write: () => undefined,
+        } as any);
+        useAccountMock.mockReturnValue({
+            isConnected: true,
         } as any);
     });
     afterEach(() => {
@@ -146,6 +153,28 @@ describe("VoucherExecution component", () => {
         fireEvent.mouseEnter(button);
         expect(
             screen.getByText("Voucher proof is pending"),
+        ).toBeInTheDocument();
+    });
+
+    it("should display tooltip when wallet is not connected and voucher is not executed", () => {
+        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+            data: false,
+            isLoading: false,
+        } as any);
+        useAccountMock.mockReturnValue({
+            isConnected: false,
+        } as any);
+
+        render(<Component {...defaultProps} />);
+
+        const button = screen
+            .getByText("Execute")
+            .closest("button") as HTMLButtonElement;
+        expect(button.hasAttribute("disabled")).toBe(true);
+
+        fireEvent.mouseEnter(button);
+        expect(
+            screen.getByText("Connect your wallet to execute the voucher"),
         ).toBeInTheDocument();
     });
 
