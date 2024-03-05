@@ -91,9 +91,19 @@ describe("SendTransaction component", () => {
         vi.restoreAllMocks();
     });
 
-    it("should show ERC20 deposit form", async () => {
+    it("should show ERC20 deposit form", () => {
         render(<Component initialDepositType="erc20" />);
         expect(screen.getByTestId("erc20-deposit-form")).toBeInTheDocument();
+    });
+
+    it("should show ERC721 deposit form", () => {
+        render(<Component initialDepositType="erc721" />);
+        expect(screen.getByTestId("erc721-deposit-form")).toBeInTheDocument();
+    });
+
+    it("should show Ether deposit form", () => {
+        render(<Component initialDepositType="ether" />);
+        expect(screen.getByTestId("ether-deposit-form")).toBeInTheDocument();
     });
 
     it("should show Raw input form", () => {

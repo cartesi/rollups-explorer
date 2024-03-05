@@ -1,14 +1,16 @@
 "use client";
 import {
     ERC20DepositForm,
+    ERC721DepositForm,
     EtherDepositForm,
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchTokens } from "../hooks/useSearchTokens";
+import { notifications } from "@mantine/notifications";
 
 export type DepositType =
     | "ether"
@@ -23,7 +25,7 @@ interface DepositProps {
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc20",
+    initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -38,6 +40,14 @@ const SendTransaction: FC<DepositProps> = ({
         address: debouncedTokenId,
     });
 
+    const onDepositErc721 = useCallback(() => {
+        notifications.show({
+            message: "Token was deposited successfully",
+            color: "green",
+            withBorder: true,
+        });
+    }, []);
+
     return (
         <>
             <Select
@@ -50,6 +60,7 @@ const SendTransaction: FC<DepositProps> = ({
                         items: [
                             { value: "ether", label: "Ether Deposit" },
                             { value: "erc20", label: "ERC-20 Deposit" },
+                            { value: "erc721", label: "ERC-721 Deposit" },
                         ],
                     },
                     {
@@ -64,7 +75,13 @@ const SendTransaction: FC<DepositProps> = ({
                 }}
             />
 
-            {depositType === "erc20" ? (
+            {depositType === "ether" ? (
+                <EtherDepositForm
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                />
+            ) : depositType === "erc20" ? (
                 <ERC20DepositForm
                     tokens={tokens}
                     applications={applications}
@@ -72,11 +89,12 @@ const SendTransaction: FC<DepositProps> = ({
                     onSearchApplications={setApplicationId}
                     onSearchTokens={setTokenId}
                 />
-            ) : depositType === "ether" ? (
-                <EtherDepositForm
+            ) : depositType === "erc721" ? (
+                <ERC721DepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                    onDeposit={onDepositErc721}
                 />
             ) : depositType === "input" ? (
                 <RawInputForm

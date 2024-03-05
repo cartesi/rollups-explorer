@@ -1,4 +1,3 @@
-import { FC, useEffect } from "react";
 import {
     useEtherPortalDepositEther,
     usePrepareEtherPortalDepositEther,
@@ -12,11 +11,12 @@ import {
     Loader,
     Stack,
     Text,
-    Textarea,
     TextInput,
+    Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { FC, useEffect } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -25,8 +25,8 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    getAddress,
     Hex,
+    getAddress,
     isAddress,
     isHex,
     parseUnits,
@@ -71,7 +71,9 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                           chain?.nativeCurrency.decimals ?? 18,
                       )
                     : undefined,
-            execLayerData: values.execLayerData as Hex,
+            execLayerData: values.execLayerData
+                ? (values.execLayerData as Hex)
+                : "0x",
         }),
     });
     const { address, amount, execLayerData } = form.getTransformedValues();
