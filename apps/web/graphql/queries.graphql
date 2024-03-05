@@ -65,6 +65,12 @@ query stats($applicationId: String) {
     }
 }
 
+query statsApplicationsOwner($applicationId: String) {
+    applicationsConnection(orderBy: id_ASC, where: {owner_startsWith: $applicationId}) {
+        totalCount
+    }
+}
+
 query applications($limit: Int, $where: ApplicationWhereInput) {
     applications(where: $where, limit: $limit) {
         id
