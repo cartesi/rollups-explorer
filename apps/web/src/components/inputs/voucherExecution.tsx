@@ -2,7 +2,7 @@
 import { FC, useCallback, useEffect } from "react";
 import { Button, Flex, Loader, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Address, useAccount } from "wagmi";
+import { Address, useAccount, useWaitForTransaction } from "wagmi";
 import {
     useCartesiDAppExecuteVoucher,
     useCartesiDAppWasVoucherExecuted,
@@ -59,23 +59,26 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
         ],
         address: appId,
     });
-    const isExecuted = wasExecuted.data || execute.status === "success";
+    const wait = useWaitForTransaction(execute.data);
+    const isLoading = execute.status === "loading" || wait.status === "loading";
+    const isExecuted = wasExecuted.data || wait.status === "success";
     const isTooltipEnabled =
         (!isConnected && !isExecuted) || (isConnected && !hasVoucherProof);
+    const isExecuteDisabled = isExecuted || !hasVoucherProof || !isConnected;
 
     const onExecute = useCallback(() => {
         execute.write();
     }, [execute]);
 
     useEffect(() => {
-        if (execute.status === "success") {
+        if (wait.status === "success") {
             notifications.show({
                 message: "Voucher executed successfully",
                 color: "green",
                 withBorder: true,
             });
         }
-    }, [execute.status]);
+    }, [wait.status]);
 
     return (
         <div>
@@ -94,10 +97,8 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                 >
                     <Button
                         mt={6}
-                        disabled={
-                            isExecuted || !hasVoucherProof || !isConnected
-                        }
-                        loading={execute.isLoading}
+                        disabled={isExecuteDisabled}
+                        loading={isLoading}
                         onClick={onExecute}
                     >
                         {isExecuted ? "Executed" : "Execute"}

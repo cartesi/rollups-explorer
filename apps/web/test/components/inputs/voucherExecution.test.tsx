@@ -4,7 +4,7 @@ import {
     useCartesiDAppExecuteVoucher,
     useCartesiDAppWasVoucherExecuted,
 } from "@cartesi/rollups-wagmi";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
@@ -30,6 +30,7 @@ const useCartesiDAppExecuteVoucherMock = vi.mocked(
     true,
 );
 const useAccountMock = vi.mocked(useAccount, true);
+const useWaitForTransactionMock = vi.mocked(useWaitForTransaction, true);
 
 const Component = withMantineTheme(VoucherExecution);
 const defaultProps = {
@@ -77,6 +78,10 @@ describe("VoucherExecution component", () => {
             status: "idle",
             isLoading: false,
             write: () => undefined,
+        } as any);
+        useWaitForTransactionMock.mockReturnValue({
+            status: "idle",
+            isLoading: false,
         } as any);
         useAccountMock.mockReturnValue({
             isConnected: true,
@@ -213,6 +218,10 @@ describe("VoucherExecution component", () => {
             isLoading: true,
             write: mockedWrite,
         } as any);
+        useWaitForTransactionMock.mockReturnValue({
+            status: "loading",
+            isLoading: true,
+        } as any);
 
         render(<Component {...defaultProps} />);
 
@@ -222,7 +231,7 @@ describe("VoucherExecution component", () => {
         expect(button.getAttribute("data-loading")).toBe("true");
     });
 
-    it("should display a notification after voucher has been successfully executed", async () => {
+    it("should not display a notification until transaction is successful", async () => {
         const mantineNotifications = await import("@mantine/notifications");
         const showMock = vi.fn();
         mantineNotifications.notifications = {
@@ -231,6 +240,32 @@ describe("VoucherExecution component", () => {
         } as any;
 
         useCartesiDAppExecuteVoucherMock.mockReturnValue({
+            status: "success",
+            isLoading: true,
+        } as any);
+        useWaitForTransactionMock.mockReturnValue({
+            status: "idle",
+            isLoading: true,
+        } as any);
+
+        render(<Component {...defaultProps} />);
+
+        expect(showMock).toHaveBeenCalledTimes(0);
+    });
+
+    it("should display a notification after voucher has been successfully executed and transaction for it is successful", async () => {
+        const mantineNotifications = await import("@mantine/notifications");
+        const showMock = vi.fn();
+        mantineNotifications.notifications = {
+            ...mantineNotifications.notifications,
+            show: showMock,
+        } as any;
+
+        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+            status: "success",
+            isLoading: true,
+        } as any);
+        useWaitForTransactionMock.mockReturnValue({
             status: "success",
             isLoading: true,
         } as any);
