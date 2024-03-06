@@ -1,26 +1,7 @@
-/**
- * @typedef {Object} QueryReturn
- * @property {Array.<{msgSender_startsWith: string} | {application: {id_startsWith: string}}>} [OR]
- * @property {Array.<{application: {id_startsWith: string}} | {msgSender_startsWith?: string; transactionHash_startsWith?: string; index_eq?: number;}>} [AND]
- * @property {string} [transactionHash_startsWith]
- * @property {number} [index_eq]
- */
-type QueryReturn = {
-    OR?: [
-        { msgSender_startsWith: string },
-        { application: { id_startsWith: string } },
-    ];
-    AND?: [
-        { application: { id_startsWith: string } },
-        {
-            msgSender_startsWith?: string;
-            transactionHash_startsWith?: string;
-            index_eq?: number;
-        },
-    ];
-    transactionHash_startsWith?: string;
-    index_eq?: number;
-};
+import { isHash, isHex } from "viem";
+import { InputWhereInput } from "../graphql/explorer/types";
+
+type QueryReturn = InputWhereInput;
 
 /**
  *
@@ -32,30 +13,42 @@ export const checkQuery = (
     input: string,
     applicationId: string = "",
 ): QueryReturn => {
-    if (!input) return {};
+    if (applicationId) {
+        const byAppIdQuery: QueryReturn = {
+            application: { id_startsWith: applicationId },
+        };
 
-    if (!applicationId) {
-        if (input.startsWith("0x")) {
-            if (input.length === 66) {
-                return { transactionHash_startsWith: input };
+        if (input) {
+            const AND: QueryReturn[] = [byAppIdQuery];
+
+            if (isHex(input)) {
+                if (isHash(input)) {
+                    AND.push({ transactionHash_eq: input });
+                } else {
+                    AND.push({ msgSender_startsWith: input });
+                }
+            } else {
+                AND.push({ index_eq: parseInt(input) });
             }
-            return {
-                OR: [
-                    { msgSender_startsWith: input },
-                    { application: { id_startsWith: input } },
-                ],
-            };
+            return { AND };
         }
-        return { index_eq: parseInt(input) };
+        return byAppIdQuery;
+    } else if (input) {
+        if (isHex(input)) {
+            if (isHash(input)) {
+                return { transactionHash_eq: input };
+            } else {
+                return {
+                    OR: [
+                        { msgSender_startsWith: input },
+                        { application: { id_startsWith: input } },
+                    ],
+                };
+            }
+        } else {
+            return { index_eq: parseInt(input) };
+        }
     }
 
-    const common = { application: { id_startsWith: applicationId } };
-
-    if (input.startsWith("0x")) {
-        if (input.length === 66) {
-            return { AND: [common, { transactionHash_startsWith: input }] };
-        }
-        return { AND: [common, { msgSender_startsWith: input }] };
-    }
-    return { AND: [common, { index_eq: parseInt(input) }] };
+    return {};
 };
