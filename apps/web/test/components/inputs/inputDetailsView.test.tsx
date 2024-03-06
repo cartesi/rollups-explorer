@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
@@ -37,6 +37,7 @@ vi.mock("wagmi");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const useQueryMock = vi.mocked(useQuery, true);
 const useAccountMock = vi.mocked(useAccount, true);
+const useWaitForTransactionMock = vi.mocked(useWaitForTransaction, true);
 
 const View = withMantineTheme(InputDetailsView);
 
@@ -49,6 +50,10 @@ describe("Input details view component", () => {
         useConnectionConfigMock.mockReturnValue(useConnectionConfigReturnStub);
         useAccountMock.mockReturnValue({
             isConnected: true,
+        } as any);
+        useWaitForTransactionMock.mockReturnValue({
+            status: "idle",
+            isLoading: false,
         } as any);
     });
 
