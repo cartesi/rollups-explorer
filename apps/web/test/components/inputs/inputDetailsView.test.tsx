@@ -1,3 +1,4 @@
+import * as RollupsWagmi from "@cartesi/rollups-wagmi";
 import {
     cleanup,
     fireEvent,
@@ -7,8 +8,8 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
-import { useAccount, useWaitForTransaction } from "wagmi";
 import { afterEach, beforeEach, describe, it } from "vitest";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../../utils/WithMantineTheme";
@@ -23,7 +24,12 @@ import { queryMockImplBuilder } from "../../utils/useQueryMock";
 vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("urql");
 vi.mock("@cartesi/rollups-wagmi", async () => {
+    const actual = await vi.importActual<typeof RollupsWagmi>(
+        "@cartesi/rollups-wagmi",
+    );
+
     return {
+        ...actual,
         useCartesiDAppWasVoucherExecuted: () => ({
             data: {},
         }),
