@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
@@ -21,9 +22,22 @@ import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("urql");
+vi.mock("@cartesi/rollups-wagmi", async () => {
+    return {
+        useCartesiDAppWasVoucherExecuted: () => ({
+            data: {},
+        }),
+        useCartesiDAppExecuteVoucher: () => ({
+            data: {},
+        }),
+    };
+});
+vi.mock("wagmi");
 
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const useQueryMock = vi.mocked(useQuery, true);
+const useAccountMock = vi.mocked(useAccount, true);
+const useWaitForTransactionMock = vi.mocked(useWaitForTransaction, true);
 
 const View = withMantineTheme(InputDetailsView);
 
@@ -34,6 +48,13 @@ describe("Input details view component", () => {
         useConnectionConfigReturnStub.getConnection.mockReturnValue(undefined);
         useConnectionConfigReturnStub.hasConnection.mockReturnValue(false);
         useConnectionConfigMock.mockReturnValue(useConnectionConfigReturnStub);
+        useAccountMock.mockReturnValue({
+            isConnected: true,
+        } as any);
+        useWaitForTransactionMock.mockReturnValue({
+            status: "idle",
+            isLoading: false,
+        } as any);
     });
 
     afterEach(() => {

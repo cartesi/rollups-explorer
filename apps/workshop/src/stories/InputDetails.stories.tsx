@@ -8,6 +8,8 @@ import {
 import { Button, Group, Stack, Title } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useCallback, useEffect, useState } from "react";
+import VoucherExecution from "web/src/components/inputs/voucherExecution.tsx";
+import { Voucher } from "web/src/graphql/rollups/types.ts";
 
 const meta: Meta<typeof InputDetails> = {
     component: InputDetails,
@@ -280,6 +282,86 @@ const WithActionToConnect = () => {
     );
 };
 
+const WithVoucherExecution = () => {
+    const reportQuery = useEmulatedData([reportEx]);
+    const voucherQuery = useEmulatedData([
+        jsonWithdraw0,
+        jsonWithdraw1,
+        jsonContent,
+    ]);
+    const noticeQuery = useEmulatedData([queryContent]);
+    const appId = "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C";
+    const vouchers = [
+        {
+            index: 0,
+            input: { index: 1 },
+            destination: "0xa2887b3a8f75c1de921ed2b1ba6a41b2692d961c",
+            payload:
+                "0xd0def521000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002e516d534877426b4b76675a70375644465373616832386247785271566d726671704846694b7a5239437267574269000000000000000000000000000000000000",
+            proof: {
+                context:
+                    "0x0000000000000000000000000000000000000000000000000000000000000001",
+                validity: {
+                    inputIndexWithinEpoch: 0,
+                    machineStateHash:
+                        "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    noticesEpochRootHash:
+                        "0xef215f287c88aad4da4d5352886561f4d934f0cd8750d6d72046c5a573f0815e",
+                    outputHashInOutputHashesSiblings: [
+                        "0xae39ce8537aca75e2eff3e38c98011dfe934e700a0967732fc07b430dd656a23",
+                    ],
+                    outputHashesInEpochSiblings: [
+                        "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
+                    ],
+                    outputHashesRootHash:
+                        "0xa75810da274c447f08b143a92de1165cad2e6cc05ed05ec03f22d5d46bf26e67",
+                    outputIndexWithinInput: 0,
+                    vouchersEpochRootHash:
+                        "0x5962bf18a749fd52f008d10e7c5ed69c674b81c9ea29f10133752a11303ceb2d",
+                    __typename: "OutputValidityProof",
+                },
+                __typename: "Proof",
+            },
+            __typename: "Voucher",
+        },
+    ] as Partial<Voucher>[];
+
+    return (
+        <InputDetails>
+            <InputContent content={queryContent} contentType="text" />
+            <ReportContent
+                content={reportQuery.data}
+                contentType="raw"
+                paging={{
+                    onNextPage: () => reportQuery.nextPage(),
+                    onPreviousPage: () => reportQuery.prevPage(),
+                    total: reportQuery.total,
+                }}
+            />
+            <VoucherContent
+                content={voucherQuery.data}
+                contentType="json"
+                paging={{
+                    onNextPage: () => voucherQuery.nextPage(),
+                    onPreviousPage: () => voucherQuery.prevPage(),
+                    total: voucherQuery.total,
+                }}
+            >
+                <VoucherExecution appId={appId} voucher={vouchers[0]} />
+            </VoucherContent>
+            <NoticeContent
+                content={noticeQuery.data}
+                contentType="text"
+                paging={{
+                    onNextPage: () => noticeQuery.nextPage(),
+                    onPreviousPage: () => noticeQuery.prevPage(),
+                    total: noticeQuery.total,
+                }}
+            />
+        </InputDetails>
+    );
+};
+
 export const Default: Story = {
     render: () => <InputDetailsWithHooks />,
 };
@@ -298,4 +380,8 @@ export const DynamicDisplayingContent = {
 
 export const WithConnectAction = {
     render: () => <WithActionToConnect />,
+};
+
+export const WithVoucherToExecute = {
+    render: () => <WithVoucherExecution />,
 };

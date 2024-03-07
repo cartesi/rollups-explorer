@@ -12,6 +12,8 @@ import {
     InputDetailsQueryVariables,
 } from "../../graphql/rollups/operations";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
+import { Voucher } from "../../graphql/rollups/types";
+import VoucherExecution from "./voucherExecution";
 
 interface ApplicationInputDataProps {
     input: InputItemFragment;
@@ -92,6 +94,10 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const showVouchers =
         !connection ||
         (connection && vouchers && payloadOrString(vouchers) !== "");
+    const vouchersForExecution = (vouchers?.edges?.map((e) => e.node) ??
+        []) as Partial<Voucher>[];
+    const showVoucherForExecution =
+        showVouchers && vouchersForExecution.length > 0;
 
     useEffect(() => {
         if (connection) execQuery({ url: connection.url });
@@ -229,7 +235,14 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                                 });
                             },
                         }}
-                    />
+                    >
+                        {showVoucherForExecution ? (
+                            <VoucherExecution
+                                appId={appId}
+                                voucher={vouchersForExecution[0]}
+                            />
+                        ) : null}
+                    </InputDetails.VoucherContent>
                 )}
             </InputDetails>
         </Box>
