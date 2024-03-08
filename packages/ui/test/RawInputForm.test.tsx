@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { RawInputForm } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
+import { getAddress } from "viem";
 
 const Component = withMantineTheme(RawInputForm);
 
@@ -43,19 +44,27 @@ vi.mock("viem", async () => {
     };
 });
 
+vi.mock("@mantine/form", async () => {
+    const actual = await vi.importActual("@mantine/form");
+    return {
+        ...(actual as any),
+        useForm: (actual as any).useForm,
+    };
+});
+
 describe("Rollups RawInputForm", () => {
     afterAll(() => {
         vi.restoreAllMocks();
     });
 
-    describe("Textarea", () => {
-        it("should display correct label", () => {
+    describe("Raw input textarea", () => {
+        it("should display correct label for raw input", () => {
             render(<Component {...defaultProps} />);
 
             expect(screen.getByText("Raw input")).toBeInTheDocument();
         });
 
-        it("should display correct description", () => {
+        it("should display correct description for raw input", () => {
             render(<Component {...defaultProps} />);
 
             expect(
@@ -79,6 +88,83 @@ describe("Rollups RawInputForm", () => {
 
             expect(textarea.getAttribute("aria-invalid")).toBe("true");
             expect(screen.getByText("Invalid hex string")).toBeInTheDocument();
+        });
+
+        it("should not display error when value is hex", () => {
+            const { container } = render(<Component {...defaultProps} />);
+            const textarea = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x123123",
+                },
+            });
+
+            fireEvent.blur(textarea);
+
+            expect(textarea.getAttribute("aria-invalid")).toBe("false");
+            expect(() => screen.getByText("Invalid hex string")).toThrow(
+                "Unable to find an element",
+            );
+        });
+
+        it("should correctly format hex data", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareInputBoxAddInput = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const execLayerDataInput = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const hexValue = "0x123123";
+            fireEvent.change(execLayerDataInput, {
+                target: {
+                    value: hexValue,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", hexValue],
+                enabled: false,
+                value: undefined,
+            });
+        });
+
+        it("should correctly format address", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareInputBoxAddInput = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+
+            const [application] = applications;
+            fireEvent.change(input, {
+                target: {
+                    value: application,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [getAddress(application), "0x"],
+                enabled: true,
+            });
         });
     });
 
@@ -154,13 +240,13 @@ describe("Rollups RawInputForm", () => {
     });
 
     describe("ApplicationAutocomplete", () => {
-        it("should display correct label", () => {
+        it("should display correct label for applications input", () => {
             render(<Component {...defaultProps} />);
 
             expect(screen.getByText("Application")).toBeInTheDocument();
         });
 
-        it("should display correct description", () => {
+        it("should display correct description for applications input", () => {
             render(<Component {...defaultProps} />);
 
             expect(
@@ -189,37 +275,81 @@ describe("Rollups RawInputForm", () => {
                 screen.getByText("This is an undeployed application."),
             ).toBeInTheDocument();
         });
-    });
 
-    describe("Extra data input", () => {
-        it("should correctly format extra data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.usePrepareInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
+        it("should display error when application is invalid", () => {
             const { container } = render(<Component {...defaultProps} />);
-            const execLayerDataInput = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
+            const input = container.querySelector("input") as HTMLInputElement;
 
-            const hexValue = "0x123123";
-            fireEvent.change(execLayerDataInput, {
+            fireEvent.change(input, {
                 target: {
-                    value: hexValue,
+                    value: "0x60a7048c3136293071605a4eaffef49923e981ccffffffff",
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", hexValue],
-                enabled: false,
-                value: undefined,
+            fireEvent.blur(input);
+
+            expect(input.getAttribute("aria-invalid")).toBe("true");
+            expect(screen.getByText("Invalid application")).toBeInTheDocument();
+        });
+    });
+
+    describe("Alerts", () => {
+        it("should display alert for successful transaction", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
             });
+
+            render(<Component {...defaultProps} />);
+            expect(
+                screen.getByText("Raw input sent successfully!"),
+            ).toBeInTheDocument();
+        });
+
+        it("should display alert for failed transaction", async () => {
+            const wagmi = await import("wagmi");
+            const message = "User declined the transaction";
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: {
+                    message,
+                },
+                status: "error",
+            });
+
+            render(<Component {...defaultProps} />);
+            expect(screen.getByText(message)).toBeInTheDocument();
+        });
+    });
+
+    describe("Form resetting", () => {
+        it("should reset form after successful submission", async () => {
+            const mantineForm = await import("@mantine/form");
+            const [application] = applications;
+            const resetMock = vi.fn();
+            vi.spyOn(mantineForm, "useForm").mockReturnValue({
+                getTransformedValues: () => ({
+                    address: getAddress(application),
+                    rawInput: "0x",
+                }),
+                isValid: () => true,
+                getInputProps: () => {},
+                errors: {},
+                setFieldValue: () => "",
+                reset: resetMock,
+            } as any);
+
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            render(<Component {...defaultProps} />);
+            expect(resetMock).toHaveBeenCalled();
         });
     });
 });
