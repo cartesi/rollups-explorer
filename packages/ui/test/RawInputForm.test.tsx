@@ -139,33 +139,6 @@ describe("Rollups RawInputForm", () => {
                 value: undefined,
             });
         });
-
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.usePrepareInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
-
-            const [application] = applications;
-            fireEvent.change(input, {
-                target: {
-                    value: application,
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                enabled: true,
-            });
-        });
     });
 
     describe("Send button", () => {
@@ -291,6 +264,33 @@ describe("Rollups RawInputForm", () => {
             expect(input.getAttribute("aria-invalid")).toBe("true");
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
+
+        it("should correctly format address", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareInputBoxAddInput = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+
+            const [application] = applications;
+            fireEvent.change(input, {
+                target: {
+                    value: application,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [getAddress(application), "0x"],
+                enabled: true,
+            });
+        });
     });
 
     describe("Alerts", () => {
@@ -324,7 +324,7 @@ describe("Rollups RawInputForm", () => {
         });
     });
 
-    describe("Form resetting", () => {
+    describe("Form", () => {
         it("should reset form after successful submission", async () => {
             const mantineForm = await import("@mantine/form");
             const [application] = applications;
