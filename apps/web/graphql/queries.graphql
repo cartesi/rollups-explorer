@@ -111,6 +111,23 @@ query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int,
     }
 }
 
+query applicationsConnectionOwner($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $ownerId: String) {
+    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {owner_startsWith: $ownerId}) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...ApplicationItem
+            }
+        }
+    }
+}
+
 query applicationById($id: String!) {
     applicationById(id: $id) {
         ...ApplicationItem
