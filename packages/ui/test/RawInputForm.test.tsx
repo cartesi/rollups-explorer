@@ -210,6 +210,76 @@ describe("Rollups RawInputForm", () => {
 
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
+
+        it('should enable "usePrepareInputBoxAddInput" only when the form is valid', async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareInputBoxAddInput = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+            const textarea = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const [application] = applications;
+            fireEvent.change(input, {
+                target: {
+                    value: application,
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [getAddress(application), ""],
+                enabled: false,
+            });
+
+            fireEvent.change(input, {
+                target: {
+                    value: "",
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", "0x"],
+                enabled: false,
+            });
+
+            fireEvent.change(input, {
+                target: {
+                    value: application,
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [getAddress(application), "0x"],
+                enabled: true,
+            });
+        });
     });
 
     describe("ApplicationAutocomplete", () => {

@@ -231,6 +231,127 @@ describe("Rollups EtherDepositForm", () => {
 
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
+
+        it('should enable "usePrepareEtherPortalDepositEther" only when the form is valid', async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareEtherPortalDepositEther,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const applicationsInput = container.querySelector(
+                "input",
+            ) as HTMLInputElement;
+            const amountInput = container.querySelectorAll(
+                "input",
+            )[1] as HTMLInputElement;
+            const textarea = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const [application] = applications;
+
+            fireEvent.change(applicationsInput, {
+                target: {
+                    value: "",
+                },
+            });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.1",
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x0000000000000000000000000000000000000000", "0x"],
+                enabled: false,
+                value: 100000000000000000n,
+            });
+
+            fireEvent.change(applicationsInput, {
+                target: {
+                    value: application,
+                },
+            });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "",
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [getAddress(application), "0x"],
+                enabled: false,
+                value: undefined,
+            });
+
+            fireEvent.change(applicationsInput, {
+                target: {
+                    value: application,
+                },
+            });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.1",
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x"],
+                enabled: false,
+                value: 100000000000000000n,
+            });
+
+            fireEvent.change(applicationsInput, {
+                target: {
+                    value: application,
+                },
+            });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.1",
+                },
+            });
+
+            fireEvent.change(textarea, {
+                target: {
+                    value: "0x123",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x123"],
+                enabled: true,
+                value: 100000000000000000n,
+            });
+        });
     });
 
     describe("ApplicationAutocomplete", () => {
