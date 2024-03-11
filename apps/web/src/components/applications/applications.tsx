@@ -20,7 +20,7 @@ const UserApplications: FC = () => {
             orderBy: ApplicationOrderByInput.IdAsc,
             limit: 20,
             after: "1",
-            ownerId: address,
+            ownerId: address?.toLowerCase(),
         },
     });
     const applications =
