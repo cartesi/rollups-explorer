@@ -9,7 +9,7 @@ export type SearchProps = {
 
 const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     const { query, updateQueryParams } = useQueryParams();
-    const [keyword, setKeyword] = useState<string>("");
+    const [keyword, setKeyword] = useState<string>(query);
 
     useEffect(() => {
         updateQueryParams(keyword);
