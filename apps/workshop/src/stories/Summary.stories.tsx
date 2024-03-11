@@ -13,6 +13,7 @@ export const Default: Story = {
     args: {
         applications: 30,
         inputs: 832,
+        applicationsOwned: 7,
     },
 };
 
@@ -20,5 +21,6 @@ export const Zero: Story = {
     args: {
         applications: 0,
         inputs: 0,
+        applicationsOwned: 0,
     },
 };
