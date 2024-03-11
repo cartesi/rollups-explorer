@@ -1,27 +1,18 @@
-"use client";
-
 import { Loader, Table, Text } from "@mantine/core";
 import { FC } from "react";
-import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { Application } from "../../graphql/explorer/types";
-import ApplicationRow from "./applicationRow";
+import { ApplicationsTableProps } from "./applicationsTable";
+import UserApplicationsRow from "./userApplicationsRow";
 
-export interface ApplicationsTableProps {
-    applications: ApplicationItemFragment[];
-    fetching: boolean;
-    totalCount: number;
-}
-
-const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
+const UserApplicationsTable: FC<ApplicationsTableProps> = (props) => {
     const { applications, fetching, totalCount } = props;
-
     return (
         <Table>
             <Table.Thead>
                 <Table.Tr>
                     <Table.Th>Id</Table.Th>
-                    <Table.Th>Owner</Table.Th>
                     <Table.Th>URL</Table.Th>
+                    <Table.Th>Age</Table.Th>
                 </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -41,7 +32,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                     )
                 )}
                 {applications.map((application) => (
-                    <ApplicationRow
+                    <UserApplicationsRow
                         key={application.id}
                         application={application as Omit<Application, "inputs">}
                     />
@@ -51,4 +42,4 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
     );
 };
 
-export default ApplicationsTable;
+export default UserApplicationsTable;
