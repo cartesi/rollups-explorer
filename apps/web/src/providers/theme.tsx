@@ -1,15 +1,16 @@
 import {
     AppShell,
+    Card,
     DEFAULT_THEME,
     List,
     MantineThemeOverride,
     Modal,
-    Card,
     createTheme,
     mergeMantineTheme,
 } from "@mantine/core";
 
 const themeOverride: MantineThemeOverride = createTheme({
+    cursorType: "pointer",
     fontFamily: "Open Sans, sans-serif",
     primaryColor: "cyan",
     other: {
