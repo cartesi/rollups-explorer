@@ -41,7 +41,32 @@ import {
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
-import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
+import useUndeployedApplication from "./hooks/useUndeployedApplication";
+
+const erc721AbiEnumerable = [
+    ...erc721ABI,
+    {
+        stateMutability: "view",
+        type: "function",
+        inputs: [
+            {
+                name: "owner",
+                type: "address",
+            },
+            {
+                name: "index",
+                type: "uint256",
+            },
+        ],
+        name: "tokenOfOwnerByIndex",
+        outputs: [
+            {
+                name: "tokenId",
+                type: "uint256",
+            },
+        ],
+    },
+] as const;
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
@@ -215,6 +240,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         approveWait.status !== "success";
     const isApproveDisabled =
         approveDisabled || !needApproval || !isDepositDisabled;
+    const isUndeployedApp = useUndeployedApplication(
+        applicationAddress,
+        applications,
+    );
 
     useEffect(() => {
         if (tokensOfOwnerByIndex.tokenIds.length === 0) {
@@ -256,21 +285,15 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                     }}
                 />
 
-                {!form.errors.application &&
-                    applicationAddress !== zeroAddress &&
-                    !applications.some(
-                        (a) =>
-                            a.toLowerCase() ===
-                            applicationAddress.toLowerCase(),
-                    ) && (
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            icon={<TbAlertCircle />}
-                        >
-                            This is a deposit to an undeployed application.
-                        </Alert>
-                    )}
+                {!form.errors.application && isUndeployedApp && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
 
                 <TextInput
                     label="ERC-721"
