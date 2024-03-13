@@ -32,7 +32,7 @@ import {
     parseUnits,
     zeroAddress,
 } from "viem";
-import { useNetwork, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
@@ -45,7 +45,7 @@ export interface EtherDepositFormProps {
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
-    const { chain } = useNetwork();
+    const { chain } = useAccount();
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -84,10 +84,10 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         enabled: form.isValid(),
     });
     const execute = useEtherPortalDepositEther(prepare.config);
-    const wait = useWaitForTransaction(execute.data);
+    const wait = useWaitForTransactionReceipt(execute.data);
     const canSubmit =
         form.isValid() && !prepare.isLoading && prepare.error === null;
-    const loading = execute.status === "loading" || wait.status === "loading";
+    const loading = execute.status === "loading" || wait.status === "pending";
     const isUndeployedApp = useUndeployedApplication(address, applications);
 
     useEffect(() => {
@@ -189,7 +189,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={execute.write}
+                        onClick={() => execute.write()}
                     >
                         Deposit
                     </Button>

@@ -23,7 +23,7 @@ import {
     isHex,
     zeroAddress,
 } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
@@ -63,8 +63,8 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         enabled: form.isValid(),
     });
     const execute = useInputBoxAddInput(prepare.config);
-    const wait = useWaitForTransaction(execute.data);
-    const loading = execute.status === "loading" || wait.status === "loading";
+    const wait = useWaitForTransactionReceipt(execute.data);
+    const loading = execute.status === "loading" || wait.status === "pending";
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
 
@@ -141,7 +141,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={execute.write}
+                        onClick={() => execute.write()}
                     >
                         Send
                     </Button>

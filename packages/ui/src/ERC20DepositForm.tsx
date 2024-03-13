@@ -41,7 +41,11 @@ import {
     parseUnits,
     zeroAddress,
 } from "viem";
-import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
+import {
+    useAccount,
+    useReadContracts,
+    useWaitForTransactionReceipt,
+} from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
@@ -56,7 +60,7 @@ export const transactionButtonState = (
     const loading =
         prepare.status === "loading" ||
         execute.status === "loading" ||
-        wait.status === "loading";
+        wait.status === "pending";
 
     const disabled =
         prepare.error != null ||
@@ -151,7 +155,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         abi: erc20ABI,
         address: erc20ContractAddress,
     };
-    const erc20 = useContractReads({
+    const erc20 = useReadContracts({
         contracts: [
             { ...erc20Contract, functionName: "decimals" },
             { ...erc20Contract, functionName: "symbol" },
@@ -162,7 +166,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             },
             { ...erc20Contract, functionName: "balanceOf", args: [address!] },
         ],
-        watch: true,
+        // watch: true,
     });
 
     useEffect(() => {
@@ -192,7 +196,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             amountBigInt > allowance,
     });
     const approve = useErc20Approve(approvePrepare.config);
-    const approveWait = useWaitForTransaction(approve.data);
+    const approveWait = useWaitForTransactionReceipt(approve.data);
 
     // prepare deposit transaction
     const depositPrepare = usePrepareErc20PortalDepositErc20Tokens({
@@ -208,7 +212,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             amountBigInt <= allowance,
     });
     const deposit = useErc20PortalDepositErc20Tokens(depositPrepare.config);
-    const depositWait = useWaitForTransaction(deposit.data);
+    const depositWait = useWaitForTransactionReceipt(deposit.data);
 
     // true if current allowance is less than the amount to deposit
     const needApproval =
@@ -414,7 +418,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         disabled={approveDisabled || !needApproval}
                         leftSection={<TbCheck />}
                         loading={approveLoading}
-                        onClick={approve.write}
+                        onClick={() => approve.write()}
                     >
                         Approve
                     </Button>
@@ -425,7 +429,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         }
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
-                        onClick={deposit.write}
+                        onClick={() => deposit.write()}
                     >
                         Deposit
                     </Button>
