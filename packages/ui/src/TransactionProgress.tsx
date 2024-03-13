@@ -69,7 +69,7 @@ export const TransactionProgress: FC<TransactionProgressProps> = ({
     const [showError, { toggle: toggleError }] = useDisclosure(false);
     const isSuccess = wait.status == "success";
     const isError = !!prepare.error || !!execute.error || !!wait.error;
-    const isMining = wait.status == "loading";
+    const isMining = wait.status == "pending";
     const shortErrorMessage =
         getShortErrorMessage(prepare.error) ||
         getShortErrorMessage(execute.error) ||
@@ -78,7 +78,7 @@ export const TransactionProgress: FC<TransactionProgressProps> = ({
         getErrorMessage(prepare.error) ||
         getErrorMessage(execute.error) ||
         getErrorMessage(wait.error);
-    const isLoading = execute.status == "loading";
+    const isLoading = execute.status == "pending";
 
     return (
         <Stack gap={5}>

@@ -37,8 +37,13 @@ import {
     isAddress,
     isHex,
     zeroAddress,
+    Address,
 } from "viem";
-import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
+import {
+    useAccount,
+    useReadContracts,
+    useWaitForTransactionReceipt,
+} from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
 import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
@@ -53,7 +58,7 @@ export const transactionButtonState = (
     const loading =
         prepare.status === "loading" ||
         execute.status === "loading" ||
-        wait.status === "loading";
+        wait.status === "pending";
 
     const disabled =
         prepare.error !== null ||
@@ -136,12 +141,12 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         abi: erc721ABI,
         address: erc721ContractAddress,
     };
-    const erc721 = useContractReads({
+    const erc721 = useReadContracts({
         contracts: [
             { ...erc721Contract, functionName: "symbol" },
             { ...erc721Contract, functionName: "balanceOf", args: [address!] },
         ],
-        watch: true,
+        // watch: true,
     });
 
     const symbol = (erc721.data?.[0].result as string | undefined) ?? "";
@@ -160,7 +165,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         enabled: tokenIdBigInt !== undefined && hasPositiveBalance,
     });
     const approve = useErc721Approve(approvePrepare.config);
-    const approveWait = useWaitForTransaction(approve.data);
+    const approveWait = useWaitForTransactionReceipt(approve.data);
 
     // prepare deposit transaction
     const depositPrepare = usePrepareErc721PortalDepositErc721Token({
@@ -181,7 +186,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             approveWait.status === "success",
     });
     const deposit = useErc721PortalDepositErc721Token(depositPrepare.config);
-    const depositWait = useWaitForTransaction(deposit.data);
+    const depositWait = useWaitForTransactionReceipt(deposit.data);
     const needApproval = tokenIdBigInt !== undefined;
     const canDeposit =
         hasPositiveBalance && tokenIdBigInt !== undefined && tokenIdBigInt > 0;
@@ -380,7 +385,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         disabled={isApproveDisabled}
                         leftSection={<TbCheck />}
                         loading={approveLoading}
-                        onClick={approve.write}
+                        onClick={() => approve.write()}
                     >
                         Approve
                     </Button>
@@ -389,7 +394,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         disabled={isDepositDisabled}
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
-                        onClick={deposit.write}
+                        onClick={() => deposit.write()}
                     >
                         Deposit
                     </Button>

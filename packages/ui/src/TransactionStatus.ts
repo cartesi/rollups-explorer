@@ -1,4 +1,4 @@
 export type TransactionStageStatus = {
-    status: "error" | "loading" | "success" | "idle";
+    status: "error" | "pending" | "success" | "idle" | "loading";
     error: Error | null;
 };
