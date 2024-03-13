@@ -18,12 +18,15 @@ import {
     TbExclamationCircle,
 } from "react-icons/tb";
 import { BaseError } from "viem";
-import { TransactionStageStatus } from "./TransactionStatus";
+import {
+    TransactionStageStatus,
+    TransactionWaitStatus,
+} from "./TransactionStatus";
 
 export type TransactionProgressProps = {
     prepare: TransactionStageStatus;
     execute: TransactionStageStatus;
-    wait: TransactionStageStatus;
+    wait: TransactionWaitStatus;
     confirmationMessage?: string;
     defaultErrorMessage?: string;
 };
@@ -69,7 +72,7 @@ export const TransactionProgress: FC<TransactionProgressProps> = ({
     const [showError, { toggle: toggleError }] = useDisclosure(false);
     const isSuccess = wait.status == "success";
     const isError = !!prepare.error || !!execute.error || !!wait.error;
-    const isMining = wait.status == "pending";
+    const isMining = wait.fetchStatus === "fetching";
     const shortErrorMessage =
         getShortErrorMessage(prepare.error) ||
         getShortErrorMessage(execute.error) ||
@@ -78,7 +81,7 @@ export const TransactionProgress: FC<TransactionProgressProps> = ({
         getErrorMessage(prepare.error) ||
         getErrorMessage(execute.error) ||
         getErrorMessage(wait.error);
-    const isLoading = execute.status == "pending";
+    const isLoading = execute.status === "pending";
 
     return (
         <Stack gap={5}>
