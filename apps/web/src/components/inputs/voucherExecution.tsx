@@ -1,11 +1,13 @@
 "use client";
-import { FC, useCallback, useEffect } from "react";
+import { FC, useEffect } from "react";
 import { Button, Flex, Loader, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Address, useAccount, useWaitForTransaction } from "wagmi";
+import { Address } from "viem";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
-    useCartesiDAppExecuteVoucher,
-    useCartesiDAppWasVoucherExecuted,
+    useWriteCartesiDAppExecuteVoucher,
+    useSimulateCartesiDAppExecuteVoucher,
+    useReadCartesiDAppWasVoucherExecuted,
 } from "@cartesi/rollups-wagmi";
 import { Voucher } from "../../graphql/rollups/types";
 
@@ -44,14 +46,14 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     const hasVoucherProof =
         typeof voucher?.proof === "object" && voucher?.proof !== null;
 
-    const wasExecuted = useCartesiDAppWasVoucherExecuted({
+    const wasExecuted = useReadCartesiDAppWasVoucherExecuted({
         args: [
             BigInt(voucher.input?.index as number),
             BigInt(voucher.index as number),
         ],
         address: appId,
     });
-    const execute = useCartesiDAppExecuteVoucher({
+    const prepare = useSimulateCartesiDAppExecuteVoucher({
         args: [
             voucher.destination as `0x${string}`,
             voucher.payload as `0x${string}`,
@@ -59,26 +61,25 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
         ],
         address: appId,
     });
-    const wait = useWaitForTransaction(execute.data);
-    const isLoading = execute.status === "loading" || wait.status === "loading";
+    const execute = useWriteCartesiDAppExecuteVoucher();
+    const wait = useWaitForTransactionReceipt({
+        hash: execute.data,
+    });
+    const isLoading = execute.status === "pending" || wait.isLoading;
     const isExecuted = wasExecuted.data || wait.status === "success";
     const isTooltipEnabled =
         (!isConnected && !isExecuted) || (isConnected && !hasVoucherProof);
     const isExecuteDisabled = isExecuted || !hasVoucherProof || !isConnected;
 
-    const onExecute = useCallback(() => {
-        execute.write();
-    }, [execute]);
-
     useEffect(() => {
-        if (wait.status === "success") {
+        if (wait.isSuccess) {
             notifications.show({
                 message: "Voucher executed successfully",
                 color: "green",
                 withBorder: true,
             });
         }
-    }, [wait.status]);
+    }, [wait.isSuccess]);
 
     return (
         <div>
@@ -99,7 +100,9 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                         mt={6}
                         disabled={isExecuteDisabled}
                         loading={isLoading}
-                        onClick={onExecute}
+                        onClick={() =>
+                            execute.writeContract(prepare.data!.request)
+                        }
                     >
                         {isExecuted ? "Executed" : "Execute"}
                     </Button>
