@@ -23,18 +23,18 @@
         "dev": "tsup --watch"
     },
     "dependencies": {
-        "wagmi": "^1"
+        "wagmi": "^2"
     },
     "peerDependencies": {
-        "wagmi": "^1"
+        "wagmi": "^2"
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.0",
         "@cartesi/tsconfig": "*",
-        "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
+        "@sunodo/wagmi-plugin-hardhat-deploy": "^0.3",
         "@types/react": "^18",
         "@types/react-dom": "^18",
-        "@wagmi/cli": "^1",
+        "@wagmi/cli": "^2",
         "eslint": "^8",
         "eslint-config-cartesi": "*",
         "react": "^18",
