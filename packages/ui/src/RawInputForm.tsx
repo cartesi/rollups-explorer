@@ -1,6 +1,6 @@
 import {
-    useInputBoxAddInput,
-    usePrepareInputBoxAddInput,
+    useWriteInputBoxAddInput,
+    useSimulateInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -57,17 +57,22 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         }),
     });
     const { address, rawInput } = form.getTransformedValues();
-    const prepare = usePrepareInputBoxAddInput({
+    const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
-        enabled: form.isValid(),
+        query: {
+            enabled: form.isValid(),
+        },
     });
-    const execute = useInputBoxAddInput(prepare.config);
-    const wait = useWaitForTransactionReceipt(execute.data);
-    const loading = execute.status === "loading" || wait.status === "pending";
+
+    const execute = useWriteInputBoxAddInput();
+    const wait = useWaitForTransactionReceipt({
+        hash: execute.data,
+    });
+    const loading = execute.status === "pending" || wait.isLoading;
     const canSubmit = form.isValid() && prepare.error === null;
 
     useEffect(() => {
-        if (wait.status === "success") {
+        if (wait.isSuccess) {
             form.reset();
             onSearchApplications("");
         }
@@ -120,7 +125,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
 
                 <Collapse
                     in={
-                        execute.isLoading ||
+                        execute.status === "pending" ||
                         wait.isLoading ||
                         execute.isSuccess ||
                         execute.isError
@@ -141,7 +146,9 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={() => execute.write()}
+                        onClick={() =>
+                            execute.writeContract(prepare.data!.request)
+                        }
                     >
                         Send
                     </Button>
