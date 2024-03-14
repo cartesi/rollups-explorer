@@ -54,6 +54,7 @@ const SendTransaction: FC<DepositProps> = ({
                 label="Type"
                 placeholder="Select deposit type"
                 mb={16}
+                allowDeselect={false}
                 data={[
                     {
                         group: "Deposit",
