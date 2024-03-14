@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useBlockNumber, useBalance } from "wagmi";
+import { useBlockNumber } from "wagmi";
 
-export default function useWatchQuery() {
+export default function useWatchQueryOnBlockChange(
+    queryKey: readonly unknown[],
+) {
+    const queryClient = useQueryClient();
     const { data: blockNumber } = useBlockNumber({ watch: true });
 
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey });
-    }, [blockNumber, queryClient]);
+    }, [blockNumber, queryClient, queryKey]);
 }
