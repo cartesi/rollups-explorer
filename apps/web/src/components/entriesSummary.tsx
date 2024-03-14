@@ -8,21 +8,23 @@ import {
     useStatsQuery,
 } from "../graphql/explorer/hooks/queries";
 const EntriesSummary: FC = () => {
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
     const [{ data: stats }] = useStatsQuery();
     const [{ data: applicationsOwned }] = useStatsApplicationsOwnerQuery({
         variables: {
-            applicationId: address,
+            applicationId: address?.toLowerCase(),
         },
+        pause: !isConnected,
     });
+    const applicationsOwnedCount = isConnected
+        ? applicationsOwned?.applicationsConnection?.totalCount ?? 0
+        : 0;
 
     return (
         <Summary
             inputs={stats?.inputsConnection?.totalCount ?? 0}
             applications={stats?.applicationsConnection?.totalCount ?? 0}
-            applicationsOwned={
-                applicationsOwned?.applicationsConnection?.totalCount ?? 0
-            }
+            applicationsOwned={applicationsOwnedCount}
         />
     );
 };
