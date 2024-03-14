@@ -69,7 +69,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,
     });
-    const loading = execute.status === "pending" || wait.isLoading;
+    const loading = execute.isPending || wait.isLoading;
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
 
@@ -79,7 +79,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.status, onSearchApplications]);
+    }, [wait.isSuccess, onSearchApplications]);
 
     return (
         <form data-testid="raw-input-form">
@@ -125,7 +125,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
 
                 <Collapse
                     in={
-                        execute.status === "pending" ||
+                        execute.isPending ||
                         wait.isLoading ||
                         execute.isSuccess ||
                         execute.isError

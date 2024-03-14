@@ -1,10 +1,10 @@
 import {
-    erc20ABI,
+    erc20Abi,
     erc20PortalAddress,
-    useErc20Approve,
-    useErc20PortalDepositErc20Tokens,
-    usePrepareErc20Approve,
-    usePrepareErc20PortalDepositErc20Tokens,
+    useWriteErc20Approve,
+    useSimulateErc20Approve,
+    useWriteErc20PortalDepositErc20Tokens,
+    useSimulateErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -47,25 +47,27 @@ import {
     useWaitForTransactionReceipt,
 } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
-import { TransactionStageStatus } from "./TransactionStatus";
+import {
+    TransactionStageStatus,
+    TransactionWaitStatus,
+} from "./TransactionStatus";
+import useWatchQueryOnBlockChange from "./hooks/useWatchQueryOnBlockChange";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
 export const transactionButtonState = (
-    prepare: TransactionStageStatus,
+    prepare: TransactionWaitStatus,
     execute: TransactionStageStatus,
-    wait: TransactionStageStatus,
-    write?: () => void,
+    wait: TransactionWaitStatus,
     disableOnSuccess: boolean = true,
 ) => {
     const loading =
-        prepare.status === "loading" ||
-        execute.status === "loading" ||
-        wait.status === "pending";
+        prepare.fetchStatus === "fetching" ||
+        execute.status === "pending" ||
+        wait.fetchStatus === "fetching";
 
     const disabled =
-        prepare.error != null ||
-        (disableOnSuccess && wait.status === "success") ||
-        !write;
+        prepare.error !== null ||
+        (disableOnSuccess && wait.status === "success");
 
     return { loading, disabled };
 };
@@ -152,7 +154,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
 
     // query token information in a multicall
     const erc20Contract = {
-        abi: erc20ABI,
+        abi: erc20Abi,
         address: erc20ContractAddress,
     };
     const erc20 = useReadContracts({
@@ -166,8 +168,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             },
             { ...erc20Contract, functionName: "balanceOf", args: [address!] },
         ],
-        // watch: true,
     });
+
+    useWatchQueryOnBlockChange(erc20.queryKey);
 
     useEffect(() => {
         if (erc20.data?.[0]?.result) {
@@ -187,32 +190,40 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         : [];
 
     // prepare approve transaction
-    const approvePrepare = usePrepareErc20Approve({
+    const approvePrepare = useSimulateErc20Approve({
         address: erc20Address,
         args: [erc20PortalAddress, amountBigInt!],
-        enabled:
-            amountBigInt !== undefined &&
-            allowance !== undefined &&
-            amountBigInt > allowance,
+        query: {
+            enabled:
+                amountBigInt !== undefined &&
+                allowance !== undefined &&
+                amountBigInt > allowance,
+        },
     });
-    const approve = useErc20Approve(approvePrepare.config);
-    const approveWait = useWaitForTransactionReceipt(approve.data);
+    const approve = useWriteErc20Approve();
+    const approveWait = useWaitForTransactionReceipt({
+        hash: approve.data,
+    });
 
     // prepare deposit transaction
-    const depositPrepare = usePrepareErc20PortalDepositErc20Tokens({
+    const depositPrepare = useSimulateErc20PortalDepositErc20Tokens({
         args: [erc20Address, applicationAddress, amountBigInt!, execLayerData],
-        enabled:
-            amountBigInt !== undefined &&
-            balance !== undefined &&
-            allowance !== undefined &&
-            !form.errors.erc20Address &&
-            !form.errors.application &&
-            isHex(execLayerData) &&
-            amountBigInt <= balance &&
-            amountBigInt <= allowance,
+        query: {
+            enabled:
+                amountBigInt !== undefined &&
+                balance !== undefined &&
+                allowance !== undefined &&
+                !form.errors.erc20Address &&
+                !form.errors.application &&
+                isHex(execLayerData) &&
+                amountBigInt <= balance &&
+                amountBigInt <= allowance,
+        },
     });
-    const deposit = useErc20PortalDepositErc20Tokens(depositPrepare.config);
-    const depositWait = useWaitForTransactionReceipt(deposit.data);
+    const deposit = useWriteErc20PortalDepositErc20Tokens();
+    const depositWait = useWaitForTransactionReceipt({
+        hash: deposit.data,
+    });
 
     // true if current allowance is less than the amount to deposit
     const needApproval =
@@ -231,25 +242,13 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         amountBigInt <= balance;
 
     const { disabled: approveDisabled, loading: approveLoading } =
-        transactionButtonState(
-            approvePrepare,
-            approve,
-            approveWait,
-            approve.write,
-            false,
-        );
+        transactionButtonState(approvePrepare, approve, approveWait, false);
     const { disabled: depositDisabled, loading: depositLoading } =
-        transactionButtonState(
-            depositPrepare,
-            deposit,
-            depositWait,
-            deposit.write,
-            true,
-        );
+        transactionButtonState(depositPrepare, deposit, depositWait, true);
     const isUndeployedApp = useUndeployedApplication(
         applicationAddress,
         applications,
-    );
+    );    
 
     useEffect(() => {
         if (depositWait.status === "success") {
@@ -386,7 +385,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         {...form.getInputProps("execLayerData")}
                     />
                 </Collapse>
-                <Collapse in={approve.isLoading || approveWait.isLoading}>
+                <Collapse in={approve.isPending || approveWait.isLoading}>
                     <TransactionProgress
                         prepare={approvePrepare}
                         execute={approve}
@@ -418,7 +417,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         disabled={approveDisabled || !needApproval}
                         leftSection={<TbCheck />}
                         loading={approveLoading}
-                        onClick={() => approve.write()}
+                        onClick={() =>
+                            approve.writeContract(approvePrepare.data!.request)
+                        }
                     >
                         Approve
                     </Button>
@@ -429,7 +430,9 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         }
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
-                        onClick={() => deposit.write()}
+                        onClick={() =>
+                            deposit.writeContract(depositPrepare.data!.request)
+                        }
                     >
                         Deposit
                     </Button>

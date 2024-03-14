@@ -1,10 +1,10 @@
 import {
-    erc721ABI,
+    erc721Abi,
     erc721PortalAddress,
-    useErc721Approve,
-    useErc721PortalDepositErc721Token,
-    usePrepareErc721Approve,
-    usePrepareErc721PortalDepositErc721Token,
+    useWriteErc721Approve,
+    useSimulateErc721Approve,
+    useWriteErc721PortalDepositErc721Token,
+    useSimulateErc721PortalDepositErc721Token,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -45,26 +45,28 @@ import {
     useWaitForTransactionReceipt,
 } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
-import { TransactionStageStatus } from "./TransactionStatus";
+import {
+    TransactionStageStatus,
+    TransactionWaitStatus,
+} from "./TransactionStatus";
+import useWatchQueryOnBlockChange from "./hooks/useWatchQueryOnBlockChange";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
 
 export const transactionButtonState = (
-    prepare: TransactionStageStatus,
+    prepare: TransactionWaitStatus,
     execute: TransactionStageStatus,
-    wait: TransactionStageStatus,
-    write?: () => void,
+    wait: TransactionWaitStatus,
     disableOnSuccess: boolean = true,
 ) => {
     const loading =
-        prepare.status === "loading" ||
-        execute.status === "loading" ||
-        wait.status === "pending";
+        prepare.fetchStatus === "fetching" ||
+        execute.status === "pending" ||
+        wait.fetchStatus === "fetching";
 
     const disabled =
         prepare.error !== null ||
-        (disableOnSuccess && wait.status === "success") ||
-        !write;
+        (disableOnSuccess && wait.status === "success");
 
     return { loading, disabled };
 };
@@ -139,7 +141,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     } = form.getTransformedValues();
 
     const erc721Contract = {
-        abi: erc721ABI,
+        abi: erc721Abi,
         address: erc721ContractAddress,
     };
     const erc721 = useReadContracts({
@@ -147,8 +149,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             { ...erc721Contract, functionName: "symbol" },
             { ...erc721Contract, functionName: "balanceOf", args: [address!] },
         ],
-        // watch: true,
     });
+
+    useWatchQueryOnBlockChange(erc721.queryKey);
 
     const symbol = (erc721.data?.[0].result as string | undefined) ?? "";
     const balance = erc721.data?.[1].result as bigint | undefined;
@@ -160,16 +163,20 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     const hasPositiveBalance = balance !== undefined && balance > 0;
 
     // prepare approve transaction
-    const approvePrepare = usePrepareErc721Approve({
+    const approvePrepare = useSimulateErc721Approve({
         address: erc721Address,
         args: [erc721PortalAddress, tokenIdBigInt!],
-        enabled: tokenIdBigInt !== undefined && hasPositiveBalance,
+        query: {
+            enabled: tokenIdBigInt !== undefined && hasPositiveBalance,
+        },
     });
-    const approve = useErc721Approve(approvePrepare.config);
-    const approveWait = useWaitForTransactionReceipt(approve.data);
+    const approve = useWriteErc721Approve();
+    const approveWait = useWaitForTransactionReceipt({
+        hash: approve.data,
+    });
 
     // prepare deposit transaction
-    const depositPrepare = usePrepareErc721PortalDepositErc721Token({
+    const depositPrepare = useSimulateErc721PortalDepositErc721Token({
         args: [
             erc721Address,
             applicationAddress,
@@ -177,17 +184,21 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             baseLayerData,
             execLayerData,
         ],
-        enabled:
-            tokenIdBigInt !== undefined &&
-            hasPositiveBalance &&
-            !form.errors.erc721Address &&
-            !form.errors.application &&
-            isHex(baseLayerData) &&
-            isHex(execLayerData) &&
-            approveWait.status === "success",
+        query: {
+            enabled:
+                tokenIdBigInt !== undefined &&
+                hasPositiveBalance &&
+                !form.errors.erc721Address &&
+                !form.errors.application &&
+                isHex(baseLayerData) &&
+                isHex(execLayerData) &&
+                approveWait.status === "success",
+        },
     });
-    const deposit = useErc721PortalDepositErc721Token(depositPrepare.config);
-    const depositWait = useWaitForTransactionReceipt(deposit.data);
+    const deposit = useWriteErc721PortalDepositErc721Token();
+    const depositWait = useWaitForTransactionReceipt({
+        hash: deposit.data,
+    });
     const needApproval = tokenIdBigInt !== undefined;
     const canDeposit =
         hasPositiveBalance && tokenIdBigInt !== undefined && tokenIdBigInt > 0;
@@ -199,21 +210,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     );
 
     const { disabled: approveDisabled, loading: approveLoading } =
-        transactionButtonState(
-            approvePrepare,
-            approve,
-            approveWait,
-            approve.write,
-            true,
-        );
+        transactionButtonState(approvePrepare, approve, approveWait, true);
     const { disabled: depositDisabled, loading: depositLoading } =
-        transactionButtonState(
-            depositPrepare,
-            deposit,
-            depositWait,
-            deposit.write,
-            true,
-        );
+        transactionButtonState(depositPrepare, deposit, depositWait, true);
     const isDepositDisabled =
         depositDisabled ||
         !canDeposit ||
@@ -352,7 +351,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         {...form.getInputProps("execLayerData")}
                     />
                 </Collapse>
-                <Collapse in={approve.isLoading || approveWait.isLoading}>
+                <Collapse in={approve.isPending || approveWait.isLoading}>
                     <TransactionProgress
                         prepare={approvePrepare}
                         execute={approve}
@@ -384,7 +383,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         disabled={isApproveDisabled}
                         leftSection={<TbCheck />}
                         loading={approveLoading}
-                        onClick={() => approve.write()}
+                        onClick={() =>
+                            approve.writeContract(approvePrepare.data!.request)
+                        }
                     >
                         Approve
                     </Button>
@@ -393,7 +394,9 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         disabled={isDepositDisabled}
                         leftSection={<TbPigMoney />}
                         loading={depositLoading}
-                        onClick={() => deposit.write()}
+                        onClick={() =>
+                            deposit.writeContract(depositPrepare.data!.request)
+                        }
                     >
                         Deposit
                     </Button>
