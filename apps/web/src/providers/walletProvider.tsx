@@ -3,21 +3,20 @@ import { useMantineColorScheme } from "@mantine/core";
 import {
     AvatarComponent,
     RainbowKitProvider,
-    // connectorsForWallets,
+    connectorsForWallets,
     darkTheme,
-    // getDefaultWallets,
+    getDefaultWallets,
     lightTheme,
-    getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
-// import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
+import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
 import Image from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { WagmiProvider, http } from "wagmi";
+import { WagmiProvider, http, createConfig } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
-// import { alchemyProvider } from "wagmi/providers/alchemy";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 // import { publicProvider } from "wagmi/providers/public";
 
 // select chain based on env var
@@ -37,33 +36,53 @@ const chain =
 // );
 
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
-// const { wallets } = getDefaultWallets({
-//     appName: "CartesiScan",
-//     projectId,
-//     chains,
-// });
+const { wallets } = getDefaultWallets({
+    appName: "CartesiScan",
+    projectId,
+});
 
 const appInfo = {
     appName: "CartesiScan",
     learnMoreUrl: "https://cartesiscan.io",
 };
 
-// const connectors = connectorsForWallets(
-//     [
-//         ...wallets,
-//         {
-//             groupName: "Other",
-//             wallets: [
-//                 trustWallet({ chains, projectId }),
-//                 ledgerWallet({ chains, projectId }),
-//             ],
-//         },
-//     ],
-//     {
-//         appName: "CartesiScan",
-//         projectId,
-//     },
-// );
+const connectors = connectorsForWallets(
+    [
+        ...wallets,
+        {
+            groupName: "Other",
+            wallets: [trustWallet, ledgerWallet],
+        },
+    ],
+    {
+        appName: "CartesiScan",
+        projectId,
+    },
+);
+
+/*
+const connectors = connectorsForWallets(
+    [
+      {
+        groupName: 'Supported Wallets',
+        wallets: [
+         coinbaseWallet,
+          rainbowWallet,
+          metaMaskWallet,
+          trustWallet,
+          braveWallet,
+          ledgerWallet,
+          safeWallet,
+          walletConnectWallet,
+        ],
+      },
+    ],
+    {
+      appName: '...',
+      projectId: '...',
+    },
+  );
+ */
 
 const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
     return ensImage ? (
@@ -79,15 +98,15 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
     );
 };
 
-const wagmiConfig = getDefaultConfig({
-    appName: "CartesiScan",
-    projectId,
+const wagmiConfig = createConfig({
     chains: [chain],
     transports: {
         [mainnet.id]: http(),
         [sepolia.id]: http(),
         [foundry.id]: http(),
     },
+    connectors,
+    ssr: true,
 });
 
 const queryClient = new QueryClient();
