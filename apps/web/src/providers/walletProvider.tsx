@@ -16,30 +16,21 @@ import Image from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { WagmiProvider, http, createConfig } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-// import { publicProvider } from "wagmi/providers/public";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
-// const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const chain =
     [foundry, mainnet, sepolia].find((c) => c.id == chainId) || foundry;
 
-// const providers: ChainProviderFn<typeof chain>[] = alchemyApiKey
-//     ? [alchemyProvider({ apiKey: alchemyApiKey }), publicProvider()]
-//     : [publicProvider()];
-
-// only 1 chain is enabled, based on env var
-// const { chains, publicClient, webSocketPublicClient } = configureChains(
-//     [chain],
-//     providers,
-// );
-
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
-const { wallets } = getDefaultWallets({
+
+const connectorsForWalletsParameters = {
     appName: "CartesiScan",
     projectId,
-});
+};
+
+const { wallets } = getDefaultWallets(connectorsForWalletsParameters);
 
 const appInfo = {
     appName: "CartesiScan",
@@ -54,35 +45,8 @@ const connectors = connectorsForWallets(
             wallets: [trustWallet, ledgerWallet],
         },
     ],
-    {
-        appName: "CartesiScan",
-        projectId,
-    },
+    connectorsForWalletsParameters,
 );
-
-/*
-const connectors = connectorsForWallets(
-    [
-      {
-        groupName: 'Supported Wallets',
-        wallets: [
-         coinbaseWallet,
-          rainbowWallet,
-          metaMaskWallet,
-          trustWallet,
-          braveWallet,
-          ledgerWallet,
-          safeWallet,
-          walletConnectWallet,
-        ],
-      },
-    ],
-    {
-      appName: '...',
-      projectId: '...',
-    },
-  );
- */
 
 const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
     return ensImage ? (
@@ -99,14 +63,22 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
 };
 
 const wagmiConfig = createConfig({
+    ssr: true,
+    connectors,
     chains: [chain],
     transports: {
-        [mainnet.id]: http(),
-        [sepolia.id]: http(),
+        [mainnet.id]: http(
+            alchemyApiKey
+                ? `https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`
+                : undefined,
+        ),
+        [sepolia.id]: http(
+            alchemyApiKey
+                ? `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`
+                : undefined,
+        ),
         [foundry.id]: http(),
     },
-    connectors,
-    ssr: true,
 });
 
 const queryClient = new QueryClient();
