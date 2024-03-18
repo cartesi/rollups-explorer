@@ -1,58 +1,59 @@
 import { useMantineColorScheme } from "@mantine/core";
 import {
-    RainbowKitProvider,
     connectorsForWallets,
     darkTheme,
     getDefaultWallets,
     lightTheme,
+    RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
     argentWallet,
     ledgerWallet,
     trustWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { createConfig, http, WagmiProvider } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
-
-// only 1 chain is enabled, based on env var
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-    [foundry, mainnet, sepolia],
-    [publicProvider()],
-);
 
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
-const { wallets } = getDefaultWallets({
+
+const connectorsForWalletsParameters = {
     appName: "CartesiScan",
     projectId,
-    chains,
-});
+};
+
+const { wallets } = getDefaultWallets(connectorsForWalletsParameters);
 
 const appInfo = {
-    appName: "CartesiScan",
+    appName: connectorsForWalletsParameters.appName,
     learnMoreUrl: "https://cartesiscan.io",
 };
 
-const connectors = connectorsForWallets([
-    ...wallets,
-    {
-        groupName: "Other",
-        wallets: [
-            argentWallet({ chains, projectId }),
-            trustWallet({ chains, projectId }),
-            ledgerWallet({ chains, projectId }),
-        ],
-    },
-]);
+const connectors = connectorsForWallets(
+    [
+        ...wallets,
+        {
+            groupName: "Other",
+            wallets: [argentWallet, trustWallet, ledgerWallet],
+        },
+    ],
+    connectorsForWalletsParameters,
+);
 
 const wagmiConfig = createConfig({
-    autoConnect: true,
+    ssr: true,
     connectors,
-    publicClient,
-    webSocketPublicClient,
+    chains: [foundry, mainnet, sepolia],
+    transports: {
+        [mainnet.id]: http(),
+        [sepolia.id]: http(),
+        [foundry.id]: http(),
+    },
 });
+
+const queryClient = new QueryClient();
 
 const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     const scheme = useMantineColorScheme();
@@ -69,15 +70,13 @@ const WalletProvider = ({ children }: { children: React.ReactNode }) => {
             : lightTheme(themeOptions);
 
     return (
-        <WagmiConfig config={wagmiConfig}>
-            <RainbowKitProvider
-                appInfo={appInfo}
-                chains={chains}
-                theme={walletTheme}
-            >
-                {children}
-            </RainbowKitProvider>
-        </WagmiConfig>
+        <WagmiProvider config={wagmiConfig}>
+            <QueryClientProvider client={queryClient}>
+                <RainbowKitProvider appInfo={appInfo} theme={walletTheme}>
+                    {children}
+                </RainbowKitProvider>
+            </QueryClientProvider>
+        </WagmiProvider>
     );
 };
 
