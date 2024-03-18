@@ -1,5 +1,11 @@
 import { afterEach, describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
 import {
     useWriteCartesiDAppExecuteVoucher,
     useReadCartesiDAppWasVoucherExecuted,
@@ -86,7 +92,7 @@ describe("VoucherExecution component", () => {
             data: {
                 request: {},
             },
-        });
+        } as any);
         useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
             isLoading: false,
@@ -147,7 +153,7 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(false);
     });
 
-    it("should display tooltip when voucher is pending", () => {
+    it("should display tooltip when voucher is pending", async () => {
         useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -169,12 +175,14 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Voucher proof is pending"),
-        ).toBeInTheDocument();
+        await waitFor(() =>
+            expect(
+                screen.getByText("Voucher proof is pending"),
+            ).toBeInTheDocument(),
+        );
     });
 
-    it("should display tooltip when wallet is not connected and voucher is not executed", () => {
+    it("should display tooltip when wallet is not connected and voucher is not executed", async () => {
         useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -191,9 +199,11 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Connect your wallet to execute the voucher"),
-        ).toBeInTheDocument();
+        await waitFor(() =>
+            expect(
+                screen.getByText("Connect your wallet to execute the voucher"),
+            ).toBeInTheDocument(),
+        );
     });
 
     it("should execute voucher when button is clicked", () => {
