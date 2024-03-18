@@ -12,6 +12,7 @@ RUN turbo prune --scope=web --docker
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 RUN apk add --no-cache libc6-compat
+RUN apk add --update --no-cache python3 build-base gcc && ln -sf /usr/bin/python3 /usr/bin/python
 RUN apk update
 WORKDIR /app
 
