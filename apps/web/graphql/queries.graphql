@@ -65,8 +65,8 @@ query stats($applicationId: String) {
     }
 }
 
-query statsApplicationsOwner($applicationId: String) {
-    applicationsConnection(orderBy: id_ASC, where: {owner_startsWith: $applicationId}) {
+query statsApplicationsOwner($ownerAddress: String) {
+    applicationsConnection(orderBy: id_ASC, where: {owner_eq: $ownerAddress}) {
         totalCount
     }
 }
@@ -112,7 +112,7 @@ query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int,
 }
 
 query applicationsConnectionOwner($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $ownerId: String) {
-    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {owner_startsWith: $ownerId}) {
+    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {owner_eq: $ownerId}) {
         totalCount
         pageInfo {
             hasNextPage
