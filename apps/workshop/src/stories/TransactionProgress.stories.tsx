@@ -13,8 +13,8 @@ type Story = StoryObj<typeof TransactionProgress>;
 export const WaitingWallet: Story = {
     args: {
         prepare: { status: "success", error: null },
-        execute: { status: "loading", error: null },
-        wait: { status: "idle", error: null },
+        execute: { status: "pending", error: null },
+        wait: { status: "pending", fetchStatus: "idle", error: null },
     },
 };
 
@@ -22,7 +22,7 @@ export const WaitingConfirmation: Story = {
     args: {
         prepare: { status: "success", error: null },
         execute: { status: "success", error: null },
-        wait: { status: "loading", error: null },
+        wait: { status: "pending", fetchStatus: "fetching", error: null },
     },
 };
 
@@ -30,7 +30,7 @@ export const Success: Story = {
     args: {
         prepare: { status: "success", error: null },
         execute: { status: "success", error: null },
-        wait: { status: "success", error: null },
+        wait: { status: "success", fetchStatus: "idle", error: null },
     },
 };
 
@@ -41,7 +41,7 @@ export const Error: Story = {
             error: new BaseError('The contract function "decimals" reverted.'),
         },
         execute: { status: "idle", error: null },
-        wait: { status: "idle", error: null },
+        wait: { status: "pending", fetchStatus: "idle", error: null },
     },
 };
 
@@ -61,6 +61,6 @@ Version: viem@1.10.12`,
             }),
         },
         execute: { status: "idle", error: null },
-        wait: { status: "idle", error: null },
+        wait: { status: "pending", fetchStatus: "idle", error: null },
     },
 };

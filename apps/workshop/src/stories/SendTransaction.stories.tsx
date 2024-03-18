@@ -43,8 +43,8 @@ const FormWithSegmentedControlComponent = () => {
         <div>
             <SegmentedControl
                 value={depositType}
-                onChange={(nextValue: DepositType) => {
-                    setDepositType(nextValue);
+                onChange={(nextValue) => {
+                    setDepositType(nextValue as DepositType);
                 }}
                 data={data}
                 styles={{ root: { width: "100%" } }}
@@ -114,8 +114,8 @@ const FormWithSelectComponent = () => {
                     },
                 ]}
                 value={depositType}
-                onChange={(nextValue: DepositType) => {
-                    setDepositType(nextValue);
+                onChange={(nextValue) => {
+                    setDepositType(nextValue as DepositType);
                 }}
             />
 
