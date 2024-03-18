@@ -30,8 +30,5 @@
     "engines": {
         "node": ">=18.0.0"
     },
-    "packageManager": "yarn@1.22.19",
-    "resolutions": {
-        "node-gyp-build": "^4.3.0"
-    }
+    "packageManager": "yarn@1.22.19"
 }
