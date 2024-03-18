@@ -36,35 +36,11 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
         useWriteCartesiDAppExecuteVoucher: () => ({
             data: {},
         }),
-        useSimulateCartesiDAppExecuteVoucherMock: () => ({
+        useSimulateCartesiDAppExecuteVoucher: () => ({
             data: {
                 request: {},
             },
         }),
-        /*
-
-        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
-            data: false,
-            isLoading: false,
-        } as any);
-        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
-            data: {
-                request: {},
-            },
-        });
-        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
-            status: "idle",
-            isLoading: false,
-            writeContract: () => undefined,
-        } as any);
-        useWaitForTransactionReceiptMock.mockReturnValue({
-            status: "idle",
-            isLoading: false,
-        } as any);
-        useAccountMock.mockReturnValue({
-            isConnected: true,
-        } as any);
-         */
     };
 });
 vi.mock("wagmi");
