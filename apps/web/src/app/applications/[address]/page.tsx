@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
+import { Address as AddressType } from "viem";
 import Address from "../../../components/address";
 import Breadcrumbs from "../../../components/breadcrumbs";
 import Inputs from "../../../components/inputs/inputs";
@@ -58,7 +59,7 @@ const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
                     },
                 ]}
             >
-                <Address value={params.address as Address} icon />
+                <Address value={params.address as AddressType} icon />
             </Breadcrumbs>
 
             <Group>
