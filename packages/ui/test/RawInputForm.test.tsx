@@ -20,11 +20,13 @@ const defaultProps = {
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
     return {
-        usePrepareInputBoxAddInput: () => ({
+        useSimulateInputBoxAddInput: () => ({
+            data: {
+                request: {},
+            },
             config: {},
         }),
-        useInputBoxAddInput: () => ({
-            data: {},
+        useWriteInputBoxAddInput: () => ({
             wait: vi.fn(),
         }),
     };
@@ -32,7 +34,7 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 
 vi.mock("wagmi", async () => {
     return {
-        useWaitForTransaction: () => ({}),
+        useWaitForTransactionReceipt: () => ({}),
     };
 });
 
@@ -164,13 +166,16 @@ describe("Rollups RawInputForm", () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.usePrepareInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
+            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
+                ...rollupsWagmi.useSimulateInputBoxAddInput,
+                data: {
+                    request: {},
+                },
                 error: null,
             });
-            rollupsWagmi.useInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useInputBoxAddInput,
-                write: mockedWrite,
+            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
+                ...rollupsWagmi.useWriteInputBoxAddInput,
+                writeContract: mockedWrite,
             });
 
             const { container } = render(<Component {...defaultProps} />);
@@ -194,10 +199,10 @@ describe("Rollups RawInputForm", () => {
 
         it("should invoke onSearchApplications function after successful submission", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             const onSearchApplicationsMock = vi.fn();
@@ -344,11 +349,11 @@ describe("Rollups RawInputForm", () => {
         it("should correctly format address", async () => {
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                ...rollupsWagmi.useSimulateInputBoxAddInput,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareInputBoxAddInput = vi
+            rollupsWagmi.useSimulateInputBoxAddInput = vi
                 .fn()
                 .mockImplementation(mockedHook);
 
@@ -363,8 +368,11 @@ describe("Rollups RawInputForm", () => {
             });
 
             expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                enabled: true,
+                args: ["0x0000000000000000000000000000000000000000", hexValue],
+                value: undefined,
+                query: {
+                    enabled: false,
+                },
             });
         });
     });

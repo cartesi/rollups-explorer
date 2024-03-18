@@ -15,9 +15,7 @@ describe("Rollups SummaryCard", () => {
     });
 
     it("should display icon when defined", () => {
-        const { container } = render(
-            <SummaryCardE title="Applications" value={10} icon={TbUser} />,
-        );
+        render(<SummaryCardE title="Applications" value={10} icon={TbUser} />);
         expect(
             screen.getByTestId("summary-card-applications-icon"),
         ).toBeInTheDocument();
