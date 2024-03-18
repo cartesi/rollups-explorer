@@ -7,12 +7,7 @@ import UserApplicationsRow from "./userApplicationsRow";
 const UserApplicationsTable: FC<ApplicationsTableProps> = (props) => {
     const { applications, fetching, totalCount } = props;
     return (
-        <Box
-            h={"40vh"}
-            style={{
-                overflowY: "scroll",
-            }}
-        >
+        <Box>
             <Table>
                 <Table.Thead>
                     <Table.Tr>
