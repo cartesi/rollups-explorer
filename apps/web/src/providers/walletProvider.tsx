@@ -34,7 +34,7 @@ const connectorsForWalletsParameters = {
 const { wallets } = getDefaultWallets(connectorsForWalletsParameters);
 
 const appInfo = {
-    appName: "CartesiScan",
+    appName: connectorsForWalletsParameters.appName,
     learnMoreUrl: "https://cartesiscan.io",
 };
 
