@@ -93,9 +93,11 @@ type AvailableContentAsSet = (value: State) => Set<SupportedContent>;
 
 const availableContentAsSet: AvailableContentAsSet = pipe(
     prop("availableContent"),
-    // @ts-ignore
-    keys,
-    memoizeWith(join("/"), (keys) => new Set(keys as SupportedContent[])),
+    keys as (a: unknown) => unknown,
+    memoizeWith(
+        join("/") as (a: unknown) => string,
+        (keys) => new Set(keys as SupportedContent[]),
+    ),
 );
 
 export const useDefinedContentSet = () => {
