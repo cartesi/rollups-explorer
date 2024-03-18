@@ -1,4 +1,5 @@
 "use client";
+import { ReactNode } from "react";
 import { useMantineColorScheme } from "@mantine/core";
 import {
     AvatarComponent,
@@ -83,7 +84,7 @@ const wagmiConfig = createConfig({
 
 const queryClient = new QueryClient();
 
-const WalletProvider = ({ children }: { children: React.ReactNode }) => {
+const WalletProvider = ({ children }: { children: ReactNode }) => {
     const scheme = useMantineColorScheme();
 
     // XXX: make this match the mantine theme

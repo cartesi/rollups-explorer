@@ -251,12 +251,12 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     );    
 
     useEffect(() => {
-        if (depositWait.status === "success") {
+        if (depositWait.isSuccess) {
             form.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.status, onSearchApplications]);
+    }, [depositWait.isSuccess, onSearchApplications]);
 
     return (
         <form data-testid="erc20-deposit-form">

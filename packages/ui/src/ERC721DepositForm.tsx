@@ -233,7 +233,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     }, [tokensOfOwnerByIndex]);
 
     useEffect(() => {
-        if (depositWait.status === "success") {
+        if (depositWait.isSuccess) {
             setDepositedTokens((tokens) => [
                 ...tokens,
                 tokenIdBigInt as bigint,
@@ -245,7 +245,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.status, tokenIdBigInt, onDeposit, onSearchApplications]);
+    }, [depositWait.isSuccess, tokenIdBigInt, onDeposit, onSearchApplications]);
 
     return (
         <form data-testid="erc721-deposit-form">
