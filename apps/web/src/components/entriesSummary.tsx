@@ -12,7 +12,7 @@ const EntriesSummary: FC = () => {
     const [{ data: stats }] = useStatsQuery();
     const [{ data: applicationsOwned }] = useStatsApplicationsOwnerQuery({
         variables: {
-            applicationId: address?.toLowerCase(),
+            ownerAddress: address?.toLowerCase(),
         },
         pause: !isConnected,
     });
