@@ -11,7 +11,7 @@ const Component = withMantineTheme(LatestEntriesTable);
 const defaultProps: LatestEntriesTableProps = {
     entries: [
         {
-            appId: "0xDB84080e7d2b4654a7e384de851a6cf7281643de",
+            appId: "0x0974cc873df893b302f6be7ecf4f9d4b1a15c366",
             timestamp: 1700593992,
             href: "/inputs/0xdb84080e7d2b4654a7e384de851a6cf7281643de",
         },
@@ -71,7 +71,7 @@ describe("LatestEntriesTable component", () => {
     it("should display shortened application address", () => {
         render(<Component {...defaultProps} />);
         const [entry] = defaultProps.entries;
-        const appId = entry.appId;
+        const appId = getAddress(entry.appId);
         const shortenedId = `${appId.slice(0, 8)}...${appId.slice(-6)}`;
 
         expect(screen.getByText(shortenedId)).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("LatestEntriesTable component", () => {
     it("should wrap application address in a link", () => {
         render(<Component {...defaultProps} />);
         const [entry] = defaultProps.entries;
-        const appId = entry.appId;
+        const appId = getAddress(entry.appId);
         const shortenedId = `${appId.slice(0, 8)}...${appId.slice(-6)}`;
 
         const link = screen.getByText(shortenedId)

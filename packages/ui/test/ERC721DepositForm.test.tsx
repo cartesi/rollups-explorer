@@ -1,32 +1,44 @@
 import { describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { ERC721DepositForm } from "../src/ERC721DepositForm";
+import { cleanup, render, renderHook, screen } from "@testing-library/react";
+import {
+    ERC721DepositForm,
+    useTokensOfOwnerByIndex,
+} from "../src/ERC721DepositForm";
+import { Address } from "viem";
 import { withMantineTheme } from "./utils/WithMantineTheme";
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import {
-    useErc721Approve,
-    useErc721PortalDepositErc721Token,
-    usePrepareErc721Approve,
-    usePrepareErc721PortalDepositErc721Token,
+    useAccount,
+    useReadContracts,
+    useWaitForTransactionReceipt,
+} from "wagmi";
+import {
+    useSimulateErc721Approve,
+    useSimulateErc721PortalDepositErc721Token,
+    useWriteErc721Approve,
+    useWriteErc721PortalDepositErc721Token,
 } from "@cartesi/rollups-wagmi";
 import { getAddress } from "viem";
 
 vi.mock("@cartesi/rollups-wagmi");
-const mockUsePrepareErc721Approve = vi.mocked(usePrepareErc721Approve, true);
-const mockUseErc721Approve = vi.mocked(useErc721Approve, true);
-const mockUsePrepareErc721PortalDepositErc721Token = vi.mocked(
-    usePrepareErc721PortalDepositErc721Token,
+const useSimulateErc721ApproveMock = vi.mocked(useSimulateErc721Approve, true);
+const useWriteErc721ApproveMock = vi.mocked(useWriteErc721Approve, true);
+const useSimulateErc721PortalDepositErc721TokenMock = vi.mocked(
+    useSimulateErc721PortalDepositErc721Token,
     true,
 );
-const mockUseErc721PortalDepositErc721Token = vi.mocked(
-    useErc721PortalDepositErc721Token,
+const useWriteErc721PortalDepositErc721TokenMock = vi.mocked(
+    useWriteErc721PortalDepositErc721Token,
     true,
 );
 
 vi.mock("wagmi");
-const mockUseContractReads = vi.mocked(useContractReads, true);
-const mockUseAccount = vi.mocked(useAccount, true);
-const mockUseWaitForTransaction = vi.mocked(useWaitForTransaction, true);
+const useReadContractsMock = vi.mocked(useReadContracts, true);
+const useAccountMock = vi.mocked(useAccount, true);
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    true,
+);
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -43,6 +55,9 @@ vi.mock("@mantine/form", async () => {
         useForm: (actual as any).useForm,
     };
 });
+vi.mock("../src/hooks/useWatchQueryOnBlockChange", () => ({
+    default: () => undefined,
+}));
 
 const Component = withMantineTheme(ERC721DepositForm);
 const defaultProps = {
@@ -58,21 +73,22 @@ const defaultProps = {
 
 describe("ERC721DepositForm", () => {
     beforeEach(() => {
-        mockUsePrepareErc721Approve.mockReturnValue({ config: {} } as any);
-        mockUseErc721Approve.mockReturnValue({
-            data: {},
+        useSimulateErc721ApproveMock.mockReturnValue({ config: {} } as any);
+        useWriteErc721ApproveMock.mockReturnValue({
             wait: vi.fn(),
             reset: vi.fn(),
         } as any);
-        mockUsePrepareErc721PortalDepositErc721Token.mockReturnValue({
+        useSimulateErc721PortalDepositErc721TokenMock.mockReturnValue({
+            data: {
+                request: {},
+            },
             config: {},
         } as any);
-        mockUseErc721PortalDepositErc721Token.mockReturnValue({
-            data: {},
+        useWriteErc721PortalDepositErc721TokenMock.mockReturnValue({
             wait: vi.fn(),
             reset: vi.fn(),
         } as any);
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [
@@ -86,15 +102,201 @@ describe("ERC721DepositForm", () => {
                 },
             ],
         } as any);
-        mockUseAccount.mockReturnValue({
+        useAccountMock.mockReturnValue({
             address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
         } as any);
-        mockUseWaitForTransaction.mockReturnValue({} as any);
+        useWaitForTransactionReceiptMock.mockReturnValue({} as any);
     });
 
     afterEach(() => {
         vi.clearAllMocks();
         cleanup();
+    });
+
+    describe("useTokensOfOwnerByIndex hook", () => {
+        it('should return an empty list with token ids when "erc721ContractAddress" is undefined', () => {
+            const [address] = defaultProps.applications;
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    undefined as unknown as Address,
+                    address as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(0);
+        });
+
+        it('should return an empty list with token ids when "ownerAddress" are undefined', () => {
+            const [erc721ContractAddress] = contracts;
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    undefined as unknown as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(0);
+        });
+
+        it("should return a list with one token id when data for token ids contain only one entry", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+
+            useReadContractsMock.mockReturnValue({
+                isLoading: false,
+                isSuccess: true,
+                data: [
+                    {
+                        result: 1n,
+                        status: "success",
+                    },
+                ],
+            } as any);
+
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(1);
+            expect(result.current.tokenIds[0]).toBe(1n);
+        });
+
+        it("should return a list with multiple token id when data for token ids contain multiple entries", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+            const data = [
+                {
+                    result: 1n,
+                    status: "success",
+                },
+                {
+                    result: 2n,
+                    status: "success",
+                },
+                {
+                    result: 3n,
+                    status: "success",
+                },
+            ];
+
+            const implementation = (config: any) => {
+                const [contractData] = config.contracts;
+                return {
+                    isLoading: false,
+                    isSuccess: true,
+                    data: [data[Number(contractData.args[1])]],
+                };
+            };
+            useReadContractsMock.mockImplementation(implementation as any);
+
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(data.length);
+
+            data.forEach((entry, entryIndex) => {
+                expect(entry.result).toBe(result.current.tokenIds[entryIndex]);
+            });
+        });
+
+        it("should return a filtered list with token ids excluding already deposited tokens", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+            const data = [
+                {
+                    result: 1n,
+                    status: "success",
+                },
+                {
+                    result: 2n,
+                    status: "success",
+                },
+                {
+                    result: 3n,
+                    status: "success",
+                },
+            ];
+
+            const implementation = (config: any) => {
+                const [contractData] = config.contracts;
+                return {
+                    isLoading: false,
+                    isSuccess: true,
+                    data: [data[Number(contractData.args[1])]],
+                };
+            };
+            useReadContractsMock.mockImplementation(implementation as any);
+
+            const depositedToken = 1n;
+            const depositedTokens = [depositedToken];
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                    depositedTokens,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(data.length - 1);
+            expect(
+                result.current.tokenIds.find(
+                    (tokenId) => tokenId === depositedToken,
+                ),
+            ).toBe(undefined);
+        });
+
+        it("should return an empty list when data for token ids contains no entries", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+
+            useReadContractsMock.mockReturnValue({
+                isLoading: false,
+                isSuccess: true,
+                data: [],
+            } as any);
+
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(0);
+        });
+
+        it("should return an empty list when 'tokenOfOwnerByIndex' is unavailable", () => {
+            const [erc721ContractAddress] = contracts;
+            const [address] = defaultProps.applications;
+
+            useReadContractsMock.mockReturnValue({
+                isLoading: false,
+                isSuccess: true,
+                data: [
+                    {
+                        result: undefined,
+                        status: "failure",
+                        error: {},
+                    },
+                ],
+            } as any);
+
+            const { result } = renderHook(() =>
+                useTokensOfOwnerByIndex(
+                    erc721ContractAddress as Address,
+                    address as Address,
+                ),
+            );
+
+            expect(result.current.tokenIds.length).toBe(0);
+        });
     });
 
     describe("ERC721DepositForm component", () => {
@@ -156,7 +358,7 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
             render(<Component {...defaultProps} />);
 
             expect(
@@ -226,7 +428,7 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
 
             render(<Component {...defaultProps} />);
             expect(screen.getByTestId("token-id-select")).toBeInTheDocument();
@@ -263,16 +465,16 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
             expect(screen.getByTestId("token-id-input")).toBeInTheDocument();
         });
 
         it("should invoke onSearchApplications function after successful deposit", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             const onSearchApplicationsMock = vi.fn();
@@ -314,10 +516,10 @@ describe("ERC721DepositForm", () => {
 
         it("should invoke onDeposit callback after successful deposit", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             const onDepositMock = vi.fn();
