@@ -5,6 +5,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
+import { useQueryParams } from "../../hooks/useQueryParams";
 import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
@@ -19,7 +20,8 @@ const Inputs: FC<InputsProps> = ({
     orderBy = InputOrderByInput.TimestampDesc,
     applicationId,
 }) => {
-    const [query, setQuery] = useState("");
+    const { query: urlQuery } = useQueryParams();
+    const [query, setQuery] = useState(urlQuery);
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();

@@ -2,9 +2,9 @@
 
 import { Loader, Table } from "@mantine/core";
 import { FC } from "react";
-import ApplicationRow from "./applicationRow";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { Application } from "../../graphql/explorer/types";
+import ApplicationRow from "./applicationRow";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -34,7 +34,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                 ) : (
                     totalCount === 0 && (
                         <Table.Tr>
-                            <Table.Td colSpan={3} align="center">
+                            <Table.Td colSpan={3} align="center" fw={700}>
                                 No applications
                             </Table.Td>
                         </Table.Tr>

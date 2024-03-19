@@ -1,9 +1,9 @@
 "use client";
 import { Button, Loader, Table, Text } from "@mantine/core";
-import { FC, useCallback, useState } from "react";
-import Address from "./address";
 import type { Address as AddressType } from "abitype/dist/types/abi";
 import prettyMilliseconds from "pretty-ms";
+import { FC, useCallback, useState } from "react";
+import Address from "./address";
 
 export interface Entry {
     appId: AddressType;
@@ -54,8 +54,8 @@ const LatestEntriesTable: FC<LatestEntriesTableProps> = ({
                 ) : (
                     totalCount === 0 && (
                         <Table.Tr>
-                            <Table.Td colSpan={3} align="center">
-                                No inputs
+                            <Table.Td colSpan={3} align="center" fw={700}>
+                                No entries
                             </Table.Td>
                         </Table.Tr>
                     )
