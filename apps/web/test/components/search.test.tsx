@@ -69,7 +69,20 @@ describe("Search Component", () => {
             },
         );
     });
+    it("should have the same value between query and keyword", async () => {
+        const mockedUpdateParams = vi.fn();
+        const initialQuery = "0x872";
 
+        useQueryParamsMock.mockReturnValue({
+            query: initialQuery,
+            updateQueryParams: mockedUpdateParams,
+        });
+        render(<Component {...defaultProps} />);
+        const searchInput = screen.getByTestId(
+            "search-input",
+        ) as HTMLInputElement;
+        expect(searchInput.value).toBe(initialQuery);
+    });
     it("should call updateQueryParams hooks when input change", async () => {
         const mockedUpdateParams = vi.fn();
 
