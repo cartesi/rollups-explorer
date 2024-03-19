@@ -1,10 +1,10 @@
-import { describe, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import prettyMilliseconds from "pretty-ms";
+import { describe, it } from "vitest";
 import LatestEntriesTable, {
     LatestEntriesTableProps,
 } from "../../src/components/latestEntriesTable";
 import { withMantineTheme } from "../utils/WithMantineTheme";
-import prettyMilliseconds from "pretty-ms";
 
 const Component = withMantineTheme(LatestEntriesTable);
 
@@ -42,7 +42,7 @@ describe("LatestEntriesTable component", () => {
 
     it("should display correct label when no entries are fetched", () => {
         render(<Component entries={[]} fetching={false} totalCount={0} />);
-        expect(screen.getByText("No inputs")).toBeInTheDocument();
+        expect(screen.getByText("No entries")).toBeInTheDocument();
     });
 
     it("should display correct age", () => {
