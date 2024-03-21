@@ -27,6 +27,7 @@
     "dependencies": {
         "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.5.0",
+        "@mantine/form": "^7.5.0",
         "@mantine/hooks": "^7.5.0",
         "@react-spring/web": "^9.7.3",
         "ramda": "^0.29.0",
@@ -36,6 +37,7 @@
     },
     "peerDependencies": {
         "@mantine/core": "^7.0.0",
+        "@mantine/form": "^7.0.0",
         "@mantine/hooks": "^7.0.0"
     },
     "devDependencies": {
