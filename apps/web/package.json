@@ -16,9 +16,9 @@
     "dependencies": {
         "@cartesi/rollups-explorer-ui": "*",
         "@cartesi/rollups-wagmi": "*",
-        "@mantine/core": "^7.5.0",
-        "@mantine/form": "^7.5.0",
-        "@mantine/hooks": "^7.5.0",
+        "@mantine/core": "^7.6.1",
+        "@mantine/form": "^7.6.1",
+        "@mantine/hooks": "^7.6.1",
         "@mantine/notifications": "^7.5.0",
         "@rainbow-me/rainbowkit": "2",
         "@react-spring/web": "^9.7.3",
