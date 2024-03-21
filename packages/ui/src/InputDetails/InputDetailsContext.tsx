@@ -63,7 +63,6 @@ const InputDetailsContext = createContext<ContextProps>({
 
 const getOnlySupportedContent = (dict: OptionalContents) => {
     const supportedTypes = map(prop("type"), SUPPORTED_TABS);
-    //@ts-ignore
     return pick(supportedTypes, dict);
 };
 
@@ -93,11 +92,8 @@ type AvailableContentAsSet = (value: State) => Set<SupportedContent>;
 
 const availableContentAsSet: AvailableContentAsSet = pipe(
     prop("availableContent"),
-    keys as (a: unknown) => unknown,
-    memoizeWith(
-        join("/") as (a: unknown) => string,
-        (keys) => new Set(keys as SupportedContent[]),
-    ),
+    keys<OptionalContents>,
+    memoizeWith(join("/"), (keys) => new Set(keys as SupportedContent[])),
 );
 
 export const useDefinedContentSet = () => {
