@@ -1,12 +1,13 @@
 import {
     AppShell,
+    Card,
     DEFAULT_THEME,
     List,
     MantineThemeOverride,
     Modal,
-    Card,
+    Paper,
     createTheme,
-    mergeMantineTheme,
+    mergeMantineTheme
 } from "@mantine/core";
 
 const themeOverride: MantineThemeOverride = createTheme({
@@ -51,6 +52,11 @@ const themeOverride: MantineThemeOverride = createTheme({
                 withBorder: true,
             },
         }),
+        Paper: Paper.extend( {
+            defaultProps: {
+                shadow: 'xs',           
+            }
+        })
     },
 });
 
