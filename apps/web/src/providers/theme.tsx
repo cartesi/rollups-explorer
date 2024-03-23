@@ -7,7 +7,7 @@ import {
     Modal,
     Paper,
     createTheme,
-    mergeMantineTheme
+    mergeMantineTheme,
 } from "@mantine/core";
 
 const themeOverride: MantineThemeOverride = createTheme({
@@ -52,11 +52,11 @@ const themeOverride: MantineThemeOverride = createTheme({
                 withBorder: true,
             },
         }),
-        Paper: Paper.extend( {
+        Paper: Paper.extend({
             defaultProps: {
-                shadow: 'xs',           
-            }
-        })
+                shadow: "xs",
+            },
+        }),
     },
 });
 
