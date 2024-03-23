@@ -2,23 +2,30 @@ import { useErc1155BalanceOf, useErc1155Uri } from "@cartesi/rollups-wagmi";
 import {
     Accordion,
     Avatar,
-    Box,
     Button,
     Collapse,
+    DefaultMantineColor,
     Flex,
     Group,
     JsonInput,
     Loader,
+    Notification,
     NumberFormatter,
     NumberInput,
-    Paper,
     Stack,
     Text,
     TextInput,
 } from "@mantine/core";
-import { allPass, complement, equals, hasPath, or, pathOr } from "ramda";
+import {
+    allPass,
+    complement,
+    equals,
+    hasPath,
+    isNotNil,
+    or,
+    pathOr,
+} from "ramda";
 import { FC } from "react";
-import { TbBraces } from "react-icons/tb";
 import { zeroAddress } from "viem";
 import { useFormContext } from "./context";
 import {
@@ -41,82 +48,88 @@ const hasResult = allPass([notFetching, notIdle]);
 interface MetadataViewProps {
     tokenMetadata: TokenMetadataResult;
 }
+interface MessageProps {
+    color?: DefaultMantineColor;
+    title: string;
+    content?: string;
+}
 
-const testJSON = {
-    name: "Stoic Sellsword",
-    description:
-        "There are those who would laugh at bringing a sword to a gun fight. This guy doesn’t seem worried about it.",
-    external_url:
-        "https://rarible.com/token/0x76be3b62873462d2142405439777e971754e8e77:10789",
-    token_id: 10789,
-    attributes: [
-        {
-            key: "Rarity",
-            trait_type: "Rarity",
-            value: "Common",
-        },
-        {
-            key: "Class",
-            trait_type: "Class",
-            value: "First Edition",
-        },
-        {
-            key: "Parallel",
-            trait_type: "Parallel",
-            value: "Universal",
-        },
-        {
-            key: "Artist",
-            trait_type: "Artist",
-            value: "Sasha Vinogradova",
-        },
-    ],
-    image: "https://nftmedia.parallelnft.com/parallel-alpha/QmeHU52dkiMo7ExfPJrd6Av23pjn8zMTBktDtzXUYj1PFz/image.png",
+const Message: FC<MessageProps> = ({ title, content, color }) => {
+    return (
+        <Notification
+            color={color ?? "blue"}
+            title={title}
+            withCloseButton={false}
+        >
+            {content && <Text size="xs">{content}</Text>}
+        </Notification>
+    );
+};
+
+/**
+ * Messages to display based on the State
+ * in the token-metadata-result. Tracking only the ones of interest.
+ */
+const feedbackByState: Partial<Record<State, string>> = {
+    http_network_error:
+        "We could not fetch the data. It may be due to a CORS problem or unavailability.",
+    not_http: "The URI is valid, but it is not an HTTP protocol.",
+    errored: "Something is wrong with the URI returned by the contract.",
 } as const;
 
 const MetadataView: FC<MetadataViewProps> = ({ tokenMetadata }) => {
-    return (
-        <Paper withBorder p="md">
-            <Group wrap="nowrap">
-                <Avatar
-                    src="https://nftmedia.parallelnft.com/parallel-alpha/QmeHU52dkiMo7ExfPJrd6Av23pjn8zMTBktDtzXUYj1PFz/image.png"
-                    radius="xl"
-                    size="lg"
-                />
-                <div>
-                    <Text>Stoic Sellsword</Text>
-                    <Text size="sm" c="dimmed" fw={400}>
-                        There are those who would laugh at bringing a sword to a
-                        gun fight. This guy doesn’t seem worried about it.
-                    </Text>
-                </div>
-            </Group>
+    const { state, url, data } = tokenMetadata;
+    const message = feedbackByState[state];
+    const name = pathOr("", ["name"], data);
+    const description = pathOr("", ["description"], data);
+    const image = pathOr("", ["image"], data);
 
-            <Accordion chevronPosition="right" variant="contained" py="sm">
-                <Accordion.Item
-                    key={tokenMetadata.state}
-                    value={tokenMetadata.state}
-                >
-                    <Accordion.Control>
-                        <Flex direction="row" align="center" gap="xs">
-                            <Box component={TbBraces} mb={1} />
-                            <Text component="span" lh={0}>
-                                Metadata
-                            </Text>
-                        </Flex>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <JsonInput
-                            autosize
-                            maxRows={10}
-                            readOnly
-                            contentEditable={false}
-                            value={JSON.stringify(testJSON, null, " ")}
-                        />
-                    </Accordion.Panel>
-                </Accordion.Item>
-            </Accordion>
-        </Paper>
+    return (
+        <>
+            {isNotNil(message) && (
+                <Message
+                    title={message}
+                    content={or(url, "URI is not defined.")}
+                />
+            )}
+
+            {state === "success" && (
+                <Accordion chevronPosition="right" variant="contained" py="sm">
+                    <Accordion.Item
+                        key={tokenMetadata.state}
+                        value={tokenMetadata.state}
+                    >
+                        <Accordion.Control>
+                            <Group wrap="nowrap">
+                                <Avatar src={image} radius="xl" size="lg">
+                                    {name ?? "TK"}
+                                </Avatar>
+                                <div>
+                                    <Text>{name}</Text>
+                                    <Text
+                                        size="sm"
+                                        c="dimmed"
+                                        fw={400}
+                                        lineClamp={2}
+                                    >
+                                        {description}
+                                    </Text>
+                                </div>
+                            </Group>
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                            <JsonInput
+                                autosize
+                                maxRows={10}
+                                readOnly
+                                contentEditable={false}
+                                value={JSON.stringify(data, null, " ")}
+                            />
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
+            )}
+        </>
     );
 };
 
@@ -137,8 +150,6 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
     const decimals = pathOr(0, ["decimals"], metadataResult.data);
     const name = pathOr("", ["name"], metadataResult.data);
     const symbol = pathOr("", ["symbol"], metadataResult.data);
-
-    console.log(metadataResult);
 
     return (
         <Collapse in={display}>
@@ -172,11 +183,14 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
                     placeholder="0"
                     withAsterisk
                     data-testid="amount-input"
+                    rightSectionProps={{
+                        style: { width: "auto", paddingRight: "0.5rem" },
+                    }}
                     rightSection={
                         metadataResult.state === "fetching" ? (
                             <Loader size="xs" />
                         ) : (
-                            symbol || name
+                            <Text> {symbol || name} </Text>
                         )
                     }
                     {...form.getInputProps("amount")}
@@ -189,7 +203,7 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
                             justify={"space-between"}
                             direction={"row"}
                         >
-                            <Flex rowGap={6} c={"dark.2"} align="flex-start">
+                            <Flex rowGap={6} c={"dimmed"} align="flex-start">
                                 <Text fz="xs">Balance:</Text>
                                 <Text id="token-balance" fz="xs" mx={4}>
                                     {isCheckingBalance
@@ -224,11 +238,11 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
                                 Decimals: {decimals}
                             </Text>
                         </Flex>
-                        <Stack>
-                            <MetadataView tokenMetadata={metadataResult} />
-                        </Stack>
                     </>
                 )}
+                <Stack>
+                    <MetadataView tokenMetadata={metadataResult} />
+                </Stack>
             </Stack>
         </Collapse>
     );

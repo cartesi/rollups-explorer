@@ -74,9 +74,13 @@ const fetchMetadata = async (
 
     return fetch(result.url, { signal })
         .then(async (r) => {
-            if (r.ok)
+            if (r.ok) {
                 return r.json().then((data: Record<string, any>) => ({ data }));
-            return { error: new Error(r.statusText) };
+            }
+            const errorMessage = await r
+                .text()
+                .catch(() => `Status: ${r.status}`);
+            return { error: new Error(errorMessage) };
         })
         .catch((e: Error) => ({ error: e }));
 };
@@ -116,12 +120,16 @@ export const useGetTokenMetadata: UseGetTokenMetadata = (uri, id) => {
     });
 
     useEffect(() => {
+        if (isNil(uri) || isNil(id)) {
+            setResult(() => ({ state: "idle" }));
+            return;
+        }
+
         const update = async (uri: string, id: bigint, signal: AbortSignal) => {
             const urlResult = prepareUrl(uri, id);
             const fetchResult = await fetchMetadata(urlResult, signal);
 
             if (isNil(fetchResult.error)) {
-                // we try the wire next time.
                 setCache((cache) => {
                     cache[uri + id] = result;
                     return cache;
