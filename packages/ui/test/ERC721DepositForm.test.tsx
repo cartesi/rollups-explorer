@@ -1,32 +1,39 @@
 import { describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { ERC721DepositForm } from "../src/ERC721DepositForm";
 import { withMantineTheme } from "./utils/WithMantineTheme";
-import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import {
-    useErc721Approve,
-    useErc721PortalDepositErc721Token,
-    usePrepareErc721Approve,
-    usePrepareErc721PortalDepositErc721Token,
+    useAccount,
+    useReadContracts,
+    useWaitForTransactionReceipt,
+} from "wagmi";
+import {
+    useSimulateErc721Approve,
+    useSimulateErc721PortalDepositErc721Token,
+    useWriteErc721Approve,
+    useWriteErc721PortalDepositErc721Token,
 } from "@cartesi/rollups-wagmi";
 import { getAddress } from "viem";
 
 vi.mock("@cartesi/rollups-wagmi");
-const mockUsePrepareErc721Approve = vi.mocked(usePrepareErc721Approve, true);
-const mockUseErc721Approve = vi.mocked(useErc721Approve, true);
-const mockUsePrepareErc721PortalDepositErc721Token = vi.mocked(
-    usePrepareErc721PortalDepositErc721Token,
+const useSimulateErc721ApproveMock = vi.mocked(useSimulateErc721Approve, true);
+const useWriteErc721ApproveMock = vi.mocked(useWriteErc721Approve, true);
+const useSimulateErc721PortalDepositErc721TokenMock = vi.mocked(
+    useSimulateErc721PortalDepositErc721Token,
     true,
 );
-const mockUseErc721PortalDepositErc721Token = vi.mocked(
-    useErc721PortalDepositErc721Token,
+const useWriteErc721PortalDepositErc721TokenMock = vi.mocked(
+    useWriteErc721PortalDepositErc721Token,
     true,
 );
 
 vi.mock("wagmi");
-const mockUseContractReads = vi.mocked(useContractReads, true);
-const mockUseAccount = vi.mocked(useAccount, true);
-const mockUseWaitForTransaction = vi.mocked(useWaitForTransaction, true);
+const useReadContractsMock = vi.mocked(useReadContracts, true);
+const useAccountMock = vi.mocked(useAccount, true);
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    true,
+);
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -43,6 +50,9 @@ vi.mock("@mantine/form", async () => {
         useForm: (actual as any).useForm,
     };
 });
+vi.mock("../src/hooks/useWatchQueryOnBlockChange", () => ({
+    default: () => undefined,
+}));
 
 const Component = withMantineTheme(ERC721DepositForm);
 const defaultProps = {
@@ -58,21 +68,22 @@ const defaultProps = {
 
 describe("ERC721DepositForm", () => {
     beforeEach(() => {
-        mockUsePrepareErc721Approve.mockReturnValue({ config: {} } as any);
-        mockUseErc721Approve.mockReturnValue({
-            data: {},
+        useSimulateErc721ApproveMock.mockReturnValue({ config: {} } as any);
+        useWriteErc721ApproveMock.mockReturnValue({
             wait: vi.fn(),
             reset: vi.fn(),
         } as any);
-        mockUsePrepareErc721PortalDepositErc721Token.mockReturnValue({
+        useSimulateErc721PortalDepositErc721TokenMock.mockReturnValue({
+            data: {
+                request: {},
+            },
             config: {},
         } as any);
-        mockUseErc721PortalDepositErc721Token.mockReturnValue({
-            data: {},
+        useWriteErc721PortalDepositErc721TokenMock.mockReturnValue({
             wait: vi.fn(),
             reset: vi.fn(),
         } as any);
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [
@@ -86,10 +97,10 @@ describe("ERC721DepositForm", () => {
                 },
             ],
         } as any);
-        mockUseAccount.mockReturnValue({
+        useAccountMock.mockReturnValue({
             address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
         } as any);
-        mockUseWaitForTransaction.mockReturnValue({} as any);
+        useWaitForTransactionReceiptMock.mockReturnValue({} as any);
     });
 
     afterEach(() => {
@@ -156,7 +167,7 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
             render(<Component {...defaultProps} />);
 
             expect(
@@ -226,7 +237,7 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
 
             render(<Component {...defaultProps} />);
             expect(screen.getByTestId("token-id-select")).toBeInTheDocument();
@@ -263,16 +274,16 @@ describe("ERC721DepositForm", () => {
                           ],
                       };
             };
-            mockUseContractReads.mockImplementation(implementation as any);
+            useReadContractsMock.mockImplementation(implementation as any);
             expect(screen.getByTestId("token-id-input")).toBeInTheDocument();
         });
 
         it("should invoke onSearchApplications function after successful deposit", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             const onSearchApplicationsMock = vi.fn();
@@ -286,25 +297,23 @@ describe("ERC721DepositForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it("should invoke approve.reset and deposit.reset functions after successful deposit", async () => {
+        it("should invoke approve.reset and deposit.reset functions after successful deposit", () => {
             const approveResetMock = vi.fn();
-            mockUseErc721Approve.mockReturnValue({
+            useWriteErc721ApproveMock.mockReturnValue({
                 data: {},
                 wait: vi.fn(),
                 reset: approveResetMock,
             } as any);
             const depositResetMock = vi.fn();
-            mockUseErc721PortalDepositErc721Token.mockReturnValue({
+            useWriteErc721PortalDepositErc721TokenMock.mockReturnValue({
                 data: {},
                 wait: vi.fn(),
                 reset: depositResetMock,
             } as any);
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
-                status: "success",
-            });
+                isSuccess: true,
+            } as any);
 
             render(<Component {...defaultProps} />);
 
@@ -314,10 +323,10 @@ describe("ERC721DepositForm", () => {
 
         it("should invoke onDeposit callback after successful deposit", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             const onDepositMock = vi.fn();
@@ -342,16 +351,15 @@ describe("ERC721DepositForm", () => {
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
 
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format address", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareErc721PortalDepositErc721Token,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareErc721PortalDepositErc721Token = vi
-                .fn()
-                .mockImplementation(mockedHook);
+
+            useSimulateErc721PortalDepositErc721TokenMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -371,12 +379,14 @@ describe("ERC721DepositForm", () => {
                     "0x",
                     "0x",
                 ],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
         });
 
         it("should not initially show token id input/select", () => {
-            mockUseContractReads.mockReturnValue({
+            useReadContractsMock.mockReturnValue({
                 isLoading: false,
                 isSuccess: false,
                 data: undefined,
@@ -393,16 +403,15 @@ describe("ERC721DepositForm", () => {
             expect(collapse).toBeInTheDocument();
         });
 
-        it("should correctly format base and extra layer data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format base and extra layer data", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareErc721PortalDepositErc721Token,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareErc721PortalDepositErc721Token = vi
-                .fn()
-                .mockImplementation(mockedHook);
+
+            useSimulateErc721PortalDepositErc721TokenMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const textareas = container.querySelectorAll("textarea");
@@ -429,7 +438,9 @@ describe("ERC721DepositForm", () => {
                     hexValue,
                     hexValue,
                 ],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
         });
     });
@@ -451,12 +462,10 @@ describe("ERC721DepositForm", () => {
                 reset: resetMock,
             } as any);
 
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
-                status: "success",
-            });
+                isSuccess: true,
+            } as any);
 
             render(<Component {...defaultProps} />);
             expect(resetMock).toHaveBeenCalled();

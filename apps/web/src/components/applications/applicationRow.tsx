@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import { ActionIcon, Table, Tooltip } from "@mantine/core";
+import { Address as AddressType } from "viem";
 import Address from "../address";
 import Link from "next/link";
 import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
@@ -18,7 +19,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
         showConnectionModal,
         removeConnection,
     } = useConnectionConfig();
-    const appId = application.id as Address;
+    const appId = application.id as AddressType;
     const connection = getConnection(appId);
 
     return (
@@ -29,7 +30,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
             <Table.Td>
                 {application.owner ? (
                     <Address
-                        value={application.owner as Address}
+                        value={application.owner as AddressType}
                         icon
                         shorten
                     />

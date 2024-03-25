@@ -1,9 +1,11 @@
-import { Address, useContractReads } from "wagmi";
+import { useReadContracts } from "wagmi";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { erc721ABI } from "@cartesi/rollups-wagmi";
+import { Address } from "viem";
+import { erc721Abi } from "@cartesi/rollups-wagmi";
+import useWatchQueryOnBlockChange from "./useWatchQueryOnBlockChange";
 
 const erc721AbiEnumerable = [
-    ...erc721ABI,
+    ...erc721Abi,
     {
         stateMutability: "view",
         type: "function",
@@ -37,7 +39,7 @@ export default function useTokensOfOwnerByIndex(
     const [fetching, setFetching] = useState(true);
     const lastErc721ContractAddress = useRef(erc721ContractAddress);
     const lastOwnerAddress = useRef(ownerAddress);
-    const erc721 = useContractReads({
+    const erc721 = useReadContracts({
         contracts: [
             {
                 abi: erc721AbiEnumerable,
@@ -46,11 +48,15 @@ export default function useTokensOfOwnerByIndex(
                 args: [ownerAddress!, BigInt(index)],
             },
         ],
-        enabled:
-            erc721ContractAddress?.toString() !== "" &&
-            ownerAddress?.toString() !== "",
-        watch: true,
+        query: {
+            enabled:
+                erc721ContractAddress?.toString() !== "" &&
+                ownerAddress?.toString() !== "",
+        },
     });
+
+    useWatchQueryOnBlockChange(erc721.queryKey);
+
     const tokenOfOwnerByIndex = erc721.data?.[0];
 
     const onChange = useCallback(() => {
