@@ -1,12 +1,7 @@
 import { describe, it } from "vitest";
-import { cleanup, render, renderHook, screen } from "@testing-library/react";
-import {
-    ERC721DepositForm,
-    useTokensOfOwnerByIndex,
-} from "../src/ERC721DepositForm";
-import { Address } from "viem";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { ERC721DepositForm } from "../src/ERC721DepositForm";
 import { withMantineTheme } from "./utils/WithMantineTheme";
-import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import {
     useAccount,
     useReadContracts,
@@ -111,192 +106,6 @@ describe("ERC721DepositForm", () => {
     afterEach(() => {
         vi.clearAllMocks();
         cleanup();
-    });
-
-    describe("useTokensOfOwnerByIndex hook", () => {
-        it('should return an empty list with token ids when "erc721ContractAddress" is undefined', () => {
-            const [address] = defaultProps.applications;
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    undefined as unknown as Address,
-                    address as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(0);
-        });
-
-        it('should return an empty list with token ids when "ownerAddress" are undefined', () => {
-            const [erc721ContractAddress] = contracts;
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    undefined as unknown as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(0);
-        });
-
-        it("should return a list with one token id when data for token ids contain only one entry", () => {
-            const [erc721ContractAddress] = contracts;
-            const [address] = defaultProps.applications;
-
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    {
-                        result: 1n,
-                        status: "success",
-                    },
-                ],
-            } as any);
-
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    address as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(1);
-            expect(result.current.tokenIds[0]).toBe(1n);
-        });
-
-        it("should return a list with multiple token id when data for token ids contain multiple entries", () => {
-            const [erc721ContractAddress] = contracts;
-            const [address] = defaultProps.applications;
-            const data = [
-                {
-                    result: 1n,
-                    status: "success",
-                },
-                {
-                    result: 2n,
-                    status: "success",
-                },
-                {
-                    result: 3n,
-                    status: "success",
-                },
-            ];
-
-            const implementation = (config: any) => {
-                const [contractData] = config.contracts;
-                return {
-                    isLoading: false,
-                    isSuccess: true,
-                    data: [data[Number(contractData.args[1])]],
-                };
-            };
-            useReadContractsMock.mockImplementation(implementation as any);
-
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    address as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(data.length);
-
-            data.forEach((entry, entryIndex) => {
-                expect(entry.result).toBe(result.current.tokenIds[entryIndex]);
-            });
-        });
-
-        it("should return a filtered list with token ids excluding already deposited tokens", () => {
-            const [erc721ContractAddress] = contracts;
-            const [address] = defaultProps.applications;
-            const data = [
-                {
-                    result: 1n,
-                    status: "success",
-                },
-                {
-                    result: 2n,
-                    status: "success",
-                },
-                {
-                    result: 3n,
-                    status: "success",
-                },
-            ];
-
-            const implementation = (config: any) => {
-                const [contractData] = config.contracts;
-                return {
-                    isLoading: false,
-                    isSuccess: true,
-                    data: [data[Number(contractData.args[1])]],
-                };
-            };
-            useReadContractsMock.mockImplementation(implementation as any);
-
-            const depositedToken = 1n;
-            const depositedTokens = [depositedToken];
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    address as Address,
-                    depositedTokens,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(data.length - 1);
-            expect(
-                result.current.tokenIds.find(
-                    (tokenId) => tokenId === depositedToken,
-                ),
-            ).toBe(undefined);
-        });
-
-        it("should return an empty list when data for token ids contains no entries", () => {
-            const [erc721ContractAddress] = contracts;
-            const [address] = defaultProps.applications;
-
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [],
-            } as any);
-
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    address as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(0);
-        });
-
-        it("should return an empty list when 'tokenOfOwnerByIndex' is unavailable", () => {
-            const [erc721ContractAddress] = contracts;
-            const [address] = defaultProps.applications;
-
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    {
-                        result: undefined,
-                        status: "failure",
-                        error: {},
-                    },
-                ],
-            } as any);
-
-            const { result } = renderHook(() =>
-                useTokensOfOwnerByIndex(
-                    erc721ContractAddress as Address,
-                    address as Address,
-                ),
-            );
-
-            expect(result.current.tokenIds.length).toBe(0);
-        });
     });
 
     describe("ERC721DepositForm component", () => {
@@ -488,25 +297,23 @@ describe("ERC721DepositForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it("should invoke approve.reset and deposit.reset functions after successful deposit", async () => {
+        it("should invoke approve.reset and deposit.reset functions after successful deposit", () => {
             const approveResetMock = vi.fn();
-            mockUseErc721Approve.mockReturnValue({
+            useWriteErc721ApproveMock.mockReturnValue({
                 data: {},
                 wait: vi.fn(),
                 reset: approveResetMock,
             } as any);
             const depositResetMock = vi.fn();
-            mockUseErc721PortalDepositErc721Token.mockReturnValue({
+            useWriteErc721PortalDepositErc721TokenMock.mockReturnValue({
                 data: {},
                 wait: vi.fn(),
                 reset: depositResetMock,
             } as any);
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
-                status: "success",
-            });
+                isSuccess: true,
+            } as any);
 
             render(<Component {...defaultProps} />);
 
@@ -544,16 +351,15 @@ describe("ERC721DepositForm", () => {
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
 
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format address", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareErc721PortalDepositErc721Token,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareErc721PortalDepositErc721Token = vi
-                .fn()
-                .mockImplementation(mockedHook);
+
+            useSimulateErc721PortalDepositErc721TokenMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -573,12 +379,14 @@ describe("ERC721DepositForm", () => {
                     "0x",
                     "0x",
                 ],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
         });
 
         it("should not initially show token id input/select", () => {
-            mockUseContractReads.mockReturnValue({
+            useReadContractsMock.mockReturnValue({
                 isLoading: false,
                 isSuccess: false,
                 data: undefined,
@@ -595,16 +403,15 @@ describe("ERC721DepositForm", () => {
             expect(collapse).toBeInTheDocument();
         });
 
-        it("should correctly format base and extra layer data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format base and extra layer data", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareErc721PortalDepositErc721Token,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareErc721PortalDepositErc721Token = vi
-                .fn()
-                .mockImplementation(mockedHook);
+
+            useSimulateErc721PortalDepositErc721TokenMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const textareas = container.querySelectorAll("textarea");
@@ -631,7 +438,9 @@ describe("ERC721DepositForm", () => {
                     hexValue,
                     hexValue,
                 ],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
         });
     });
@@ -653,12 +462,10 @@ describe("ERC721DepositForm", () => {
                 reset: resetMock,
             } as any);
 
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
-                status: "success",
-            });
+                isSuccess: true,
+            } as any);
 
             render(<Component {...defaultProps} />);
             expect(resetMock).toHaveBeenCalled();

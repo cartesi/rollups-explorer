@@ -1,12 +1,13 @@
 import { describe, it } from "vitest";
 import { cleanup, renderHook } from "@testing-library/react";
 import useTokensOfOwnerByIndex from "../../src/hooks/useTokensOfOwnerByIndex";
-import { Address, useContractReads } from "wagmi";
+import { useReadContracts } from "wagmi";
+import { Address } from "viem";
 
 vi.mock("@cartesi/rollups-wagmi");
 
 vi.mock("wagmi");
-const mockUseContractReads = vi.mocked(useContractReads, true);
+const useReadContractsMock = vi.mocked(useReadContracts, true);
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -24,6 +25,10 @@ vi.mock("@mantine/form", async () => {
     };
 });
 
+vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
+    default: () => undefined,
+}));
+
 const applications = [
     "0x60a7048c3136293071605a4eaffef49923e981cc",
     "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
@@ -36,7 +41,7 @@ const contracts = [
 ];
 describe("useTokensOfOwnerByIndex hook", () => {
     beforeEach(() => {
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [
@@ -85,7 +90,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
         const [erc721ContractAddress] = contracts;
         const [address] = applications;
 
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [
@@ -107,7 +112,33 @@ describe("useTokensOfOwnerByIndex hook", () => {
         expect(result.current.tokenIds[0]).toBe(1n);
     });
 
-    it("should return a list with multiple token id when data for token ids contain multiple entries", () => {
+    it("should return a list with one token id when data for token ids contain only one entry", () => {
+        const [erc721ContractAddress] = contracts;
+        const [address] = applications;
+
+        useReadContractsMock.mockReturnValue({
+            isLoading: false,
+            isSuccess: true,
+            data: [
+                {
+                    result: 1n,
+                    status: "success",
+                },
+            ],
+        } as any);
+
+        const { result } = renderHook(() =>
+            useTokensOfOwnerByIndex(
+                erc721ContractAddress as Address,
+                address as Address,
+            ),
+        );
+
+        expect(result.current.tokenIds.length).toBe(1);
+        expect(result.current.tokenIds[0]).toBe(1n);
+    });
+
+    it("should return a list with multiple token ids when data for token ids contain multiple entries", () => {
         const [erc721ContractAddress] = contracts;
         const [address] = applications;
         const data = [
@@ -133,7 +164,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
                 data: [data[Number(contractData.args[1])]],
             };
         };
-        mockUseContractReads.mockImplementation(implementation as any);
+        useReadContractsMock.mockImplementation(implementation as any);
 
         const { result } = renderHook(() =>
             useTokensOfOwnerByIndex(
@@ -175,7 +206,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
                 data: [data[Number(contractData.args[1])]],
             };
         };
-        mockUseContractReads.mockImplementation(implementation as any);
+        useReadContractsMock.mockImplementation(implementation as any);
 
         const depositedToken = 1n;
         const depositedTokens = [depositedToken];
@@ -190,7 +221,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
         expect(result.current.tokenIds.length).toBe(data.length - 1);
         expect(
             result.current.tokenIds.find(
-                (tokenId: bigint) => tokenId === depositedToken,
+                (tokenId) => tokenId === depositedToken,
             ),
         ).toBe(undefined);
     });
@@ -199,7 +230,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
         const [erc721ContractAddress] = contracts;
         const [address] = applications;
 
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [],
@@ -219,7 +250,7 @@ describe("useTokensOfOwnerByIndex hook", () => {
         const [erc721ContractAddress] = contracts;
         const [address] = applications;
 
-        mockUseContractReads.mockReturnValue({
+        useReadContractsMock.mockReturnValue({
             isLoading: false,
             isSuccess: true,
             data: [
