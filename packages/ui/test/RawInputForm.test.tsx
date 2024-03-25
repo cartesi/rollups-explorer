@@ -115,11 +115,11 @@ describe("Rollups RawInputForm", () => {
         it("should correctly format hex data", async () => {
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                ...rollupsWagmi.useSimulateInputBoxAddInput,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareInputBoxAddInput = vi
+            rollupsWagmi.useSimulateInputBoxAddInput = vi
                 .fn()
                 .mockImplementation(mockedHook);
 
@@ -137,7 +137,9 @@ describe("Rollups RawInputForm", () => {
 
             expect(mockedHook).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", hexValue],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
                 value: undefined,
             });
         });
@@ -216,14 +218,14 @@ describe("Rollups RawInputForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it('should enable "usePrepareInputBoxAddInput" only when the form is valid', async () => {
+        it('should enable "useSimulateInputBoxAddInput" only when the form is valid', async () => {
             const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareInputBoxAddInput,
+                ...rollupsWagmi.useSimulateInputBoxAddInput,
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.usePrepareInputBoxAddInput = vi
+            rollupsWagmi.useSimulateInputBoxAddInput = vi
                 .fn()
                 .mockImplementation(mockedHook);
 
@@ -248,7 +250,9 @@ describe("Rollups RawInputForm", () => {
 
             expect(mockedHook).toHaveBeenLastCalledWith({
                 args: [getAddress(application), ""],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
 
             fireEvent.change(input, {
@@ -265,7 +269,9 @@ describe("Rollups RawInputForm", () => {
 
             expect(mockedHook).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", "0x"],
-                enabled: false,
+                query: {
+                    enabled: false,
+                },
             });
 
             fireEvent.change(input, {
@@ -282,7 +288,9 @@ describe("Rollups RawInputForm", () => {
 
             expect(mockedHook).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
-                enabled: true,
+                query: {
+                    enabled: true,
+                },
             });
         });
     });
@@ -362,10 +370,10 @@ describe("Rollups RawInputForm", () => {
             });
 
             expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", hexValue],
+                args: [getAddress(application), "0x"],
                 value: undefined,
                 query: {
-                    enabled: false,
+                    enabled: true,
                 },
             });
         });
@@ -374,10 +382,11 @@ describe("Rollups RawInputForm", () => {
     describe("Alerts", () => {
         it("should display alert for successful transaction", async () => {
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
                 status: "success",
+                isSuccess: true,
             });
 
             render(<Component {...defaultProps} />);
@@ -389,12 +398,13 @@ describe("Rollups RawInputForm", () => {
         it("should display alert for failed transaction", async () => {
             const wagmi = await import("wagmi");
             const message = "User declined the transaction";
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: {
                     message,
                 },
                 status: "error",
+                isSuccess: false,
             });
 
             render(<Component {...defaultProps} />);
@@ -420,10 +430,10 @@ describe("Rollups RawInputForm", () => {
             } as any);
 
             const wagmi = await import("wagmi");
-            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransaction,
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
-                status: "success",
+                isSuccess: true,
             });
 
             render(<Component {...defaultProps} />);

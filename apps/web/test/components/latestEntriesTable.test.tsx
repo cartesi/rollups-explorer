@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import { describe, it } from "vitest";
+import { getAddress } from "viem";
 import LatestEntriesTable, {
     LatestEntriesTableProps,
 } from "../../src/components/latestEntriesTable";
