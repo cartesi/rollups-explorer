@@ -198,7 +198,8 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
 
     const { operation } = result;
     const displayQueryResult = url === operation?.context?.url;
-    const testSuccess = !result.fetching && !result.stale && !result.error;
+    const testSuccess =
+        !result.fetching && !result.stale && !result.error && validURL;
 
     const onSuccess = () => {
         const { address } = form.getTransformedValues();
