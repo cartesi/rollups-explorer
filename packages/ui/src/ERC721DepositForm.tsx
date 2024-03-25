@@ -37,7 +37,6 @@ import {
     isAddress,
     isHex,
     zeroAddress,
-    Address,
 } from "viem";
 import {
     useAccount,
