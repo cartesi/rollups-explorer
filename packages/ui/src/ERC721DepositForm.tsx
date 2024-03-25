@@ -22,7 +22,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -38,39 +38,10 @@ import {
     isHex,
     zeroAddress,
 } from "viem";
-import {
-    Address,
-    useAccount,
-    useContractReads,
-    useWaitForTransaction,
-} from "wagmi";
+import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
-
-const erc721AbiEnumerable = [
-    ...erc721ABI,
-    {
-        stateMutability: "view",
-        type: "function",
-        inputs: [
-            {
-                name: "owner",
-                type: "address",
-            },
-            {
-                name: "index",
-                type: "uint256",
-            },
-        ],
-        name: "tokenOfOwnerByIndex",
-        outputs: [
-            {
-                name: "tokenId",
-                type: "uint256",
-            },
-        ],
-    },
-] as const;
+import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
@@ -90,70 +61,6 @@ export const transactionButtonState = (
         !write;
 
     return { loading, disabled };
-};
-
-export const useTokensOfOwnerByIndex = (
-    erc721ContractAddress: Address,
-    ownerAddress: Address,
-    depositedTokens: bigint[] = [],
-) => {
-    const [index, setIndex] = useState(0);
-    const [tokenIds, setTokenIds] = useState<bigint[]>([]);
-    const [fetching, setFetching] = useState(true);
-    const lastErc721ContractAddress = useRef(erc721ContractAddress);
-    const lastOwnerAddress = useRef(ownerAddress);
-    const erc721 = useContractReads({
-        contracts: [
-            {
-                abi: erc721AbiEnumerable,
-                address: erc721ContractAddress,
-                functionName: "tokenOfOwnerByIndex",
-                args: [ownerAddress!, BigInt(index)],
-            },
-        ],
-        enabled:
-            erc721ContractAddress?.toString() !== "" &&
-            ownerAddress?.toString() !== "",
-        watch: true,
-    });
-    const tokenOfOwnerByIndex = erc721.data?.[0];
-
-    const onChange = useCallback(() => {
-        const isExisting =
-            erc721ContractAddress === lastErc721ContractAddress.current &&
-            ownerAddress === lastOwnerAddress.current;
-
-        lastErc721ContractAddress.current = erc721ContractAddress;
-        lastOwnerAddress.current = ownerAddress;
-
-        if (tokenOfOwnerByIndex?.status === "success") {
-            setTokenIds((prevTokenIds) =>
-                isExisting
-                    ? [...prevTokenIds, tokenOfOwnerByIndex.result as bigint]
-                    : [tokenOfOwnerByIndex.result as bigint],
-            );
-            setIndex((prevIndex) => (isExisting ? prevIndex + 1 : 1));
-            setFetching(true);
-        } else {
-            setTokenIds((prevTokenIds) => (isExisting ? prevTokenIds : []));
-            setIndex((prevIndex) => (isExisting ? prevIndex : 0));
-            setFetching(false);
-        }
-    }, [tokenOfOwnerByIndex, erc721ContractAddress, ownerAddress]);
-
-    useEffect(() => {
-        onChange();
-    }, [onChange]);
-
-    return useMemo(
-        () => ({
-            tokenIds: [...tokenIds]
-                .filter((tokenId) => !depositedTokens.includes(tokenId))
-                .sort(),
-            fetching,
-        }),
-        [tokenIds, fetching, depositedTokens],
-    );
 };
 
 export interface ERC721DepositFormProps {
@@ -418,7 +325,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         >
                             <Flex rowGap={6} c="dark.2">
                                 <Text id="token-balance" fz="xs" mx={4}>
-                                    Balance: {Number(balance)} {symbol}
+                                    Balance:{" "}
+                                    {balance === undefined
+                                        ? ""
+                                        : `${Number(balance)} ${symbol}`}
                                 </Text>
                             </Flex>
                         </Flex>

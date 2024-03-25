@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it } from "vitest";
 import { ERC20DepositForm } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
+import { getAddress } from "viem";
 
 const Component = withMantineTheme(ERC20DepositForm);
 
@@ -90,6 +91,14 @@ vi.mock("viem", async () => {
     };
 });
 
+vi.mock("@mantine/form", async () => {
+    const actual = await vi.importActual("@mantine/form");
+    return {
+        ...(actual as any),
+        useForm: (actual as any).useForm,
+    };
+});
+
 describe("Rollups ERC20DepositForm", () => {
     describe("ApplicationAutocomplete", () => {
         it("should display correct label", () => {
@@ -129,6 +138,56 @@ describe("Rollups ERC20DepositForm", () => {
                     "This is a deposit to an undeployed application.",
                 ),
             ).toBeInTheDocument();
+        });
+
+        it("should display error when application is invalid", () => {
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+
+            fireEvent.change(input, {
+                target: {
+                    value: "0x60a7048c3136293071605a4eaffef49923e981ccffffffff",
+                },
+            });
+
+            fireEvent.blur(input);
+
+            expect(input.getAttribute("aria-invalid")).toBe("true");
+            expect(
+                screen.getByText("Invalid Application address"),
+            ).toBeInTheDocument();
+        });
+
+        it("should correctly format address", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareErc20PortalDepositErc20Tokens,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareErc20PortalDepositErc20Tokens = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const input = container.querySelector("input") as HTMLInputElement;
+
+            const [application] = defaultProps.applications;
+            fireEvent.change(input, {
+                target: {
+                    value: application,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [
+                    "0x0000000000000000000000000000000000000000",
+                    getAddress(application),
+                    undefined,
+                    "0x",
+                ],
+                enabled: false,
+            });
         });
     });
 
@@ -226,6 +285,38 @@ describe("Rollups ERC20DepositForm", () => {
 
             expect(screen.getByDisplayValue(value) === amountInput).toBe(true);
         });
+
+        it("should correctly process small decimal numbers", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareErc20Approve,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareErc20Approve = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.0000001",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                address: "0x0000000000000000000000000000000000000000",
+                args: [
+                    "0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB",
+                    100000000000n,
+                ],
+                enabled: true,
+            });
+        });
     });
     describe("Max Amount Button", () => {
         vi.mock("wagmi", async () => {
@@ -315,40 +406,6 @@ describe("Rollups ERC20DepositForm", () => {
         });
     });
 
-    describe("Amount input", () => {
-        it("should correctly process small decimal numbers", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.usePrepareErc20Approve,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.usePrepareErc20Approve = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const amountInput = container.querySelector(
-                '[type="number"]',
-            ) as HTMLInputElement;
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.0000001",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                address: "0x0000000000000000000000000000000000000000",
-                args: [
-                    "0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB",
-                    100000000000n,
-                ],
-                enabled: true,
-            });
-        });
-    });
-
     describe("Deposit button", () => {
         it("should invoke onSearchApplications function after successful deposit", async () => {
             const wagmi = await import("wagmi");
@@ -367,6 +424,69 @@ describe("Rollups ERC20DepositForm", () => {
             );
 
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
+        });
+
+        it("should correctly format extra data", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            const mockedHook = vi.fn().mockReturnValue({
+                ...rollupsWagmi.usePrepareErc20PortalDepositErc20Tokens,
+                loading: false,
+                error: null,
+            });
+            rollupsWagmi.usePrepareErc20PortalDepositErc20Tokens = vi
+                .fn()
+                .mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const textarea = container.querySelector(
+                "textarea",
+            ) as HTMLTextAreaElement;
+
+            const hexValue = "0x123123";
+            fireEvent.change(textarea, {
+                target: {
+                    value: hexValue,
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000",
+                    undefined,
+                    hexValue,
+                ],
+                enabled: false,
+            });
+        });
+    });
+
+    describe("Form", () => {
+        it("should reset form after successful submission", async () => {
+            const mantineForm = await import("@mantine/form");
+            const [application] = defaultProps.applications;
+            const resetMock = vi.fn();
+            vi.spyOn(mantineForm, "useForm").mockReturnValue({
+                getTransformedValues: () => ({
+                    address: getAddress(application),
+                    rawInput: "0x",
+                }),
+                isValid: () => true,
+                getInputProps: () => {},
+                errors: {},
+                setFieldValue: () => "",
+                reset: resetMock,
+            } as any);
+
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransaction = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransaction,
+                error: null,
+                status: "success",
+            });
+
+            render(<Component {...defaultProps} />);
+            expect(resetMock).toHaveBeenCalled();
         });
     });
 });
