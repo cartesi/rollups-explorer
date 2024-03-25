@@ -3,6 +3,7 @@ import {
     Button,
     Loader,
     Table,
+    Text,
     Transition,
     useMantineColorScheme,
     useMantineTheme,
@@ -90,8 +91,8 @@ const InputsTable: FC<InputsTableProps> = ({
                     ) : (
                         totalCount === 0 && (
                             <Table.Tr>
-                                <Table.Td colSpan={3} align="center">
-                                    No inputs
+                                <Table.Td colSpan={7} align="center">
+                                    <Text fw={700}> No inputs</Text>
                                 </Table.Td>
                             </Table.Tr>
                         )
