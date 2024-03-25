@@ -37,7 +37,6 @@ import {
     isAddress,
     isHex,
     zeroAddress,
-    Address,
 } from "viem";
 import {
     useAccount,
@@ -50,31 +49,7 @@ import {
     TransactionWaitStatus,
 } from "./TransactionStatus";
 import useWatchQueryOnBlockChange from "./hooks/useWatchQueryOnBlockChange";
-
-const erc721AbiEnumerable = [
-    ...erc721Abi,
-    {
-        stateMutability: "view",
-        type: "function",
-        inputs: [
-            {
-                name: "owner",
-                type: "address",
-            },
-            {
-                name: "index",
-                type: "uint256",
-            },
-        ],
-        name: "tokenOfOwnerByIndex",
-        outputs: [
-            {
-                name: "tokenId",
-                type: "uint256",
-            },
-        ],
-    },
-] as const;
+import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
 
 export const transactionButtonState = (
     prepare: TransactionWaitStatus,
