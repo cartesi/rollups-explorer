@@ -242,14 +242,22 @@ describe("connectionForm", () => {
         expect(addConnection).not.toHaveBeenCalled();
     });
 
-    it("should be able to call save when required field are filled", () => {
+    it("should be able to call save when required fields are filled", async () => {
+        const url = "http://localhost:8000/graphql";
+        useQueryMock.mockImplementation(
+            queryMockImplBuilder({
+                checkStatus: {
+                    data: checkStatusSample,
+                    url,
+                },
+            }),
+        );
         const addConnection = vi.mocked(
             useConnectionConfigMock().addConnection,
             true,
         );
 
         const address = "0x60a7048c3136293071605a4eaffef49923e981cd";
-        const url = "http://localhost:8000/graphql";
 
         render(<AppConnectionFormE application={address} />);
 
@@ -261,6 +269,14 @@ describe("connectionForm", () => {
             target: { value: url },
         });
 
+        await waitFor(() =>
+            expect(screen.getByTestId("icon-test-success")).toBeInTheDocument(),
+        );
+
+        expect(
+            screen.getByText("This application responded with"),
+        ).toBeInTheDocument();
+
         fireEvent.click(screen.getByText("Save"));
 
         expect(addConnection).toHaveBeenCalledWith(
@@ -271,6 +287,93 @@ describe("connectionForm", () => {
                 onFinished: expect.any(Function),
             },
         );
+    });
+
+    it("should be able to call save when required fields are filled", async () => {
+        const url = "http://localhost:8000/graphql";
+        useQueryMock.mockImplementation(
+            queryMockImplBuilder({
+                checkStatus: {
+                    data: checkStatusSample,
+                    url,
+                },
+            }),
+        );
+        const addConnection = vi.mocked(
+            useConnectionConfigMock().addConnection,
+            true,
+        );
+
+        const address = "0x60a7048c3136293071605a4eaffef49923e981cd";
+
+        render(<AppConnectionFormE application={address} />);
+
+        const urlInput = screen.getByPlaceholderText(
+            "https://app-hostname/graphql",
+        );
+
+        fireEvent.change(urlInput, {
+            target: { value: url },
+        });
+
+        await waitFor(() =>
+            expect(screen.getByTestId("icon-test-success")).toBeInTheDocument(),
+        );
+
+        expect(
+            screen.getByText("This application responded with"),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText("Save"));
+
+        expect(addConnection).toHaveBeenCalledWith(
+            { address, url },
+            {
+                onFailure: expect.any(Function),
+                onSuccess: expect.any(Function),
+                onFinished: expect.any(Function),
+            },
+        );
+    });
+
+    it("should not be able to call save when url is invalid", async () => {
+        const url = "invalid-url";
+        useQueryMock.mockImplementation(
+            queryMockImplBuilder({
+                checkStatus: {
+                    data: checkStatusSample,
+                    url,
+                },
+            }),
+        );
+        const addConnection = vi.mocked(
+            useConnectionConfigMock().addConnection,
+            true,
+        );
+
+        const address = "0x60a7048c3136293071605a4eaffef49923e981cd";
+
+        render(<AppConnectionFormE application={address} />);
+
+        const urlInput = screen.getByPlaceholderText(
+            "https://app-hostname/graphql",
+        );
+
+        fireEvent.change(urlInput, {
+            target: { value: url },
+        });
+
+        await waitFor(() =>
+            expect(screen.getByRole("alert")).toBeInTheDocument(),
+        );
+
+        expect(
+            screen.getByText("This application responded with"),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText("Save"));
+
+        expect(addConnection).toHaveBeenCalledTimes(0);
     });
 
     it("should notify and not allow to save when test-connection failed", () => {
