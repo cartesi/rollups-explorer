@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader, Table } from "@mantine/core";
+import { Loader, Table, Text } from "@mantine/core";
 import { FC } from "react";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { Application } from "../../graphql/explorer/types";
@@ -34,8 +34,8 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                 ) : (
                     totalCount === 0 && (
                         <Table.Tr>
-                            <Table.Td colSpan={3} align="center" fw={700}>
-                                No applications
+                            <Table.Td colSpan={3} align="center">
+                                <Text fw={700}>No applications</Text>
                             </Table.Td>
                         </Table.Tr>
                     )

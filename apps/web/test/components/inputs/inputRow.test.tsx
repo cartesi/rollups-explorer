@@ -1,12 +1,12 @@
-import { describe, it } from "vitest";
-import type { FC } from "react";
+import { Table } from "@mantine/core";
 import { render, screen } from "@testing-library/react";
+import prettyMilliseconds from "pretty-ms";
+import type { FC } from "react";
+import { describe, it } from "vitest";
 import InputRow, {
     InputRowProps,
 } from "../../../src/components/inputs/inputRow";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
-import { Table } from "@mantine/core";
-import prettyMilliseconds from "pretty-ms";
 
 const TableComponent: FC<InputRowProps> = (props) => (
     <Table>
@@ -33,6 +33,7 @@ const defaultProps: InputRowProps = {
         erc20Deposit: null,
     },
     timeType: "age",
+    keepDataColVisible: false,
 };
 
 describe("InputRow component", () => {
@@ -51,7 +52,13 @@ describe("InputRow component", () => {
     });
 
     it("should display correct timestamp in UTC format", () => {
-        render(<Component input={defaultProps.input} timeType="timestamp" />);
+        render(
+            <Component
+                input={defaultProps.input}
+                timeType="timestamp"
+                keepDataColVisible={false}
+            />,
+        );
 
         const timestamp = new Date(
             defaultProps.input.timestamp * 1000,

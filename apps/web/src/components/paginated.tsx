@@ -6,7 +6,7 @@ import { pathOr } from "ramda";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
 
-const perPageList = Array.from({ length: 3 }).map((_, index) => {
+export const perPageList = Array.from({ length: 3 }).map((_, index) => {
     const key = ((index + 1) * 10).toString() as keyof typeof limitBounds;
     return limitBounds[key].toString();
 });
