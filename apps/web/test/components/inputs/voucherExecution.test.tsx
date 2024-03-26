@@ -1,4 +1,8 @@
-import { afterEach, describe, it } from "vitest";
+import {
+    useReadCartesiDAppWasVoucherExecuted,
+    useSimulateCartesiDAppExecuteVoucher,
+    useWriteCartesiDAppExecuteVoucher,
+} from "@cartesi/rollups-wagmi";
 import {
     cleanup,
     fireEvent,
@@ -6,15 +10,11 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import {
-    useWriteCartesiDAppExecuteVoucher,
-    useReadCartesiDAppWasVoucherExecuted,
-    useSimulateCartesiDAppExecuteVoucher,
-} from "@cartesi/rollups-wagmi";
+import { afterEach, describe, it } from "vitest";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("@cartesi/rollups-wagmi");
 vi.mock("@mantine/notifications", async () => {
@@ -150,7 +150,12 @@ describe("VoucherExecution component", () => {
         const button = screen
             .getByText("Execute")
             .closest("button") as HTMLButtonElement;
-        expect(button.hasAttribute("disabled")).toBe(false);
+        await waitFor(
+            () => expect(button.hasAttribute("disabled")).toBe(false),
+            {
+                timeout: 500,
+            },
+        );
     });
 
     it("should display tooltip when voucher is pending", async () => {
