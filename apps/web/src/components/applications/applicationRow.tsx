@@ -2,7 +2,7 @@ import { ActionIcon, Table, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import { FC } from "react";
 import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
-import { Address as viemAddress } from "viem";
+import { Address as AddressType } from "viem";
 import { Application } from "../../graphql/explorer/types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
@@ -19,7 +19,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
         showConnectionModal,
         removeConnection,
     } = useConnectionConfig();
-    const appId = application.id as viemAddress;
+    const appId = application.id as AddressType;
     const connection = getConnection(appId);
 
     return (
@@ -30,7 +30,7 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
             <Table.Td>
                 {application.owner ? (
                     <Address
-                        value={application.owner as viemAddress}
+                        value={application.owner as AddressType}
                         icon
                         shorten
                     />
