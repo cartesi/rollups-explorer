@@ -14,7 +14,7 @@ import { FC } from "react";
 import { TbCheck, TbCopy } from "react-icons/tb";
 import { jsNumberForAddress } from "react-jazzicon";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
-import { Address, getAddress } from "viem";
+import { getAddress, Address as viemAddress } from "viem";
 
 import {
     dAppAddressRelayAddress,
@@ -26,14 +26,14 @@ import {
 } from "@cartesi/rollups-wagmi";
 
 export type AddressProps = {
-    value: Address;
+    value: viemAddress;
     href?: string;
     icon?: boolean;
     iconSize?: number;
     shorten?: boolean;
 };
 
-const cartesi: Record<Address, string> = {
+const cartesi: Record<viemAddress, string> = {
     [dAppAddressRelayAddress]: "DAppAddressRelay",
     [erc20PortalAddress]: "ERC20Portal",
     [erc1155BatchPortalAddress]: "ERC1155BatchPortal",
@@ -42,7 +42,7 @@ const cartesi: Record<Address, string> = {
     [etherPortalAddress]: "EtherPortal",
 };
 
-const resolveName = (value: Address) => {
+const resolveName = (value: viemAddress) => {
     return cartesi[value];
 };
 
