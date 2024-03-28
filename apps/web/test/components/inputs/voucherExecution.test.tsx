@@ -1,13 +1,19 @@
-import { afterEach, describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import {
     useCartesiDAppExecuteVoucher,
     useCartesiDAppWasVoucherExecuted,
 } from "@cartesi/rollups-wagmi";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import { afterEach, describe, it } from "vitest";
 import { useAccount, useWaitForTransaction } from "wagmi";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("@cartesi/rollups-wagmi");
 vi.mock("@mantine/notifications", async () => {
@@ -119,7 +125,7 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
     });
 
-    it("should display enabled button when voucher is not yet executed", () => {
+    it("should display enabled button when voucher is not yet executed", async () => {
         useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -131,10 +137,15 @@ describe("VoucherExecution component", () => {
         const button = screen
             .getByText("Execute")
             .closest("button") as HTMLButtonElement;
-        expect(button.hasAttribute("disabled")).toBe(false);
+        await waitFor(
+            () => expect(button.hasAttribute("disabled")).toBe(false),
+            {
+                timeout: 500,
+            },
+        );
     });
 
-    it("should display tooltip when voucher is pending", () => {
+    it("should display tooltip when voucher is pending", async () => {
         useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -156,12 +167,18 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Voucher proof is pending"),
-        ).toBeInTheDocument();
+        await waitFor(
+            () =>
+                expect(
+                    screen.getByText("Voucher proof is pending"),
+                ).toBeInTheDocument(),
+            {
+                timeout: 500,
+            },
+        );
     });
 
-    it("should display tooltip when wallet is not connected and voucher is not executed", () => {
+    it("should display tooltip when wallet is not connected and voucher is not executed", async () => {
         useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -178,9 +195,17 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Connect your wallet to execute the voucher"),
-        ).toBeInTheDocument();
+        await waitFor(
+            () =>
+                expect(
+                    screen.getByText(
+                        "Connect your wallet to execute the voucher",
+                    ),
+                ).toBeInTheDocument(),
+            {
+                timeout: 500,
+            },
+        );
     });
 
     it("should execute voucher when button is clicked", () => {
