@@ -11,7 +11,6 @@ const EntriesSummary: FC = () => {
         <Summary
             inputs={stats?.inputsConnection?.totalCount ?? 0}
             applications={stats?.applicationsConnection?.totalCount ?? 0}
-            applicationsOwned={0}
         />
     );
 };
