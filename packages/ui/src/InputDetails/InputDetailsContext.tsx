@@ -1,6 +1,6 @@
 "use client";
 
-import { keys, map, memoizeWith, pick, pipe, prop } from "ramda";
+import { join, keys, map, memoizeWith, pick, pipe, prop } from "ramda";
 import React, {
     Dispatch,
     FC,
@@ -91,12 +91,10 @@ const useSelector: UseSelector = (predicate) => {
 
 type AvailableContentAsSet = (value: State) => Set<SupportedContent>;
 
-const createSetFromKeys = (keys: SupportedContent[]) =>
-    new Set<SupportedContent>(keys);
-
-const availableContentAsSet: AvailableContentAsSet = memoizeWith(
-    (state: State) => JSON.stringify(state.availableContent),
-    pipe(prop("availableContent"), keys, createSetFromKeys),
+const availableContentAsSet: AvailableContentAsSet = pipe(
+    prop("availableContent"),
+    keys,
+    memoizeWith(join("/"), (keys) => new Set(keys as SupportedContent[])),
 );
 
 export const useDefinedContentSet = () => {
