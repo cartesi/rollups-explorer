@@ -1,6 +1,6 @@
 import {
-    useWriteInputBoxAddInput,
     useSimulateInputBoxAddInput,
+    useWriteInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -13,7 +13,7 @@ import {
     Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
@@ -35,10 +35,6 @@ export interface RawInputFormProps {
 
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
