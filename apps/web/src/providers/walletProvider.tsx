@@ -3,11 +3,11 @@ import { ReactNode } from "react";
 import { useMantineColorScheme } from "@mantine/core";
 import {
     AvatarComponent,
-    RainbowKitProvider,
     connectorsForWallets,
     darkTheme,
     getDefaultWallets,
     lightTheme,
+    RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
 import Image from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { WagmiProvider, http, createConfig } from "wagmi";
+import { createConfig, fallback, http, WagmiProvider } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
 
 // select chain based on env var
@@ -68,17 +68,15 @@ const wagmiConfig = createConfig({
     connectors,
     chains: [chain],
     transports: {
-        [mainnet.id]: http(
-            alchemyApiKey
-                ? `https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`
-                : undefined,
-        ),
-        [sepolia.id]: http(
-            alchemyApiKey
-                ? `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`
-                : undefined,
-        ),
-        [foundry.id]: http(),
+        [mainnet.id]: fallback([
+            http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
+            http(mainnet.rpcUrls.default.http[0]),
+        ]),
+        [sepolia.id]: fallback([
+            http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+            http(sepolia.rpcUrls.default.http[0]),
+        ]),
+        [foundry.id]: http(foundry.rpcUrls.default.http[0]),
     },
 });
 
