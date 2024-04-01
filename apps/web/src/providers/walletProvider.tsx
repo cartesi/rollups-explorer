@@ -17,6 +17,7 @@ import Image from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
+import { Transport } from "viem";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
@@ -63,20 +64,28 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
     );
 };
 
+const [defaultMainnetRpcUrl] = mainnet.rpcUrls.default.http;
+const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
+const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
+
 const wagmiConfig = createConfig({
     ssr: true,
     connectors,
     chains: [chain],
     transports: {
-        [mainnet.id]: fallback([
-            http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
-            http(mainnet.rpcUrls.default.http[0]),
-        ]),
-        [sepolia.id]: fallback([
-            http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
-            http(sepolia.rpcUrls.default.http[0]),
-        ]),
-        [foundry.id]: http(foundry.rpcUrls.default.http[0]),
+        [mainnet.id]: alchemyApiKey
+            ? fallback([
+                  http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
+                  http(defaultMainnetRpcUrl),
+              ])
+            : http(defaultMainnetRpcUrl),
+        [sepolia.id]: alchemyApiKey
+            ? fallback([
+                  http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+                  http(defaultSepoliaRpcUrl),
+              ])
+            : http(defaultSepoliaRpcUrl),
+        [foundry.id]: http(defaultFoundryRpcUrl),
     },
 });
 
