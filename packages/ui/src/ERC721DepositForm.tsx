@@ -42,31 +42,7 @@ import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
-
-const erc721AbiEnumerable = [
-    ...erc721ABI,
-    {
-        stateMutability: "view",
-        type: "function",
-        inputs: [
-            {
-                name: "owner",
-                type: "address",
-            },
-            {
-                name: "index",
-                type: "uint256",
-            },
-        ],
-        name: "tokenOfOwnerByIndex",
-        outputs: [
-            {
-                name: "tokenId",
-                type: "uint256",
-            },
-        ],
-    },
-] as const;
+import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
