@@ -248,7 +248,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const isUndeployedApp = useUndeployedApplication(
         applicationAddress,
         applications,
-    );    
+    );
 
     useEffect(() => {
         if (depositWait.isSuccess) {
