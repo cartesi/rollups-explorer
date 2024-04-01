@@ -41,6 +41,7 @@ import {
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
+import useUndeployedApplication from "./hooks/useUndeployedApplication";
 import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
 
 export const transactionButtonState = (
@@ -215,6 +216,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         approveWait.status !== "success";
     const isApproveDisabled =
         approveDisabled || !needApproval || !isDepositDisabled;
+    const isUndeployedApp = useUndeployedApplication(
+        applicationAddress,
+        applications,
+    );
 
     useEffect(() => {
         if (tokensOfOwnerByIndex.tokenIds.length === 0) {
@@ -256,21 +261,15 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                     }}
                 />
 
-                {!form.errors.application &&
-                    applicationAddress !== zeroAddress &&
-                    !applications.some(
-                        (a) =>
-                            a.toLowerCase() ===
-                            applicationAddress.toLowerCase(),
-                    ) && (
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            icon={<TbAlertCircle />}
-                        >
-                            This is a deposit to an undeployed application.
-                        </Alert>
-                    )}
+                {!form.errors.application && isUndeployedApp && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
 
                 <TextInput
                     label="ERC-721"

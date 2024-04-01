@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { RawInputForm } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
@@ -304,7 +304,7 @@ describe("Rollups RawInputForm", () => {
             expect(input?.getAttribute("placeholder")).toBe("0x");
         });
 
-        it("should display alert for unemployed application", () => {
+        it("should display alert for unemployed application", async () => {
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
 
@@ -314,9 +314,15 @@ describe("Rollups RawInputForm", () => {
                 },
             });
 
-            expect(
-                screen.getByText("This is an undeployed application."),
-            ).toBeInTheDocument();
+            await waitFor(
+                () =>
+                    expect(
+                        screen.getByText("This is an undeployed application."),
+                    ).toBeInTheDocument(),
+                {
+                    timeout: 1100,
+                },
+            );
         });
 
         it("should display error when application is invalid", () => {

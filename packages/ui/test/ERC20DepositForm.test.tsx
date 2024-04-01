@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, it } from "vitest";
 import { ERC20DepositForm } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
@@ -122,7 +122,7 @@ describe("Rollups ERC20DepositForm", () => {
             expect(input?.getAttribute("placeholder")).toBe("0x");
         });
 
-        it("should display alert for undeployed application", () => {
+        it("should display alert for undeployed application", async () => {
             const customProps = { ...defaultProps, applications: [] };
             const { container } = render(<Component {...customProps} />);
             const input = screen.getByTestId("application") as HTMLInputElement;
@@ -133,11 +133,17 @@ describe("Rollups ERC20DepositForm", () => {
                 },
             });
 
-            expect(
-                screen.getByText(
-                    "This is a deposit to an undeployed application.",
-                ),
-            ).toBeInTheDocument();
+            await waitFor(
+                () =>
+                    expect(
+                        screen.getByText(
+                            "This is a deposit to an undeployed application.",
+                        ),
+                    ).toBeInTheDocument(),
+                {
+                    timeout: 1100,
+                },
+            );
         });
 
         it("should display error when application is invalid", () => {

@@ -44,6 +44,7 @@ import {
 import { useAccount, useContractReads, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import { TransactionStageStatus } from "./TransactionStatus";
+import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
 export const transactionButtonState = (
     prepare: TransactionStageStatus,
@@ -241,6 +242,10 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             deposit.write,
             true,
         );
+    const isUndeployedApp = useUndeployedApplication(
+        applicationAddress,
+        applications,
+    );
 
     useEffect(() => {
         if (depositWait.status === "success") {
@@ -268,17 +273,15 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                     }}
                 />
 
-                {isAddress(applicationAddress) &&
-                    applicationAddress !== zeroAddress &&
-                    !applications.length && (
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            icon={<TbAlertCircle />}
-                        >
-                            This is a deposit to an undeployed application.
-                        </Alert>
-                    )}
+                {!form.errors.application && isUndeployedApp && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
 
                 <Autocomplete
                     label="ERC-20"

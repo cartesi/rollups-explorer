@@ -34,6 +34,7 @@ import {
 } from "viem";
 import { useNetwork, useWaitForTransaction } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
+import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
 export interface EtherDepositFormProps {
     applications: string[];
@@ -87,6 +88,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const canSubmit =
         form.isValid() && !prepare.isLoading && prepare.error === null;
     const loading = execute.status === "loading" || wait.status === "loading";
+    const isUndeployedApp = useUndeployedApplication(address, applications);
 
     useEffect(() => {
         if (wait.status === "success") {
@@ -121,19 +123,15 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     }}
                 />
 
-                {!form.errors.application &&
-                    address !== zeroAddress &&
-                    !applications.some(
-                        (a) => a.toLowerCase() === address.toLowerCase(),
-                    ) && (
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            icon={<TbAlertCircle />}
-                        >
-                            This is a deposit to an undeployed application.
-                        </Alert>
-                    )}
+                {!form.errors.application && isUndeployedApp && (
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        icon={<TbAlertCircle />}
+                    >
+                        This is a deposit to an undeployed application.
+                    </Alert>
+                )}
 
                 <TextInput
                     type="number"
