@@ -3,6 +3,7 @@ import Link from "next/link";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
 import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
+import { Address as AddressType } from "viem";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
 import { ApplicationRowProps } from "./applicationRow";
@@ -15,7 +16,7 @@ const UserApplicationsRow: FC<ApplicationRowProps> = (props) => {
         showConnectionModal,
         removeConnection,
     } = useConnectionConfig();
-    const appId = application.id as Address;
+    const appId = application.id as AddressType;
     const connection = getConnection(appId);
     return (
         <Table.Tr key={application.id}>
