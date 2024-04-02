@@ -1,6 +1,6 @@
 import {
-    useInputBoxAddInput,
-    usePrepareInputBoxAddInput,
+    useSimulateInputBoxAddInput,
+    useWriteInputBoxAddInput,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -13,7 +13,7 @@ import {
     Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
@@ -23,7 +23,7 @@ import {
     isHex,
     zeroAddress,
 } from "viem";
-import { useWaitForTransaction } from "wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
@@ -35,10 +35,6 @@ export interface RawInputFormProps {
 
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
-    const addresses = useMemo(
-        () => applications.map(getAddress),
-        [applications],
-    );
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -58,23 +54,28 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         }),
     });
     const { address, rawInput } = form.getTransformedValues();
-    const prepare = usePrepareInputBoxAddInput({
+    const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
-        enabled: form.isValid(),
+        query: {
+            enabled: form.isValid(),
+        },
     });
-    const execute = useInputBoxAddInput(prepare.config);
-    const wait = useWaitForTransaction(execute.data);
-    const loading = execute.status === "loading" || wait.status === "loading";
+
+    const execute = useWriteInputBoxAddInput();
+    const wait = useWaitForTransactionReceipt({
+        hash: execute.data,
+    });
+    const loading = execute.isPending || wait.isLoading;
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
 
     useEffect(() => {
-        if (wait.status === "success") {
+        if (wait.isSuccess) {
             form.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.status, onSearchApplications]);
+    }, [wait.isSuccess, onSearchApplications]);
 
     return (
         <form data-testid="raw-input-form">
@@ -120,7 +121,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
 
                 <Collapse
                     in={
-                        execute.isLoading ||
+                        execute.isPending ||
                         wait.isLoading ||
                         execute.isSuccess ||
                         execute.isError
@@ -141,7 +142,9 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={execute.write}
+                        onClick={() =>
+                            execute.writeContract(prepare.data!.request)
+                        }
                     >
                         Send
                     </Button>

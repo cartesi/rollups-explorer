@@ -1,10 +1,17 @@
 import { afterEach, describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import {
-    useCartesiDAppExecuteVoucher,
-    useCartesiDAppWasVoucherExecuted,
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import {
+    useWriteCartesiDAppExecuteVoucher,
+    useReadCartesiDAppWasVoucherExecuted,
+    useSimulateCartesiDAppExecuteVoucher,
 } from "@cartesi/rollups-wagmi";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
@@ -21,16 +28,23 @@ vi.mock("@mantine/notifications", async () => {
 });
 vi.mock("wagmi");
 
-const useCartesiDAppWasVoucherExecutedMock = vi.mocked(
-    useCartesiDAppWasVoucherExecuted,
+const useReadCartesiDAppWasVoucherExecutedMock = vi.mocked(
+    useReadCartesiDAppWasVoucherExecuted,
     true,
 );
-const useCartesiDAppExecuteVoucherMock = vi.mocked(
-    useCartesiDAppExecuteVoucher,
+const useWriteCartesiDAppExecuteVoucherMock = vi.mocked(
+    useWriteCartesiDAppExecuteVoucher,
+    true,
+);
+const useSimulateCartesiDAppExecuteVoucherMock = vi.mocked(
+    useSimulateCartesiDAppExecuteVoucher,
     true,
 );
 const useAccountMock = vi.mocked(useAccount, true);
-const useWaitForTransactionMock = vi.mocked(useWaitForTransaction, true);
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    true,
+);
 
 const Component = withMantineTheme(VoucherExecution);
 const defaultProps = {
@@ -70,16 +84,21 @@ const defaultProps = {
 
 describe("VoucherExecution component", () => {
     beforeEach(() => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
-        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
+            data: {
+                request: {},
+            },
+        } as any);
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
             isLoading: false,
-            write: () => undefined,
+            writeContract: () => undefined,
         } as any);
-        useWaitForTransactionMock.mockReturnValue({
+        useWaitForTransactionReceiptMock.mockReturnValue({
             status: "idle",
             isLoading: false,
         } as any);
@@ -93,7 +112,7 @@ describe("VoucherExecution component", () => {
     });
 
     it("should display spinner while loading voucher data", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: true,
         } as any);
@@ -105,7 +124,7 @@ describe("VoucherExecution component", () => {
     });
 
     it("should display disabled button when voucher is already executed", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: true,
             isLoading: false,
         } as any);
@@ -120,7 +139,7 @@ describe("VoucherExecution component", () => {
     });
 
     it("should display enabled button when voucher is not yet executed", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
@@ -134,8 +153,8 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(false);
     });
 
-    it("should display tooltip when voucher is pending", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+    it("should display tooltip when voucher is pending", async () => {
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
@@ -156,13 +175,15 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Voucher proof is pending"),
-        ).toBeInTheDocument();
+        await waitFor(() =>
+            expect(
+                screen.getByText("Voucher proof is pending"),
+            ).toBeInTheDocument(),
+        );
     });
 
-    it("should display tooltip when wallet is not connected and voucher is not executed", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+    it("should display tooltip when wallet is not connected and voucher is not executed", async () => {
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
@@ -178,22 +199,24 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
 
         fireEvent.mouseEnter(button);
-        expect(
-            screen.getByText("Connect your wallet to execute the voucher"),
-        ).toBeInTheDocument();
+        await waitFor(() =>
+            expect(
+                screen.getByText("Connect your wallet to execute the voucher"),
+            ).toBeInTheDocument(),
+        );
     });
 
     it("should execute voucher when button is clicked", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
 
         const mockedWrite = vi.fn();
-        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
             isLoading: false,
-            write: mockedWrite,
+            writeContract: mockedWrite,
         } as any);
 
         render(<Component {...defaultProps} />);
@@ -207,18 +230,18 @@ describe("VoucherExecution component", () => {
     });
 
     it("should display a loading button while executing voucher", () => {
-        useCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
         } as any);
 
         const mockedWrite = vi.fn();
-        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
             isLoading: true,
-            write: mockedWrite,
+            writeContract: mockedWrite,
         } as any);
-        useWaitForTransactionMock.mockReturnValue({
+        useWaitForTransactionReceiptMock.mockReturnValue({
             status: "loading",
             isLoading: true,
         } as any);
@@ -239,11 +262,11 @@ describe("VoucherExecution component", () => {
             show: showMock,
         } as any;
 
-        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "success",
             isLoading: true,
         } as any);
-        useWaitForTransactionMock.mockReturnValue({
+        useWaitForTransactionReceiptMock.mockReturnValue({
             status: "idle",
             isLoading: true,
         } as any);
@@ -261,13 +284,13 @@ describe("VoucherExecution component", () => {
             show: showMock,
         } as any;
 
-        useCartesiDAppExecuteVoucherMock.mockReturnValue({
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "success",
             isLoading: true,
         } as any);
-        useWaitForTransactionMock.mockReturnValue({
-            status: "success",
-            isLoading: true,
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            isSuccess: true,
+            isLoading: false,
         } as any);
 
         render(<Component {...defaultProps} />);

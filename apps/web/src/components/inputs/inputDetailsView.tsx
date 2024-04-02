@@ -47,7 +47,7 @@ const updateForPrevPage = (
         case "vouchers":
             return omit(["firstVouchers", "vouchersNextPage"], obj);
         case "notices":
-            return omit(["fistNotices", "noticesNextPage"], obj);
+            return omit(["firstNotices", "noticesNextPage"], obj);
         case "reports":
             return omit(["firstReports", "reportsNextPage"], obj);
         default:

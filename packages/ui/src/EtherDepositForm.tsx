@@ -1,6 +1,6 @@
 import {
-    useEtherPortalDepositEther,
-    usePrepareEtherPortalDepositEther,
+    useWriteEtherPortalDepositEther,
+    useSimulateEtherPortalDepositEther,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -32,7 +32,7 @@ import {
     parseUnits,
     zeroAddress,
 } from "viem";
-import { useNetwork, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
@@ -45,7 +45,7 @@ export interface EtherDepositFormProps {
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     const { applications, isLoadingApplications, onSearchApplications } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
-    const { chain } = useNetwork();
+    const { chain } = useAccount();
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -78,25 +78,29 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         }),
     });
     const { address, amount, execLayerData } = form.getTransformedValues();
-    const prepare = usePrepareEtherPortalDepositEther({
+    const prepare = useSimulateEtherPortalDepositEther({
         args: [address, execLayerData],
         value: amount,
-        enabled: form.isValid(),
+        query: {
+            enabled: form.isValid(),
+        },
     });
-    const execute = useEtherPortalDepositEther(prepare.config);
-    const wait = useWaitForTransaction(execute.data);
+    const execute = useWriteEtherPortalDepositEther();
+    const wait = useWaitForTransactionReceipt({
+        hash: execute.data,
+    });
     const canSubmit =
         form.isValid() && !prepare.isLoading && prepare.error === null;
-    const loading = execute.status === "loading" || wait.status === "loading";
+    const loading = execute.isPending || wait.isLoading;
     const isUndeployedApp = useUndeployedApplication(address, applications);
 
     useEffect(() => {
-        if (wait.status === "success") {
+        if (wait.isSuccess) {
             form.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.status, onSearchApplications]);
+    }, [wait.isSuccess, onSearchApplications]);
 
     return (
         <form data-testid="ether-deposit-form">
@@ -156,7 +160,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
 
                 <Collapse
                     in={
-                        execute.isLoading ||
+                        execute.isPending ||
                         wait.isLoading ||
                         execute.isSuccess ||
                         execute.isError
@@ -189,7 +193,9 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                         disabled={!canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
-                        onClick={execute.write}
+                        onClick={() =>
+                            execute.writeContract(prepare.data!.request)
+                        }
                     >
                         Deposit
                     </Button>

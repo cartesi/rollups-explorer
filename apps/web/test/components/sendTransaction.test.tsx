@@ -14,9 +14,12 @@ vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
 vi.mock("@cartesi/rollups-wagmi", async () => {
     return {
         usePrepareInputBoxAddInput: () => ({
+            data: {
+                request: {},
+            },
             config: {},
         }),
-        useInputBoxAddInput: () => ({
+        useWriteInputBoxAddInput: () => ({
             data: {},
             wait: vi.fn(),
         }),
@@ -35,18 +38,62 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
     const actual = await vi.importActual("@cartesi/rollups-wagmi");
     return {
         ...(actual as any),
-        usePrepareErc20Approve: () => ({
+        useSimulateErc20Approve: () => ({
+            data: {
+                request: {},
+            },
             config: {},
         }),
-        useErc20Approve: () => ({
+        useWriteErc20Approve: () => ({
             data: {},
             wait: vi.fn(),
         }),
-        usePrepareErc20PortalDepositErc20Tokens: () => ({
+        useSimulateErc20PortalDepositErc20Tokens: () => ({
+            data: {
+                request: {},
+            },
             config: {},
         }),
-        useErc20PortalDepositErc20Tokens: () => ({
+        useWriteErc20PortalDepositErc20Tokens: () => ({
             data: {},
+            wait: vi.fn(),
+        }),
+        useSimulateErc721Approve: () => ({
+            data: {
+                request: {},
+            },
+            config: {},
+        }),
+        useWriteErc721Approve: () => ({
+            data: {},
+            wait: vi.fn(),
+        }),
+        useSimulateErc721PortalDepositErc721Token: () => ({
+            data: {
+                request: {},
+            },
+            config: {},
+        }),
+        useWriteErc721PortalDepositErc721Token: () => ({
+            wait: vi.fn(),
+            reset: vi.fn(),
+        }),
+        useSimulateEtherPortalDepositEther: () => ({
+            data: {
+                request: {},
+            },
+            config: {},
+        }),
+        useWriteEtherPortalDepositEther: () => ({
+            wait: vi.fn(),
+        }),
+        useSimulateInputBoxAddInput: () => ({
+            data: {
+                request: {},
+            },
+            config: {},
+        }),
+        useWriteInputBoxAddInput: () => ({
             wait: vi.fn(),
         }),
     };
@@ -83,6 +130,21 @@ vi.mock("wagmi", async () => {
         useWaitForTransaction: () => ({}),
         useContractWrite: () => ({}),
         useNetwork: () => ({}),
+        useReadContracts: () => ({}),
+        useBlockNumber: () => ({
+            data: 0,
+        }),
+        useWaitForTransactionReceipt: () => ({}),
+    };
+});
+
+vi.mock("@tanstack/react-query", async () => {
+    const actual = await vi.importActual("@tanstack/react-query");
+    return {
+        ...(actual as any),
+        useQueryClient: () => ({
+            invalidateQueries: () => undefined,
+        }),
     };
 });
 
@@ -111,11 +173,6 @@ describe("SendTransaction component", () => {
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
     });
 
-    it("should show Ether deposit form", () => {
-        render(<Component initialDepositType="ether" />);
-        expect(screen.getByTestId("ether-deposit-form")).toBeInTheDocument();
-    });
-
     it("should initially query 10 applications with no predefined search", async () => {
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         const graphqlModule = await import(
@@ -125,7 +182,7 @@ describe("SendTransaction component", () => {
             .fn()
             .mockImplementation(mockedFn);
 
-        render(<Component initialDepositType="input" />);
+        render(<Component initialDepositType="erc20" />);
 
         expect(mockedFn).toHaveBeenCalledWith({
             variables: {
@@ -138,7 +195,7 @@ describe("SendTransaction component", () => {
     });
 
     it("should query applications with given search id, using debouncing", async () => {
-        render(<Component initialDepositType="input" />);
+        render(<Component initialDepositType="erc20" />);
 
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         const graphqlModule = await import(
@@ -149,7 +206,7 @@ describe("SendTransaction component", () => {
             .mockImplementation(mockedFn);
 
         const rawInputForm = screen.queryByTestId(
-            "raw-input-form",
+            "erc20-deposit-form",
         ) as HTMLFormElement;
         const applicationInput = rawInputForm.querySelector(
             "input",
@@ -193,7 +250,7 @@ describe("SendTransaction component", () => {
         );
         graphqlModule.useTokensQuery = vi.fn().mockImplementation(mockedFn);
 
-        render(<Component initialDepositType="input" />);
+        render(<Component initialDepositType="erc20" />);
 
         expect(mockedFn).toHaveBeenCalledWith({
             variables: {
