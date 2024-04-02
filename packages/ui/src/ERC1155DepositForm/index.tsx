@@ -1,12 +1,12 @@
 import {
-    erc1155ABI,
+    erc1155Abi,
     erc1155SinglePortalAddress,
-    useErc1155BalanceOf,
-    useErc1155IsApprovedForAll,
-    useErc1155SetApprovalForAll,
-    useErc1155SinglePortalDepositSingleErc1155Token,
-    usePrepareErc1155SetApprovalForAll,
-    usePrepareErc1155SinglePortalDepositSingleErc1155Token,
+    useReadErc1155BalanceOf,
+    useReadErc1155IsApprovedForAll,
+    useSimulateErc1155SetApprovalForAll,
+    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
+    useWriteErc1155SetApprovalForAll,
+    useWriteErc1155SinglePortalDepositSingleErc1155Token,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -35,7 +35,7 @@ import {
     isHex,
     zeroAddress,
 } from "viem";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
 import AdvancedFields from "./AdvancedFields";
@@ -121,18 +121,19 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
     } = form.getTransformedValues();
 
     const erc1155Contract = {
-        abi: erc1155ABI,
+        abi: erc1155Abi,
         address: erc1155Address !== zeroAddress ? erc1155Address : undefined,
     } as const;
 
-    const balanceOf = useErc1155BalanceOf({
+    const balanceOf = useReadErc1155BalanceOf({
         address: erc1155Contract.address,
         args: [getAddress(address!), tokenId!],
-        // watch: true,
-        enabled: tokenId !== undefined,
+        query: {
+            enabled: tokenId !== undefined,
+        },
     });
 
-    const approvedForAll = useErc1155IsApprovedForAll({
+    const approvedForAll = useReadErc1155IsApprovedForAll({
         address: erc1155Contract.address,
         args: [getAddress(address!), erc1155SinglePortalAddress],
     });
@@ -145,22 +146,26 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
         .map((d) => (d.error as BaseError).shortMessage);
 
     // prepare approve transaction
-    const approvePrepare = usePrepareErc1155SetApprovalForAll({
+    const approvePrepare = useSimulateErc1155SetApprovalForAll({
         address: erc1155Address,
         args: [erc1155SinglePortalAddress, true],
-        enabled:
-            accountBalance !== undefined &&
-            amount !== undefined &&
-            amount > 0 &&
-            amount <= accountBalance,
+        query: {
+            enabled:
+                accountBalance !== undefined &&
+                amount !== undefined &&
+                amount > 0 &&
+                amount <= accountBalance,
+        },
     });
 
-    const approve = useErc1155SetApprovalForAll(approvePrepare.config);
-    const approveWait = useWaitForTransaction(approve.data);
+    const approve = useWriteErc1155SetApprovalForAll();
+    const approveWait = useWaitForTransactionReceipt({
+        hash: approve.data,
+    });
 
     // prepare deposit transaction
     const depositPrepare =
-        usePrepareErc1155SinglePortalDepositSingleErc1155Token({
+        useSimulateErc1155SinglePortalDepositSingleErc1155Token({
             args: [
                 erc1155Address!,
                 applicationAddress,
@@ -169,22 +174,25 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                 baseLayerData,
                 execLayerData,
             ],
-            enabled:
-                tokenId !== undefined &&
-                amount !== undefined &&
-                accountBalance !== undefined &&
-                amount <= accountBalance &&
-                !form.errors.application &&
-                !form.errors.erc1155Address &&
-                isHex(execLayerData) &&
-                isHex(baseLayerData),
+            query: {
+                enabled:
+                    tokenId !== undefined &&
+                    amount !== undefined &&
+                    accountBalance !== undefined &&
+                    amount <= accountBalance &&
+                    !form.errors.application &&
+                    !form.errors.erc1155Address &&
+                    isHex(execLayerData) &&
+                    isHex(baseLayerData),
+            },
         });
 
-    const deposit = useErc1155SinglePortalDepositSingleErc1155Token(
-        depositPrepare.config,
-    );
+    const deposit = useWriteErc1155SinglePortalDepositSingleErc1155Token();
 
-    const depositWait = useWaitForTransaction(deposit.data);
+    const depositWait = useWaitForTransactionReceipt({
+        hash: deposit.data,
+    });
+
     const canDeposit =
         accountBalance !== undefined &&
         amount !== undefined &&
@@ -195,17 +203,10 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
         approvePrepare,
         approve,
         approveWait,
-        approve.write,
         false,
     );
     const { disabled: depositDisabled, loading: depositLoading } =
-        transactionState(
-            depositPrepare,
-            deposit,
-            depositWait,
-            deposit.write,
-            true,
-        );
+        transactionState(depositPrepare, deposit, depositWait, true);
 
     return (
         <FormProvider form={form}>
@@ -277,7 +278,7 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
 
                     <AdvancedFields display={advanced} />
 
-                    <Collapse in={approve.isLoading || approveWait.isLoading}>
+                    <Collapse in={!approve.isIdle || approveWait.isLoading}>
                         <TransactionProgress
                             prepare={approvePrepare}
                             execute={approve}
@@ -310,7 +311,11 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                             disabled={isApproved || !form.isValid()}
                             leftSection={<TbCheck />}
                             loading={isCheckingApproval || approveLoading}
-                            onClick={approve.write}
+                            onClick={() =>
+                                approve.writeContract(
+                                    approvePrepare.data!.request,
+                                )
+                            }
                         >
                             {!isCheckingApproval && isApproved
                                 ? "Approved"
@@ -325,7 +330,11 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                             }
                             leftSection={<TbPigMoney />}
                             loading={depositLoading}
-                            onClick={deposit.write}
+                            onClick={() =>
+                                deposit.writeContract(
+                                    depositPrepare.data!.request,
+                                )
+                            }
                         >
                             Deposit
                         </Button>

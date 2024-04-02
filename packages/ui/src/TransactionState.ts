@@ -1,21 +1,22 @@
-import { TransactionStageStatus } from "./TransactionStatus";
+import {
+    TransactionStageStatus,
+    TransactionWaitStatus,
+} from "./TransactionStatus";
 
 export const transactionState = (
-    prepare: TransactionStageStatus,
+    prepare: TransactionWaitStatus,
     execute: TransactionStageStatus,
-    wait: TransactionStageStatus,
-    write?: () => void,
+    wait: TransactionWaitStatus,
     disableOnSuccess: boolean = true,
 ) => {
     const loading =
-        prepare.status === "loading" ||
-        execute.status === "loading" ||
-        wait.status === "loading";
+        prepare.fetchStatus === "fetching" ||
+        execute.status === "pending" ||
+        wait.fetchStatus === "fetching";
 
     const disabled =
-        prepare.error != null ||
-        (disableOnSuccess && wait.status === "success") ||
-        !write;
+        prepare.error !== null ||
+        (disableOnSuccess && wait.status === "success");
 
     return { loading, disabled };
 };

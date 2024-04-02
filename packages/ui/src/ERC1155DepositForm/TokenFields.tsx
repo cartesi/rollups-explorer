@@ -1,4 +1,7 @@
-import { useErc1155BalanceOf, useErc1155Uri } from "@cartesi/rollups-wagmi";
+import {
+    useReadErc1155BalanceOf,
+    useReadErc1155Uri,
+} from "@cartesi/rollups-wagmi";
 import {
     Accordion,
     Avatar,
@@ -21,12 +24,14 @@ import {
     complement,
     equals,
     hasPath,
+    is,
     isNotNil,
     or,
     pathOr,
 } from "ramda";
 import { FC } from "react";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
+import { Config } from "wagmi";
 import { useFormContext } from "./context";
 import {
     State,
@@ -34,7 +39,14 @@ import {
     useGetTokenMetadata,
 } from "./useGetTokenMetadata";
 
-type BalanceOf = ReturnType<typeof useErc1155BalanceOf<"balanceOf", bigint>>;
+type BalanceOf = ReturnType<
+    typeof useReadErc1155BalanceOf<
+        "balanceOf",
+        [Address, bigint],
+        Config,
+        bigint
+    >
+>;
 
 interface Props {
     balanceOf: BalanceOf;
@@ -83,6 +95,9 @@ const MetadataView: FC<MetadataViewProps> = ({ tokenMetadata }) => {
     const name = pathOr("", ["name"], data);
     const description = pathOr("", ["description"], data);
     const image = pathOr("", ["image"], data);
+    const dataAsString = is(Object, data)
+        ? JSON.stringify(data, null, " ")
+        : data;
 
     return (
         <>
@@ -123,7 +138,7 @@ const MetadataView: FC<MetadataViewProps> = ({ tokenMetadata }) => {
                                 maxRows={10}
                                 readOnly
                                 contentEditable={false}
-                                value={JSON.stringify(data, null, " ")}
+                                value={dataAsString}
                             />
                         </Accordion.Panel>
                     </Accordion.Item>
@@ -138,10 +153,12 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
     const { erc1155Address, tokenId } = form.getTransformedValues();
     const { data: accountBalance, isLoading: isCheckingBalance } = balanceOf;
 
-    const { data: uri, isLoading: isCheckingURI } = useErc1155Uri({
+    const { data: uri, isLoading: isCheckingURI } = useReadErc1155Uri({
         address: erc1155Address !== zeroAddress ? erc1155Address : undefined,
         args: [tokenId!],
-        enabled: tokenId !== undefined,
+        query: {
+            enabled: tokenId !== undefined,
+        },
     });
 
     const metadataResult = useGetTokenMetadata(uri, tokenId);
