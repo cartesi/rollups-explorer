@@ -138,7 +138,7 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
     });
 
-    it("should display enabled button when voucher is not yet executed", () => {
+    it("should display enabled button when voucher is not yet executed", async () => {
         useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
