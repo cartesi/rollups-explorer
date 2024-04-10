@@ -4,6 +4,7 @@ import {
     Burger,
     Button,
     Group,
+    Menu,
     Modal,
     NavLink,
     Stack,
@@ -17,23 +18,22 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 import {
+    TbAdjustmentsHorizontal,
     TbApps,
     TbArrowsDownUp,
-    TbDotsVertical,
     TbHome,
     TbInbox,
     TbMoonStars,
+    TbPlugConnected,
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
-import ConnectionView from "../../components/connection/connectionView";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle }] = useDisclosure();
-    const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
     const [
         transaction,
         {
@@ -62,13 +62,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 width: 180,
                 collapsed: {
                     mobile: !opened,
-                },
-            }}
-            aside={{
-                ...themeDefaultProps?.aside,
-                collapsed: {
-                    desktop: !menuOpened,
-                    mobile: !menuOpened,
                 },
             }}
             padding="md"
@@ -104,6 +97,36 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             >
                                 Send Transaction
                             </Button>
+                            <Menu
+                                shadow="md"
+                                width={200}
+                                styles={{ item: { padding: 0 } }}
+                            >
+                                <Menu.Target>
+                                    <Button
+                                        variant="subtle"
+                                        leftSection={
+                                            <TbAdjustmentsHorizontal />
+                                        }
+                                        visibleFrom="sm"
+                                        data-testid="settings-button"
+                                    >
+                                        Settings
+                                    </Button>
+                                </Menu.Target>
+
+                                <Menu.Dropdown>
+                                    <Menu.Item>
+                                        <NavLink
+                                            component={Link}
+                                            label="Connections"
+                                            leftSection={<TbPlugConnected />}
+                                            href="/connections"
+                                            data-testid="connections-link"
+                                        />
+                                    </Menu.Item>
+                                </Menu.Dropdown>
+                            </Menu>
                             {showWalletNavbar && (
                                 <ConnectButton
                                     showBalance={!hideBalanceViewport}
@@ -141,14 +164,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             />
                         </Group>
                     </Group>
-                    <Button variant="subtle" onClick={toggleMenu}>
-                        <TbDotsVertical size={theme.other.iconSize} />
-                    </Button>
                 </Group>
             </AppShell.Header>
-            <AppShell.Aside p="md" zIndex={102}>
-                <ConnectionView />
-            </AppShell.Aside>
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
                 <Stack px={13}>
                     <NavLink
