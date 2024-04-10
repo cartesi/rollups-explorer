@@ -1,11 +1,10 @@
-import { Group, Stack, Title } from "@mantine/core";
-import { TbInbox } from "react-icons/tb";
+import { Stack } from "@mantine/core";
 import { Metadata } from "next";
-import Inputs from "../../components/inputs/inputs";
+import Connections from "../../components/connection/connections";
 import Breadcrumbs from "../../components/breadcrumbs";
 
 export const metadata: Metadata = {
-    title: "Inputs",
+    title: "Connections",
 };
 
 export default function InputsPage() {
@@ -20,12 +19,7 @@ export default function InputsPage() {
                 ]}
             />
 
-            <Group>
-                <TbInbox size={40} />
-                <Title order={2}>Inputs</Title>
-            </Group>
-
-            <Inputs />
+            <Connections />
         </Stack>
     );
 }
