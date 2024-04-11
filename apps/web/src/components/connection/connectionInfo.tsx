@@ -21,7 +21,7 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
     const { removeConnection } = useConnectionConfig();
     const theme = useMantineTheme();
     return (
-        <Card withBorder py="lg" my="md" radius="sm" shadow="sm">
+        <Card withBorder py="lg" mt="md" radius="sm" shadow="sm">
             <Card.Section inheritPadding withBorder>
                 <Flex justify="space-between">
                     <Address value={connection.address} shorten icon />
