@@ -1,4 +1,10 @@
-import { render, screen, within } from "@testing-library/react";
+import {
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+    within,
+} from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../../utils/WithMantineTheme";
 import Shell from "../../../src/components/layout/shell";
@@ -144,6 +150,38 @@ describe("Shell component", () => {
                     "applications-link",
                 ),
             ).toThrow("Unable to find an element");
+        });
+
+        it("should display settings menu in header", () => {
+            render(<Component>Children</Component>);
+
+            expect(
+                within(screen.getByTestId("header")).getByTestId(
+                    "settings-menu",
+                ),
+            ).toBeInTheDocument();
+        });
+
+        it("should display connections link in settings menu", async () => {
+            render(<Component>Children</Component>);
+
+            const settingsMenu = within(
+                screen.getByTestId("header"),
+            ).getByTestId("settings-menu");
+
+            fireEvent.click(settingsMenu);
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link"),
+                ).toBeInTheDocument(),
+            );
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link").getAttribute("href"),
+                ).toBe("/connections"),
+            );
         });
     });
 
