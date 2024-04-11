@@ -151,38 +151,6 @@ describe("Shell component", () => {
                 ),
             ).toThrow("Unable to find an element");
         });
-
-        it("should display settings menu in header", () => {
-            render(<Component>Children</Component>);
-
-            expect(
-                within(screen.getByTestId("header")).getByTestId(
-                    "settings-menu",
-                ),
-            ).toBeInTheDocument();
-        });
-
-        it("should display connections link in settings menu", async () => {
-            render(<Component>Children</Component>);
-
-            const settingsMenu = within(
-                screen.getByTestId("header"),
-            ).getByTestId("settings-menu");
-
-            fireEvent.click(settingsMenu);
-
-            await waitFor(() =>
-                expect(
-                    screen.getByTestId("connections-link"),
-                ).toBeInTheDocument(),
-            );
-
-            await waitFor(() =>
-                expect(
-                    screen.getByTestId("connections-link").getAttribute("href"),
-                ).toBe("/connections"),
-            );
-        });
     });
 
     describe("Navbar", () => {
@@ -206,6 +174,38 @@ describe("Shell component", () => {
             ) as HTMLDivElement;
 
             expect(navbar).toBeVisible();
+        });
+
+        it("should display settings menu in navbar", () => {
+            render(<Component>Children</Component>);
+
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId(
+                    "settings-link",
+                ),
+            ).toBeInTheDocument();
+        });
+
+        it("should display connections link in settings menu", async () => {
+            render(<Component>Children</Component>);
+
+            const settingsMenu = within(
+                screen.getByTestId("navbar"),
+            ).getByTestId("settings-link");
+
+            fireEvent.click(settingsMenu);
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link"),
+                ).toBeInTheDocument(),
+            );
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link").getAttribute("href"),
+                ).toBe("/connections"),
+            );
         });
     });
 });
