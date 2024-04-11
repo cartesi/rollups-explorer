@@ -41,7 +41,7 @@ const ConnectionView = () => {
                 </Group>
             </Group>
 
-            <Stack gap={0}>
+            <Stack gap={0} style={{ maxWidth: "48rem" }}>
                 {connections.map((connection) => (
                     <ConnectionInfo
                         key={connection.address}
