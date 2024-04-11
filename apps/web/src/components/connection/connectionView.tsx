@@ -1,24 +1,20 @@
+"use client";
 import {
     Avatar,
     Button,
-    Collapse,
     Group,
-    ScrollArea,
+    Stack,
     Text,
     Title,
-    VisuallyHidden,
     useMantineTheme,
+    VisuallyHidden,
 } from "@mantine/core";
-import { useDisclosure, useViewportSize } from "@mantine/hooks";
-import { TbChevronDown, TbChevronUp, TbPlus } from "react-icons/tb";
+import { TbPlus } from "react-icons/tb";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionInfo from "./connectionInfo";
 
 const ConnectionView = () => {
-    const [showConnectionList, { toggle: toggleConnectionList }] =
-        useDisclosure(true);
     const { showConnectionModal } = useConnectionConfig();
-    const { height: viewportHeight } = useViewportSize();
     const theme = useMantineTheme();
     const { listConnections } = useConnectionConfig();
     const connections = listConnections();
@@ -43,36 +39,22 @@ const ConnectionView = () => {
                         </Avatar>
                     )}
                 </Group>
-                <Button variant="transparent" onClick={toggleConnectionList}>
-                    {showConnectionList ? (
-                        <>
-                            <TbChevronUp size={theme.other.iconSize} />
-                            <VisuallyHidden>Hide connections</VisuallyHidden>
-                        </>
-                    ) : (
-                        <>
-                            <TbChevronDown size={theme.other.iconSize} />
-                            <VisuallyHidden>Show connections</VisuallyHidden>
-                        </>
-                    )}
-                </Button>
             </Group>
-            <Collapse in={showConnectionList}>
-                <ScrollArea h={viewportHeight / 2} type="never">
-                    {connections.map((connection) => (
-                        <ConnectionInfo
-                            key={connection.address}
-                            connection={connection}
-                        />
-                    ))}
 
-                    {!hasConnections && (
-                        <Text c="dimmed" py="sm">
-                            Create your first connection.
-                        </Text>
-                    )}
-                </ScrollArea>
-            </Collapse>
+            <Stack gap={0}>
+                {connections.map((connection) => (
+                    <ConnectionInfo
+                        key={connection.address}
+                        connection={connection}
+                    />
+                ))}
+
+                {!hasConnections && (
+                    <Text c="dimmed" py="sm">
+                        Create your first connection.
+                    </Text>
+                )}
+            </Stack>
         </>
     );
 };
