@@ -35,7 +35,7 @@ const themeOverride: MantineThemeOverride = createTheme({
                     breakpoint: "sm",
                 },
                 aside: {
-                    width: 400,
+                    width: 0,
                     breakpoint: "sm",
                 },
             },
