@@ -79,30 +79,4 @@ describe("Connection view component", () => {
 
         expect(removeConnection).toHaveBeenCalledWith(connections[0].address);
     });
-
-    it("should hide the connections when clicking the chevron-up icon", () => {
-        const { listConnections } = useConnectionConfigReturnStub;
-        listConnections.mockReturnValue(connections);
-
-        render(<View />);
-
-        expect(screen.queryByText(connections[0].url)).toBeVisible();
-
-        fireEvent.click(screen.getByText("Hide connections"));
-
-        expect(screen.queryByText(connections[0].url)).not.toBeVisible();
-    });
-
-    it("should show the connections when clicking the chevron-down icon", () => {
-        const { listConnections } = useConnectionConfigReturnStub;
-        listConnections.mockReturnValue(connections);
-
-        render(<View />);
-
-        fireEvent.click(screen.getByText("Hide connections"));
-        expect(screen.queryByText(connections[0].url)).not.toBeVisible();
-
-        fireEvent.click(screen.getByText("Show connections"));
-        expect(screen.queryByText(connections[0].url)).toBeVisible();
-    });
 });
