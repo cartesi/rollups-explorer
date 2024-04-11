@@ -101,6 +101,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 shadow="md"
                                 width={200}
                                 styles={{ item: { padding: 0 } }}
+                                data-testid="settings-menu"
                             >
                                 <Menu.Target>
                                     <Button
@@ -109,7 +110,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                             <TbAdjustmentsHorizontal />
                                         }
                                         visibleFrom="sm"
-                                        data-testid="settings-button"
                                     >
                                         Settings
                                     </Button>
