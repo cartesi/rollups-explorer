@@ -1,5 +1,6 @@
 import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
@@ -34,7 +35,10 @@ const Layout: FC<LayoutProps> = ({ children }) => {
             </head>
             <body>
                 <Providers>
-                    <Shell>{children}</Shell>
+                    <>
+                        <Notifications />
+                        <Shell>{children}</Shell>
+                    </>
                 </Providers>
                 <Analytics />
             </body>
