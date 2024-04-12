@@ -19,7 +19,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { isEmpty } from "ramda";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -36,8 +36,10 @@ import {
     zeroAddress,
 } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { DepositFormSuccessData } from "../DepositFormTypes";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
+import useWatchQueryOnBlockChange from "../hooks/useWatchQueryOnBlockChange";
 import AdvancedFields from "./AdvancedFields";
 import TokenFields from "./TokenFields";
 import { FormProvider, useForm } from "./context";
@@ -48,6 +50,7 @@ export interface ERC1155DepositFormProps {
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSearchTokens: (tokenId: string) => void;
+    onSuccess?: (receipt: DepositFormSuccessData) => void;
 }
 
 export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
@@ -57,6 +60,7 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
         isLoadingApplications,
         onSearchApplications,
         onSearchTokens,
+        onSuccess,
     } = props;
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
@@ -138,6 +142,8 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
         args: [getAddress(address!), erc1155SinglePortalAddress],
     });
 
+    useWatchQueryOnBlockChange(approvedForAll.queryKey);
+
     const { data: accountBalance, isLoading: isCheckingBalance } = balanceOf;
     const { data: isApproved, isLoading: isCheckingApproval } = approvedForAll;
 
@@ -183,7 +189,8 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                     !form.errors.application &&
                     !form.errors.erc1155Address &&
                     isHex(execLayerData) &&
-                    isHex(baseLayerData),
+                    isHex(baseLayerData) &&
+                    isApproved,
             },
         });
 
@@ -191,22 +198,43 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
 
     const depositWait = useWaitForTransactionReceipt({
         hash: deposit.data,
+        query: {
+            enabled: isApproved,
+        },
     });
 
     const canDeposit =
         accountBalance !== undefined &&
         amount !== undefined &&
         amount > 0 &&
-        amount <= accountBalance;
+        amount <= accountBalance &&
+        isApproved;
 
     const { loading: approveLoading } = transactionState(
         approvePrepare,
         approve,
         approveWait,
-        false,
+        true,
     );
     const { disabled: depositDisabled, loading: depositLoading } =
         transactionState(depositPrepare, deposit, depositWait, true);
+
+    useEffect(() => {
+        if (depositWait.isSuccess) {
+            if (onSuccess)
+                onSuccess({ receipt: depositWait.data, type: "ERC-1155" });
+            form.reset();
+            approve.reset();
+            deposit.reset();
+        }
+    }, [
+        depositWait.isSuccess,
+        onSuccess,
+        approve,
+        deposit,
+        form,
+        depositWait.data,
+    ]);
 
     return (
         <FormProvider form={form}>
@@ -329,7 +357,7 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                                 !form.isValid()
                             }
                             leftSection={<TbPigMoney />}
-                            loading={depositLoading}
+                            loading={canDeposit && depositLoading}
                             onClick={() =>
                                 deposit.writeContract(
                                     depositPrepare.data!.request,

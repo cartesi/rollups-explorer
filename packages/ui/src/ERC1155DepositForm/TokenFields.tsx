@@ -83,8 +83,7 @@ const Message: FC<MessageProps> = ({ title, content, color }) => {
  * in the token-metadata-result. Tracking only the ones of interest.
  */
 const feedbackByState: Partial<Record<State, string>> = {
-    http_network_error:
-        "We could not fetch the data. It may be due to a CORS problem or unavailability.",
+    http_network_error: "We could not fetch the metadata.",
     not_http: "The URI is valid, but it is not an HTTP protocol.",
     errored: "Something is wrong with the URI returned by the contract.",
 } as const;
