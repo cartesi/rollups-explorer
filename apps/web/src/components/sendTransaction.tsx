@@ -1,5 +1,7 @@
 "use client";
 import {
+    DepositFormSuccessData,
+    ERC1155DepositForm,
     ERC20DepositForm,
     ERC721DepositForm,
     EtherDepositForm,
@@ -7,10 +9,11 @@ import {
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchTokens } from "../hooks/useSearchTokens";
-import { notifications } from "@mantine/notifications";
+import { BlockExplorerLink } from "./BlockExplorerLink";
 
 export type DepositType =
     | "ether"
@@ -25,7 +28,7 @@ interface DepositProps {
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "ether",
+    initialDepositType = "erc1155",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -48,6 +51,32 @@ const SendTransaction: FC<DepositProps> = ({
         });
     }, []);
 
+    const onSuccess = useCallback(
+        ({ receipt, type }: DepositFormSuccessData) => {
+            const message = receipt?.transactionHash
+                ? {
+                      message: (
+                          <BlockExplorerLink
+                              value={receipt.transactionHash.toString()}
+                              type="tx"
+                          />
+                      ),
+                      title: `${type} transfer completed`,
+                  }
+                : { message: `${type} transfer completed.` };
+
+            notifications.show({
+                withCloseButton: true,
+                autoClose: false,
+                color: "green",
+                ...message,
+            });
+
+            setTokenId("");
+        },
+        [],
+    );
+
     return (
         <>
             <Select
@@ -62,6 +91,7 @@ const SendTransaction: FC<DepositProps> = ({
                             { value: "ether", label: "Ether Deposit" },
                             { value: "erc20", label: "ERC-20 Deposit" },
                             { value: "erc721", label: "ERC-721 Deposit" },
+                            { value: "erc1155", label: "ERC-1155 Deposit" },
                         ],
                     },
                     {
@@ -102,6 +132,15 @@ const SendTransaction: FC<DepositProps> = ({
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                />
+            ) : depositType === "erc1155" ? (
+                <ERC1155DepositForm
+                    tokens={[]}
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                    onSearchTokens={setTokenId}
+                    onSuccess={onSuccess}
                 />
             ) : null}
         </>
