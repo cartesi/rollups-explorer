@@ -8,10 +8,11 @@ import {
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedState, useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
+import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
 import { BlockExplorerLink } from "./BlockExplorerLink";
 
@@ -36,12 +37,14 @@ const SendTransaction: FC<DepositProps> = ({
     const [tokenId, setTokenId] = useState<string>("");
     const [debouncedApplicationId] = useDebouncedValue(applicationId, 400);
     const [debouncedTokenId] = useDebouncedValue(tokenId, 400);
+    const [multiTokenId, setMultiTokenId] = useDebouncedState("", 400);
     const { applications, fetching } = useSearchApplications({
         address: debouncedApplicationId,
     });
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
     });
+    const { multiTokens } = useSearchMultiTokens({ address: multiTokenId });
 
     const onDepositErc721 = useCallback(() => {
         notifications.show({
@@ -72,7 +75,8 @@ const SendTransaction: FC<DepositProps> = ({
                 ...message,
             });
 
-            setTokenId("");
+            setMultiTokenId("");
+            setApplicationId("");
         },
         [],
     );
@@ -135,11 +139,11 @@ const SendTransaction: FC<DepositProps> = ({
                 />
             ) : depositType === "erc1155" ? (
                 <ERC1155DepositForm
-                    tokens={[]}
+                    tokens={multiTokens}
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
-                    onSearchTokens={setTokenId}
+                    onSearchTokens={setMultiTokenId}
                     onSuccess={onSuccess}
                 />
             ) : null}
