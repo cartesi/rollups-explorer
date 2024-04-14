@@ -29,7 +29,7 @@
         "wagmi": "^2"
     },
     "devDependencies": {
-        "@cartesi/rollups": "^1.0",
+        "@cartesi/rollups": "^1.2.0",
         "@cartesi/tsconfig": "*",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.3",
         "@types/react": "^18",
