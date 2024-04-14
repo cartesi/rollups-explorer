@@ -32,6 +32,7 @@ import {
     getAddress,
     isAddress,
     isHex,
+    parseUnits,
     zeroAddress,
 } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -101,10 +102,14 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
                 ? getAddress(values.erc1155Address)
                 : zeroAddress,
             tokenId:
-                values.tokenId && Number.isInteger(Number(values.tokenId))
+                values.tokenId !== "" &&
+                Number.isInteger(Number(values.tokenId))
                     ? BigInt(values.tokenId)
                     : undefined,
-            amount: values.amount ? BigInt(values.amount) : undefined,
+            amount:
+                values.amount !== ""
+                    ? parseUnits(values.amount.toString(), values.decimals)
+                    : undefined,
             execLayerData: values.execLayerData as Hex,
             baseLayerData: values.baseLayerData as Hex,
         }),
