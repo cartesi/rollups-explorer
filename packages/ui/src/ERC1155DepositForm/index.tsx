@@ -18,7 +18,6 @@ import {
     Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { isEmpty } from "ramda";
 import { FC, useEffect } from "react";
 import {
     TbAlertCircle,
@@ -43,6 +42,13 @@ import useWatchQueryOnBlockChange from "../hooks/useWatchQueryOnBlockChange";
 import AdvancedFields from "./AdvancedFields";
 import TokenFields from "./TokenFields";
 import { FormProvider, useForm } from "./context";
+import {
+    amountValidation,
+    applicationValidation,
+    erc1155AddressValidation,
+    hexValidation,
+    tokenIdValidation,
+} from "./validations";
 
 export interface ERC1155DepositFormProps {
     tokens: string[];
@@ -70,36 +76,22 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
+            mode: "single",
             application: "",
             erc1155Address: "",
             tokenId: "",
             amount: "",
             execLayerData: "0x",
             baseLayerData: "0x",
+            decimals: 0,
         },
         validate: {
-            application: (value) => {
-                if (isEmpty(value)) return `Application address is required.`;
-                if (!isAddress(value)) {
-                    return `Invalid Application address`;
-                }
-                return null;
-            },
-            erc1155Address: (value) => {
-                if (isEmpty(value)) return `ERC1155 address is required`;
-                if (!isAddress(value)) {
-                    return `Invalid ERC1155 address`;
-                }
-                return null;
-            },
-            tokenId: (value) =>
-                value !== "" && Number(value) >= 0 ? null : "Invalid token id",
-            amount: (value) =>
-                value !== "" && Number(value) > 0 ? null : "Invalid amount",
-            execLayerData: (value) =>
-                isHex(value) ? null : "Invalid hex string",
-            baseLayerData: (value) =>
-                isHex(value) ? null : "Invalid hex string",
+            application: applicationValidation,
+            erc1155Address: erc1155AddressValidation,
+            tokenId: tokenIdValidation,
+            amount: amountValidation,
+            execLayerData: hexValidation,
+            baseLayerData: hexValidation,
         },
         transformValues: (values) => ({
             applicationAddress: isAddress(values.application)
@@ -108,7 +100,10 @@ export const ERC1155DepositForm: FC<ERC1155DepositFormProps> = (props) => {
             erc1155Address: isAddress(values.erc1155Address)
                 ? getAddress(values.erc1155Address)
                 : zeroAddress,
-            tokenId: values.tokenId ? BigInt(values.tokenId) : undefined,
+            tokenId:
+                values.tokenId && Number.isInteger(Number(values.tokenId))
+                    ? BigInt(values.tokenId)
+                    : undefined,
             amount: values.amount ? BigInt(values.amount) : undefined,
             execLayerData: values.execLayerData as Hex,
             baseLayerData: values.baseLayerData as Hex,
