@@ -29,7 +29,7 @@ import {
     or,
     pathOr,
 } from "ramda";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Address, zeroAddress } from "viem";
 import { Config } from "wagmi";
 import { useFormContext } from "./context";
@@ -166,6 +166,11 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
     const decimals = pathOr(0, ["decimals"], metadataResult.data);
     const name = pathOr("", ["name"], metadataResult.data);
     const symbol = pathOr("", ["symbol"], metadataResult.data);
+
+    useEffect(() => {
+        form.setFieldValue("decimals", decimals);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [decimals]);
 
     return (
         <Collapse in={display}>
