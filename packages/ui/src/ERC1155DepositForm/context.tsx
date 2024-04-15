@@ -1,7 +1,19 @@
 import { createFormContext } from "@mantine/form";
 import { Address, Hex } from "viem";
 
-type Transfer = Record<string, string>;
+export type DepositData = {
+    tokenId: bigint;
+    name?: string;
+    amount: bigint;
+    id: Hex;
+};
+
+type Amounts = bigint[];
+type TokenIds = bigint[];
+
+export type DepositDataTuple = [bigint, bigint];
+export type BatchTuple = [TokenIds, Amounts];
+
 interface FormValues {
     mode: "single" | "batch";
     application: string;
@@ -11,7 +23,7 @@ interface FormValues {
     execLayerData: Hex;
     baseLayerData: Hex;
     decimals: number;
-    batch?: Transfer;
+    batch?: DepositData[];
 }
 
 interface TransformedValues {
@@ -21,6 +33,7 @@ interface TransformedValues {
     amount?: bigint;
     execLayerData: Hex;
     baseLayerData: Hex;
+    batchAsLists?: BatchTuple;
 }
 
 type TransformValues = (a: FormValues) => TransformedValues;
