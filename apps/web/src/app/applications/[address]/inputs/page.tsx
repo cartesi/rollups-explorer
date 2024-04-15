@@ -2,7 +2,7 @@ import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
-import { TbInbox } from "react-icons/tb";
+import { TbStack2 } from "react-icons/tb";
 import { Address as AddressType } from "viem";
 import Address from "../../../../components/address";
 import Breadcrumbs from "../../../../components/breadcrumbs";
