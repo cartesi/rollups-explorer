@@ -21,6 +21,7 @@ export type DepositType =
     | "erc20"
     | "erc721"
     | "erc1155"
+    | "erc1155Batch"
     | "relay"
     | "input";
 
@@ -96,6 +97,10 @@ const SendTransaction: FC<DepositProps> = ({
                             { value: "erc20", label: "ERC-20 Deposit" },
                             { value: "erc721", label: "ERC-721 Deposit" },
                             { value: "erc1155", label: "ERC-1155 Deposit" },
+                            {
+                                value: "erc1155Batch",
+                                label: "ERC-1155 Batch Deposit",
+                            },
                         ],
                     },
                     {
@@ -139,6 +144,17 @@ const SendTransaction: FC<DepositProps> = ({
                 />
             ) : depositType === "erc1155" ? (
                 <ERC1155DepositForm
+                    mode="single"
+                    tokens={multiTokens}
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                    onSearchTokens={setMultiTokenId}
+                    onSuccess={onSuccess}
+                />
+            ) : depositType === "erc1155Batch" ? (
+                <ERC1155DepositForm
+                    mode="batch"
                     tokens={multiTokens}
                     applications={applications}
                     isLoadingApplications={fetching}
