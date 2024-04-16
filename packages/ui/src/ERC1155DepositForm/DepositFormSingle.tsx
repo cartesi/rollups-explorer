@@ -78,6 +78,7 @@ const DepositFormSingle: FC<Props> = (props) => {
             execLayerData: "0x",
             baseLayerData: "0x",
             decimals: 0,
+            balance: 0n,
         },
         validate: {
             application: applicationValidation,
