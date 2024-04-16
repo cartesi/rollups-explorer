@@ -14,8 +14,9 @@ type TokenIds = bigint[];
 export type DepositDataTuple = [bigint, bigint];
 export type BatchTuple = [TokenIds, Amounts];
 
-interface FormValues {
-    mode: "single" | "batch";
+export type Mode = "single" | "batch";
+export interface FormValues {
+    mode: Mode;
     application: string;
     erc1155Address: string;
     tokenId: string;
@@ -23,10 +24,11 @@ interface FormValues {
     execLayerData: Hex;
     baseLayerData: Hex;
     decimals: number;
+    balance: bigint;
     batch?: DepositData[];
 }
 
-interface TransformedValues {
+export interface TransformedValues {
     applicationAddress: Address;
     erc1155Address: Address;
     tokenId?: bigint;
