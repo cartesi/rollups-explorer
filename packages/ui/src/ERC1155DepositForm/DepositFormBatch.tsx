@@ -1,6 +1,6 @@
 import {
     erc1155Abi,
-    erc1155SinglePortalAddress,
+    erc1155BatchPortalAddress,
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
     useSimulateErc1155BatchPortalDepositBatchErc1155Token,
@@ -41,6 +41,7 @@ import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
 import useWatchQueryOnBlockChange from "../hooks/useWatchQueryOnBlockChange";
 import AdvancedFields from "./AdvancedFields";
+import DepositBatchReview from "./DepositBatchReview";
 import TokenFields from "./TokenFields";
 import {
     BatchTuple,
@@ -60,10 +61,10 @@ import {
 
 type Props = Omit<ERC1155DepositFormProps, "mode">;
 
-const reducer = reduce<DepositData, DepositDataTuple[]>((acc, curr) => {
-    acc.push([curr.tokenId, curr.amount]);
-    return acc;
-}, [] as DepositDataTuple[]);
+const reducer = reduce<DepositData, DepositDataTuple[]>(
+    (acc, curr) => [...acc, [curr.tokenId, curr.amount]],
+    [] as DepositDataTuple[],
+);
 
 const splitBatchInOrder = pipe(reducer, (l) => transpose(l) as BatchTuple);
 
@@ -92,6 +93,7 @@ const DepositFormBatch: FC<Props> = (props) => {
             execLayerData: "0x",
             baseLayerData: "0x",
             decimals: 0,
+            balance: 0n,
             batch: undefined,
         },
         validate: {
@@ -160,7 +162,7 @@ const DepositFormBatch: FC<Props> = (props) => {
 
     const approvedForAll = useReadErc1155IsApprovedForAll({
         address: erc1155Contract.address,
-        args: [getAddress(address!), erc1155SinglePortalAddress],
+        args: [getAddress(address!), erc1155BatchPortalAddress],
     });
 
     useWatchQueryOnBlockChange(approvedForAll.queryKey);
@@ -175,7 +177,7 @@ const DepositFormBatch: FC<Props> = (props) => {
     // prepare approve transaction
     const approvePrepare = useSimulateErc1155SetApprovalForAll({
         address: erc1155Address,
-        args: [erc1155SinglePortalAddress, true],
+        args: [erc1155BatchPortalAddress, true],
         query: {
             enabled:
                 accountBalance !== undefined &&
@@ -325,7 +327,7 @@ const DepositFormBatch: FC<Props> = (props) => {
                         }
                     />
 
-                    <h1>THE REVIEW AREA GOES HERE!!!!</h1>
+                    <DepositBatchReview />
 
                     <AdvancedFields display={advanced} />
 
@@ -374,11 +376,7 @@ const DepositFormBatch: FC<Props> = (props) => {
                         </Button>
                         <Button
                             variant="filled"
-                            disabled={
-                                depositDisabled ||
-                                !canDeposit ||
-                                !form.isValid()
-                            }
+                            disabled={depositDisabled || !canDeposit}
                             leftSection={<TbPigMoney />}
                             loading={canDeposit && depositLoading}
                             onClick={() =>
