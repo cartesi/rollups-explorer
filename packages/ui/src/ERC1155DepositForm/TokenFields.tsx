@@ -25,14 +25,15 @@ import {
     equals,
     hasPath,
     is,
+    isNil,
     isNotNil,
     or,
     pathOr,
 } from "ramda";
 import { FC, useEffect } from "react";
-import { Address, zeroAddress } from "viem";
+import { Address, toHex, zeroAddress } from "viem";
 import { Config } from "wagmi";
-import { useFormContext } from "./context";
+import { Mode, useFormContext } from "./context";
 import {
     State,
     TokenMetadataResult,
@@ -147,12 +148,58 @@ const MetadataView: FC<MetadataViewProps> = ({ tokenMetadata }) => {
     );
 };
 
+interface AddToBatchListProps {
+    name?: string;
+    tokenId?: bigint;
+    amount?: bigint;
+}
+
+const AddToBatchList: FC<AddToBatchListProps> = ({ name, tokenId, amount }) => {
+    const form = useFormContext();
+    const batchErrorMsg = pathOr(null, ["errors", "batch"], form);
+
+    const noErrors = isNil(form.errors.amount) && isNil(form.errors.tokenId);
+    const canAddToList =
+        tokenId !== undefined && amount !== undefined && noErrors;
+
+    return (
+        <>
+            <Button
+                disabled={!canAddToList}
+                onClick={() => {
+                    const newEntry = {
+                        amount: amount!,
+                        tokenId: tokenId!,
+                        name,
+                        id: toHex(Date.now()),
+                    };
+
+                    form.setValues((prev) => {
+                        return {
+                            batch: [...(prev.batch ?? []), newEntry],
+                            tokenId: "",
+                            amount: "",
+                        };
+                    });
+                }}
+            >
+                ADD TO DEPOSIT LIST
+            </Button>
+
+            <Text c="red" size="xs">
+                {batchErrorMsg}
+            </Text>
+        </>
+    );
+};
+
 const TokenFields: FC<Props> = ({ balanceOf, display }) => {
     const form = useFormContext();
-    const { erc1155Address, tokenId } = form.getTransformedValues();
+    const mode = pathOr<Mode>("single", ["values", "mode"], form);
+    const { erc1155Address, tokenId, amount } = form.getTransformedValues();
     const { data: accountBalance, isLoading: isCheckingBalance } = balanceOf;
 
-    const { data: uri, isLoading: isCheckingURI } = useReadErc1155Uri({
+    const { data: uri } = useReadErc1155Uri({
         address: erc1155Address !== zeroAddress ? erc1155Address : undefined,
         args: [tokenId!],
         query: {
@@ -171,6 +218,11 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
         form.setFieldValue("decimals", decimals);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [decimals]);
+
+    useEffect(() => {
+        if (accountBalance) form.setFieldValue("balance", accountBalance);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [accountBalance]);
 
     return (
         <Collapse in={display}>
@@ -260,6 +312,13 @@ const TokenFields: FC<Props> = ({ balanceOf, display }) => {
                             </Text>
                         </Flex>
                     </>
+                )}
+                {mode === "batch" && (
+                    <AddToBatchList
+                        name={name}
+                        amount={amount}
+                        tokenId={tokenId}
+                    />
                 )}
                 <Stack>
                     <MetadataView tokenMetadata={metadataResult} />
