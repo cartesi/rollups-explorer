@@ -1,5 +1,6 @@
-import { anyPass, complement, isEmpty } from "ramda";
+import { anyPass, complement, isEmpty, map, pipe, reduce } from "ramda";
 import { isAddress, isHex } from "viem";
+import { DepositData, FormValues } from "./context";
 
 const isNotNumberOrInteger = anyPass<(val: number) => boolean>([
     Number.isNaN,
@@ -32,8 +33,29 @@ export const applicationValidation = (value: string) => {
     return null;
 };
 
-export const amountValidation = (value: string) => {
-    return value !== "" && Number(value) > 0 ? null : "Invalid amount";
+const sumBatchFor = (tokenId: bigint) =>
+    pipe(
+        map<DepositData, bigint>((d) =>
+            d.tokenId === tokenId ? d.amount : BigInt(0),
+        ),
+        reduce((acc, curr) => acc + curr, BigInt(0)),
+    );
+
+export const amountValidation = (value: string, values: FormValues) => {
+    const amount = BigInt(value);
+    if (amount === 0n) return "Invalid amount.";
+
+    if (amount > values.balance)
+        return "The amount should be smaller or equal to your balance.";
+
+    if (values.mode === "batch") {
+        const sum = sumBatchFor(BigInt(values.tokenId));
+        const totalAmount = sum(values.batch ?? []) + amount;
+        if (totalAmount > values.balance)
+            return `You are above your balance for token id ${values.tokenId}. Delete an entry on review or change your amount.`;
+    }
+
+    return null;
 };
 
 export const hexValidation = (value: string) => {
