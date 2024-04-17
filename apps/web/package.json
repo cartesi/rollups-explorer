@@ -11,7 +11,7 @@
         "lint": "next lint",
         "test": "vitest run",
         "test:watch": "vitest",
-        "test:ci": "vitest run --coverage --dangerouslyIgnoreUnhandledErrors",
+        "test:ci": "vitest run --coverage",
         "test:e2e": "playwright test",
         "test:e2e:ui": "playwright test --ui"
     },
