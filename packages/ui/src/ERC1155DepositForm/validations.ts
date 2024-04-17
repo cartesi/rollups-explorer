@@ -8,7 +8,7 @@ const isNotNumberOrInteger = anyPass<(val: number) => boolean>([
 ]);
 
 export const tokenIdValidation = (value: string) => {
-    if (isEmpty(value)) return "token id is required!";
+    if (isEmpty(value)) return "Token id is required!";
 
     const tokenId = Number(value);
     if (isNotNumberOrInteger(tokenId))

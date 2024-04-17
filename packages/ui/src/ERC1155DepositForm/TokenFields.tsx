@@ -109,14 +109,24 @@ const MetadataView: FC<MetadataViewProps> = ({ tokenMetadata }) => {
             )}
 
             {state === "success" && (
-                <Accordion chevronPosition="right" variant="contained" py="sm">
+                <Accordion
+                    chevronPosition="right"
+                    variant="contained"
+                    py="sm"
+                    data-testid="metadata-view"
+                >
                     <Accordion.Item
                         key={tokenMetadata.state}
                         value={tokenMetadata.state}
                     >
                         <Accordion.Control>
                             <Group wrap="nowrap">
-                                <Avatar src={image} radius="xl" size="lg">
+                                <Avatar
+                                    src={image}
+                                    radius="xl"
+                                    size="lg"
+                                    data-testid="metadata-view-img"
+                                >
                                     {name ?? "TK"}
                                 </Avatar>
                                 <div>

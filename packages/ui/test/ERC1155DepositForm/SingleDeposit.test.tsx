@@ -1,0 +1,975 @@
+import {
+    useReadErc1155BalanceOf,
+    useReadErc1155IsApprovedForAll,
+    useReadErc1155Uri,
+    useSimulateErc1155SetApprovalForAll,
+    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
+    useWriteErc1155SetApprovalForAll,
+    useWriteErc1155SinglePortalDepositSingleErc1155Token,
+} from "@cartesi/rollups-wagmi";
+import {
+    cleanup,
+    fireEvent,
+    getByText,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import * as viem from "viem";
+import { afterEach, beforeEach, describe, it } from "vitest";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { ERC1155DepositForm } from "../../src";
+import { ERC1155DepositFormProps } from "../../src/ERC1155DepositForm/types";
+import { useGetTokenMetadata } from "../../src/ERC1155DepositForm/useGetTokenMetadata";
+import withMantineTheme from "../utils/WithMantineTheme";
+import {
+    accountAddress,
+    applicationIds,
+    erc1155ContractIds,
+    tokenMetadataResultStub,
+} from "./stubs";
+
+vi.mock("@cartesi/rollups-wagmi");
+const useReadBalanceOfMock = vi.mocked(useReadErc1155BalanceOf, {
+    partial: true,
+});
+
+const useReadIsApprovedForAllMock = vi.mocked(useReadErc1155IsApprovedForAll, {
+    partial: true,
+});
+
+const useReadUriMock = vi.mocked(useReadErc1155Uri, { partial: true });
+
+const useSimulateSetApprovalForAllMock = vi.mocked(
+    useSimulateErc1155SetApprovalForAll,
+    { partial: true },
+);
+const useSimulatePortalDepositSingleMock = vi.mocked(
+    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
+    { partial: true },
+);
+const useWriteSetApprovalForAllMock = vi.mocked(
+    useWriteErc1155SetApprovalForAll,
+    { partial: true },
+);
+const useWritePortalDepositSingleMock = vi.mocked(
+    useWriteErc1155SinglePortalDepositSingleErc1155Token,
+    { partial: true },
+);
+
+vi.mock("wagmi");
+const useAccountMock = vi.mocked(useAccount, { partial: true });
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    { partial: true },
+);
+
+vi.mock("../../src/ERC1155DepositForm/useGetTokenMetadata");
+const useGetTokenMetadataMock = vi.mocked(useGetTokenMetadata, {
+    partial: true,
+});
+
+vi.mock("viem", async () => {
+    const actual = await vi.importActual<typeof viem>("viem");
+    return {
+        ...actual,
+        getAddress: (address: string) => address,
+    };
+});
+
+vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
+    default: () => undefined,
+}));
+
+const defaultProps: ERC1155DepositFormProps = {
+    mode: "single",
+    applications: applicationIds,
+    tokens: erc1155ContractIds,
+    isLoadingApplications: false,
+    onSearchApplications: vi.fn(),
+    onSearchTokens: vi.fn(),
+    onSuccess: vi.fn(),
+};
+
+const Component = withMantineTheme(ERC1155DepositForm);
+
+describe("ERC-1155 Single Deposit", () => {
+    beforeEach(() => {
+        useReadBalanceOfMock.mockReturnValue({
+            isLoading: false,
+            data: 1000n,
+        });
+
+        useReadIsApprovedForAllMock.mockReturnValue({
+            isLoading: false,
+            data: true,
+        });
+
+        useReadUriMock.mockReturnValue({
+            isLoading: false,
+            data: undefined,
+        });
+
+        useSimulateSetApprovalForAllMock.mockReturnValue({
+            isPending: false,
+            isLoading: false,
+            fetchStatus: "idle",
+            data: { request: {} },
+            error: null,
+        });
+
+        useWriteSetApprovalForAllMock.mockReturnValue({
+            isIdle: true,
+            status: "idle",
+            reset: () => {},
+        });
+
+        useSimulatePortalDepositSingleMock.mockReturnValue({
+            isLoading: false,
+            fetchStatus: "idle",
+            data: { request: {} },
+            error: null,
+        });
+
+        useWritePortalDepositSingleMock.mockReturnValue({
+            isIdle: true,
+            status: "idle",
+            reset: () => {},
+        });
+
+        useAccountMock.mockReturnValue({
+            address: accountAddress,
+        });
+
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            status: "pending",
+            fetchStatus: "idle",
+        });
+
+        useGetTokenMetadataMock.mockReturnValue(tokenMetadataResultStub);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        cleanup();
+    });
+
+    it("should display expected initial fields", () => {
+        render(<Component {...defaultProps} />);
+
+        expect(screen.getByText("Application")).toBeInTheDocument();
+        expect(
+            screen.getByText("The application smart contract address"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("ERC-1155")).toBeInTheDocument();
+        expect(
+            screen.getByText("The ERC-1155 smart contract address"),
+        ).toBeInTheDocument();
+    });
+
+    it("should display fields for token id and amount after filling app address and contract address", async () => {
+        render(<Component {...defaultProps} />);
+
+        fireEvent.change(screen.getByTestId("application"), {
+            target: {
+                value: applicationIds[0],
+            },
+        });
+
+        fireEvent.change(screen.getByTestId("erc1155Address"), {
+            target: {
+                value: applicationIds[0],
+            },
+        });
+
+        fireEvent.click(screen.getByText("Advanced"));
+
+        await waitFor(() => screen.getByText("Token id"));
+
+        expect(
+            screen.getByText("Token identifier to deposit"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Amount")).toBeInTheDocument();
+        expect(
+            screen.getByText("Amount of tokens to deposit"),
+        ).toBeInTheDocument();
+    });
+
+    it("should display Base and Execution layer data fields after clicking the advanced button", async () => {
+        render(<Component {...defaultProps} />);
+
+        fireEvent.click(screen.getByText("Advanced"));
+
+        await waitFor(() => screen.getByText("Base layer data"));
+
+        expect(
+            screen.getByText(
+                "Additional data to be interpreted by the base layer",
+            ),
+        );
+        expect(screen.getByText("Execution layer data")).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "Additional data to be interpreted by the execution layer",
+            ),
+        );
+    });
+
+    describe("Validations", () => {
+        describe("Application field", () => {
+            it("should display field required message", async () => {
+                render(<Component {...defaultProps} />);
+
+                const input = screen.getByTestId("application");
+                fireEvent.change(input, {
+                    target: { value: applicationIds[0] },
+                });
+
+                fireEvent.change(input, { target: { value: "" } });
+
+                expect(
+                    await screen.findByText("Application address is required."),
+                ).toBeInTheDocument();
+            });
+
+            it("should display invalid address message", async () => {
+                render(<Component {...defaultProps} />);
+
+                const input = screen.getByTestId("application");
+
+                fireEvent.change(input, {
+                    target: { value: "invalid-address-here" },
+                });
+
+                expect(
+                    await screen.findByText("Invalid Application address"),
+                ).toBeInTheDocument();
+            });
+        });
+
+        describe("ERC-1155 field", () => {
+            it("should display field required message", async () => {
+                render(<Component {...defaultProps} />);
+
+                const input = screen.getByTestId("erc1155Address");
+                fireEvent.change(input, {
+                    target: { value: applicationIds[0] },
+                });
+
+                fireEvent.change(input, { target: { value: "" } });
+
+                expect(
+                    await screen.findByText("ERC1155 address is required"),
+                ).toBeInTheDocument();
+            });
+
+            it("should display invalid address message", async () => {
+                render(<Component {...defaultProps} />);
+
+                const input = screen.getByTestId("erc1155Address");
+
+                fireEvent.change(input, {
+                    target: { value: "invalid-text" },
+                });
+
+                expect(
+                    await screen.findByText("Invalid ERC1155 address"),
+                ).toBeInTheDocument();
+            });
+        });
+
+        describe("Token id field", () => {
+            it("should display field require message", async () => {
+                render(<Component {...defaultProps} />);
+
+                fireEvent.change(screen.getByTestId("application"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("erc1155Address"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("token-id-input"), {
+                    target: { value: "0" },
+                });
+
+                fireEvent.change(screen.getByTestId("token-id-input"), {
+                    target: { value: "" },
+                });
+
+                expect(
+                    await screen.findByText("Token id is required!"),
+                ).toBeInTheDocument();
+            });
+
+            it("should display integer is required message", async () => {
+                render(<Component {...defaultProps} />);
+
+                fireEvent.change(screen.getByTestId("application"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("erc1155Address"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("token-id-input"), {
+                    target: { value: "0.01" },
+                });
+
+                expect(
+                    await screen.findByText(
+                        "Token id should be an integer value!",
+                    ),
+                ).toBeInTheDocument();
+            });
+        });
+
+        describe("Amount field", () => {
+            it("should display error message for invalid value", async () => {
+                render(<Component {...defaultProps} />);
+
+                fireEvent.change(screen.getByTestId("application"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("erc1155Address"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("token-id-input"), {
+                    target: { value: "0" },
+                });
+
+                fireEvent.change(screen.getByTestId("amount-input"), {
+                    target: { value: "0" },
+                });
+
+                expect(
+                    await screen.findByText("Invalid amount."),
+                ).toBeInTheDocument();
+            });
+
+            it("should display error message for amount bigger than the balance", async () => {
+                useReadBalanceOfMock.mockReturnValue({
+                    isLoading: false,
+                    data: 100n,
+                });
+
+                render(<Component {...defaultProps} />);
+
+                fireEvent.change(screen.getByTestId("application"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("erc1155Address"), {
+                    target: {
+                        value: applicationIds[0],
+                    },
+                });
+
+                fireEvent.change(screen.getByTestId("token-id-input"), {
+                    target: { value: "0" },
+                });
+
+                fireEvent.change(screen.getByTestId("amount-input"), {
+                    target: { value: "200" },
+                });
+
+                expect(
+                    await screen.findByText(
+                        "The amount should be smaller or equal to your balance.",
+                    ),
+                ).toBeInTheDocument();
+            });
+        });
+
+        describe("Data layer fields", () => {
+            it("should display error message for invalid hex value for Base layer data", async () => {
+                render(<Component {...defaultProps} />);
+
+                fireEvent.click(screen.getByText("Advanced"));
+
+                fireEvent.change(screen.getByTestId("base-layer-data-input"), {
+                    target: { value: "hello-world" },
+                });
+                expect(
+                    await screen.findByText("Invalid hex string"),
+                ).toBeInTheDocument();
+            });
+
+            it("should display error message for invalid hex value for Execution layer data", async () => {
+                render(<Component {...defaultProps} />);
+
+                fireEvent.click(screen.getByText("Advanced"));
+
+                fireEvent.change(
+                    screen.getByTestId("execution-layer-data-input"),
+                    {
+                        target: { value: "hello-execution-layer" },
+                    },
+                );
+                expect(
+                    await screen.findByText("Invalid hex string"),
+                ).toBeInTheDocument();
+            });
+        });
+    });
+
+    describe("Metadata View", () => {
+        it("should display token metadata on request success", async () => {
+            render(<Component {...defaultProps} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("token-id-input"), {
+                target: { value: "0" },
+            });
+
+            const metadataView = screen.getByTestId("metadata-view");
+
+            await waitFor(() => expect(metadataView).toBeVisible());
+
+            expect(getByText(metadataView, "Gold")).toBeVisible();
+            expect(
+                getByText(metadataView, "Golden coins to use."),
+            ).toBeInTheDocument();
+            const img = screen
+                .getByTestId("metadata-view-img")
+                .querySelector("img");
+
+            expect(img).toBeVisible();
+            expect(img?.getAttribute("src")).toEqual(
+                tokenMetadataResultStub.data?.image,
+            );
+        });
+
+        it("should display an info message when URI has problems", async () => {
+            useGetTokenMetadataMock.mockReturnValue({
+                isHttp: false,
+                url: "",
+                state: "errored",
+                error: new Error("Invalid URL"),
+            });
+
+            render(<Component {...defaultProps} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("token-id-input"), {
+                target: { value: "0" },
+            });
+
+            expect(
+                screen.queryByTestId("metadata-view"),
+            ).not.toBeInTheDocument();
+
+            expect(
+                await screen.findByText(
+                    "Something is wrong with the URI returned by the contract.",
+                ),
+            ).toBeVisible();
+
+            expect(screen.getByText("URI is not defined.")).toBeVisible();
+        });
+
+        it("should display an info message when URI is valid but it is not a HTTP protocol", async () => {
+            useGetTokenMetadataMock.mockReturnValue({
+                isHttp: false,
+                url: "ipfs://QmYN9HnMjYuZB173n7daXGLXuC41JnSHz4pXKzqMEUDGj7",
+                state: "not_http",
+            });
+
+            render(<Component {...defaultProps} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("token-id-input"), {
+                target: { value: "0" },
+            });
+
+            expect(
+                screen.queryByTestId("metadata-view"),
+            ).not.toBeInTheDocument();
+
+            expect(
+                await screen.findByText(
+                    "The URI is valid, but it is not an HTTP protocol.",
+                ),
+            ).toBeVisible();
+
+            expect(
+                screen.getByText(
+                    "ipfs://QmYN9HnMjYuZB173n7daXGLXuC41JnSHz4pXKzqMEUDGj7",
+                ),
+            ).toBeVisible();
+        });
+
+        it("should display an info message when URI is valid but the request failed", async () => {
+            useGetTokenMetadataMock.mockReturnValue({
+                state: "http_network_error",
+                error: new Error("403 forbidden"),
+                data: undefined,
+                isHttp: true,
+                url: tokenMetadataResultStub.url,
+            });
+
+            render(<Component {...defaultProps} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("token-id-input"), {
+                target: { value: "0" },
+            });
+
+            expect(
+                screen.queryByTestId("metadata-view"),
+            ).not.toBeInTheDocument();
+
+            expect(
+                await screen.findByText("We could not fetch the metadata."),
+            ).toBeVisible();
+
+            expect(
+                screen.getByText(tokenMetadataResultStub.url!),
+            ).toBeVisible();
+        });
+    });
+
+    describe("Actions", () => {
+        type Screen = typeof screen;
+        const fillForm = (screen: Screen) => {
+            fireEvent.change(screen.getByTestId("application"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: {
+                    value: applicationIds[0],
+                },
+            });
+
+            fireEvent.change(screen.getByTestId("token-id-input"), {
+                target: { value: "0" },
+            });
+
+            fireEvent.change(screen.getByTestId("amount-input"), {
+                target: { value: "500" },
+            });
+        };
+
+        describe("Approve states", () => {
+            it("should display approved when portal is set as an approved operator", () => {
+                const writeContract = vi.fn();
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    writeContract: writeContract,
+                });
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Approved").closest("button");
+                fireEvent.click(btn!);
+
+                expect(btn).toBeDisabled();
+                expect(writeContract).toHaveBeenCalledTimes(0);
+            });
+
+            it("should be able to click the approve when portal is not authorized", () => {
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: false,
+                });
+                const writeContract = vi.fn();
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    writeContract: writeContract,
+                });
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Approve");
+
+                fireEvent.click(btn);
+
+                expect(writeContract).toHaveBeenCalledTimes(1);
+            });
+
+            it("should display a feedback while waiting approve transaction confirmation", () => {
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: false,
+                });
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    isIdle: false,
+                    status: "pending",
+                    data: "0x0001",
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  isLoading: true,
+                                  status: "pending",
+                                  fetchStatus: "fetching",
+                              }
+                            : {
+                                  isLoading: false,
+                                  status: "pending",
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Approve").closest("button");
+                expect(btn?.getAttribute("data-loading")).toEqual("true");
+                expect(
+                    screen.getByText("Waiting for confirmation..."),
+                ).toBeVisible();
+            });
+
+            it("should display a feedback once the approve transaction is confirmed", () => {
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: true,
+                });
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    status: "success",
+                    data: "0x0001",
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  status: "success",
+                                  isSuccess: true,
+                                  fetchStatus: "idle",
+                              }
+                            : {
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Approved").closest("button");
+                expect(btn).toBeDisabled();
+
+                expect(
+                    screen.getByText("Approve transaction confirmed"),
+                ).toBeVisible();
+
+                expect(
+                    screen.queryByText("Check wallet..."),
+                ).not.toBeInTheDocument();
+
+                expect(
+                    screen.queryByText("Waiting for confirmation..."),
+                ).not.toBeInTheDocument();
+            });
+
+            it("should display error message when transaction fails", () => {
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: false,
+                });
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    status: "idle",
+                    data: "0x0001",
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  status: "error",
+                                  isError: true,
+                                  error: {
+                                      shortMessage: "Something went wrong",
+                                      code: 500,
+                                      details: "Error",
+                                      message: "Body error message",
+                                      name: "Error",
+                                      version: 1,
+                                  },
+                                  fetchStatus: "idle",
+                              }
+                            : {
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Approve").closest("button");
+                expect(btn).not.toBeDisabled();
+
+                expect(screen.getByText("Something went wrong")).toBeVisible();
+                expect(
+                    screen.queryByText("Check wallet..."),
+                ).not.toBeInTheDocument();
+
+                expect(
+                    screen.queryByText("Waiting for confirmation..."),
+                ).not.toBeInTheDocument();
+            });
+        });
+
+        describe("Deposit states", () => {
+            it("should keep deposit button disabled when portal is not an approved operator", () => {
+                const writeContract = vi.fn();
+
+                useWritePortalDepositSingleMock.mockReturnValue({
+                    writeContract: writeContract,
+                });
+
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: false,
+                });
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Deposit").closest("button");
+                fireEvent.click(btn!);
+
+                expect(btn).toBeDisabled();
+                expect(writeContract).toHaveBeenCalledTimes(0);
+            });
+
+            it("should be able to click the deposit button when authorized and form is valid", () => {
+                useReadIsApprovedForAllMock.mockReturnValue({
+                    isLoading: false,
+                    data: true,
+                });
+                const writeContract = vi.fn();
+
+                useWritePortalDepositSingleMock.mockReturnValue({
+                    writeContract: writeContract,
+                    data: "0x0002",
+                    status: "idle",
+                });
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Deposit");
+
+                fireEvent.click(btn);
+
+                expect(writeContract).toHaveBeenCalledTimes(1);
+            });
+
+            it("should display a feedback while waiting deposit confirmation", () => {
+                useWritePortalDepositSingleMock.mockReturnValue({
+                    isIdle: false,
+                    status: "pending",
+                    data: "0x0001",
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  isLoading: true,
+                                  status: "pending",
+                                  fetchStatus: "fetching",
+                              }
+                            : {
+                                  isLoading: false,
+                                  status: "pending",
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Deposit").closest("button");
+                expect(btn?.getAttribute("data-loading")).toEqual("true");
+                expect(
+                    screen.getByText("Waiting for confirmation..."),
+                ).toBeVisible();
+            });
+
+            it("should cleanup and call onSuccess once the deposit is confirmed", () => {
+                const depositReset = vi.fn();
+                const approveReset = vi.fn();
+                // Avoiding infinite loop by making a computed prop change when deposit reset is called.
+                const depositWaitStatus = {
+                    _status: "success",
+                    get props(): {
+                        status?: "success";
+                        isSuccess?: true;
+                    } {
+                        return this._status === "success"
+                            ? { status: "success", isSuccess: true }
+                            : {};
+                    },
+                    reset() {
+                        this._status = "idle";
+                    },
+                };
+
+                useWriteSetApprovalForAllMock.mockReturnValue({
+                    isIdle: true,
+                    status: "idle",
+                    reset: approveReset,
+                });
+
+                useWritePortalDepositSingleMock.mockReturnValue({
+                    status: "success",
+                    data: "0x0001",
+                    reset: () => {
+                        depositReset();
+                        depositWaitStatus.reset();
+                    },
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  ...depositWaitStatus.props,
+                                  fetchStatus: "idle",
+                                  data: { transactionHash: "0x01" },
+                              }
+                            : {
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                const onSuccess = vi.fn();
+
+                render(<Component {...defaultProps} onSuccess={onSuccess} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Deposit").closest("button");
+
+                expect(btn).toBeDisabled();
+                expect(onSuccess).toHaveBeenCalledTimes(1);
+                expect(depositReset).toHaveBeenCalledTimes(1);
+                expect(approveReset).toHaveBeenCalledTimes(1);
+            });
+
+            it("should display error message when transaction fails", () => {
+                useWritePortalDepositSingleMock.mockReturnValue({
+                    isError: true,
+                    status: "error",
+                    data: "0x0001",
+                });
+
+                useWaitForTransactionReceiptMock.mockImplementation(
+                    (params) => {
+                        return params?.hash === "0x0001"
+                            ? {
+                                  status: "error",
+                                  isError: true,
+                                  error: {
+                                      shortMessage: "Transaction reverted!",
+                                      code: 500,
+                                      details: "Error",
+                                      message: "error message",
+                                      name: "Error",
+                                      version: 1,
+                                  },
+                                  fetchStatus: "idle",
+                              }
+                            : {
+                                  fetchStatus: "idle",
+                              };
+                    },
+                );
+
+                render(<Component {...defaultProps} />);
+                fillForm(screen);
+
+                const btn = screen.getByText("Deposit").closest("button");
+                expect(btn).not.toBeDisabled();
+
+                expect(screen.getByText("Transaction reverted!")).toBeVisible();
+                expect(
+                    screen.queryByText("Check wallet..."),
+                ).not.toBeInTheDocument();
+
+                expect(
+                    screen.queryByText("Waiting for confirmation..."),
+                ).not.toBeInTheDocument();
+            });
+        });
+    });
+});

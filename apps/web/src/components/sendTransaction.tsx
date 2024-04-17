@@ -30,7 +30,7 @@ interface DepositProps {
 }
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc1155",
+    initialDepositType = "erc1155Batch",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);

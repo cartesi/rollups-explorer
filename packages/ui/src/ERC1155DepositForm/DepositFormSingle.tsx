@@ -98,7 +98,7 @@ const DepositFormSingle: FC<Props> = (props) => {
             tokenId:
                 values.tokenId !== "" &&
                 Number.isInteger(Number(values.tokenId))
-                    ? BigInt(values.tokenId)
+                    ? BigInt(Number(values.tokenId))
                     : undefined,
             amount:
                 values.amount !== ""

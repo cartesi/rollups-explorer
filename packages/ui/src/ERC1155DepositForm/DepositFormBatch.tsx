@@ -122,7 +122,7 @@ const DepositFormBatch: FC<Props> = (props) => {
             tokenId:
                 values.tokenId !== "" &&
                 Number.isInteger(Number(values.tokenId))
-                    ? BigInt(values.tokenId)
+                    ? BigInt(Number(values.tokenId))
                     : undefined,
             amount:
                 values.amount !== ""
@@ -257,7 +257,7 @@ const DepositFormBatch: FC<Props> = (props) => {
 
     return (
         <FormProvider form={form}>
-            <form data-testid="erc1155-deposit-form">
+            <form data-testid="erc1155-batch-deposit-form">
                 <Stack>
                     <Autocomplete
                         label="Application"
