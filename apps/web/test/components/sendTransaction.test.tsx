@@ -1,13 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
+import * as wagmi from "wagmi";
 import SendTransaction from "../../src/components/sendTransaction";
 import withMantineTheme from "../utils/WithMantineTheme";
-const Component = withMantineTheme(SendTransaction);
+import withWagmiProvider from "../utils/WithWagmiProvider";
+const Component = withMantineTheme(withWagmiProvider(SendTransaction));
 
 vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
     return {
         useApplicationsQuery: () => [{ data: {}, fetching: false }],
         useTokensQuery: () => [{ data: {}, fetching: false }],
+        useMultiTokensQuery: () => [{ data: {}, fetching: false }],
     };
 });
 
@@ -100,7 +103,9 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 });
 
 vi.mock("wagmi", async () => {
+    const actual = await vi.importActual<typeof wagmi>("wagmi");
     return {
+        ...actual,
         useContractReads: () => ({
             isLoading: false,
             isSuccess: true,
@@ -171,6 +176,18 @@ describe("SendTransaction component", () => {
     it("should show Raw input form", () => {
         render(<Component initialDepositType="input" />);
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
+    });
+
+    it("should show ERC1155 single deposit form", () => {
+        render(<Component initialDepositType="erc1155" />);
+        expect(screen.getByTestId("erc1155-deposit-form")).toBeInTheDocument();
+    });
+
+    it("should show ERC1155 batch deposit form", () => {
+        render(<Component initialDepositType="erc1155Batch" />);
+        expect(
+            screen.getByTestId("erc1155-batch-deposit-form"),
+        ).toBeInTheDocument();
     });
 
     it("should initially query 10 applications with no predefined search", async () => {
