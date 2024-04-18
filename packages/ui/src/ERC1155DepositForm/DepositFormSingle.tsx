@@ -3,6 +3,7 @@ import {
     erc1155SinglePortalAddress,
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
+    useReadErc1155SupportsInterface,
     useSimulateErc1155SetApprovalForAll,
     useSimulateErc1155SinglePortalDepositSingleErc1155Token,
     useWriteErc1155SetApprovalForAll,
@@ -48,6 +49,7 @@ import {
     applicationValidation,
     erc1155AddressValidation,
     hexValidation,
+    isValidContractInterface,
     tokenIdValidation,
 } from "./validations";
 
@@ -131,9 +133,24 @@ const DepositFormSingle: FC<Props> = (props) => {
         },
     });
 
+    const supportsInterface = useReadErc1155SupportsInterface({
+        address: erc1155Contract.address,
+        args: ["0xd9b67a26"],
+        query: {
+            enabled: erc1155Contract.address !== undefined,
+        },
+    });
+
+    const { isLoading: isCheckingContractInterface } = supportsInterface;
+    const validContractResult = isValidContractInterface(supportsInterface);
+
     const approvedForAll = useReadErc1155IsApprovedForAll({
         address: erc1155Contract.address,
         args: [getAddress(address!), erc1155SinglePortalAddress],
+        query: {
+            enabled:
+                validContractResult.isValid && !isCheckingContractInterface,
+        },
     });
 
     useWatchQueryOnBlockChange(approvedForAll.queryKey);
@@ -271,12 +288,16 @@ const DepositFormSingle: FC<Props> = (props) => {
                         withAsterisk
                         data-testid="erc1155Address"
                         rightSection={
-                            (isCheckingApproval || isCheckingBalance) && (
-                                <Loader size="xs" />
-                            )
+                            (isCheckingContractInterface ||
+                                isCheckingApproval ||
+                                isCheckingBalance) && <Loader size="xs" />
                         }
                         {...form.getInputProps("erc1155Address")}
-                        error={erc1155Errors[0] || form.errors.erc1155Address}
+                        error={
+                            validContractResult.errorMessage ||
+                            erc1155Errors[0] ||
+                            form.errors.erc1155Address
+                        }
                         onChange={(nextValue) => {
                             const formattedValue = nextValue.substring(
                                 nextValue.indexOf("0x"),
@@ -294,6 +315,8 @@ const DepositFormSingle: FC<Props> = (props) => {
                         balanceOf={balanceOf}
                         display={
                             erc1155Address !== zeroAddress &&
+                            !isCheckingContractInterface &&
+                            validContractResult.isValid &&
                             isAddress(erc1155Address)
                         }
                     />

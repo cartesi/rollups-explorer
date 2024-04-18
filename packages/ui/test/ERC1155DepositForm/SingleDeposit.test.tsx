@@ -1,6 +1,7 @@
 import {
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
+    useReadErc1155SupportsInterface,
     useReadErc1155Uri,
     useSimulateErc1155SetApprovalForAll,
     useSimulateErc1155SinglePortalDepositSingleErc1155Token,
@@ -30,6 +31,12 @@ import {
 } from "./stubs";
 
 vi.mock("@cartesi/rollups-wagmi");
+
+const useReadSupportsInterfaceMock = vi.mocked(
+    useReadErc1155SupportsInterface,
+    { partial: true },
+);
+
 const useReadBalanceOfMock = vi.mocked(useReadErc1155BalanceOf, {
     partial: true,
 });
@@ -95,6 +102,12 @@ const Component = withMantineTheme(ERC1155DepositForm);
 
 describe("ERC-1155 Single Deposit", () => {
     beforeEach(() => {
+        useReadSupportsInterfaceMock.mockReturnValue({
+            isLoading: false,
+            fetchStatus: "idle",
+            data: true,
+        });
+
         useReadBalanceOfMock.mockReturnValue({
             isLoading: false,
             data: 1000n,
@@ -274,6 +287,58 @@ describe("ERC-1155 Single Deposit", () => {
 
                 expect(
                     await screen.findByText("Invalid ERC1155 address"),
+                ).toBeInTheDocument();
+            });
+
+            it("should display invalid contract message when supported-interface call result is false", async () => {
+                useReadSupportsInterfaceMock.mockReturnValue({
+                    isLoading: false,
+                    status: "success",
+                    data: false,
+                });
+
+                render(<Component {...defaultProps} />);
+
+                const erc721Address =
+                    "0x7a3cc9c0408887a030a0354330c36a9cd681aa7e";
+
+                const input = screen.getByTestId("erc1155Address");
+                fireEvent.change(input, {
+                    target: {
+                        value: erc721Address,
+                    },
+                });
+
+                expect(
+                    await screen.findByText(
+                        "This is not an ERC-1155 contract. Check the address.",
+                    ),
+                ).toBeInTheDocument();
+            });
+
+            it("should display invalid contract message when supported-interface call failed", async () => {
+                useReadSupportsInterfaceMock.mockReturnValue({
+                    isLoading: false,
+                    status: "error",
+                    data: undefined,
+                });
+
+                render(<Component {...defaultProps} />);
+
+                const erc20Address =
+                    "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8";
+
+                const input = screen.getByTestId("erc1155Address");
+                fireEvent.change(input, {
+                    target: {
+                        value: erc20Address,
+                    },
+                });
+
+                expect(
+                    await screen.findByText(
+                        "This is not an ERC-1155 contract. Check the address.",
+                    ),
                 ).toBeInTheDocument();
             });
         });
