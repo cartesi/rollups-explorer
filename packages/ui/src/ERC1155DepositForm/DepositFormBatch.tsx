@@ -237,8 +237,9 @@ const DepositFormBatch: FC<Props> = (props) => {
         },
     });
 
-    const canDeposit =
-        tokenIds !== undefined && amounts !== undefined && isApproved;
+    const hasDeposits = tokenIds !== undefined && amounts !== undefined;
+    const canDeposit = hasDeposits && isApproved;
+    const needApproval = hasDeposits && !isApproved;
 
     const { loading: approveLoading } = transactionState(
         approvePrepare,
@@ -378,7 +379,7 @@ const DepositFormBatch: FC<Props> = (props) => {
                         </Button>
                         <Button
                             variant="filled"
-                            disabled={isApproved || !form.isValid()}
+                            disabled={!needApproval}
                             leftSection={<TbCheck />}
                             loading={isCheckingApproval || approveLoading}
                             onClick={() =>

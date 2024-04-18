@@ -904,7 +904,7 @@ describe("ERC-1155 Batch Deposit", () => {
                 expect(writeContract).toHaveBeenCalledTimes(0);
             });
 
-            it("should be able to click the approve when portal is not authorized", () => {
+            it("should be able to click the approve when portal is not authorized and at least one deposit on review", () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: false,
@@ -917,6 +917,9 @@ describe("ERC-1155 Batch Deposit", () => {
 
                 render(<Component {...defaultProps} />);
                 fillForm(screen);
+                fireEvent.click(
+                    screen.getByText(text.ADD_TO_DEPOSIT_LIST_BUTTON),
+                );
 
                 const btn = screen.getByText("Approve");
 
@@ -1042,6 +1045,9 @@ describe("ERC-1155 Batch Deposit", () => {
 
                 render(<Component {...defaultProps} />);
                 fillForm(screen);
+                fireEvent.click(
+                    screen.getByText(text.ADD_TO_DEPOSIT_LIST_BUTTON),
+                );
 
                 const btn = screen.getByText("Approve").closest("button");
                 expect(btn).not.toBeDisabled();
