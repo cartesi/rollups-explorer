@@ -1,5 +1,17 @@
-import { anyPass, complement, isEmpty, map, pipe, reduce } from "ramda";
+import { useReadErc1155SupportsInterface } from "@cartesi/rollups-wagmi";
+import {
+    T,
+    anyPass,
+    complement,
+    cond,
+    isEmpty,
+    isNil,
+    map,
+    pipe,
+    reduce,
+} from "ramda";
 import { isAddress, isHex } from "viem";
+import { Config } from "wagmi";
 import { DepositData, FormValues } from "./context";
 
 const isNotNumberOrInteger = anyPass<(val: number) => boolean>([
@@ -61,3 +73,39 @@ export const amountValidation = (value: string, values: FormValues) => {
 export const hexValidation = (value: string) => {
     return isHex(value) ? null : "Invalid hex string";
 };
+
+export const batchValidation = (value?: DepositData[]) => {
+    if (isNil(value)) return null;
+
+    if (isEmpty(value))
+        return "At least one deposit should be added. Or consider using the single deposit version.";
+
+    return null;
+};
+
+type SupportsInterfaceReturn = ReturnType<
+    typeof useReadErc1155SupportsInterface<
+        "supportsInterface",
+        readonly [`0x${string}`],
+        Config,
+        boolean
+    >
+>;
+
+const notValidContract =
+    "This is not an ERC-1155 contract. Check the address." as const;
+
+export const isValidContractInterface = cond<
+    [result: SupportsInterfaceReturn],
+    { isValid: boolean; errorMessage?: typeof notValidContract }
+>([
+    [
+        (result) => result.status === "error" && !result.data,
+        () => ({ isValid: false, errorMessage: notValidContract }),
+    ],
+    [
+        (result) => result.status === "success" && result.data === false,
+        () => ({ isValid: false, errorMessage: notValidContract }),
+    ],
+    [T, () => ({ isValid: true })],
+]);

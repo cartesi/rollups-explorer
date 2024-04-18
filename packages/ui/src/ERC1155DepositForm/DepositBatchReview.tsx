@@ -54,7 +54,11 @@ const DepositBatchReview = () => {
                         </Accordion.Control>
 
                         <Accordion.Panel>
-                            <Table horizontalSpacing="xl" highlightOnHover>
+                            <Table
+                                horizontalSpacing="xl"
+                                highlightOnHover
+                                data-testid="batch-review-table"
+                            >
                                 <Table.Thead>
                                     <Table.Tr>
                                         <Table.Th

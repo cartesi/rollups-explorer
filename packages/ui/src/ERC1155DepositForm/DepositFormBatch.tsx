@@ -3,6 +3,7 @@ import {
     erc1155BatchPortalAddress,
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
+    useReadErc1155SupportsInterface,
     useSimulateErc1155BatchPortalDepositBatchErc1155Token,
     useSimulateErc1155SetApprovalForAll,
     useWriteErc1155BatchPortalDepositBatchErc1155Token,
@@ -18,7 +19,7 @@ import {
     Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { isEmpty, isNil, pipe, reduce, transpose } from "ramda";
+import { isEmpty, pipe, reduce, transpose } from "ramda";
 import { FC, useEffect } from "react";
 import {
     TbAlertCircle,
@@ -54,8 +55,10 @@ import { ERC1155DepositFormProps } from "./types";
 import {
     amountValidation,
     applicationValidation,
+    batchValidation,
     erc1155AddressValidation,
     hexValidation,
+    isValidContractInterface,
     tokenIdValidation,
 } from "./validations";
 
@@ -103,14 +106,7 @@ const DepositFormBatch: FC<Props> = (props) => {
             amount: amountValidation,
             execLayerData: hexValidation,
             baseLayerData: hexValidation,
-            batch: (value) => {
-                if (isNil(value)) return null;
-
-                if (isEmpty(value))
-                    return "At least one deposit should be added. Or consider using the single deposit version.";
-
-                return null;
-            },
+            batch: batchValidation,
         },
         transformValues: (values) => ({
             applicationAddress: isAddress(values.application)
@@ -160,9 +156,24 @@ const DepositFormBatch: FC<Props> = (props) => {
         },
     });
 
+    const supportsInterface = useReadErc1155SupportsInterface({
+        address: erc1155Contract.address,
+        args: ["0xd9b67a26"],
+        query: {
+            enabled: erc1155Contract.address !== undefined,
+        },
+    });
+
+    const { isLoading: isCheckingContractInterface } = supportsInterface;
+    const isValidContractResult = isValidContractInterface(supportsInterface);
+
     const approvedForAll = useReadErc1155IsApprovedForAll({
         address: erc1155Contract.address,
         args: [getAddress(address!), erc1155BatchPortalAddress],
+        query: {
+            enabled:
+                isValidContractResult.isValid && !isCheckingContractInterface,
+        },
     });
 
     useWatchQueryOnBlockChange(approvedForAll.queryKey);
@@ -296,12 +307,16 @@ const DepositFormBatch: FC<Props> = (props) => {
                         withAsterisk
                         data-testid="erc1155Address"
                         rightSection={
-                            (isCheckingApproval || isCheckingBalance) && (
-                                <Loader size="xs" />
-                            )
+                            (isCheckingContractInterface ||
+                                isCheckingApproval ||
+                                isCheckingBalance) && <Loader size="xs" />
                         }
                         {...form.getInputProps("erc1155Address")}
-                        error={erc1155Errors[0] || form.errors.erc1155Address}
+                        error={
+                            isValidContractResult.errorMessage ||
+                            erc1155Errors[0] ||
+                            form.errors.erc1155Address
+                        }
                         onChange={(nextValue) => {
                             const formattedValue = nextValue.substring(
                                 nextValue.indexOf("0x"),
@@ -323,6 +338,8 @@ const DepositFormBatch: FC<Props> = (props) => {
                         balanceOf={balanceOf}
                         display={
                             erc1155Address !== zeroAddress &&
+                            !isCheckingContractInterface &&
+                            isValidContractResult.isValid &&
                             isAddress(erc1155Address)
                         }
                     />
