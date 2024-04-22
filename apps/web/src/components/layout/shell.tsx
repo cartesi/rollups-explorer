@@ -54,7 +54,9 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
     );
     const { isConnected } = useAccount();
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme({
+        keepTransitions: true,
+    });
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (
