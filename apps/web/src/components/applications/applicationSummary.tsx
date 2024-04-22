@@ -128,7 +128,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                 )}
 
                 {!isAppConnected && (
-                    <Flex justify="center" w="100%">
+                    <Flex justify="center" w="100%" mb="1.5rem">
                         <Button
                             variant="light"
                             radius="md"
