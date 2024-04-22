@@ -4,19 +4,19 @@ import { notFound } from "next/navigation";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import { Address as AddressType } from "viem";
-import Address from "../../../components/address";
-import Breadcrumbs from "../../../components/breadcrumbs";
-import Inputs from "../../../components/inputs/inputs";
+import Address from "../../../../components/address";
+import Breadcrumbs from "../../../../components/breadcrumbs";
+import Inputs from "../../../../components/inputs/inputs";
 import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
-} from "../../../graphql/explorer/operations";
-import { getUrqlServerClient } from "../../../lib/urql";
+} from "../../../../graphql/explorer/operations";
+import { getUrqlServerClient } from "../../../../lib/urql";
 
 export async function generateMetadata({
     params,
-}: ApplicationPageProps): Promise<Metadata> {
+}: ApplicationInputsPageProps): Promise<Metadata> {
     return {
         title: `Application ${params.address}`,
     };
@@ -34,11 +34,13 @@ async function getApplication(address: string) {
     return result.data?.applicationById;
 }
 
-export type ApplicationPageProps = {
+export type ApplicationInputsPageProps = {
     params: { address: string };
 };
 
-const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
+const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
+    params,
+}) => {
     const application = await getApplication(params.address);
 
     if (!application) {
@@ -72,4 +74,4 @@ const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
     );
 };
 
-export default ApplicationPage;
+export default ApplicationInputsPage;
