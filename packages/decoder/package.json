@@ -7,9 +7,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tsup src/index.ts --watch",
-    "lint": "eslint \"src/**/*.ts*]\"",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint \"src/**/*.ts*\"",
+    "build": "tsup src/index.ts --format esm,cjs --dts"
   },
   "dependencies": {
     "ethers": "^6.9.0",
@@ -18,9 +17,10 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@cartesi/tsconfig": "*",
     "eslint": "^8",
     "eslint-config-cartesi": "*",
     "tsup": "^7",
-    "typescript": "^5.4.5"
+    "typescript": "^5"
   }
 }
