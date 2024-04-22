@@ -14,9 +14,8 @@ import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionInfo from "./connectionInfo";
 
 const ConnectionView = () => {
-    const { showConnectionModal } = useConnectionConfig();
+    const { listConnections, showConnectionModal } = useConnectionConfig();
     const theme = useMantineTheme();
-    const { listConnections } = useConnectionConfig();
     const connections = listConnections();
     const hasConnections = connections.length > 0;
 
