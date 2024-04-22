@@ -1,0 +1,26 @@
+{
+  "name": "@cartesi/decoder",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsup src/index.ts --watch",
+    "lint": "eslint \"src/**/*.ts*]\"",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "viem": "^2",
+    "wagmi": "^2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-cartesi": "*",
+    "tsup": "^7",
+    "typescript": "^5.4.5"
+  }
+}
