@@ -26,7 +26,7 @@ type StackApplicationProps = {
 
 /**
  *
- * @returns Component to wrap Application or UserApplication coponent
+ * @returns Component to wrap Application or UserApplication component
  */
 
 const StackApplication: FC<StackApplicationProps> = ({ children }) => {
@@ -57,7 +57,7 @@ const UserApplications: FC = () => {
             after,
             limit,
             orderBy: ApplicationOrderByInput.IdAsc,
-            ownerId: "0xf05d57a5bed2d1b529c56001fc5810cc9afc0335".toLowerCase(),
+            ownerId: address?.toLowerCase(),
         },
         pause: !isConnected,
     });
