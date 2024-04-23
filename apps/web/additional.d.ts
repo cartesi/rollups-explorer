@@ -17,5 +17,10 @@ declare namespace NodeJS {
          * Internal calls may need a different URI to become reachable.
          */
         INTERNAL_EXPLORER_API_URL: string;
+
+        /**
+         * CI=true is common set in most CI providers. e.g. Github, TravisCI
+         */
+        CI?: "true" | "false";
     }
 }
