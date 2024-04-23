@@ -1,6 +1,7 @@
 import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import type { FC, ReactNode } from "react";
@@ -35,6 +36,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                 <Providers>
                     <Shell>{children}</Shell>
                 </Providers>
+                <Analytics />
             </body>
         </html>
     );
