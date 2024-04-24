@@ -105,7 +105,7 @@ const LatestEntries: FC = () => {
         applicationsData?.applicationsConnection.edges.map((edge) => ({
             appId: edge.node.id as AddressType,
             timestamp: Number(edge.node.timestamp),
-            href: `/applications/${edge.node.id}/inputs`,
+            href: `/applications/${edge.node.id}`,
         })) ?? [];
 
     return (
