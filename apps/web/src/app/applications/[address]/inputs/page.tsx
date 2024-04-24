@@ -1,4 +1,4 @@
-import { Group, Stack, Title } from "@mantine/core";
+import { Group, Stack, Text, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
@@ -61,11 +61,15 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
                     },
                 ]}
             >
-                <Address value={params.address as AddressType} icon />
+                <Address
+                    value={params.address as AddressType}
+                    href={`/applications/${params.address}`}
+                />
+                <Text>Inputs</Text>
             </Breadcrumbs>
 
             <Group>
-                <TbInbox size={40} />
+                <TbStack2 size={40} />
                 <Title order={2}>Inputs</Title>
             </Group>
 
