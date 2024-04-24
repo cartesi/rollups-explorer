@@ -2,11 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/cartesi/rollups-explorer/badge.svg?branch=feature/97-upload-test-coverage-to-coveralls)](https://coveralls.io/github/cartesi/rollups-explorer?branch=feature/97-upload-test-coverage-to-coveralls)
 
-This is a monorepo holding up two web applications. One is called [web](./apps//web/) and is the UI for the rollups explorer and the second is called [workshop](./apps/workshop/) that is a storybook to support fast development iteration and showcase. The repository also holds a few packages more on these below.
-
-## What's inside?
-
-This monorepo uses [Yarn v1](https://classic.yarnpkg.com/) as a package manager and is controlled by [turborepo](https://turbo.build/repo).
+This is a monorepo managed by [turborepo](https://turbo.build/repo) using [Yarn v1](https://classic.yarnpkg.com/) as the package manager. It holds two web apps and a few packages. A nextJS app called [web](./apps//web/) that is the rollups-explorer UI. The second is a Storybook app called [workshop](./apps/workshop/) to support showcase and quick development of components. The backend for the rollups-explorer can be found [here](https://github.com/cartesi/rollups-explorer-api)
 
 ## Formatter + Linter
 
@@ -51,7 +47,33 @@ yarn run dev --filter=web --filter=@cartesi/rollups-explorer-ui
 
 ## Testing
 
-We are using [Vitest framework](https://vitest.dev/) combined with [testing-library](https://testing-library.com/docs/react-testing-library/intro/) for react in both `packages/ui` and `apps/web`.
+The project is using [Vitest framework](https://vitest.dev/) combined with [testing-library](https://testing-library.com/docs/react-testing-library/intro/) for react in both `packages/ui` and `apps/web` for unit testing.
+
+### E2E Testing
+
+The project is using [Playwright](https://playwright.dev/docs/intro) to run the E2E checks against the rollups-explorer UI. You can run the commands inside the [web](./apps//web/) app.
+
+> [!IMPORTANT]  
+> Make sure you have your app running in dev mode or a built version
+
+For single run, execute the following:
+
+```
+yarn test:e2e
+```
+
+To run in a interactive way with watch mode run the following command (Preferred)
+
+```
+yarn run test:e2e:ui
+```
+
+Below is a table with env vars and its default value that is used by the Playwright config, that can be found inside the `apps/web`
+
+|  Env variable  |         Default         |
+| :------------: | :---------------------: |
+| `E2E_BASE_URL` | `http://localhost:3000` |
+|      `CI`      |       `undefined`       |
 
 ## Build
 
