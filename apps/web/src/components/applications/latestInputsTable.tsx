@@ -84,35 +84,25 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
                 {inputs.map((input) => (
                     <Table.Tr key={`${input.application}-${input.timestamp}`}>
                         <Table.Td>
-                            <Table.Td>
-                                <Box
-                                    display="flex"
-                                    w="max-content"
-                                    style={{
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                    }}
-                                >
-                                    {input.erc20Deposit ? (
-                                        <Group>
-                                            <Address
-                                                value={
-                                                    input.erc20Deposit
-                                                        .from as AddressType
-                                                }
-                                                icon
-                                                shorten
-                                            />
-                                            <TbArrowRight />
-                                            <Address
-                                                value={
-                                                    input.msgSender as AddressType
-                                                }
-                                                icon
-                                                shorten
-                                            />
-                                        </Group>
-                                    ) : (
+                            <Box
+                                display="flex"
+                                w="max-content"
+                                style={{
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                {input.erc20Deposit ? (
+                                    <Group>
+                                        <Address
+                                            value={
+                                                input.erc20Deposit
+                                                    .from as AddressType
+                                            }
+                                            icon
+                                            shorten
+                                        />
+                                        <TbArrowRight />
                                         <Address
                                             value={
                                                 input.msgSender as AddressType
@@ -120,9 +110,15 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
                                             icon
                                             shorten
                                         />
-                                    )}
-                                </Box>
-                            </Table.Td>
+                                    </Group>
+                                ) : (
+                                    <Address
+                                        value={input.msgSender as AddressType}
+                                        icon
+                                        shorten
+                                    />
+                                )}
+                            </Box>
                         </Table.Td>
                         <Table.Td>
                             <Badge
