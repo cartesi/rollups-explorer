@@ -2,7 +2,7 @@ import { Group, Stack, Text, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
-import { TbStack2 } from "react-icons/tb";
+import { TbInbox } from "react-icons/tb";
 import { Address as AddressType } from "viem";
 import Address from "../../../../components/address";
 import Breadcrumbs from "../../../../components/breadcrumbs";
@@ -69,7 +69,7 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
             </Breadcrumbs>
 
             <Group>
-                <TbStack2 size={40} />
+                <TbInbox size={40} />
                 <Title order={2}>Inputs</Title>
             </Group>
 
