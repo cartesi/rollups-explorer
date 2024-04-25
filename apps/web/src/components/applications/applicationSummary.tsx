@@ -12,30 +12,16 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import React, { FC, useMemo } from "react";
+import React, { FC } from "react";
 import { SummaryCard } from "@cartesi/rollups-explorer-ui";
-import {
-    TbAlertTriangle,
-    TbInbox,
-    TbReportAnalytics,
-    TbTicket,
-} from "react-icons/tb";
+import { TbInbox } from "react-icons/tb";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Address } from "viem";
-import { useQuery } from "urql";
-import {
-    CheckStatusDocument,
-    CheckStatusQuery,
-    CheckStatusQueryVariables,
-} from "../../graphql/rollups/operations";
 import Link from "next/link";
 import LatestInputsTable from "./latestInputsTable";
-
-interface ConnectionInfoProps {
-    url: string;
-}
+import ConnectionSummary from "../connection/connectionSummary";
 
 const SummarySkeletonCard = () => (
     <Card shadow="xs" w="100%">
@@ -45,45 +31,6 @@ const SummarySkeletonCard = () => (
         <Skeleton animate={false} height={8} mt={6} width="70%" radius="xl" />
     </Card>
 );
-
-const ConnectionInfo: FC<ConnectionInfoProps> = ({ url }) => {
-    const [result] = useQuery<CheckStatusQuery, CheckStatusQueryVariables>({
-        query: CheckStatusDocument,
-        context: useMemo(
-            () => ({
-                url,
-                requestPolicy: "network-only",
-            }),
-            [url],
-        ),
-    });
-
-    return (
-        <>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
-                <SummaryCard
-                    title="Notices"
-                    value={result.data?.notices.totalCount ?? 0}
-                    icon={TbAlertTriangle}
-                />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
-                <SummaryCard
-                    title="Vouchers"
-                    value={result.data?.vouchers.totalCount ?? 0}
-                    icon={TbTicket}
-                />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
-                <SummaryCard
-                    title="Reports"
-                    value={result.data?.reports.totalCount ?? 0}
-                    icon={TbReportAnalytics}
-                />
-            </Grid.Col>
-        </>
-    );
-};
 
 export type ApplicationSummaryProps = {
     applicationId: string;
@@ -97,6 +44,8 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
         },
     });
     const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
+    const inputsTotalCount = data?.inputsConnection.totalCount ?? 0;
+
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
     const connection = getConnection(applicationId as Address);
@@ -116,9 +65,13 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                 </Grid.Col>
 
                 {isAppConnected ? (
-                    <ConnectionInfo url={connection?.url as string} />
+                    <ConnectionSummary url={connection?.url as string} />
                 ) : (
-                    <Grid.Col span={{ base: 12, sm: 6, md: 9 }} mb="sm">
+                    <Grid.Col
+                        span={{ base: 12, sm: 6, md: 9 }}
+                        mb="sm"
+                        data-testid="skeleton"
+                    >
                         <Flex m={0} p={0} gap="sm" w="100%">
                             <SummarySkeletonCard />
                             <SummarySkeletonCard />
@@ -156,24 +109,26 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                         <LatestInputsTable
                             inputs={inputs}
                             fetching={fetching}
-                            totalCount={data?.inputsConnection.totalCount ?? 0}
+                            totalCount={inputsTotalCount}
                         />
                     </Group>
 
-                    <Group gap={5} mt="auto">
-                        <Button
-                            component={Link}
-                            href={`/applications/${applicationId}/inputs`}
-                            variant="light"
-                            fullWidth={isSmallDevice}
-                            mt="md"
-                            mx="auto"
-                            radius="md"
-                            tt="uppercase"
-                        >
-                            View inputs
-                        </Button>
-                    </Group>
+                    {inputsTotalCount > 0 && (
+                        <Group gap={5} mt="auto">
+                            <Button
+                                component={Link}
+                                href={`/applications/${applicationId}/inputs`}
+                                variant="light"
+                                fullWidth={isSmallDevice}
+                                mt="md"
+                                mx="auto"
+                                radius="md"
+                                tt="uppercase"
+                            >
+                                View inputs
+                            </Button>
+                        </Group>
+                    )}
                 </Card>
             </Grid>
         </Stack>
