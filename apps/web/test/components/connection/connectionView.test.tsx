@@ -27,9 +27,7 @@ describe("Connection view component", () => {
 
         expect(screen.getByText("Create connection")).toBeInTheDocument();
         expect(screen.getByText("Connections")).toBeInTheDocument();
-        expect(
-            screen.getByText("Create your first connection."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("No connections found.")).toBeInTheDocument();
     });
 
     it("should call the creation form when clicking the plus sign", () => {
