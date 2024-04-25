@@ -2,8 +2,8 @@
 import {
     Avatar,
     Button,
+    Grid,
     Group,
-    Stack,
     Text,
     Title,
     useMantineTheme,
@@ -31,6 +31,7 @@ const ConnectionView = () => {
                         <TbPlus />
                         <VisuallyHidden>Create connection</VisuallyHidden>
                     </Button>
+
                     <Title size="h2">Connections</Title>
                     {hasConnections && (
                         <Avatar size="sm" color={theme.primaryColor}>
@@ -40,20 +41,23 @@ const ConnectionView = () => {
                 </Group>
             </Group>
 
-            <Stack gap={0} style={{ maxWidth: "48rem" }}>
-                {connections.map((connection) => (
-                    <ConnectionInfo
-                        key={connection.address}
-                        connection={connection}
-                    />
-                ))}
-
-                {!hasConnections && (
-                    <Text c="dimmed" py="sm">
-                        Create your first connection.
-                    </Text>
-                )}
-            </Stack>
+            {hasConnections ? (
+                <Grid gutter="sm">
+                    {connections.map((connection) => (
+                        <Grid.Col
+                            key={connection.address}
+                            span={{ base: 12, sm: 6 }}
+                            mt="md"
+                        >
+                            <ConnectionInfo connection={connection} />
+                        </Grid.Col>
+                    ))}
+                </Grid>
+            ) : (
+                <Text c="dimmed" py="sm" ta="center">
+                    No connections found.
+                </Text>
+            )}
         </>
     );
 };
