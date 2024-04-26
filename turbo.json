@@ -5,7 +5,9 @@
         "BASE_PATH",
         "NEXT_PUBLIC_CHAIN_ID",
         "NEXT_PUBLIC_EXPLORER_API_URL",
-        "NEXT_PUBLIC_ALCHEMY_API_KEY"
+        "NEXT_PUBLIC_ALCHEMY_API_KEY",
+        "CI",
+        "E2E_BASE_URL"
     ],
     "pipeline": {
         "build": {

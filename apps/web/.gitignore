@@ -47,3 +47,7 @@ yarn-error.log*
 # generated files
 src/contracts.ts
 src/graphql
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

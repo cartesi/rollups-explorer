@@ -17,5 +17,16 @@ declare namespace NodeJS {
          * Internal calls may need a different URI to become reachable.
          */
         INTERNAL_EXPLORER_API_URL: string;
+
+        /**
+         * CI=true is common set in most CI providers. e.g. Github, TravisCI
+         */
+        CI?: "true";
+
+        /**
+         * Base url to be used inside the e2e tests when calling e.g. page.goto("/applications")
+         * Default used in its absence is http://localhost:3000
+         */
+        E2E_BASE_URL?: string;
     }
 }

@@ -8,6 +8,7 @@ import {
     NavLink,
     Stack,
     Switch,
+    VisuallyHidden,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
@@ -82,6 +83,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">
                     <Burger
+                        data-testid="burger-menu-btn"
                         opened={opened}
                         onClick={toggle}
                         hiddenFrom="sm"
@@ -108,17 +110,33 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 />
                             )}
                             <Switch
+                                wrapperProps={{
+                                    "data-testid": "theme-mode-switch",
+                                }}
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
                                 size="md"
                                 onLabel={
-                                    <TbSun color={theme.white} size="1rem" />
+                                    <>
+                                        <VisuallyHidden>
+                                            Light Mode
+                                        </VisuallyHidden>
+                                        <TbSun
+                                            color={theme.white}
+                                            size="1rem"
+                                        />
+                                    </>
                                 }
                                 offLabel={
-                                    <TbMoonStars
-                                        color={theme.colors.gray[6]}
-                                        size="1rem"
-                                    />
+                                    <>
+                                        <VisuallyHidden>
+                                            Dark Mode
+                                        </VisuallyHidden>
+                                        <TbMoonStars
+                                            color={theme.colors.gray[6]}
+                                            size="1rem"
+                                        />
+                                    </>
                                 }
                             />
                         </Group>
@@ -161,6 +179,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
+                        component="button"
+                        data-testid="menu-item-send-transaction"
                         label="Send Transaction"
                         leftSection={<TbArrowsDownUp />}
                         disabled={!isConnected}
