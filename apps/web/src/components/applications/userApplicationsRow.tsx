@@ -43,7 +43,7 @@ const UserApplicationsRow: FC<ApplicationRowProps> = (props) => {
             <Table.Td>
                 <Tooltip label="Inputs">
                     <Link
-                        href={`/applications/${appId}`}
+                        href={`/applications/${appId}/inputs`}
                         data-testid="applications-link"
                     >
                         <ActionIcon variant="default">
