@@ -101,7 +101,7 @@ describe("ApplicationRow component", () => {
 
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(
-            `/applications/${defaultProps.application.id}`,
+            `/applications/${defaultProps.application.id}/inputs`,
         );
     });
 
