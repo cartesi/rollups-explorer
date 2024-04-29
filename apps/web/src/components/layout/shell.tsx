@@ -3,7 +3,6 @@ import {
     AppShell,
     Burger,
     Button,
-    Collapse,
     Group,
     Modal,
     NavLink,
@@ -21,8 +20,6 @@ import {
     TbAdjustmentsHorizontal,
     TbApps,
     TbArrowsDownUp,
-    TbChevronDown,
-    TbChevronUp,
     TbHome,
     TbInbox,
     TbMoonStars,
@@ -35,8 +32,7 @@ import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
-    const [opened, { toggle }] = useDisclosure();
-    const [settingsOpened, { toggle: toggleSettings }] = useDisclosure(false);
+    const [opened, { toggle: toggleMobileMenu }] = useDisclosure();
     const [
         transaction,
         {
@@ -83,7 +79,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <Burger
                         data-testid="burger-menu-btn"
                         opened={opened}
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         hiddenFrom="sm"
                         size="sm"
                     />
@@ -148,14 +144,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Home"
                         href="/"
                         leftSection={<TbHome />}
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
                         label="Applications"
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         href="/applications"
                         leftSection={<TbApps />}
                         data-testid="applications-link"
@@ -164,11 +160,27 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <NavLink
                         component={Link}
                         label="Inputs"
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         href="/inputs"
                         leftSection={<TbInbox />}
                         data-testid="inputs-link"
                     />
+
+                    <NavLink
+                        label="Settings"
+                        leftSection={<TbAdjustmentsHorizontal />}
+                        data-testid="settings-link"
+                        childrenOffset="xs"
+                    >
+                        <NavLink
+                            component={Link}
+                            onClick={toggleMobileMenu}
+                            label="Connections"
+                            leftSection={<TbPlugConnected />}
+                            href="/connections"
+                            data-testid="connections-link"
+                        />
+                    </NavLink>
 
                     <NavLink
                         component="button"
@@ -179,30 +191,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         onClick={toggleTransaction}
                         hiddenFrom="sm"
                     />
-
-                    <NavLink
-                        label="Settings"
-                        leftSection={<TbAdjustmentsHorizontal />}
-                        rightSection={
-                            settingsOpened ? (
-                                <TbChevronUp size={theme.other.iconSize} />
-                            ) : (
-                                <TbChevronDown size={theme.other.iconSize} />
-                            )
-                        }
-                        onClick={toggleSettings}
-                        data-testid="settings-link"
-                    />
-
-                    <Collapse in={settingsOpened}>
-                        <NavLink
-                            component={Link}
-                            label="Connections"
-                            leftSection={<TbPlugConnected />}
-                            href="/connections"
-                            data-testid="connections-link"
-                        />
-                    </Collapse>
 
                     {showWalletSidebar && <ConnectButton showBalance />}
                 </Stack>
