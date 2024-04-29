@@ -65,6 +65,12 @@ query stats($applicationId: String) {
     }
 }
 
+query statsApplicationsOwner($ownerAddress: String) {
+    applicationsConnection(orderBy: id_ASC, where: {owner_eq: $ownerAddress}) {
+        totalCount
+    }
+}
+
 query applications($limit: Int, $where: ApplicationWhereInput) {
     applications(where: $where, limit: $limit) {
         id
@@ -90,6 +96,23 @@ fragment ApplicationItem on Application {
 
 query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $factoryId: String) {
     applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {factory: {id_startsWith: $factoryId}}) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                ...ApplicationItem
+            }
+        }
+    }
+}
+
+query applicationsConnectionOwner($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $ownerId: String) {
+    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {owner_eq: $ownerId}) {
         totalCount
         pageInfo {
             hasNextPage
