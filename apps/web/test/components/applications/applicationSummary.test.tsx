@@ -5,6 +5,7 @@ import ApplicationSummary from "../../../src/components/applications/application
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { useInputsConnectionQuery } from "../../../src/graphql/explorer/hooks/queries";
 import { inputsConnectionMock } from "./mocks";
+import { InputOrderByInput } from "../../../src/graphql/explorer/types";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -42,6 +43,32 @@ describe("ApplicationSummary component", () => {
     afterEach(() => {
         vi.clearAllMocks();
         cleanup();
+    });
+
+    it("should filter applications based on application id", () => {
+        const implementationMock = vi.fn(
+            () =>
+                [
+                    {
+                        data: inputsConnectionMock,
+                        fetching: false,
+                    },
+                ] as any,
+        );
+        useInputsConnectionQueryMock.mockImplementation(implementationMock);
+        render(<Component {...defaultProps} />);
+
+        expect(implementationMock).toHaveBeenCalledWith({
+            variables: {
+                orderBy: InputOrderByInput.TimestampDesc,
+                limit: 6,
+                where: {
+                    application: {
+                        id_eq: defaultProps.applicationId.toLowerCase(),
+                    },
+                },
+            },
+        });
     });
 
     it("should display summary card for inputs", () => {
