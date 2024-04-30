@@ -11,47 +11,70 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Navigations", () => {
     test("can navigate to home page", async ({ page }) => {
+        // Click on home link
         await page.getByTestId("home-link").click();
+
+        // Wait for navigation to home page
         await page.waitForURL("/");
 
+        // Verify that latest inputs section is visible
         await expect(page.getByText("Latest inputs")).toBeVisible();
+
+        // Verify that latest applications section is visible
         await expect(page.getByText("Latest applications")).toBeVisible();
     });
 
     test("can navigate to applications page", async ({ page }) => {
+        // Click on applications link
         await page.getByTestId("applications-link").click();
+
+        // Wait for navigation to applications page
         await page.waitForURL(`/applications`);
 
+        // Verify page heading
         await expect(getHeadingText(page, "Applications")).toBeVisible();
 
+        // Verify that table with correct columns is visible
         await expect(
             page.getByRole("row", { name: "Id Owner URL" }),
         ).toBeVisible();
 
+        // Verify table rows' count
         await expect(page.getByRole("row")).toHaveCount(11);
     });
 
     test("can navigate to inputs page", async ({ page }) => {
+        // Click on inputs link
         await page.getByTestId("inputs-link").click();
+
+        // Wait for navigation to inputs page
         await page.waitForURL(`/inputs`);
 
+        // Verify page heading
+        await expect(getHeadingText(page, "Inputs")).toBeVisible();
+
+        // Verify that inputs search is visible
         await expect(
             page.getByPlaceholder("Search by Address / Txn Hash / Index"),
         ).toBeVisible();
 
-        await expect(getHeadingText(page, "Inputs")).toBeVisible();
-
+        // Verify that table with correct columns is visible
         await expect(
             page.getByRole("row", { name: "From To Method Index Age Data" }),
         ).toBeVisible();
 
-        // For each input row it actually inserts 3 <tr>
+        // Verify table rows' count. For each input row it actually inserts 3 <tr>
         await expect(page.getByRole("row")).toHaveCount(31);
     });
 
     test("can navigate to connections page", async ({ page }) => {
+        // Click on settings menu
         await page.getByTestId("settings-link").click();
+
+        // Click on connections link
         await page.getByTestId("connections-link").click();
+
+        // Wait for navigation to connections page
         await page.waitForURL("/connections");
 
         // Verify page heading
@@ -68,65 +91,92 @@ test.describe("Navigations", () => {
 
     test.describe("mobile", () => {
         test("can navigate to home page", async ({ page }) => {
+            // Find and click the burger menu
             const burgerBtn = page.getByTestId("burger-menu-btn");
             await expect(burgerBtn).toBeVisible();
             await burgerBtn.click();
 
+            // Click on home link
             await page.getByTestId("home-link").click();
+
+            // Wait for navigation to home page
             await page.waitForURL("/");
 
+            // Verify that latest inputs section is visible
             await expect(page.getByText("Latest inputs")).toBeVisible();
+
+            // Verify that latest applications section is visible
             await expect(page.getByText("Latest applications")).toBeVisible();
         });
 
         test("can navigate to applications page", async ({ page }) => {
+            // Find and click the burger menu
             const burgerBtn = page.getByTestId("burger-menu-btn");
             await expect(burgerBtn).toBeVisible();
             await burgerBtn.click();
 
+            // Click on applications link
             await page.getByTestId("applications-link").click();
+
+            // Wait for navigation to applications page
             await page.waitForURL(`/applications`);
 
+            // Verify page heading
             await expect(getHeadingText(page, "Applications")).toBeVisible();
 
+            // Verify that table with correct columns is visible
             await expect(
                 page.getByRole("row", { name: "Id Owner URL" }),
             ).toBeVisible();
 
+            // Verify table rows' count
             await expect(page.getByRole("row")).toHaveCount(11);
         });
 
         test("can navigate to inputs page", async ({ page }) => {
+            // Find and click the burger menu
             const burgerBtn = page.getByTestId("burger-menu-btn");
             await expect(burgerBtn).toBeVisible();
             await burgerBtn.click();
 
+            // Click on inputs link
             await page.getByTestId("inputs-link").click();
+
+            // Wait for navigation to inputs page
             await page.waitForURL(`/inputs`);
 
+            // Verify page heading
+            await expect(getHeadingText(page, "Inputs")).toBeVisible();
+
+            // Verify that inputs search is visible
             await expect(
                 page.getByPlaceholder("Search by Address / Txn Hash / Index"),
             ).toBeVisible();
 
-            await expect(getHeadingText(page, "Inputs")).toBeVisible();
-
+            // Verify that table with correct columns is visible
             await expect(
                 page.getByRole("row", {
                     name: "From To Method Index Age Data",
                 }),
             ).toBeVisible();
 
-            // For each input row it actually inserts 3 <tr>
+            // Verify table rows' count. For each input row it actually inserts 3 <tr>
             await expect(page.getByRole("row")).toHaveCount(31);
         });
 
         test("can navigate to connections page", async ({ page }) => {
+            // Find and click the burger menu
             const burgerBtn = page.getByTestId("burger-menu-btn");
             await expect(burgerBtn).toBeVisible();
             await burgerBtn.click();
 
+            // Click on settings menu
             await page.getByTestId("settings-link").click();
+
+            // Click on connections link
             await page.getByTestId("connections-link").click();
+
+            // Wait for navigation to connections page
             await page.waitForURL("/connections");
 
             // Verify page heading

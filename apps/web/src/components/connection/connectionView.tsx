@@ -33,7 +33,9 @@ const ConnectionView = () => {
                         <VisuallyHidden>Create connection</VisuallyHidden>
                     </Button>
 
-                    <Title size="h2">Connections</Title>
+                    <Title data-testid="page-heading" size="h2">
+                        Connections
+                    </Title>
                     {hasConnections && (
                         <Avatar size="sm" color={theme.primaryColor}>
                             {connections.length}
