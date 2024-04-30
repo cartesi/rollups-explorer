@@ -41,6 +41,9 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,
             limit: 6,
+            where: {
+                id_startsWith: applicationId,
+            },
         },
     });
     const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
