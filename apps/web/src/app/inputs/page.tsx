@@ -3,6 +3,7 @@ import { TbInbox } from "react-icons/tb";
 import { Metadata } from "next";
 import Inputs from "../../components/inputs/inputs";
 import Breadcrumbs from "../../components/breadcrumbs";
+import PageHeading from "../../components/layout/pageHeading";
 
 export const metadata: Metadata = {
     title: "Inputs",
@@ -20,11 +21,7 @@ export default function InputsPage() {
                 ]}
             />
 
-            <Group>
-                <TbInbox size={40} />
-                <Title order={2}>Inputs</Title>
-            </Group>
-
+            <PageHeading heading="Inputs" Icon={TbInbox} />
             <Inputs />
         </Stack>
     );

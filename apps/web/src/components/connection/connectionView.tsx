@@ -26,6 +26,7 @@ const ConnectionView = () => {
                     <Button
                         size="compact-sm"
                         variant="filled"
+                        data-testid="add-connection"
                         onClick={() => showConnectionModal()}
                     >
                         <TbPlus />
