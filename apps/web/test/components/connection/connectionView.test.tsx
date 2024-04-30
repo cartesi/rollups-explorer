@@ -27,9 +27,7 @@ describe("Connection view component", () => {
 
         expect(screen.getByText("Create connection")).toBeInTheDocument();
         expect(screen.getByText("Connections")).toBeInTheDocument();
-        expect(
-            screen.getByText("Create your first connection."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("No connections found.")).toBeInTheDocument();
     });
 
     it("should call the creation form when clicking the plus sign", () => {
@@ -78,31 +76,5 @@ describe("Connection view component", () => {
         );
 
         expect(removeConnection).toHaveBeenCalledWith(connections[0].address);
-    });
-
-    it("should hide the connections when clicking the chevron-up icon", () => {
-        const { listConnections } = useConnectionConfigReturnStub;
-        listConnections.mockReturnValue(connections);
-
-        render(<View />);
-
-        expect(screen.queryByText(connections[0].url)).toBeVisible();
-
-        fireEvent.click(screen.getByText("Hide connections"));
-
-        expect(screen.queryByText(connections[0].url)).not.toBeVisible();
-    });
-
-    it("should show the connections when clicking the chevron-down icon", () => {
-        const { listConnections } = useConnectionConfigReturnStub;
-        listConnections.mockReturnValue(connections);
-
-        render(<View />);
-
-        fireEvent.click(screen.getByText("Hide connections"));
-        expect(screen.queryByText(connections[0].url)).not.toBeVisible();
-
-        fireEvent.click(screen.getByText("Show connections"));
-        expect(screen.queryByText(connections[0].url)).toBeVisible();
     });
 });

@@ -1,4 +1,10 @@
-import { render, screen, within } from "@testing-library/react";
+import {
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+    within,
+} from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import withMantineTheme from "../../utils/WithMantineTheme";
 import Shell from "../../../src/components/layout/shell";
@@ -168,6 +174,38 @@ describe("Shell component", () => {
             ) as HTMLDivElement;
 
             expect(navbar).toBeVisible();
+        });
+
+        it("should display settings menu in navbar", () => {
+            render(<Component>Children</Component>);
+
+            expect(
+                within(screen.getByTestId("navbar")).getByTestId(
+                    "settings-link",
+                ),
+            ).toBeInTheDocument();
+        });
+
+        it("should display connections link in settings menu", async () => {
+            render(<Component>Children</Component>);
+
+            const settingsMenu = within(
+                screen.getByTestId("navbar"),
+            ).getByTestId("settings-link");
+
+            fireEvent.click(settingsMenu);
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link"),
+                ).toBeInTheDocument(),
+            );
+
+            await waitFor(() =>
+                expect(
+                    screen.getByTestId("connections-link").getAttribute("href"),
+                ).toBe("/connections"),
+            );
         });
     });
 });

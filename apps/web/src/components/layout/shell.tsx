@@ -17,23 +17,22 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 import {
+    TbAdjustmentsHorizontal,
     TbApps,
     TbArrowsDownUp,
-    TbDotsVertical,
     TbHome,
     TbInbox,
     TbMoonStars,
+    TbPlugConnected,
     TbSun,
 } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
-import ConnectionView from "../../components/connection/connectionView";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
-    const [opened, { toggle }] = useDisclosure();
-    const [menuOpened, { toggle: toggleMenu }] = useDisclosure(false);
+    const [opened, { toggle: toggleMobileMenu }] = useDisclosure();
     const [
         transaction,
         {
@@ -51,7 +50,9 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
     );
     const { isConnected } = useAccount();
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme({
+        keepTransitions: true,
+    });
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (
@@ -62,13 +63,6 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 width: 180,
                 collapsed: {
                     mobile: !opened,
-                },
-            }}
-            aside={{
-                ...themeDefaultProps?.aside,
-                collapsed: {
-                    desktop: !menuOpened,
-                    mobile: !menuOpened,
                 },
             }}
             padding="md"
@@ -85,7 +79,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <Burger
                         data-testid="burger-menu-btn"
                         opened={opened}
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         hiddenFrom="sm"
                         size="sm"
                     />
@@ -141,14 +135,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             />
                         </Group>
                     </Group>
-                    <Button variant="subtle" onClick={toggleMenu}>
-                        <TbDotsVertical size={theme.other.iconSize} />
-                    </Button>
                 </Group>
             </AppShell.Header>
-            <AppShell.Aside p="md" zIndex={102}>
-                <ConnectionView />
-            </AppShell.Aside>
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
                 <Stack px={13}>
                     <NavLink
@@ -156,14 +144,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Home"
                         href="/"
                         leftSection={<TbHome />}
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
                         label="Applications"
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         href="/applications"
                         leftSection={<TbApps />}
                         data-testid="applications-link"
@@ -172,11 +160,27 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <NavLink
                         component={Link}
                         label="Inputs"
-                        onClick={toggle}
+                        onClick={toggleMobileMenu}
                         href="/inputs"
                         leftSection={<TbInbox />}
                         data-testid="inputs-link"
                     />
+
+                    <NavLink
+                        label="Settings"
+                        leftSection={<TbAdjustmentsHorizontal />}
+                        data-testid="settings-link"
+                        childrenOffset="xs"
+                    >
+                        <NavLink
+                            component={Link}
+                            onClick={toggleMobileMenu}
+                            label="Connections"
+                            leftSection={<TbPlugConnected />}
+                            href="/connections"
+                            data-testid="connections-link"
+                        />
+                    </NavLink>
 
                     <NavLink
                         component="button"
