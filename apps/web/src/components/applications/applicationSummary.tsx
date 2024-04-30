@@ -42,7 +42,9 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
             orderBy: InputOrderByInput.TimestampDesc,
             limit: 6,
             where: {
-                id_startsWith: applicationId,
+                application: {
+                    id_eq: applicationId.toLowerCase(),
+                },
             },
         },
     });
