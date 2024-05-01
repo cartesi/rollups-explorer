@@ -21,13 +21,12 @@ const EntriesSummary: FC = () => {
         : 0;
 
     return (
-        <div data-testid="entries-summary">
-            <Summary
-                inputs={stats?.inputsConnection?.totalCount ?? 0}
-                applications={stats?.applicationsConnection?.totalCount ?? 0}
-                applicationsOwned={applicationsOwnedCount}
-            />
-        </div>
+        <Summary
+            inputs={stats?.inputsConnection?.totalCount ?? 0}
+            applications={stats?.applicationsConnection?.totalCount ?? 0}
+            applicationsOwned={applicationsOwnedCount}
+            data-testid="entries-summary"
+        />
     );
 };
 
