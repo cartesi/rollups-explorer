@@ -1,7 +1,7 @@
 import { expect, Page, test } from "@playwright/test";
 
-const getHeadingText = (page: Page, text: string) =>
-    page.locator('[data-testid="page-heading"]', {
+const getPageTitle = (page: Page, text: string) =>
+    page.locator('[data-testid="page-title"]', {
         hasText: text,
     });
 
@@ -32,7 +32,7 @@ test.describe("Navigations", () => {
         await page.waitForURL(`/applications`);
 
         // Verify page heading
-        await expect(getHeadingText(page, "Applications")).toBeVisible();
+        await expect(getPageTitle(page, "Applications")).toBeVisible();
 
         // Verify that table with correct columns is visible
         await expect(
@@ -51,7 +51,7 @@ test.describe("Navigations", () => {
         await page.waitForURL(`/inputs`);
 
         // Verify page heading
-        await expect(getHeadingText(page, "Inputs")).toBeVisible();
+        await expect(getPageTitle(page, "Inputs")).toBeVisible();
 
         // Verify that inputs search is visible
         await expect(
@@ -78,7 +78,7 @@ test.describe("Navigations", () => {
         await page.waitForURL("/connections");
 
         // Verify page heading
-        await expect(getHeadingText(page, "Connections")).toBeVisible();
+        await expect(getPageTitle(page, "Connections")).toBeVisible();
 
         // Click on add-connection button
         await page.getByTestId("add-connection").click();
@@ -122,7 +122,7 @@ test.describe("Navigations", () => {
             await page.waitForURL(`/applications`);
 
             // Verify page heading
-            await expect(getHeadingText(page, "Applications")).toBeVisible();
+            await expect(getPageTitle(page, "Applications")).toBeVisible();
 
             // Verify that table with correct columns is visible
             await expect(
@@ -146,7 +146,7 @@ test.describe("Navigations", () => {
             await page.waitForURL(`/inputs`);
 
             // Verify page heading
-            await expect(getHeadingText(page, "Inputs")).toBeVisible();
+            await expect(getPageTitle(page, "Inputs")).toBeVisible();
 
             // Verify that inputs search is visible
             await expect(
@@ -180,7 +180,7 @@ test.describe("Navigations", () => {
             await page.waitForURL("/connections");
 
             // Verify page heading
-            await expect(getHeadingText(page, "Connections")).toBeVisible();
+            await expect(getPageTitle(page, "Connections")).toBeVisible();
 
             // Click on add-connection button
             await page.getByTestId("add-connection").click();

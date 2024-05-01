@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { TbApps } from "react-icons/tb";
 import { Applications } from "../../components/applications/applications";
 import Breadcrumbs from "../../components/breadcrumbs";
-import PageHeading from "../../components/layout/pageHeading";
+import PageTitle from "../../components/layout/pageTitle";
 
 export const metadata: Metadata = {
     title: "Applications",
@@ -21,7 +21,7 @@ export default function ApplicationsPage() {
                 ]}
             />
 
-            <PageHeading heading="Applications" Icon={TbApps} />
+            <PageTitle title="Applications" Icon={TbApps} />
             <Applications />
         </Stack>
     );

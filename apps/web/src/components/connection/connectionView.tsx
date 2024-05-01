@@ -33,7 +33,7 @@ const ConnectionView = () => {
                         <VisuallyHidden>Create connection</VisuallyHidden>
                     </Button>
 
-                    <Title data-testid="page-heading" size="h2">
+                    <Title data-testid="page-title" size="h2">
                         Connections
                     </Title>
                     {hasConnections && (

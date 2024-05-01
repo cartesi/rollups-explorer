@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import PageHeading from "../../../src/components/layout/pageHeading";
+import PageTitle from "../../../src/components/layout/pageTitle";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { TbInbox } from "react-icons/tb";
 
-const Component = withMantineTheme(PageHeading);
+const Component = withMantineTheme(PageTitle);
 
 const defaultProps = {
-    heading: "Applications",
+    title: "Applications",
     Icon: TbInbox,
 };
 
-describe("PageHeading component", () => {
+describe("PageTitle component", () => {
     it("should display correct title", () => {
         render(<Component {...defaultProps} />);
-        expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
+        expect(screen.getByText(defaultProps.title)).toBeInTheDocument();
     });
 
     it("should display correct icon", () => {

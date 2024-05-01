@@ -1,20 +1,18 @@
 import { Group, Title } from "@mantine/core";
 import { FC, JSX } from "react";
 
-interface PageHeadingProps {
-    heading: string;
+interface PageTitleProps {
+    title: string;
     Icon: JSX.ElementType;
 }
 
-const PageHeading: FC<PageHeadingProps> = ({ heading, Icon }) => {
+const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
     return (
-        <Group mb="sm">
+        <Group mb="sm" data-testid="page-title">
             <Icon size={40} />
-            <Title data-testid="page-heading" order={2}>
-                {heading}
-            </Title>
+            <Title order={2}>{title}</Title>
         </Group>
     );
 };
 
-export default PageHeading;
+export default PageTitle;
