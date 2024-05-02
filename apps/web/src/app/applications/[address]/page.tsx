@@ -1,22 +1,22 @@
-import { Group, Stack, Text, Title } from "@mantine/core";
+import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
-import { TbInbox } from "react-icons/tb";
+import { TbStack2 } from "react-icons/tb";
 import { Address as AddressType } from "viem";
-import Address from "../../../../components/address";
-import Breadcrumbs from "../../../../components/breadcrumbs";
-import Inputs from "../../../../components/inputs/inputs";
+import Address from "../../../components/address";
+import Breadcrumbs from "../../../components/breadcrumbs";
+import ApplicationSummary from "../../../components/applications/applicationSummary";
 import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
-} from "../../../../graphql/explorer/operations";
-import { getUrqlServerClient } from "../../../../lib/urql";
+} from "../../../graphql/explorer/operations";
+import { getUrqlServerClient } from "../../../lib/urql";
 
 export async function generateMetadata({
     params,
-}: ApplicationInputsPageProps): Promise<Metadata> {
+}: ApplicationPageProps): Promise<Metadata> {
     return {
         title: `Application ${params.address}`,
     };
@@ -34,13 +34,11 @@ async function getApplication(address: string) {
     return result.data?.applicationById;
 }
 
-export type ApplicationInputsPageProps = {
+export type ApplicationPageProps = {
     params: { address: string };
 };
 
-const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
-    params,
-}) => {
+const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
     const application = await getApplication(params.address);
 
     if (!application) {
@@ -61,21 +59,17 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
                     },
                 ]}
             >
-                <Address
-                    value={params.address as AddressType}
-                    href={`/applications/${params.address}`}
-                />
-                <Text>Inputs</Text>
+                <Address value={params.address as AddressType} icon />
             </Breadcrumbs>
 
             <Group>
-                <TbInbox size={40} />
-                <Title order={2}>Inputs</Title>
+                <TbStack2 size={40} />
+                <Title order={2}>Summary</Title>
             </Group>
 
-            <Inputs applicationId={params.address} />
+            <ApplicationSummary applicationId={params.address} />
         </Stack>
     );
 };
 
-export default ApplicationInputsPage;
+export default ApplicationPage;
