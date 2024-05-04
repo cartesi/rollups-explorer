@@ -54,9 +54,7 @@ test.describe("Navigations", () => {
         await expect(getPageTitle(page, "Inputs")).toBeVisible();
 
         // Verify that inputs search is visible
-        await expect(
-            page.getByPlaceholder("Search by Address / Txn Hash / Index"),
-        ).toBeVisible();
+        await expect(page.getByTestId("search-input")).toBeVisible();
 
         // Verify that table with correct columns is visible
         await expect(
@@ -149,9 +147,7 @@ test.describe("Navigations", () => {
             await expect(getPageTitle(page, "Inputs")).toBeVisible();
 
             // Verify that inputs search is visible
-            await expect(
-                page.getByPlaceholder("Search by Address / Txn Hash / Index"),
-            ).toBeVisible();
+            await expect(page.getByTestId("search-input")).toBeVisible();
 
             // Verify that table with correct columns is visible
             await expect(
