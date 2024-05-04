@@ -25,6 +25,7 @@ const EntriesSummary: FC = () => {
             inputs={stats?.inputsConnection?.totalCount ?? 0}
             applications={stats?.applicationsConnection?.totalCount ?? 0}
             applicationsOwned={applicationsOwnedCount}
+            data-testid="entries-summary"
         />
     );
 };

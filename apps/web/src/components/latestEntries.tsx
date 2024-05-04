@@ -110,7 +110,11 @@ const LatestEntries: FC = () => {
 
     return (
         <Grid gutter="md">
-            <Grid.Col span={{ base: 12, md: 6 }} my="md">
+            <Grid.Col
+                span={{ base: 12, md: 6 }}
+                my="md"
+                data-testid="latest-inputs"
+            >
                 <LatestEntriesCard
                     title="Latest inputs"
                     Icon={TbInbox}
@@ -122,7 +126,11 @@ const LatestEntries: FC = () => {
                 />
             </Grid.Col>
 
-            <Grid.Col span={{ base: 12, md: 6 }} my="md">
+            <Grid.Col
+                span={{ base: 12, md: 6 }}
+                my="md"
+                data-testid="latest-applications"
+            >
                 <LatestEntriesCard
                     title="Latest applications"
                     Icon={TbApps}
