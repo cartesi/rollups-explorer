@@ -1,6 +1,13 @@
 "use client";
 
-import { Group, Pagination, Select, Stack, Text } from "@mantine/core";
+import {
+    Group,
+    Pagination,
+    Select,
+    Stack,
+    StackProps,
+    Text,
+} from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
@@ -11,15 +18,15 @@ export const perPageList = Array.from({ length: 3 }).map((_, index) => {
     return limitBounds[key].toString();
 });
 
-export type PaginatedProps = {
+export interface PaginatedProps extends Omit<StackProps, "onChange"> {
     children: ReactNode;
     totalCount?: number;
     fetching: boolean;
     onChange: (limit: number, page: number) => void;
-};
+}
 
 const Paginated: FC<PaginatedProps> = (props) => {
-    const { children, totalCount, fetching, onChange } = props;
+    const { children, totalCount, fetching, onChange, ...restProps } = props;
     const [{ limit, page }, updateParams] = usePaginationParams();
     const totalPages = Math.ceil(
         totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
@@ -75,7 +82,7 @@ const Paginated: FC<PaginatedProps> = (props) => {
     }, [limit, page, onChange]);
 
     return (
-        <Stack>
+        <Stack {...restProps}>
             <Pagination
                 styles={{ root: { alignSelf: "flex-end" } }}
                 value={activePage}

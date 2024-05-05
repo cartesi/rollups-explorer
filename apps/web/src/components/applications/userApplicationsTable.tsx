@@ -4,8 +4,17 @@ import { Application } from "../../graphql/explorer/types";
 import { ApplicationsTableProps } from "./applicationsTable";
 import UserApplicationsRow from "./userApplicationsRow";
 
-const UserApplicationsTable: FC<ApplicationsTableProps> = (props) => {
-    const { applications, fetching, totalCount } = props;
+interface UserApplicationsTableProps extends ApplicationsTableProps {
+    noResultsMessage?: string;
+}
+
+const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
+    const {
+        applications,
+        fetching,
+        totalCount,
+        noResultsMessage = "No applications",
+    } = props;
     return (
         <Box>
             <Table>
@@ -27,7 +36,7 @@ const UserApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                         totalCount === 0 && (
                             <Table.Tr>
                                 <Table.Td colSpan={3} align="center">
-                                    <Text fw={700}>No applications</Text>
+                                    <Text fw={700}>{noResultsMessage}</Text>
                                 </Table.Td>
                             </Table.Tr>
                         )
