@@ -63,29 +63,29 @@ describe("Applications component", () => {
         cleanup();
     });
 
-    it("should display tabs when wallet is connected", () => {
-        render(<Component />);
-        expect(screen.getByText("All Apps")).toBeInTheDocument();
-        expect(screen.getByText("My Apps")).toBeInTheDocument();
-    });
-
     it("should display all applications tab by default", () => {
         render(<Component />);
         expect(screen.getByTestId("all-applications")).toBeInTheDocument();
     });
 
-    it("should not display tabs when wallet is not connected", () => {
+    it("should display tabs when wallet is connected", () => {
+        useAccountMock.mockReturnValue({
+            ...useAccountData,
+            isConnected: true,
+        } as any);
+        render(<Component />);
+        expect(screen.getByText("All Apps")).toBeInTheDocument();
+        expect(screen.getByText("My Apps")).toBeInTheDocument();
+    });
+
+    it("should display tabs when wallet is not connected", () => {
         useAccountMock.mockReturnValue({
             ...useAccountData,
             isConnected: false,
         } as any);
         render(<Component />);
-        expect(() => screen.getByText("All apps")).toThrow(
-            "Unable to find an element",
-        );
-        expect(() => screen.getByText("My apps")).toThrow(
-            "Unable to find an element",
-        );
+        expect(screen.getByText("All Apps")).toBeInTheDocument();
+        expect(screen.getByText("My Apps")).toBeInTheDocument();
     });
 
     it("should display correct content when tab is selected", () => {
