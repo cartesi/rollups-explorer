@@ -84,9 +84,7 @@ type ApplicationTab = "all-apps" | "my-apps";
 
 export const Applications = () => {
     const { isConnected } = useAccount();
-    const [activeTab, setActiveTab] = useState<ApplicationTab | null>(
-        "all-apps",
-    );
+    const [activeTab, setActiveTab] = useState<ApplicationTab>("all-apps");
 
     const onChangeTab = useCallback((tab: string | null) => {
         setActiveTab(tab as ApplicationTab);
