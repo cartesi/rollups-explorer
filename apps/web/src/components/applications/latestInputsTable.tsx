@@ -4,11 +4,9 @@ import type { Address as AddressType } from "abitype/dist/types/abi";
 import prettyMilliseconds from "pretty-ms";
 import { FC, useCallback, useState } from "react";
 import Address from "../address";
-import { getAddress } from "viem";
-import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
-import { MethodResolver } from "../inputs/inputRow";
 import { InputItemFragment } from "../../graphql/explorer/operations";
 import { TbArrowRight } from "react-icons/tb";
+import { methodResolver } from "../../lib/methodResolver";
 
 export interface Entry {
     appId: AddressType;
@@ -21,21 +19,6 @@ export interface LatestInputsTableProps {
     fetching: boolean;
     totalCount: number;
 }
-
-const etherDepositResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === etherPortalAddress && "depositEther";
-
-const erc20PortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc20PortalAddress && "depositERC20Tokens";
-
-const resolvers: MethodResolver[] = [etherDepositResolver, erc20PortalResolver];
-const methodResolver: MethodResolver = (input) => {
-    for (const resolver of resolvers) {
-        const method = resolver(input);
-        if (method) return method;
-    }
-    return undefined;
-};
 
 const LatestInputsTable: FC<LatestInputsTableProps> = ({
     inputs,
