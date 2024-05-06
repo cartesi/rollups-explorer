@@ -6,11 +6,13 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "format": "prettier \"src/**/*.ts*\" --write",
     "format:check": "prettier \"src/**/*.ts*\" --check",
-    "build": "tsup src/index.ts --format esm,cjs --dts"
+    "test:watch": "vitest",
+    "test:ci": "vitest run --coverage"
   },
   "dependencies": {
     "@shazow/whatsabi": "0.11.0",
@@ -24,6 +26,7 @@
     "eslint": "^8",
     "eslint-config-cartesi": "*",
     "tsup": "^7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.0"
   }
 }
