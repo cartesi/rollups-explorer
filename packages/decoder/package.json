@@ -9,8 +9,8 @@
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch",
     "lint": "eslint \"src/**/*.ts*\"",
-    "format": "prettier \"src/**/*.ts*\" --write",
-    "format:check": "prettier \"src/**/*.ts*\" --check",
+    "format:check": "prettier \"**/*.{ts,tsx}\" --check",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage"
   },
