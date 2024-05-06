@@ -1,7 +1,12 @@
-import { ActionIcon, Table, Tooltip } from "@mantine/core";
+import { ActionIcon, Group, Table, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import { FC } from "react";
-import { TbInbox, TbPlugConnected, TbPlugConnectedX } from "react-icons/tb";
+import {
+    TbInbox,
+    TbPlugConnected,
+    TbPlugConnectedX,
+    TbStack2,
+} from "react-icons/tb";
 import { Address as AddressType } from "viem";
 import { Application } from "../../graphql/explorer/types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
@@ -40,39 +45,49 @@ const ApplicationRow: FC<ApplicationRowProps> = (props) => {
             </Table.Td>
             <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
             <Table.Td>
-                <Tooltip label="Inputs">
-                    <Link
-                        href={`/applications/${appId}/inputs`}
-                        data-testid="applications-link"
-                    >
-                        <ActionIcon variant="default">
-                            <TbInbox />
-                        </ActionIcon>
-                    </Link>
-                </Tooltip>
-                {hasConnection(appId) ? (
-                    <Tooltip label="Remove connection">
-                        <ActionIcon
-                            data-testid="remove-connection"
-                            variant="default"
-                            ml={4}
-                            onClick={() => removeConnection(appId)}
+                <Group gap="xs">
+                    <Tooltip label="Summary">
+                        <Link
+                            href={`/applications/${appId}`}
+                            data-testid="applications-summary-link"
                         >
-                            <TbPlugConnectedX />
-                        </ActionIcon>
+                            <ActionIcon variant="default">
+                                <TbStack2 />
+                            </ActionIcon>
+                        </Link>
                     </Tooltip>
-                ) : (
-                    <Tooltip label="Add a connection">
-                        <ActionIcon
-                            data-testid="add-connection"
-                            variant="default"
-                            ml={4}
-                            onClick={() => showConnectionModal(appId)}
+                    <Tooltip label="Inputs">
+                        <Link
+                            href={`/applications/${appId}/inputs`}
+                            data-testid="applications-link"
                         >
-                            <TbPlugConnected />
-                        </ActionIcon>
+                            <ActionIcon variant="default">
+                                <TbInbox />
+                            </ActionIcon>
+                        </Link>
                     </Tooltip>
-                )}
+                    {hasConnection(appId) ? (
+                        <Tooltip label="Remove connection">
+                            <ActionIcon
+                                data-testid="remove-connection"
+                                variant="default"
+                                onClick={() => removeConnection(appId)}
+                            >
+                                <TbPlugConnectedX />
+                            </ActionIcon>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip label="Add a connection">
+                            <ActionIcon
+                                data-testid="add-connection"
+                                variant="default"
+                                onClick={() => showConnectionModal(appId)}
+                            >
+                                <TbPlugConnected />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                </Group>
             </Table.Td>
         </Table.Tr>
     );

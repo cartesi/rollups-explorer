@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, it } from "vitest";
-import type { FC } from "react";
+import { Table } from "@mantine/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import type { FC } from "react";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import ApplicationRow, {
     ApplicationRowProps,
 } from "../../../src/components/applications/applicationRow";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
-import { Table } from "@mantine/core";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -109,6 +109,16 @@ describe("ApplicationRow component", () => {
         render(<Component {...defaultProps} />);
 
         expect(screen.getByText(defaultConnection.url)).toBeInTheDocument();
+    });
+
+    it("should display link to the application summary page", () => {
+        render(<Component {...defaultProps} />);
+        const link = screen.getByTestId("applications-summary-link");
+
+        expect(link).toBeInTheDocument();
+        expect(link.getAttribute("href")).toBe(
+            `/applications/${defaultProps.application.id}`,
+        );
     });
 
     it("should display link to application inputs page", () => {

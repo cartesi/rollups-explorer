@@ -96,7 +96,7 @@ const AllApplications: FC = () => {
 
 export const Applications = () => {
     return (
-        <Tabs defaultValue="all-apps">
+        <Tabs defaultValue="all-apps" keepMounted={false}>
             <Tabs.List>
                 <Tabs.Tab value="all-apps">All Apps</Tabs.Tab>
                 <Tabs.Tab value="my-apps">My Apps</Tabs.Tab>

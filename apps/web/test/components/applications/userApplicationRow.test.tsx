@@ -95,6 +95,16 @@ describe("ApplicationRow component", () => {
         expect(screen.getByText(defaultConnection.url)).toBeInTheDocument();
     });
 
+    it("should display link to application summary page", () => {
+        render(<Component {...defaultProps} />);
+        const link = screen.getByTestId("applications-summary-link");
+
+        expect(link).toBeInTheDocument();
+        expect(link.getAttribute("href")).toBe(
+            `/applications/${defaultProps.application.id}`,
+        );
+    });
+
     it("should display link to application inputs page", () => {
         render(<Component {...defaultProps} />);
         const link = screen.getByTestId("applications-link");
