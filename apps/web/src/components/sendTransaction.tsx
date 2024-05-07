@@ -8,7 +8,7 @@ import {
     RawInputForm,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
-import { useDebouncedState, useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
@@ -29,23 +29,34 @@ interface DepositProps {
     initialDepositType?: DepositType;
 }
 
+const DEBOUNCE_TIME = 400 as const;
+
 const SendTransaction: FC<DepositProps> = ({
     initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
     const [applicationId, setApplicationId] = useState<string>("");
+    const [multiTokenId, setMultiTokenId] = useState<string>("");
     const [tokenId, setTokenId] = useState<string>("");
-    const [debouncedApplicationId] = useDebouncedValue(applicationId, 400);
-    const [debouncedTokenId] = useDebouncedValue(tokenId, 400);
-    const [multiTokenId, setMultiTokenId] = useDebouncedState("", 400);
+    const [debouncedApplicationId] = useDebouncedValue(
+        applicationId,
+        DEBOUNCE_TIME,
+    );
+    const [debouncedTokenId] = useDebouncedValue(tokenId, DEBOUNCE_TIME);
+    const [debouncedMultiTokenId] = useDebouncedValue(
+        multiTokenId,
+        DEBOUNCE_TIME,
+    );
     const { applications, fetching } = useSearchApplications({
         address: debouncedApplicationId,
     });
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
     });
-    const { multiTokens } = useSearchMultiTokens({ address: multiTokenId });
+    const { multiTokens } = useSearchMultiTokens({
+        address: debouncedMultiTokenId,
+    });
 
     const onDepositErc721 = useCallback(() => {
         notifications.show({
