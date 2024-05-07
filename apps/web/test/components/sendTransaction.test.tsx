@@ -1,28 +1,21 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, describe, it } from "vitest";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import SendTransaction from "../../src/components/sendTransaction";
 import withMantineTheme from "../utils/WithMantineTheme";
+import sendTransactionMocks from "./sendTransaction.mocks";
 const Component = withMantineTheme(SendTransaction);
 
 vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
     return {
         useApplicationsQuery: () => [{ data: {}, fetching: false }],
         useTokensQuery: () => [{ data: {}, fetching: false }],
-    };
-});
-
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        usePrepareInputBoxAddInput: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteInputBoxAddInput: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
+        useMultiTokensQuery: () => [{ data: {}, fetching: false }],
     };
 });
 
@@ -34,109 +27,8 @@ vi.mock("viem", async () => {
     };
 });
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    const actual = await vi.importActual("@cartesi/rollups-wagmi");
-    return {
-        ...(actual as any),
-        useSimulateErc20Approve: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc20Approve: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        useSimulateErc20PortalDepositErc20Tokens: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc20PortalDepositErc20Tokens: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        useSimulateErc721Approve: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc721Approve: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        useSimulateErc721PortalDepositErc721Token: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc721PortalDepositErc721Token: () => ({
-            wait: vi.fn(),
-            reset: vi.fn(),
-        }),
-        useSimulateEtherPortalDepositEther: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteEtherPortalDepositEther: () => ({
-            wait: vi.fn(),
-        }),
-        useSimulateInputBoxAddInput: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteInputBoxAddInput: () => ({
-            wait: vi.fn(),
-        }),
-    };
-});
-
-vi.mock("wagmi", async () => {
-    return {
-        useContractReads: () => ({
-            isLoading: false,
-            isSuccess: true,
-            data: [
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-            ],
-        }),
-        useAccount: () => ({
-            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
-        }),
-        usePrepareContractWrite: () => ({}),
-        useWaitForTransaction: () => ({}),
-        useContractWrite: () => ({}),
-        useNetwork: () => ({}),
-        useReadContracts: () => ({}),
-        useBlockNumber: () => ({
-            data: 0,
-        }),
-        useWaitForTransactionReceipt: () => ({}),
-    };
-});
+vi.mock("@cartesi/rollups-wagmi");
+vi.mock("wagmi");
 
 vi.mock("@tanstack/react-query", async () => {
     const actual = await vi.importActual("@tanstack/react-query");
@@ -149,8 +41,13 @@ vi.mock("@tanstack/react-query", async () => {
 });
 
 describe("SendTransaction component", () => {
-    afterAll(() => {
-        vi.restoreAllMocks();
+    beforeEach(() => {
+        sendTransactionMocks.setup();
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        cleanup();
     });
 
     it("should show ERC20 deposit form", () => {
@@ -171,6 +68,18 @@ describe("SendTransaction component", () => {
     it("should show Raw input form", () => {
         render(<Component initialDepositType="input" />);
         expect(screen.getByTestId("raw-input-form")).toBeInTheDocument();
+    });
+
+    it("should show ERC1155 single deposit form", () => {
+        render(<Component initialDepositType="erc1155" />);
+        expect(screen.getByTestId("erc1155-deposit-form")).toBeInTheDocument();
+    });
+
+    it("should show ERC1155 batch deposit form", () => {
+        render(<Component initialDepositType="erc1155Batch" />);
+        expect(
+            screen.getByTestId("erc1155-batch-deposit-form"),
+        ).toBeInTheDocument();
     });
 
     it("should initially query 10 applications with no predefined search", async () => {

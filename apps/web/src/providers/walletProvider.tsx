@@ -1,5 +1,4 @@
 "use client";
-import { ReactNode } from "react";
 import { useMantineColorScheme } from "@mantine/core";
 import {
     AvatarComponent,
@@ -10,14 +9,14 @@ import {
     RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
 import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Image from "next/image";
+import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
-import { Transport } from "viem";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");

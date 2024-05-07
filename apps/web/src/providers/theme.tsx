@@ -5,6 +5,7 @@ import {
     List,
     MantineThemeOverride,
     Modal,
+    Paper,
     createTheme,
     mergeMantineTheme,
 } from "@mantine/core";
@@ -50,6 +51,11 @@ const themeOverride: MantineThemeOverride = createTheme({
             defaultProps: {
                 shadow: "sm",
                 withBorder: true,
+            },
+        }),
+        Paper: Paper.extend({
+            defaultProps: {
+                shadow: "xs",
             },
         }),
     },

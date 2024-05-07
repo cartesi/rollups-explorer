@@ -85,6 +85,12 @@ query tokens($limit: Int, $where: TokenWhereInput) {
     }
 }
 
+query multiTokens($limit: Int, $where: MultiTokenWhereInput) {
+    multiTokens(limit: $limit, where: $where) {
+        id
+    }
+}
+
 fragment ApplicationItem on Application {
     id
     owner

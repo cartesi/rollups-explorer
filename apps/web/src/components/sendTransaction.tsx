@@ -1,5 +1,7 @@
 "use client";
 import {
+    DepositFormSuccessData,
+    ERC1155DepositForm,
     ERC20DepositForm,
     ERC721DepositForm,
     EtherDepositForm,
@@ -7,16 +9,19 @@ import {
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
+import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
-import { notifications } from "@mantine/notifications";
+import { BlockExplorerLink } from "./BlockExplorerLink";
 
 export type DepositType =
     | "ether"
     | "erc20"
     | "erc721"
     | "erc1155"
+    | "erc1155Batch"
     | "relay"
     | "input";
 
@@ -24,20 +29,33 @@ interface DepositProps {
     initialDepositType?: DepositType;
 }
 
+const DEBOUNCE_TIME = 400 as const;
+
 const SendTransaction: FC<DepositProps> = ({
     initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
     const [applicationId, setApplicationId] = useState<string>("");
+    const [multiTokenId, setMultiTokenId] = useState<string>("");
     const [tokenId, setTokenId] = useState<string>("");
-    const [debouncedApplicationId] = useDebouncedValue(applicationId, 400);
-    const [debouncedTokenId] = useDebouncedValue(tokenId, 400);
+    const [debouncedApplicationId] = useDebouncedValue(
+        applicationId,
+        DEBOUNCE_TIME,
+    );
+    const [debouncedTokenId] = useDebouncedValue(tokenId, DEBOUNCE_TIME);
+    const [debouncedMultiTokenId] = useDebouncedValue(
+        multiTokenId,
+        DEBOUNCE_TIME,
+    );
     const { applications, fetching } = useSearchApplications({
         address: debouncedApplicationId,
     });
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
+    });
+    const { multiTokens } = useSearchMultiTokens({
+        address: debouncedMultiTokenId,
     });
 
     const onDepositErc721 = useCallback(() => {
@@ -47,6 +65,33 @@ const SendTransaction: FC<DepositProps> = ({
             withBorder: true,
         });
     }, []);
+
+    const onSuccess = useCallback(
+        ({ receipt, type }: DepositFormSuccessData) => {
+            const message = receipt?.transactionHash
+                ? {
+                      message: (
+                          <BlockExplorerLink
+                              value={receipt.transactionHash.toString()}
+                              type="tx"
+                          />
+                      ),
+                      title: `${type} transfer completed`,
+                  }
+                : { message: `${type} transfer completed.` };
+
+            notifications.show({
+                withCloseButton: true,
+                autoClose: false,
+                color: "green",
+                ...message,
+            });
+
+            setMultiTokenId("");
+            setApplicationId("");
+        },
+        [],
+    );
 
     return (
         <>
@@ -62,6 +107,11 @@ const SendTransaction: FC<DepositProps> = ({
                             { value: "ether", label: "Ether Deposit" },
                             { value: "erc20", label: "ERC-20 Deposit" },
                             { value: "erc721", label: "ERC-721 Deposit" },
+                            { value: "erc1155", label: "ERC-1155 Deposit" },
+                            {
+                                value: "erc1155Batch",
+                                label: "ERC-1155 Batch Deposit",
+                            },
                         ],
                     },
                     {
@@ -102,6 +152,26 @@ const SendTransaction: FC<DepositProps> = ({
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                />
+            ) : depositType === "erc1155" ? (
+                <ERC1155DepositForm
+                    mode="single"
+                    tokens={multiTokens}
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                    onSearchTokens={setMultiTokenId}
+                    onSuccess={onSuccess}
+                />
+            ) : depositType === "erc1155Batch" ? (
+                <ERC1155DepositForm
+                    mode="batch"
+                    tokens={multiTokens}
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
+                    onSearchTokens={setMultiTokenId}
+                    onSuccess={onSuccess}
                 />
             ) : null}
         </>
