@@ -25,7 +25,7 @@ describe("BlockExplorerLink component", () => {
         cleanup();
     });
 
-    it("it should render nothing when the block-explorer URL is not available", () => {
+    it("should render nothing when the block-explorer URL is not available", () => {
         useConfigMock.mockReturnValue({
             chains: [foundry],
         });
@@ -37,7 +37,7 @@ describe("BlockExplorerLink component", () => {
         expect(link).not.toBeDefined();
     });
 
-    it("it should render the correct link to the block-explorer given a transaction hash", () => {
+    it("should render the correct link to the block-explorer given a transaction hash", () => {
         render(<Component type="tx" value={txHash} />);
         const link = screen.getByText("0x4d6ce1...3efebf").closest("a");
 
@@ -47,7 +47,7 @@ describe("BlockExplorerLink component", () => {
         );
     });
 
-    it("it should render the correct link to the block-explorer given an address", () => {
+    it("should render the correct link to the block-explorer given an address", () => {
         render(<Component type="address" value={address} />);
         const textEl = screen.getByText("0xedB538...B055Aa");
         const link = textEl.closest("a");
@@ -58,7 +58,7 @@ describe("BlockExplorerLink component", () => {
         );
     });
 
-    it("it should render the correct link to the block-explorer given an block-number", () => {
+    it("should render the correct link to the block-explorer given an block-number", () => {
         render(<Component type="block" value={blockNumber.toString()} />);
         const textEl = screen.getByText("5298115");
         const link = textEl.closest("a");
