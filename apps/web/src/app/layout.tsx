@@ -3,6 +3,7 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import type { FC, ReactNode } from "react";
@@ -41,6 +42,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                     </>
                 </Providers>
                 <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     );
