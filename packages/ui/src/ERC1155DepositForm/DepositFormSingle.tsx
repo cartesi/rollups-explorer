@@ -37,6 +37,7 @@ import {
     zeroAddress,
 } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { interfaceIdForERC1155 } from "../ERC165Identifiers";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
 import useWatchQueryOnBlockChange from "../hooks/useWatchQueryOnBlockChange";
@@ -135,7 +136,7 @@ const DepositFormSingle: FC<Props> = (props) => {
 
     const supportsInterface = useReadErc1155SupportsInterface({
         address: erc1155Contract.address,
-        args: ["0xd9b67a26"],
+        args: [interfaceIdForERC1155],
         query: {
             enabled: erc1155Contract.address !== undefined,
         },
