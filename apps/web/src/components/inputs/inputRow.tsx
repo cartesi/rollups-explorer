@@ -1,5 +1,4 @@
 "use client";
-import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
 import {
     ActionIcon,
     Badge,
@@ -14,33 +13,16 @@ import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
 import { TbArrowRight, TbFileText, TbX } from "react-icons/tb";
-import { Address as AddressType, formatUnits, getAddress } from "viem";
+import { Address as AddressType, formatUnits } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
 import Address from "../address";
 import InputDetailsView from "./inputDetailsView";
+import { methodResolver } from "../../lib/methodResolver";
 
 export type InputRowProps = {
     input: InputItemFragment;
     timeType: string;
     keepDataColVisible: boolean;
-};
-
-export type MethodResolver = (
-    input: InputItemFragment,
-) => string | undefined | false;
-
-const etherDepositResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === etherPortalAddress && "depositEther";
-const erc20PortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc20PortalAddress && "depositERC20Tokens";
-
-const resolvers: MethodResolver[] = [etherDepositResolver, erc20PortalResolver];
-const methodResolver: MethodResolver = (input) => {
-    for (const resolver of resolvers) {
-        const method = resolver(input);
-        if (method) return method;
-    }
-    return undefined;
 };
 
 const InputRow: FC<InputRowProps> = ({
