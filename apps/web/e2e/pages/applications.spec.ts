@@ -33,3 +33,37 @@ test('should display empty state when "My apps" tab is active', async ({
         page.getByText("Connect your wallet to list your Applications"),
     ).toBeVisible();
 });
+
+test("should open application summary page", async ({ page }) => {
+    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    const applicationSummaryLinks = await page.getByTestId(
+        "applications-summary-link",
+    );
+
+    const firstLink = applicationSummaryLinks.first();
+    const href = (await firstLink.getAttribute("href")) as string;
+
+    await firstLink.click();
+    await page.waitForURL(href);
+});
+
+test("should open application inputs page", async ({ page }) => {
+    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    const applicationInputsLinks = await page.getByTestId("applications-link");
+
+    const firstLink = applicationInputsLinks.first();
+    const href = (await firstLink.getAttribute("href")) as string;
+
+    await firstLink.click();
+    await page.waitForURL(href);
+});
+
+test("should open add-connection modal", async ({ page }) => {
+    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    const addConnectionButton = await page.getByTestId("add-connection");
+
+    const firstButton = addConnectionButton.first();
+
+    await firstButton.click();
+    await expect(page.getByText("Create App Connection")).toBeVisible();
+});
