@@ -17,3 +17,19 @@ test("should display 'All applications' table", async ({ page }) => {
     await expect(page.getByRole("row", { name: "Id Owner URL" })).toBeVisible();
     await expect(page.getByRole("row")).toHaveCount(11);
 });
+
+test("should display correct tabs", async ({ page }) => {
+    await expect(page.getByText("All apps")).toBeVisible();
+    await expect(page.getByText("My apps")).toBeVisible();
+});
+
+test('should display empty state when "My apps" tab is active', async ({
+    page,
+}) => {
+    const myAppsTab = page.getByText("My apps");
+    await myAppsTab.click();
+
+    await expect(
+        page.getByText("Connect your wallet to list your Applications"),
+    ).toBeVisible();
+});
