@@ -1,16 +1,18 @@
 import { Box, Flex } from "@mantine/core";
-import { forwardRef } from "react";
-type TableResponsiveWrapperProps = {
-    children: React.ReactNode;
-};
+import { forwardRef, ForwardRefRenderFunction, ReactNode } from "react";
 
-type Ref = HTMLDivElement;
-const Component = (props: any, ref: any) => {
-    const { children, ...restProps } = props;
+interface TableResponsiveWrapperProps {
+    children: ReactNode;
+}
+
+const TableResponsiveWrapper: ForwardRefRenderFunction<
+    HTMLDivElement,
+    TableResponsiveWrapperProps
+> = ({ children }, ref) => {
     return (
-        <Flex w="100%" align={"center"} direction={"column"}>
-            <Flex w="100%" align={"center"} direction={"column"}>
-                <Box style={{ position: "relative", width: "100%" }} ref={ref}>
+        <Flex direction="column" align="center" w="100%">
+            <Flex direction="column" align="center" w="100%">
+                <Box ref={ref} style={{ position: "relative", width: "100%" }}>
                     <Box style={{ overflowX: "auto", width: "100%" }}>
                         {children}
                     </Box>
@@ -20,7 +22,4 @@ const Component = (props: any, ref: any) => {
     );
 };
 
-export const TableResponsiveWrapper = forwardRef<
-    Ref,
-    TableResponsiveWrapperProps
->(Component);
+export default forwardRef(TableResponsiveWrapper);

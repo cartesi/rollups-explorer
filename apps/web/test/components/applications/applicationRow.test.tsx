@@ -31,6 +31,7 @@ const defaultProps: ApplicationRowProps = {
             applications: [],
         },
     },
+    keepDataColVisible: true,
 };
 
 const defaultConnection = {
@@ -84,6 +85,7 @@ describe("ApplicationRow component", () => {
 
         render(
             <Component
+                {...defaultProps}
                 application={{
                     ...defaultProps.application,
                     owner: undefined,

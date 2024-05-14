@@ -33,6 +33,15 @@ const useApplicationsConnectionQueryMock = vi.mocked(
 
 const Component = withMantineTheme(Applications);
 
+const IntersectionObserverMock = vi.fn(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    takeRecords: vi.fn(),
+    unobserve: vi.fn(),
+}));
+
+vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
+
 describe("Applications component", () => {
     beforeEach(() => {
         useAccountMock.mockReturnValue(useAccountData as any);

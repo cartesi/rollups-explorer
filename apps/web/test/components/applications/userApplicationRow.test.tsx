@@ -4,13 +4,15 @@ import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { ApplicationRowProps } from "../../../src/components/applications/applicationRow";
-import UserApplicationsRow from "../../../src/components/applications/userApplicationsRow";
+import UserApplicationsRow, {
+    UserApplicationsRowProps,
+} from "../../../src/components/applications/userApplicationsRow";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 
-const TableComponent: FC<ApplicationRowProps> = (props) => (
+const TableComponent: FC<UserApplicationsRowProps> = (props) => (
     <Table>
         <Table.Tbody>
             <UserApplicationsRow {...props} />
@@ -20,7 +22,7 @@ const TableComponent: FC<ApplicationRowProps> = (props) => (
 
 const Component = withMantineTheme(TableComponent);
 
-const defaultProps: ApplicationRowProps = {
+const defaultProps: UserApplicationsRowProps = {
     application: {
         id: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
         owner: "0x74d093f6911ac080897c3145441103dabb869307",
@@ -30,6 +32,8 @@ const defaultProps: ApplicationRowProps = {
             applications: [],
         },
     },
+    keepDataColVisible: false,
+    timeType: "age",
 };
 
 const defaultConnection = {
@@ -37,7 +41,7 @@ const defaultConnection = {
     url: "https://echo-python.sepolia.rollups.staging.cartesi.io/graphql",
 };
 
-describe("ApplicationRow component", () => {
+describe("UserApplicationRow component", () => {
     beforeEach(() => {
         useConnectionConfigMock.mockReturnValue({
             hasConnection: vi.fn(),
@@ -63,7 +67,8 @@ describe("ApplicationRow component", () => {
 
         expect(screen.getByText(shortenedId)).toBeInTheDocument();
     });
-    it("should display the correct timestamp", () => {
+
+    it("should display the correct age", () => {
         render(<Component {...defaultProps} />);
         const { application } = defaultProps;
 
@@ -76,6 +81,14 @@ describe("ApplicationRow component", () => {
             },
         )} ago`;
         expect(screen.getByText(age)).toBeInTheDocument();
+    });
+
+    it("should display the correct timestamp", () => {
+        render(<Component {...defaultProps} timeType="timestamp" />);
+        const { application } = defaultProps;
+
+        const timestamp = new Date(application.timestamp * 1000).toISOString();
+        expect(screen.getByText(timestamp)).toBeInTheDocument();
     });
 
     it("should display N/A when no connection exists", () => {
