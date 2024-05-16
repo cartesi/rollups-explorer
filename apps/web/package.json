@@ -30,6 +30,7 @@
         "@vercel/speed-insights": "^1.0.10",
         "abitype": "^0.9",
         "antd": "^5.17.4",
+        "dexie": "^4.0.4",
         "encoding": "^0.1",
         "graphql": "^16",
         "graphql-tag": "^2",
