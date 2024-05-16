@@ -4,13 +4,21 @@ import { ConnectionConfigProvider } from "./connectionConfig/connectionConfigPro
 import GraphQLProvider from "./graphqlProvider";
 import StyleProvider from "./styleProvider";
 import WalletProvider from "./walletProvider";
+import asyncRepository from "./connectionConfig/asyncRepository";
+import localRepository from "./connectionConfig/localRepository";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <StyleProvider>
             <WalletProvider>
                 <GraphQLProvider>
-                    <ConnectionConfigProvider>
+                    <ConnectionConfigProvider
+                        repository={
+                            typeof window !== "undefined" && window.indexedDB
+                                ? asyncRepository
+                                : localRepository
+                        }
+                    >
                         {children}
                     </ConnectionConfigProvider>
                 </GraphQLProvider>

@@ -9,6 +9,12 @@ export interface Repository {
     list: () => Promise<Connection[]>;
 }
 
+export interface AsyncRepository<T> extends Repository {
+    db: T | null;
+    initialize: () => Promise<void>;
+    connect: () => Promise<T>;
+}
+
 export interface Connection {
     url: string;
     address: Address;
@@ -70,11 +76,6 @@ export type ContextProps = {
     dispatch: Dispatch<Action>;
     repository: Repository;
 };
-
-export interface ConnectionConfigProviderProps {
-    children: ReactNode;
-    repository?: Repository;
-}
 
 export type Predicate<R> = (p: State) => R;
 export type UseSelector = <R>(p: Predicate<R>) => R;

@@ -1,7 +1,7 @@
 "use client";
 import Dexie, { Table } from "dexie";
-import { Connection, Repository } from "./types";
-import localRepository, { networkId, namespace } from "./localRepository";
+import { AsyncRepository, Connection } from "./types";
+import localRepository, { namespace, networkId } from "./localRepository";
 
 const formatConnection = (connection: ConnectionItem) => {
     return {
@@ -29,47 +29,33 @@ export class ConnectionsDb extends Dexie {
     }
 }
 
-export interface AsyncRepository extends Repository {
-    db: ConnectionsDb | null;
-    initialize: () => void;
-    isInitialized: boolean;
-    connect: () => Promise<ConnectionsDb>;
-}
-
 /**
  * Implements the Repository interface providing a persistent storage.
  * It uses the IndexedDb underneath.
  */
-const indexedDbRepository: AsyncRepository = {
+const asyncRepository: AsyncRepository<ConnectionsDb> = {
     db: null,
-    isInitialized: false,
+    async connect() {
+        if (!this.db) {
+            this.db = new ConnectionsDb();
+        }
+        return this.db;
+    },
     async initialize() {
-        const indexedDbConnectionsCount = await this.db?.connections
+        const db = await this.connect();
+        const asyncConnectionsCount = await db.connections
             .where("network")
             .equals(networkId)
             .count();
         const localStorageConnections = await localRepository.list();
 
-        if (
-            indexedDbConnectionsCount === 0 &&
-            localStorageConnections.length > 0
-        ) {
+        if (asyncConnectionsCount === 0 && localStorageConnections.length > 0) {
             const connections = localStorageConnections.map((connection) => ({
                 ...connection,
                 network: networkId,
             })) as ConnectionItem[];
-            return this.db?.connections.bulkPut(connections);
+            this.db?.connections.bulkPut(connections);
         }
-    },
-    async connect() {
-        if (!this.db) {
-            this.db = new ConnectionsDb();
-        }
-        if (!this.isInitialized) {
-            this.initialize();
-            this.isInitialized = true;
-        }
-        return this.db;
     },
     async add(conn: Connection) {
         const connectionItem: ConnectionItem = {
@@ -121,10 +107,8 @@ const indexedDbRepository: AsyncRepository = {
             .equals(networkId)
             .toArray();
 
-        console.log("indexedDbRepository::list::", connections);
-
         return connections.map(formatConnection);
     },
 };
 
-export default indexedDbRepository;
+export default asyncRepository;
