@@ -16,14 +16,13 @@ export interface ConnectionItem extends Connection {
 }
 
 export class ConnectionsDb extends Dexie {
-    // 'connections' is added by dexie when declaring the stores()
-    // We just tell the typing system this is the case
+    // Notify the typing system that 'connections' is added by dexie when declaring the stores()
     connections!: Table<ConnectionItem>;
 
     constructor() {
         super(namespace);
+        // Create first version of the connections store with address as primary key and indexed props
         this.version(1).stores({
-            // Primary key and indexed props
             connections: "address, url, timestamp, network",
         });
     }
