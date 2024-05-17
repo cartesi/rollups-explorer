@@ -33,7 +33,7 @@ export class ConnectionsDb extends Dexie {
  * Implements the Repository interface providing a persistent storage.
  * It uses the IndexedDb underneath.
  */
-const asyncRepository: AsyncRepository<ConnectionsDb> = {
+const indexedDbRepository: AsyncRepository<ConnectionsDb> = {
     db: null,
     async connect() {
         if (!this.db) {
@@ -67,24 +67,24 @@ const asyncRepository: AsyncRepository<ConnectionsDb> = {
         const db = await this.connect();
         return db.connections.add(connectionItem);
     },
-
     async has(addr) {
         const db = await this.connect();
-        const connection = await db.connections.get({
-            network: networkId,
-            address: addr,
-        });
+        const connection = await db.connections
+            .where("network")
+            .equals(networkId)
+            .and((connection) => connection.address === addr)
+            .first();
 
         return Boolean(connection);
     },
-
     async remove(addr) {
         const db = await this.connect();
         try {
-            await db.connections.delete({
-                network: networkId,
-                address: addr,
-            });
+            await db.connections
+                .where("network")
+                .equals(networkId)
+                .and((connection) => connection.address === addr)
+                .delete();
             return true;
         } catch (err) {
             return false;
@@ -92,16 +92,16 @@ const asyncRepository: AsyncRepository<ConnectionsDb> = {
     },
     async get(addr) {
         const db = await this.connect();
-        const connection = (await db.connections.get({
-            network: networkId,
-            address: addr,
-        })) as ConnectionItem;
+        const connection = (await db.connections
+            .where("network")
+            .equals(networkId)
+            .and((connection) => connection.address === addr)
+            .first()) as ConnectionItem;
 
         return formatConnection(connection);
     },
     async list() {
         const db = await this.connect();
-
         const connections = await db.connections
             .where("network")
             .equals(networkId)
@@ -111,4 +111,4 @@ const asyncRepository: AsyncRepository<ConnectionsDb> = {
     },
 };
 
-export default asyncRepository;
+export default indexedDbRepository;
