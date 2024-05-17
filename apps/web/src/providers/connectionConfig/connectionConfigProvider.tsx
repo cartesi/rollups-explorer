@@ -13,16 +13,11 @@ import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import { connectionConfigReducer, initialState } from "./reducer";
 import { IndexedDbRepository, Repository } from "./types";
 import { ConnectionsDb } from "./indexedDbRepository";
-
-type IndexedDbRepositoryType = IndexedDbRepository<ConnectionsDb>;
-
-const hasInitialize = (item: any): item is IndexedDbRepositoryType => {
-    return "initialize" in item && typeof item.initialize === "function";
-};
+import { hasInitialize } from "./utils";
 
 export interface ConnectionConfigProviderProps {
     children: ReactNode;
-    repository: Repository | IndexedDbRepositoryType;
+    repository: Repository | IndexedDbRepository<ConnectionsDb>;
 }
 
 const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
@@ -46,6 +41,10 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
     }, [repository]);
 
     useEffect(() => {
+        dispatch({
+            type: "SET_FETCHING",
+            payload: true,
+        });
         init()
             .then((connections) => {
                 dispatch({
@@ -55,6 +54,12 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
             })
             .catch((err) => {
                 console.error(`Error trying to fetch connections: ${err}`);
+            })
+            .finally(() => {
+                dispatch({
+                    type: "SET_FETCHING",
+                    payload: false,
+                });
             });
     }, [init]);
 
