@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode } from "react";
+import { Dispatch } from "react";
 import { Address } from "viem";
 
 export interface Repository {
@@ -9,10 +9,10 @@ export interface Repository {
     list: () => Promise<Connection[]>;
 }
 
-export interface AsyncRepository<T> extends Repository {
+export interface IndexedDbRepository<T> extends Repository {
     db: T | null;
-    initialize: () => Promise<void>;
     connect: () => Promise<T>;
+    initialize: () => Promise<void>;
 }
 
 export interface Connection {

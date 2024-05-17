@@ -11,18 +11,18 @@ import AppConnectionForm from "../../components/connection/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import { connectionConfigReducer, initialState } from "./reducer";
-import { AsyncRepository, Repository } from "./types";
-import { ConnectionsDb } from "./asyncRepository";
+import { IndexedDbRepository, Repository } from "./types";
+import { ConnectionsDb } from "./indexedDbRepository";
 
-type AsyncRepositoryType = AsyncRepository<ConnectionsDb>;
+type IndexedDbRepositoryType = IndexedDbRepository<ConnectionsDb>;
 
-const isAsyncRepository = (item: any): item is AsyncRepositoryType => {
-    return "initialize" in item;
+const hasInitialize = (item: any): item is IndexedDbRepositoryType => {
+    return "initialize" in item && typeof item.initialize === "function";
 };
 
 export interface ConnectionConfigProviderProps {
     children: ReactNode;
-    repository: Repository | AsyncRepositoryType;
+    repository: Repository | IndexedDbRepositoryType;
 }
 
 const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
@@ -35,30 +35,27 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
         [state, repository],
     );
 
-    useEffect(() => {
-        console.log("repository::", repository);
-    }, [repository]);
-
     const closeModal = () => dispatch({ type: "HIDE_CONNECTION_MODAL" });
 
     const init = useCallback(async () => {
-        if (isAsyncRepository(repository)) {
+        if (hasInitialize(repository)) {
             await repository.initialize();
         }
 
-        try {
-            const connections = await repository.list();
-            dispatch({
-                type: "SET_CONNECTIONS",
-                payload: connections,
-            });
-        } catch (err) {
-            console.error(`Error trying to fetch connections: ${err}`);
-        }
+        return await repository.list();
     }, [repository]);
 
     useEffect(() => {
-        init();
+        init()
+            .then((connections) => {
+                dispatch({
+                    type: "SET_CONNECTIONS",
+                    payload: connections,
+                });
+            })
+            .catch((err) => {
+                console.error(`Error trying to fetch connections: ${err}`);
+            });
     }, [init]);
 
     return (

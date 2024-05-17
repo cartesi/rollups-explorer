@@ -4,7 +4,7 @@ import { ConnectionConfigProvider } from "./connectionConfig/connectionConfigPro
 import GraphQLProvider from "./graphqlProvider";
 import StyleProvider from "./styleProvider";
 import WalletProvider from "./walletProvider";
-import asyncRepository from "./connectionConfig/asyncRepository";
+import indexedDbRepository from "./connectionConfig/indexedDbRepository";
 import localRepository from "./connectionConfig/localRepository";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -15,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     <ConnectionConfigProvider
                         repository={
                             typeof window !== "undefined" && window.indexedDB
-                                ? asyncRepository
+                                ? indexedDbRepository
                                 : localRepository
                         }
                     >

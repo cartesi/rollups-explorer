@@ -1,6 +1,6 @@
 "use client";
 import Dexie, { Table } from "dexie";
-import { AsyncRepository, Connection } from "./types";
+import { IndexedDbRepository, Connection } from "./types";
 import localRepository, { namespace, networkId } from "./localRepository";
 
 const formatConnection = (connection: ConnectionItem) => {
@@ -33,7 +33,7 @@ export class ConnectionsDb extends Dexie {
  * Implements the Repository interface providing a persistent storage.
  * It uses the IndexedDb underneath.
  */
-const indexedDbRepository: AsyncRepository<ConnectionsDb> = {
+const indexedDbRepository: IndexedDbRepository<ConnectionsDb> = {
     db: null,
     async connect() {
         if (!this.db) {
