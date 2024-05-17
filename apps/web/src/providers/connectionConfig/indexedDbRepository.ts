@@ -2,14 +2,7 @@
 import Dexie, { Table } from "dexie";
 import { IndexedDbRepository, Connection } from "./types";
 import localRepository, { namespace, networkId } from "./localRepository";
-
-const formatConnection = (connection: ConnectionItem) => {
-    return {
-        address: connection.address,
-        url: connection.url,
-        timestamp: connection.timestamp,
-    } as Connection;
-};
+import { formatConnection } from "./utils";
 
 export interface ConnectionItem extends Connection {
     network: string;
