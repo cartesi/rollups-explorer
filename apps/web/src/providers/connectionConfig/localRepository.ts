@@ -7,7 +7,7 @@ export const namespace = `cartesiscan:conn` as const;
 const deserialize = <T>(jsonString: string) => JSON.parse(jsonString) as T;
 const serialize = (cfg: Config) => JSON.stringify(cfg);
 
-export const getConfig = () => {
+const getConfig = () => {
     const raw = localStorage.getItem(namespace);
     return raw ? deserialize<Config>(raw) : { [networkId]: {} };
 };
