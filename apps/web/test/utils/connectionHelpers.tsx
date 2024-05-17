@@ -10,6 +10,7 @@ const connectionStubs: UseConnectionConfigReturn = {
     hideConnectionModal: vi.fn(),
     showConnectionModal: vi.fn(),
     listConnections: vi.fn(),
+    fetching: false,
 };
 
 /**
