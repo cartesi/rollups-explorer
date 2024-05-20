@@ -173,7 +173,16 @@ const transform: (e: Envelope) => Envelope = cond([
     ],
 ]);
 
-export function decodeInputPayload(
+/**
+ * Decode the payload data based on the specification passed. The return
+ * contains the result but also could contain an error as a value, therefore
+ * the callee should decide what to do with it.
+ * @param spec {Specification}
+ * @param payload {Hex | Uint8Array}
+ * @throws {SpecificationModeNotSupportedError}
+ * @returns {Envelope}
+ */
+export function decodePayload(
     spec: Specification,
     input: Hex | Uint8Array,
 ): Envelope {

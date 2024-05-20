@@ -1,7 +1,7 @@
 import { erc1155BatchPortalAbi, erc20Abi } from "@cartesi/rollups-wagmi";
 import { describe, it } from "vitest";
-import { decodeInputPayload } from "../../src/components/specification/decoder";
-import { Specification } from "../../src/components/specification/types";
+import { decodePayload } from "../../../src/components/specification/decoder";
+import { Specification } from "../../../src/components/specification/types";
 
 const inputData =
     "0x24d15c67000000000000000000000000f08b9b4044441e43337c1ab6e941c4e59d5f73c80000000000000000000000004ca2f6935200b9a782a78f408f640f17b29809d800000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000320000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -15,7 +15,7 @@ describe("Decoding Specification", () => {
     it("should throw an error for non-supported specification mode", () => {
         try {
             // @ts-ignore
-            decodeInputPayload({ mode: "random" }, batchPayload);
+            decodePayload({ mode: "random" }, batchPayload);
             expect("Should never enter here").toEqual("");
         } catch (error: any) {
             expect(error.message).toEqual(
@@ -32,7 +32,7 @@ describe("Decoding Specification", () => {
                 abi: erc1155BatchPortalAbi,
             };
 
-            const envelope = decodeInputPayload(spec, inputData);
+            const envelope = decodePayload(spec, inputData);
 
             expect(envelope.error).not.toBeDefined();
             expect(envelope.result).toEqual({
@@ -63,7 +63,7 @@ describe("Decoding Specification", () => {
                 abi: erc20Abi,
             };
 
-            const envelope = decodeInputPayload(spec, inputData);
+            const envelope = decodePayload(spec, inputData);
 
             expect(envelope.error).toBeDefined();
             expect(envelope.error?.message).toEqual(
@@ -86,7 +86,7 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
                 name: "Wagmi Encoded Data",
             };
 
-            const envelope = decodeInputPayload(spec, sample);
+            const envelope = decodePayload(spec, sample);
 
             expect(envelope.error).not.toBeDefined();
             expect(envelope.result).toEqual({
@@ -109,10 +109,7 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
                 abiParams: [],
             };
 
-            const envelope = decodeInputPayload(
-                spec,
-                singleERC1155DepositPayload,
-            );
+            const envelope = decodePayload(spec, singleERC1155DepositPayload);
 
             console.log(envelope.error);
 
@@ -138,10 +135,7 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
                 abiParams: [],
             };
 
-            const envelope = decodeInputPayload(
-                spec,
-                singleERC1155DepositPayload,
-            );
+            const envelope = decodePayload(spec, singleERC1155DepositPayload);
 
             expect(envelope.error).toBeDefined();
             expect(envelope.error?.message).toEqual(
@@ -175,7 +169,7 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
                 sliceTarget: "data",
             };
 
-            const envelope = decodeInputPayload(spec, batchPayload);
+            const envelope = decodePayload(spec, batchPayload);
 
             expect(envelope.result).toEqual({
                 amount: [200n, 50n],
