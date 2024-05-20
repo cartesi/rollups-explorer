@@ -1,6 +1,6 @@
 import { whatsabi } from "@shazow/whatsabi";
 import { decodeFunctionData } from "viem";
-import { provider } from "./utils/provider";
+import { getProvider } from "./utils/provider";
 
 /**
  * Asynchronously decodes a voucher payload using the provided ABI.
@@ -26,23 +26,20 @@ export const decodeVoucherPayload = async ({
     destination,
     payload,
 }: DecodeVoucherPayloadParamsType): Promise<DecodeVoucherPayloadReturnType> => {
+    const provider = await getProvider();
     try {
-        // Fetch the ABI using the destination address f
+        // Fetch the ABI using the destination address
         const destinationAddressAbi = await whatsabi.autoload(
             destination as string,
             { provider },
         );
 
         // Decode the payload using the fetched ABI
-        const res = decodeFunctionData({
+        const res = await decodeFunctionData({
             abi: destinationAddressAbi.abi,
             data: payload as `0x${string}`,
         });
 
-        console.log({
-            functionName: res.functionName,
-            args: res.args,
-        });
         return {
             functionName: res.functionName,
             args: res.args as [],
