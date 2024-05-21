@@ -2,6 +2,21 @@
  * @file Contains real samples from our graphQL API. This file should only hold this kind of data.
  */
 
+const nonPortalRelatedInput = {
+    id: "0xc65bf4b414cdb9e7625a33be0fc993d44030e89a-43",
+    application: {
+        id: "0xc65bf4b414cdb9e7625a33be0fc993d44030e89a",
+    },
+    index: 43,
+    payload:
+        "0x227b5c226d6574686f645c223a5c22726f6c6c446963655c222c5c22646174615c223a7b5c2267616d6549645c223a5c2264386330346137622d653230372d346466622d613164322d6336346539643039633965355c222c5c22706c61796572416464726573735c223a5c223078633537633831663064653631363462366663383433613931373161323230643265636134626533345c227d7d22",
+    msgSender: "0xc57c81f0de6164b6fc843a9171a220d2eca4be34",
+    timestamp: "1716246048",
+    transactionHash:
+        "0x77f2fcd3eecbd067f3786be862af2fb0e89775dbf8314d169c0e4f09bb752f7a",
+    erc20Deposit: null,
+} as const;
+
 const singleERC1155DepositInput = {
     id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8-802",
     application: {
@@ -80,4 +95,5 @@ export const inputResponses = {
     batchERC1155DepositInput,
     erc20DepositInput,
     erc721DepositInput,
+    nonPortalRelatedInput,
 } as const;
