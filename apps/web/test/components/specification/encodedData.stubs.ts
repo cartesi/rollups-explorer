@@ -1,0 +1,27 @@
+import { Hex } from "viem";
+
+/**
+ * @description The standard abi encoded data has the following format [string, uint, bool]
+ */
+const wagmiSample: Hex =
+    "0x000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000001a4000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000057761676d69000000000000000000000000000000000000000000000000000000";
+
+/**
+ * @description This standard abi encoded data has the following format [struct, uint, uint]
+ * @example
+ *  // A inline human-readable abi format is as follow
+ *  ['(uint256 allowance, bool success, address operator) foo, uint amount, uint id']
+ * @example
+ *  // Or a more organized way in case the struct is big
+ * [
+ *   'Foo foo, uint amount, uint id',
+ *  'struct Foo {uint256 allowance; bool success; address operator;}'
+ * ]
+ */
+const encodedDataSampleWithStruct: Hex =
+    "0x000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000028367fe226cd9e5699f4288d512fe3a4a4a001200000000000000000000000000000000000000000000000000000000000003e80000000000000000000000000000000000000000000000000000000000000002";
+
+export const encodedDataSamples = {
+    wagmiSample,
+    encodedDataSampleWithStruct,
+};
