@@ -2,6 +2,7 @@ import { erc1155BatchPortalAbi, erc20Abi } from "@cartesi/rollups-wagmi";
 import { describe, it } from "vitest";
 import { decodePayload } from "../../../src/components/specification/decoder";
 import { Specification } from "../../../src/components/specification/types";
+import { encodedDataSamples } from "./encodedData.stubs";
 
 const inputData =
     "0x24d15c67000000000000000000000000f08b9b4044441e43337c1ab6e941c4e59d5f73c80000000000000000000000004ca2f6935200b9a782a78f408f640f17b29809d800000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000320000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -77,16 +78,16 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
 
     describe("For ABI Params", () => {
         it("should parse encoded data with human-readable ABI format", () => {
-            const sample =
-                "0x000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000001a4000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000057761676d69000000000000000000000000000000000000000000000000000000";
-
             const spec: Specification = {
                 mode: "abi_params",
                 abiParams: ["string name, uint amount, bool success"],
                 name: "Wagmi Encoded Data",
             };
 
-            const envelope = decodePayload(spec, sample);
+            const envelope = decodePayload(
+                spec,
+                encodedDataSamples.wagmiSample,
+            );
 
             expect(envelope.error).not.toBeDefined();
             expect(envelope.result).toEqual({
@@ -110,8 +111,6 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
             };
 
             const envelope = decodePayload(spec, singleERC1155DepositPayload);
-
-            console.log(envelope.error);
 
             expect(envelope.error).not.toBeDefined();
             expect(envelope.result).toEqual({
@@ -178,6 +177,61 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
                 from: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
                 tokenAddress: "0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e",
                 tokenIds: [2n, 1n],
+            });
+        });
+
+        describe("Struct definition example cases", () => {
+            it("should support setting a separate struct definition to decode abi-encoded data", () => {
+                const spec: Specification = {
+                    mode: "abi_params",
+                    abiParams: [
+                        "Baz baz, uint amount, uint tokenIndex",
+                        "struct Baz {uint256 allowance; bool success; address operator;}",
+                    ],
+                    name: "Separate struct definition",
+                };
+
+                const envelope = decodePayload(
+                    spec,
+                    encodedDataSamples.encodedDataSampleWithStruct,
+                );
+
+                expect(envelope.error).not.toBeDefined();
+                expect(envelope.result).toEqual({
+                    amount: 1000n,
+                    tokenIndex: 2n,
+                    baz: {
+                        allowance: 10n,
+                        operator: "0x028367fE226CD9E5699f4288d512fE3a4a4a0012",
+                        success: false,
+                    },
+                });
+            });
+
+            it("should support setting inline struct definition to decode abi-encoded data", () => {
+                const spec: Specification = {
+                    mode: "abi_params",
+                    abiParams: [
+                        "(uint256 allowance, bool success, address operator) foo, uint amount, uint id",
+                    ],
+                    name: "Inline struct definition",
+                };
+
+                const envelope = decodePayload(
+                    spec,
+                    encodedDataSamples.encodedDataSampleWithStruct,
+                );
+
+                expect(envelope.error).not.toBeDefined();
+                expect(envelope.result).toEqual({
+                    amount: 1000n,
+                    id: 2n,
+                    foo: {
+                        allowance: 10n,
+                        operator: "0x028367fE226CD9E5699f4288d512fE3a4a4a0012",
+                        success: false,
+                    },
+                });
             });
         });
     });
