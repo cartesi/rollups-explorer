@@ -27,21 +27,21 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
         });
         repository
             .list()
-            .then((connections) => {
+            .then((connections) =>
                 dispatch({
                     type: "SET_CONNECTIONS",
                     payload: connections,
-                });
-            })
-            .catch((err) => {
-                console.error(`Error trying to fetch connections: ${err}`);
-            })
-            .finally(() => {
+                }),
+            )
+            .catch((err) =>
+                console.error(`Error trying to fetch connections: ${err}`),
+            )
+            .finally(() =>
                 dispatch({
                     type: "SET_FETCHING",
                     payload: false,
-                });
-            });
+                }),
+            );
     }, [repository]);
 
     return (
