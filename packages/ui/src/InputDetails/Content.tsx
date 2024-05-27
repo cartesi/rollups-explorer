@@ -1,11 +1,29 @@
 "use client";
 
-import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
-import { T, cond, equals, pipe, propOr } from "ramda";
+import { DecodeVoucherPayloadParamsType } from "@cartesi/decoder";
+import {
+    JsonInput,
+    SegmentedControl,
+    Skeleton,
+    Stack,
+    Textarea,
+} from "@mantine/core";
+import { cond, equals, pipe, propOr, T } from "ramda";
 import { Hex, hexToString } from "viem";
+import { useDecodeVoucherPayload } from "../hooks/useDecodeVoucherPayload";
+
+interface FCContentType {
+    type: ContentType;
+    content: string | DecodeVoucherPayloadParamsType;
+}
+
+interface VoucherDisplayContentProps {
+    type: ContentType;
+    content: DecodeVoucherPayloadParamsType;
+}
 
 export interface ContentProps {
-    content: string;
+    content: string | DecodeVoucherPayloadParamsType;
     contentType: ContentType;
 }
 
@@ -37,7 +55,61 @@ export const ContentTypeControl = ({
     );
 };
 
-export const DisplayContent = cond<
+const LoadingState: React.FC = () => {
+    return (
+        <Stack>
+            <Skeleton animate={false} height={8} radius="xl" />
+            <Skeleton animate={false} height={8} mt={6} radius="xl" />
+        </Stack>
+    );
+};
+
+export const VoucherDisplayContent: React.FC<VoucherDisplayContentProps> = ({
+    type,
+    content,
+}: {
+    type: ContentType;
+    content: DecodeVoucherPayloadParamsType;
+}) => {
+    const { data, loading, error } = useDecodeVoucherPayload(content);
+    if (loading) return <LoadingState />;
+    if (type === "json") {
+        return (
+            <JsonInput
+                rows={10}
+                value={
+                    (error as unknown as string) ??
+                    (JSON.stringify(data) as string)
+                }
+                readOnly
+                placeholder="No content defined"
+            />
+        );
+    }
+    if (type === "text") {
+        return (
+            <Textarea
+                rows={10}
+                value={
+                    (error as unknown as string) ??
+                    (JSON.stringify(data) as string)
+                }
+                readOnly
+                placeholder="No content defined"
+            />
+        );
+    }
+    return (
+        <Textarea
+            rows={10}
+            value={content.payload as Hex}
+            readOnly
+            placeholder="No content defined"
+        />
+    );
+};
+
+export const DefaultDisplayContent = cond<
     [props: { type?: ContentType; content: string }],
     JSX.Element
 >([
@@ -75,3 +147,11 @@ export const DisplayContent = cond<
         ),
     ],
 ]);
+
+export const DisplayContent: React.FC<FCContentType> = ({ type, content }) => {
+    if (typeof content !== "string") {
+        return <VoucherDisplayContent type={type} content={content} />;
+    } else {
+        return <DefaultDisplayContent type={type} content={content} />;
+    }
+};

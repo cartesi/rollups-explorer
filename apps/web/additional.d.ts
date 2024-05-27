@@ -28,5 +28,9 @@ declare namespace NodeJS {
          * Default used in its absence is http://localhost:3000
          */
         E2E_BASE_URL?: string;
+        /**
+         * Chain ID for WhatsAbi library
+         */
+        NEXT_PUBLIC_WHATSABI_PROVIDER_CHAIN: string;
     }
 }
