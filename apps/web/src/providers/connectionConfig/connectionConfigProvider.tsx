@@ -1,23 +1,15 @@
 "use client";
 import { Modal } from "@mantine/core";
-import React, {
-    FC,
-    ReactNode,
-    useCallback,
-    useEffect,
-    useReducer,
-} from "react";
+import React, { FC, ReactNode, useEffect, useReducer } from "react";
 import AppConnectionForm from "../../components/connection/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import { connectionConfigReducer, initialState } from "./reducer";
-import { IndexedDbRepository, Repository } from "./types";
-import { ConnectionsDb } from "./indexedDbRepository";
-import { hasInitialize } from "./utils";
+import { Repository } from "./types";
 
 export interface ConnectionConfigProviderProps {
     children: ReactNode;
-    repository: Repository | IndexedDbRepository<ConnectionsDb>;
+    repository: Repository;
 }
 
 const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
@@ -32,20 +24,13 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
 
     const closeModal = () => dispatch({ type: "HIDE_CONNECTION_MODAL" });
 
-    const init = useCallback(async () => {
-        if (hasInitialize(repository)) {
-            await repository.initialize();
-        }
-
-        return await repository.list();
-    }, [repository]);
-
     useEffect(() => {
         dispatch({
             type: "SET_FETCHING",
             payload: true,
         });
-        init()
+        repository
+            .list()
             .then((connections) => {
                 dispatch({
                     type: "SET_CONNECTIONS",
@@ -61,7 +46,7 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
                     payload: false,
                 });
             });
-    }, [init]);
+    }, [repository]);
 
     return (
         <ConnectionConfigContext.Provider value={store}>
@@ -70,6 +55,7 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
                 opened={state.showConnectionModal}
                 onClose={closeModal}
                 title="Create App Connection"
+                closeOnClickOutside={false}
             >
                 <AppConnectionForm
                     onSubmitted={closeModal}

@@ -9,12 +9,6 @@ export interface Repository {
     list: () => Promise<Connection[]>;
 }
 
-export interface IndexedDbRepository<T> extends Repository {
-    db: T | null;
-    connect: () => Promise<T>;
-    initialize: () => Promise<void>;
-}
-
 export interface Connection {
     url: string;
     address: Address;

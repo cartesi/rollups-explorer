@@ -1,14 +1,18 @@
 "use client";
 import Dexie, { Table } from "dexie";
-import { IndexedDbRepository, Connection } from "./types";
+import { Connection, Repository } from "./types";
 import localRepository, { namespace, networkId } from "./localRepository";
-import { formatConnection } from "./utils";
+import { Address } from "viem";
 
 export interface ConnectionItem extends Connection {
     network: string;
 }
 
-export class ConnectionsDb extends Dexie {
+/**
+ * Implements the Repository interface providing a persistent storage.
+ * It uses the IndexedDb underneath.
+ */
+class IndexedDbRepository extends Dexie implements Repository {
     // Notify the typing system that 'connections' is added by dexie when declaring the stores()
     connections!: Table<ConnectionItem>;
 
@@ -18,37 +22,57 @@ export class ConnectionsDb extends Dexie {
         this.version(1).stores({
             connections: "address, url, timestamp, network",
         });
-    }
-}
 
-/**
- * Implements the Repository interface providing a persistent storage.
- * It uses the IndexedDb underneath.
- */
-const indexedDbRepository: IndexedDbRepository<ConnectionsDb> = {
-    db: null,
-    async connect() {
-        if (!this.db) {
-            this.db = new ConnectionsDb();
-        }
-        return this.db;
-    },
-    async initialize() {
-        const db = await this.connect();
-        const asyncConnectionsCount = await db.connections
+        // When the db is ready, initialize data for it
+        this.connections.db.on(
+            "ready",
+            () =>
+                new Promise((resolve) => {
+                    this.initialize().then(resolve);
+                }),
+        );
+    }
+
+    private async initialize() {
+        // Get existing connections from indexedDbRepository
+        const indexedDbConnections = await this.connections
             .where("network")
             .equals(networkId)
-            .count();
-        const localStorageConnections = await localRepository.list();
+            .toArray();
 
-        if (asyncConnectionsCount === 0 && localStorageConnections.length > 0) {
-            const connections = localStorageConnections.map((connection) => ({
-                ...connection,
-                network: networkId,
-            })) as ConnectionItem[];
-            this.db?.connections.bulkPut(connections);
+        // Get existing connections from localRepository
+        const localRepositoryConnections = await localRepository.list();
+
+        // Check if data from localRepository should be migrated to indexedDbRepository
+        if (
+            indexedDbConnections.length === 0 &&
+            localRepositoryConnections.length > 0
+        ) {
+            const connections = localRepositoryConnections.map(
+                (connection) => ({
+                    ...connection,
+                    network: networkId,
+                }),
+            ) as ConnectionItem[];
+
+            // Save augmented connections
+            await this.connections.bulkPut(connections);
+
+            // Remove connections from localRepository to keep a single source of truth
+            await Promise.all(
+                connections.map((c) => localRepository.remove(c.address)),
+            );
         }
-    },
+    }
+
+    private formatConnection(connection: ConnectionItem) {
+        return {
+            address: connection.address,
+            url: connection.url,
+            timestamp: connection.timestamp,
+        } as Connection;
+    }
+
     async add(conn: Connection) {
         const connectionItem: ConnectionItem = {
             ...conn,
@@ -56,23 +80,22 @@ const indexedDbRepository: IndexedDbRepository<ConnectionsDb> = {
             network: networkId,
         };
 
-        const db = await this.connect();
-        return db.connections.add(connectionItem);
-    },
-    async has(addr) {
-        const db = await this.connect();
-        const connection = await db.connections
+        return this.connections.add(connectionItem);
+    }
+
+    async has(addr: Address) {
+        const connection = await this.connections
             .where("network")
             .equals(networkId)
             .and((connection) => connection.address === addr)
             .first();
 
         return Boolean(connection);
-    },
-    async remove(addr) {
-        const db = await this.connect();
+    }
+
+    async remove(addr: Address) {
         try {
-            await db.connections
+            await this.connections
                 .where("network")
                 .equals(networkId)
                 .and((connection) => connection.address === addr)
@@ -81,26 +104,26 @@ const indexedDbRepository: IndexedDbRepository<ConnectionsDb> = {
         } catch (err) {
             return false;
         }
-    },
-    async get(addr) {
-        const db = await this.connect();
-        const connection = (await db.connections
+    }
+
+    async get(addr: Address) {
+        const connection = (await this.connections
             .where("network")
             .equals(networkId)
             .and((connection) => connection.address === addr)
             .first()) as ConnectionItem;
 
-        return formatConnection(connection);
-    },
+        return this.formatConnection(connection);
+    }
+
     async list() {
-        const db = await this.connect();
-        const connections = await db.connections
+        const connections = await this.connections
             .where("network")
             .equals(networkId)
             .toArray();
 
-        return connections.map(formatConnection);
-    },
-};
+        return connections.map(this.formatConnection);
+    }
+}
 
-export default indexedDbRepository;
+export default IndexedDbRepository;
