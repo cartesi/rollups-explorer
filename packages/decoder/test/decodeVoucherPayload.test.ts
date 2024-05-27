@@ -49,17 +49,17 @@ describe("decodeVoucherPayload", () => {
         });
     });
 
-    it("should return the original payload on error", async () => {
-        const error = new Error("Test error");
+    it("should throw an error if the decode is not successful", async () => {
+        const mockError = "ABI loading failed";
         const consoleError = vi.spyOn(console, "error");
-        vi.spyOn(whatsabi, "autoload").mockRejectedValue(error);
+        vi.spyOn(whatsabi, "autoload").mockRejectedValue(mockError);
 
-        const result = await decodeVoucherPayload({
-            destination: "0x123",
-            payload: "0x456",
-        });
-
-        expect(result).toBe("0x456");
-        expect(consoleError).toHaveBeenCalledWith(error);
+        await expect(
+            decodeVoucherPayload({
+                destination: "0x123",
+                payload: "0x456",
+            }),
+        ).rejects.toThrow(mockError);
+        expect(consoleError).toHaveBeenCalledWith(mockError);
     });
 });
