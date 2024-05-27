@@ -15,12 +15,10 @@ export type DecodeVoucherPayloadParamsType = {
     payload: `0x${string}`;
 };
 
-export type DecodeVoucherPayloadReturnType =
-    | {
-          functionName: string;
-          args: unknown[] | undefined;
-      }
-    | `0x${string}`;
+export type DecodeVoucherPayloadReturnType = {
+    functionName: string;
+    args: unknown[] | undefined;
+};
 
 export const decodeVoucherPayload = async ({
     destination,
@@ -46,6 +44,6 @@ export const decodeVoucherPayload = async ({
         };
     } catch (error) {
         console.error(error);
-        return payload;
+        throw error;
     }
 };
