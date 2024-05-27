@@ -14,7 +14,9 @@ const getProvider = async (): Promise<ethers.JsonRpcProvider> => {
     const [{ mainnet, sepolia }] = await Promise.all([import("wagmi/chains")]);
 
     // Select chain based on environment variable
-    const chainId = parseInt(process.env.CHAIN_ID || "11155111");
+    const chainId = parseInt(
+        process.env.NEXT_PUBLIC_WHATSABI_PROVIDER_CHAIN || "11155111",
+    );
 
     // Find the chain configuration
     const chain = [mainnet, sepolia].find((c) => c.id === chainId) || sepolia;
