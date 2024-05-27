@@ -68,7 +68,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                     {fetching ? (
                         <Table.Tr>
                             <Table.Td align="center" colSpan={4}>
-                                <Loader />
+                                <Loader data-testid="applications-spinner" />
                             </Table.Td>
                         </Table.Tr>
                     ) : (
