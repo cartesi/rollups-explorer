@@ -1,20 +1,16 @@
 "use client";
 import { Modal } from "@mantine/core";
-import React, { FC, ReactNode, useEffect, useReducer } from "react";
+import React, { FC, useEffect, useReducer } from "react";
 import AppConnectionForm from "../../components/connection/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
 import { connectionConfigReducer, initialState } from "./reducer";
-import { Repository } from "./types";
-
-export interface ConnectionConfigProviderProps {
-    children: ReactNode;
-    repository: Repository;
-}
+import { ConnectionConfigProviderProps } from "./types";
+import localRepository from "./localRepository";
 
 const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
     children,
-    repository,
+    repository = localRepository,
 }) => {
     const [state, dispatch] = useReducer(connectionConfigReducer, initialState);
     const store = React.useMemo(

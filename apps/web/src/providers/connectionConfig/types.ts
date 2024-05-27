@@ -1,4 +1,4 @@
-import { Dispatch } from "react";
+import { Dispatch, ReactNode } from "react";
 import { Address } from "viem";
 
 export interface Repository {
@@ -77,6 +77,11 @@ export type ContextProps = {
     dispatch: Dispatch<Action>;
     repository: Repository;
 };
+
+export interface ConnectionConfigProviderProps {
+    children: ReactNode;
+    repository?: Repository;
+}
 
 export type Predicate<R> = (p: State) => R;
 export type UseSelector = <R>(p: Predicate<R>) => R;
