@@ -153,7 +153,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                 }
 
                 if (hasConnection(v)) {
-                    return `There is an connection for that address`;
+                    return `There is a connection for that address`;
                 }
 
                 return null;
