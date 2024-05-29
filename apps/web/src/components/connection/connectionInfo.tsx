@@ -32,6 +32,7 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
                         size="compact-sm"
                         variant="transparent"
                         color="red"
+                        data-testid="remove-connection"
                         onClick={() => removeConnection(connection.address)}
                     >
                         <TbTrash size={theme.other.iconSize} />

@@ -252,6 +252,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                     rightSection={showLoader ? <Loader size="sm" /> : ""}
                     placeholder="0x"
                     data={applications}
+                    data-testid="connection-address"
                     {...form.getInputProps("address")}
                 />
 
@@ -272,6 +273,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                     withAsterisk
                     placeholder="https://app-hostname/graphql"
                     description="The rollups graphQL endpoint"
+                    data-testid="connection-url"
                     rightSectionPointerEvents="none"
                     rightSection={
                         result.fetching || result.stale ? (
@@ -303,7 +305,11 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
             </Flex>
 
             <Flex direction="row" justify="flex-end" align="center" pt="xl">
-                <Button type="submit" loading={submitting}>
+                <Button
+                    type="submit"
+                    loading={submitting}
+                    data-testid="connection-save"
+                >
                     Save
                 </Button>
             </Flex>
