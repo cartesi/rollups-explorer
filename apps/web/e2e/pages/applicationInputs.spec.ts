@@ -1,27 +1,10 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { goToApplicationInputsPage } from "../utils/navigation";
 
-const goToApplicationInputsPage = async (page: Page) => {
-    await page.goto("/applications");
-
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
-    const applicationInputsLinks = page
-        .getByTestId("applications-table")
-        .getByTestId("applications-link");
-
-    const firstLink = applicationInputsLinks.first();
-    const href = (await firstLink.getAttribute("href")) as string;
-
-    await page.goto(href);
-};
-
-test.beforeEach(async ({ page }) => {
-    await goToApplicationInputsPage(page);
-});
+test.beforeEach(goToApplicationInputsPage);
 
 test("should have correct page title", async ({ page }) => {
-    const pageUrl = page.url();
-    const [, address] = pageUrl.split("/").reverse();
-
+    const [, address] = page.url().split("/").reverse();
     await expect(page).toHaveTitle(`Application ${address} | CartesiScan`);
 });
 
