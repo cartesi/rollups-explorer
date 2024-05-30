@@ -1,4 +1,4 @@
-import { Group, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FC } from "react";
@@ -13,6 +13,7 @@ import {
     ApplicationByIdQueryVariables,
 } from "../../../../graphql/explorer/operations";
 import { getUrqlServerClient } from "../../../../lib/urql";
+import PageTitle from "../../../../components/layout/pageTitle";
 
 export async function generateMetadata({
     params,
@@ -68,11 +69,7 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
                 <Text>Inputs</Text>
             </Breadcrumbs>
 
-            <Group>
-                <TbInbox size={40} />
-                <Title order={2}>Inputs</Title>
-            </Group>
-
+            <PageTitle title="Inputs" Icon={TbInbox} />
             <Inputs applicationId={params.address} />
         </Stack>
     );

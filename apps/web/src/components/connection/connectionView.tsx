@@ -26,13 +26,16 @@ const ConnectionView = () => {
                     <Button
                         size="compact-sm"
                         variant="filled"
+                        data-testid="add-connection"
                         onClick={() => showConnectionModal()}
                     >
                         <TbPlus />
                         <VisuallyHidden>Create connection</VisuallyHidden>
                     </Button>
 
-                    <Title size="h2">Connections</Title>
+                    <Title data-testid="page-title" size="h2">
+                        Connections
+                    </Title>
                     {hasConnections && (
                         <Avatar size="sm" color={theme.primaryColor}>
                             {connections.length}
