@@ -1,4 +1,5 @@
-export { type DepositFormSuccessData } from "./DepositFormTypes";
+export { AddressRelayForm } from "./AddressRelayForm";
+export { type TransactionFormSuccessData } from "./DepositFormTypes";
 export { ERC1155DepositForm } from "./ERC1155DepositForm";
 export { ERC20DepositForm } from "./ERC20DepositForm";
 export { ERC721DepositForm } from "./ERC721DepositForm";
