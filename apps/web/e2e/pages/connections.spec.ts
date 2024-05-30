@@ -1,30 +1,6 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { Address } from "viem";
-
-const createConnection = async (page: Page, address: Address) => {
-    const button = page.getByTestId("show-connection-modal");
-    await button.click();
-
-    const url = "https://honeypot.sepolia.rollups.staging.cartesi.io/graphql";
-    await expect(page.getByText("Create App Connection")).toBeVisible();
-
-    const addressInput = await page.getByTestId("connection-address");
-    await addressInput.focus();
-    await page.keyboard.type(address);
-
-    const urlInput = await page.getByTestId("connection-url");
-    await urlInput.focus();
-    await page.keyboard.type(url);
-
-    await expect(
-        page.getByText("This application responded with"),
-    ).toBeVisible();
-
-    await page.keyboard.press("Enter");
-    await expect(
-        page.getByText(`Connection ${address} created with success`),
-    ).toBeVisible();
-};
+import { createConnection } from "../utils/connection";
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/connections");
