@@ -1,4 +1,4 @@
-import { DepositFormSuccessData } from "../DepositFormTypes";
+import { TransactionFormSuccessData } from "../DepositFormTypes";
 
 export interface ERC1155DepositFormProps {
     mode: "single" | "batch";
@@ -7,5 +7,5 @@ export interface ERC1155DepositFormProps {
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSearchTokens: (tokenId: string) => void;
-    onSuccess?: (receipt: DepositFormSuccessData) => void;
+    onSuccess?: (receipt: TransactionFormSuccessData) => void;
 }
