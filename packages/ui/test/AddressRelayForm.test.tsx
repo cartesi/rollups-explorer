@@ -205,4 +205,47 @@ describe("AddressRelayform", () => {
         expect(onSuccess).toHaveBeenCalledTimes(1);
         expect(executeReset).toHaveBeenCalledTimes(1);
     });
+
+    it("should display error message when transaction fails", () => {
+        useWriteRelayDAppAddressMock.mockReturnValue({
+            isError: true,
+            status: "error",
+            data: "0x0001",
+        });
+
+        useWaitForTransactionReceiptMock.mockImplementation((params) => {
+            return params?.hash === "0x0001"
+                ? {
+                      status: "error",
+                      isError: true,
+                      error: {
+                          shortMessage: "Transaction reverted!",
+                          code: 500,
+                          details: "Error",
+                          message: "error message",
+                          name: "Error",
+                          version: 1,
+                      },
+                      fetchStatus: "idle",
+                  }
+                : {
+                      fetchStatus: "idle",
+                  };
+        });
+
+        render(<Component {...defaultProps} />);
+        fireEvent.change(screen.getByTestId("application"), {
+            target: { value: applications[0] },
+        });
+
+        const btn = screen.getByText("Send").closest("button");
+        expect(btn).not.toBeDisabled();
+
+        expect(screen.getByText("Transaction reverted!")).toBeVisible();
+        expect(screen.queryByText("Check wallet...")).not.toBeInTheDocument();
+
+        expect(
+            screen.queryByText("Waiting for confirmation..."),
+        ).not.toBeInTheDocument();
+    });
 });
