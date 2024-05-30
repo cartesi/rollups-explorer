@@ -104,7 +104,7 @@ describe("connectionForm", () => {
         });
 
         expect(
-            screen.getByText("There is an connection for that address"),
+            screen.getByText("There is a connection for that address"),
         ).toBeInTheDocument();
     });
 

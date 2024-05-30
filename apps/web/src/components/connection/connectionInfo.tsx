@@ -21,7 +21,13 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
     const { removeConnection } = useConnectionConfig();
     const theme = useMantineTheme();
     return (
-        <Card withBorder py="lg" radius="sm" shadow="sm">
+        <Card
+            withBorder
+            py="lg"
+            radius="sm"
+            shadow="sm"
+            data-testid="connection-card"
+        >
             <Card.Section inheritPadding withBorder>
                 <Flex justify="space-between">
                     <Address value={connection.address} shorten icon />
@@ -32,6 +38,7 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
                         size="compact-sm"
                         variant="transparent"
                         color="red"
+                        data-testid="remove-connection"
                         onClick={() => removeConnection(connection.address)}
                     >
                         <TbTrash size={theme.other.iconSize} />
