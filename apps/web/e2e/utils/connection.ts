@@ -6,8 +6,8 @@ export const createConnection = async (
     address: Address,
     url = "https://honeypot.sepolia.rollups.staging.cartesi.io/graphql",
 ) => {
-    // Find and click the button for displaying the add-connection modal
-    const button = page.getByTestId("show-connection-modal");
+    // Find and click the button for displaying the connection modal
+    const button = page.getByTestId("add-connection");
     await button.click();
 
     // Wait for the modal to appear
