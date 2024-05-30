@@ -63,6 +63,7 @@ const InputRow: FC<InputRowProps> = ({
                             alignItems: "center",
                             justifyContent: "center",
                         }}
+                        data-testid="application-from-address"
                     >
                         {input.erc20Deposit ? (
                             <Group>
@@ -152,8 +153,13 @@ const InputRow: FC<InputRowProps> = ({
                         shadow={keepDataColVisible ? undefined : "xl"}
                         radius={0}
                         p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
+                        data-testid="input-row-toggle"
                     >
-                        <ActionIcon variant="default" onClick={toggle}>
+                        <ActionIcon
+                            variant="default"
+                            data-testid="input-row-toggle"
+                            onClick={toggle}
+                        >
                             {opened ? <TbX /> : <TbFileText />}
                         </ActionIcon>
                     </Paper>
