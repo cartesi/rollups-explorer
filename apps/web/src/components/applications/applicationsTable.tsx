@@ -33,7 +33,11 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
 
     return (
         <TableResponsiveWrapper ref={tableRowRef}>
-            <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
+            <Table
+                width={"100%"}
+                style={{ borderCollapse: "collapse" }}
+                data-testid="applications-table"
+            >
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Id</Table.Th>
