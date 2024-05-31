@@ -4,5 +4,6 @@ declare module "@mantine/core" {
     export { core };
     export interface MantineThemeOther {
         iconSize: number;
+        chainIconSize: number;
     }
 }

@@ -30,6 +30,7 @@ import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
+import { CartesiScanChains } from "../networks/cartesiScanChains";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu }] = useDisclosure();
@@ -87,7 +88,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         <Link href="/">
                             <CartesiLogo height={40} />
                         </Link>
-                        <Group ml={{ lg: "xl" }} gap="md">
+                        <Group ml={{ lg: "xl" }}>
+                            <CartesiScanChains />
                             <Button
                                 variant="subtle"
                                 leftSection={<TbArrowsDownUp />}
