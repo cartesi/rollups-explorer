@@ -12,5 +12,10 @@ export default defineConfig({
             reporter: ["text", "lcov"],
             exclude: ["**/graphql/**"],
         },
+        server: {
+            deps: {
+                inline: ["antd", "@ant-design", "@ant-design/web3-icons"],
+            },
+        },
     },
 } as UserConfig);

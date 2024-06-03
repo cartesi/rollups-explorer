@@ -12,6 +12,7 @@ import {
     Menu,
     Text,
     Tooltip,
+    VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -138,19 +139,27 @@ const getIconByChainId = cond([
 
 const MainIcon: FC<{ chainId: number }> = ({ chainId }) => {
     const Icon = getIconByChainId(chainId);
-    return <Icon style={{ fontSize: 28 }} />;
+    return <Icon style={{ fontSize: 28 }} id={`chain-${chainId}-icon`} />;
 };
 
 export const CartesiScanChains = () => {
     const [isOpen, { close, open }] = useDisclosure(false);
     const config = useConfig();
     const chain = config.chains[0];
+    const chainName = chain.name;
 
     return (
-        <Menu withArrow withinPortal={false} onClose={close} onOpen={open}>
+        <Menu
+            withArrow
+            withinPortal={false}
+            onClose={close}
+            onOpen={open}
+            id="cartesiscan-chain-menu"
+        >
             <Menu.Target>
                 <Button variant="transparent" p={0}>
                     <Group gap={3}>
+                        <VisuallyHidden>{chainName}</VisuallyHidden>
                         <MainIcon chainId={chain.id} />
                         <CaretIcon up={isOpen} />
                     </Group>
