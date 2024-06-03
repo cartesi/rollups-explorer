@@ -3,16 +3,15 @@ import {
     Loader,
     Table,
     Text,
-    Transition,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
 import { Application } from "../../graphql/explorer/types";
-import { ApplicationsTableProps } from "./applicationsTable";
-import UserApplicationsRow from "./userApplicationsRow";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
+import { ApplicationsTableProps } from "./applicationsTable";
+import UserApplicationsRow from "./userApplicationsRow";
 
 interface UserApplicationsTableProps extends ApplicationsTableProps {
     noResultsMessage?: string;
@@ -55,28 +54,6 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
                             </Button>
                         </Table.Th>
                         <Table.Th ref={childrenRef}>Data</Table.Th>
-                        <Transition
-                            mounted={isVisible}
-                            transition="scale-x"
-                            duration={500}
-                            timingFunction="ease-out"
-                        >
-                            {(styles) => (
-                                <th
-                                    style={{
-                                        ...styles,
-                                        position: "sticky",
-                                        top: 0,
-                                        right: 0,
-                                        backgroundColor: bgColor,
-                                        padding:
-                                            "var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-lg))",
-                                    }}
-                                >
-                                    Data
-                                </th>
-                            )}
-                        </Transition>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>

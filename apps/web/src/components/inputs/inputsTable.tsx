@@ -4,7 +4,6 @@ import {
     Loader,
     Table,
     Text,
-    Transition,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
@@ -38,8 +37,8 @@ const InputsTable: FC<InputsTableProps> = ({
     });
 
     return (
-        <TableResponsiveWrapper ref={tableRowRef}>
-            <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
+        <TableResponsiveWrapper>
+            <Table>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>From</Table.Th>
@@ -56,29 +55,7 @@ const InputsTable: FC<InputsTableProps> = ({
                                 {timeType === "age" ? "Age" : "Timestamp (UTC)"}
                             </Button>
                         </Table.Th>
-                        <Table.Th ref={childrenRef}>Data</Table.Th>
-                        <Transition
-                            mounted={isVisible}
-                            transition="scale-x"
-                            duration={500}
-                            timingFunction="ease-out"
-                        >
-                            {(styles) => (
-                                <th
-                                    style={{
-                                        ...styles,
-                                        position: "sticky",
-                                        top: 0,
-                                        right: 0,
-                                        backgroundColor: bgColor,
-                                        padding:
-                                            "var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-lg))",
-                                    }}
-                                >
-                                    Data
-                                </th>
-                            )}
-                        </Transition>
+                        <Table.Th>Data</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
