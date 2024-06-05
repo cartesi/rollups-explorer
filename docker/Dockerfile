@@ -26,7 +26,8 @@ RUN yarn install
 COPY --from=builder /app/out/full/ .
 ARG ENVIRONMENT=localhost
 COPY --from=builder /app/out/full/apps/web/.env.${ENVIRONMENT} ./apps/web/.env
-RUN yarn build
+WORKDIR /app
+RUN yarn build --filter=web
 
 FROM base AS runner
 WORKDIR /app
