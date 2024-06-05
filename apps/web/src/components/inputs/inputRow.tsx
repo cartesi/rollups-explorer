@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
-import React, { FC, useMemo } from "react";
+import React, { FC } from "react";
 import { TbArrowRight, TbFileText, TbQuestionMark, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
@@ -20,53 +20,13 @@ import Address from "../address";
 import InputDetailsView from "./inputDetailsView";
 import { methodResolver } from "../../lib/methodResolver";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
-import { useQuery } from "urql";
-import {
-    InputStatusDocument,
-    InputStatusQuery,
-    InputStatusQueryVariables,
-} from "../../graphql/rollups/operations";
 import { Connection } from "../../providers/connectionConfig/types";
+import ConnectionInputStatusBadge from "../connection/connectionInputStatusBadge";
 
 export type InputRowProps = {
     input: InputItemFragment;
     timeType: string;
     keepDataColVisible: boolean;
-};
-
-interface InputStatusBadgeProps {
-    graphqlUrl: string;
-    index: number;
-}
-
-const InputStatusBadge: FC<InputStatusBadgeProps> = ({ graphqlUrl, index }) => {
-    const [result] = useQuery<InputStatusQuery, InputStatusQueryVariables>({
-        context: useMemo(
-            () => ({
-                url: graphqlUrl,
-                requestPolicy: "network-only",
-            }),
-            [graphqlUrl],
-        ),
-        query: InputStatusDocument,
-        variables: {
-            index,
-        },
-    });
-
-    return (
-        <>
-            {result.fetching ? (
-                "Loading..."
-            ) : result.data?.input.status ? (
-                <Badge variant="default" style={{ textTransform: "none" }}>
-                    {result.data.input.status}
-                </Badge>
-            ) : (
-                "N/A"
-            )}
-        </>
-    );
 };
 
 const InputRow: FC<InputRowProps> = ({
@@ -167,7 +127,7 @@ const InputRow: FC<InputRowProps> = ({
                 </Table.Td>
                 <Table.Td>
                     {hasConnection(to) ? (
-                        <InputStatusBadge
+                        <ConnectionInputStatusBadge
                             graphqlUrl={(getConnection(to) as Connection).url}
                             index={input.index}
                         />
@@ -177,6 +137,7 @@ const InputRow: FC<InputRowProps> = ({
                                 size="xs"
                                 radius={50}
                                 ml={4}
+                                data-testid="show-connection-modal"
                                 onClick={() => showConnectionModal(to)}
                             >
                                 <TbQuestionMark />
