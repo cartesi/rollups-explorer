@@ -1,6 +1,7 @@
 import {
     Box,
     Flex,
+    Paper,
     Table,
     Transition,
     useMantineColorScheme,
@@ -9,9 +10,11 @@ import {
 import { path } from "ramda";
 import React, {
     Children,
+    createContext,
+    FC,
     forwardRef,
-    ForwardRefRenderFunction,
     ReactNode,
+    useContext,
     useRef,
 } from "react";
 import { useElementVisibility } from "../hooks/useElementVisibility";
@@ -25,28 +28,50 @@ interface ResponsiveTableProps {
     isVisible: boolean;
 }
 
-const TBodyModifier = ({ children, isVisible }: ResponsiveTableProps) => {
-    return children;
+const VisibilityContext = createContext<boolean>(false);
+export const TBodyModifier: FC<TableResponsiveWrapperProps> = ({
+    children,
+}) => {
+    const isDataColVisible = useContext(VisibilityContext);
+    const TdArray = React.Children.toArray(children);
+    const TdLastContent = path(
+        [TdArray.length - 1, "props", "children"],
+        children,
+    ) as ReactNode;
+    return (
+        <>
+            {TdArray.map((elm, index) => {
+                const isLast = index === TdArray.length - 1;
+                return (
+                    <React.Fragment key={index}>
+                        {!isLast && elm}
+                        {isLast && (
+                            <Table.Td
+                                pos={!isDataColVisible ? "initial" : "sticky"}
+                                top={0}
+                                right={0}
+                                p={0}
+                            >
+                                <Paper
+                                    shadow={
+                                        !isDataColVisible ? undefined : "xl"
+                                    }
+                                    radius={0}
+                                    p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
+                                >
+                                    {TdLastContent}
+                                </Paper>
+                            </Table.Td>
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </>
+    );
 };
-
-const ResponsiveTable = forwardRef<HTMLTableCellElement, ResponsiveTableProps>(
-    ({ children, isVisible }, ref) => {
-        const Thead = path(["props", "children", "0"], children) as ReactNode;
-        const TBody = path(["props", "children", "1"], children) as ReactNode;
-        return (
-            <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
-                <THeadModifier ref={ref} isVisible={isVisible}>
-                    {Thead}
-                </THeadModifier>
-                <TBodyModifier isVisible={!isVisible}>{TBody}</TBodyModifier>
-            </Table>
-        );
-    },
-);
 
 const THeadModifier = forwardRef<HTMLTableCellElement, ResponsiveTableProps>(
     ({ children, isVisible }, ref) => {
-        // Extract the children of the <thead> element
         const Th = path(
             ["props", "children", "props", "children"],
             children,
@@ -108,33 +133,55 @@ const THeadModifier = forwardRef<HTMLTableCellElement, ResponsiveTableProps>(
         );
     },
 );
-const TableResponsiveWrapper: ForwardRefRenderFunction<
-    HTMLDivElement,
-    TableResponsiveWrapperProps
-> = ({ children }, ref) => {
+
+const ResponsiveTable = forwardRef<HTMLTableCellElement, ResponsiveTableProps>(
+    ({ children, isVisible }, ref) => {
+        const Thead = path(["props", "children", "0"], children) as ReactNode;
+        const Tbody = path(["props", "children", "1"], children) as ReactNode;
+        return (
+            <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
+                <THeadModifier ref={ref} isVisible={isVisible}>
+                    {Thead}
+                </THeadModifier>
+                {Tbody}
+            </Table>
+        );
+    },
+);
+
+const TableResponsiveWrapper: React.FC<TableResponsiveWrapperProps> = ({
+    children,
+}) => {
     const tableRowRef = useRef<HTMLTableElement>(null);
     const { childrenRef, isVisible } = useElementVisibility({
         element: tableRowRef,
     });
+
     return (
-        <Flex direction="column" align="center" w="100%">
+        <VisibilityContext.Provider value={isVisible}>
             <Flex direction="column" align="center" w="100%">
-                <Box
-                    ref={tableRowRef}
-                    style={{ position: "relative", width: "100%" }}
-                >
-                    <Box style={{ overflowX: "auto", width: "100%" }}>
-                        <ResponsiveTable
-                            ref={childrenRef}
-                            isVisible={isVisible}
-                        >
-                            {children}
-                        </ResponsiveTable>
+                <Flex direction="column" align="center" w="100%">
+                    <Box
+                        ref={tableRowRef}
+                        style={{ position: "relative", width: "100%" }}
+                    >
+                        <Box style={{ overflowX: "auto", width: "100%" }}>
+                            <ResponsiveTable
+                                ref={childrenRef}
+                                isVisible={isVisible}
+                            >
+                                {children}
+                            </ResponsiveTable>
+                        </Box>
                     </Box>
-                </Box>
+                </Flex>
             </Flex>
-        </Flex>
+        </VisibilityContext.Provider>
     );
 };
+TableResponsiveWrapper.displayName = "TableResponsiveWrapper";
+ResponsiveTable.displayName = "ResponsiveTable";
+THeadModifier.displayName = "THeadModifier ";
+TBodyModifier.displayName = "TBodyModifier";
 
-export default forwardRef(TableResponsiveWrapper);
+export default TableResponsiveWrapper;
