@@ -31,7 +31,6 @@ const defaultProps: ApplicationRowProps = {
             applications: [],
         },
     },
-    keepDataColVisible: true,
 };
 
 const defaultConnection = {

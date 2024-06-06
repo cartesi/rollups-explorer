@@ -33,7 +33,6 @@ const defaultProps: InputRowProps = {
         erc20Deposit: null,
     },
     timeType: "age",
-    keepDataColVisible: false,
 };
 
 describe("InputRow component", () => {
@@ -52,13 +51,7 @@ describe("InputRow component", () => {
     });
 
     it("should display correct timestamp in UTC format", () => {
-        render(
-            <Component
-                input={defaultProps.input}
-                timeType="timestamp"
-                keepDataColVisible={false}
-            />,
-        );
+        render(<Component input={defaultProps.input} timeType="timestamp" />);
 
         const timestamp = new Date(
             defaultProps.input.timestamp * 1000,

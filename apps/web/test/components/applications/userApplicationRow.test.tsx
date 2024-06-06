@@ -3,7 +3,6 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { ApplicationRowProps } from "../../../src/components/applications/applicationRow";
 import UserApplicationsRow, {
     UserApplicationsRowProps,
 } from "../../../src/components/applications/userApplicationsRow";
@@ -32,7 +31,6 @@ const defaultProps: UserApplicationsRowProps = {
             applications: [],
         },
     },
-    keepDataColVisible: false,
     timeType: "age",
 };
 
