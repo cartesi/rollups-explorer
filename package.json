@@ -15,6 +15,7 @@
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
         "test": "turbo run test",
         "test:ci": "turbo run test:ci",
+        "test:e2e": "turbo run test:e2e",
         "changeset": "changeset",
         "version-packages": "changeset version",
         "release": "turbo run build && changeset publish",

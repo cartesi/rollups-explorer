@@ -18,7 +18,7 @@ jobs:
                   node-version: latest
                   cache: "yarn"
 
-            - name: Install Dependencies
+            - name: Install dependencies
               run: yarn install --frozen-lockfile
 
             - name: Code format check
@@ -27,7 +27,7 @@ jobs:
             - name: Linting
               run: yarn lint
 
-            - name: Run Tests
+            - name: Run unit tests
               run: yarn test:ci
 
             - name: Merge coveralls reports
@@ -38,3 +38,6 @@ jobs:
               with:
                   path-to-lcov: "coverage/lcov.info"
                   github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Run e2e tests
+              run: yarn test:e2e

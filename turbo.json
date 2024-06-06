@@ -49,6 +49,9 @@
                 "test/**/*.ts",
                 "test/**/*.tsx"
             ]
+        },
+        "test:e2e": {
+            "dependsOn": ["build"]
         }
     }
 }
