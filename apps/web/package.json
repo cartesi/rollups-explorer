@@ -16,6 +16,7 @@
         "test:e2e:ui": "playwright test --ui"
     },
     "dependencies": {
+        "@ant-design/web3-icons": "^1.6.0",
         "@cartesi/rollups-explorer-ui": "*",
         "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.7.1",
@@ -28,6 +29,7 @@
         "@vercel/analytics": "^1.2.2",
         "@vercel/speed-insights": "^1.0.10",
         "abitype": "^0.9",
+        "antd": "^5.17.4",
         "encoding": "^0.1",
         "graphql": "^16",
         "graphql-tag": "^2",

@@ -1,13 +1,16 @@
 import {
     fireEvent,
+    getAllByRole,
+    getByText,
     render,
     screen,
     waitFor,
     within,
 } from "@testing-library/react";
+import { mainnet } from "viem/chains";
 import { afterAll, describe, it } from "vitest";
-import withMantineTheme from "../../utils/WithMantineTheme";
 import Shell from "../../../src/components/layout/shell";
+import withMantineTheme from "../../utils/WithMantineTheme";
 
 const Component = withMantineTheme(Shell);
 
@@ -74,6 +77,9 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 
 vi.mock("wagmi", async () => {
     return {
+        useConfig: () => ({
+            chains: [mainnet],
+        }),
         useContractReads: () => ({
             isLoading: false,
             isSuccess: true,
@@ -150,6 +156,28 @@ describe("Shell component", () => {
                     "applications-link",
                 ),
             ).toThrow("Unable to find an element");
+        });
+
+        it("should display the cartesiscan chain button", async () => {
+            render(<Component>Children</Component>);
+
+            const headerEl = screen.getByTestId("header");
+
+            expect(getByText(headerEl, "Ethereum")).toBeInTheDocument();
+        });
+
+        it("should display menu of supported chains after clicking the chain button", async () => {
+            render(<Component>Children</Component>);
+
+            fireEvent.click(screen.getByText("Ethereum"));
+
+            const menuEl = await screen.findByRole("menu");
+
+            expect(getAllByRole(menuEl, "menuitem")).toHaveLength(4);
+            expect(getByText(menuEl, "Ethereum")).toBeInTheDocument();
+            expect(getByText(menuEl, "Sepolia")).toBeInTheDocument();
+            expect(getByText(menuEl, "OP Mainnet")).toBeInTheDocument();
+            expect(getByText(menuEl, "OP Sepolia")).toBeInTheDocument();
         });
     });
 
