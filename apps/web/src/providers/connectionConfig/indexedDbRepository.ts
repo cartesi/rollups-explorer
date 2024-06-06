@@ -94,16 +94,13 @@ class IndexedDbRepository extends Dexie implements Repository {
     }
 
     async remove(addr: Address) {
-        try {
-            await this.connections
-                .where("network")
-                .equals(networkId)
-                .and((connection) => connection.address === addr)
-                .delete();
-            return true;
-        } catch (err) {
-            return false;
-        }
+        await this.connections
+            .where("network")
+            .equals(networkId)
+            .and((connection) => connection.address === addr)
+            .delete();
+
+        return true;
     }
 
     async get(addr: Address) {
