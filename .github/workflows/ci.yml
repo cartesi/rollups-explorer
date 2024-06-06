@@ -39,5 +39,8 @@ jobs:
                   path-to-lcov: "coverage/lcov.info"
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
+            - name: Install Playwright
+              run: yarn playwright install
+
             - name: Run e2e tests
               run: yarn test:e2e
