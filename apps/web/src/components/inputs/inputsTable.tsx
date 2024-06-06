@@ -1,15 +1,7 @@
 "use client";
-import {
-    Button,
-    Loader,
-    Table,
-    Text,
-    useMantineColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
-import { FC, useCallback, useRef, useState } from "react";
+import { Button, Loader, Table, Text } from "@mantine/core";
+import { FC, useCallback, useState } from "react";
 import type { InputItemFragment } from "../../graphql/explorer/operations";
-import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
 import InputRow from "./inputRow";
 
@@ -25,16 +17,9 @@ const InputsTable: FC<InputsTableProps> = ({
     totalCount,
 }) => {
     const [timeType, setTimeType] = useState("age");
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
-    const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
     const onChangeTimeColumnType = useCallback(() => {
         setTimeType((timeType) => (timeType === "age" ? "timestamp" : "age"));
     }, []);
-    const tableRowRef = useRef<HTMLDivElement>(null);
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
 
     return (
         <TableResponsiveWrapper>
@@ -79,7 +64,6 @@ const InputsTable: FC<InputsTableProps> = ({
                             key={input.id}
                             input={input}
                             timeType={timeType}
-                            keepDataColVisible={!isVisible}
                         />
                     ))}
                 </Table.Tbody>

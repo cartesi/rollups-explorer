@@ -1,11 +1,11 @@
 "use client";
+import { erc20PortalAddress, etherPortalAddress } from "@cartesi/rollups-wagmi";
 import {
     ActionIcon,
     Badge,
     Box,
     Collapse,
     Group,
-    Paper,
     Table,
     Text,
 } from "@mantine/core";
@@ -13,23 +13,36 @@ import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
 import { TbArrowRight, TbFileText, TbX } from "react-icons/tb";
-import { Address as AddressType, formatUnits } from "viem";
+import { Address as AddressType, formatUnits, getAddress } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
 import Address from "../address";
+import { TBodyModifier } from "../tableResponsiveWrapper";
 import InputDetailsView from "./inputDetailsView";
-import { methodResolver } from "../../lib/methodResolver";
 
 export type InputRowProps = {
     input: InputItemFragment;
     timeType: string;
-    keepDataColVisible: boolean;
 };
 
-const InputRow: FC<InputRowProps> = ({
-    input,
-    timeType,
-    keepDataColVisible,
-}) => {
+export type MethodResolver = (
+    input: InputItemFragment,
+) => string | undefined | false;
+
+const etherDepositResolver: MethodResolver = (input) =>
+    getAddress(input.msgSender) === etherPortalAddress && "depositEther";
+const erc20PortalResolver: MethodResolver = (input) =>
+    getAddress(input.msgSender) === erc20PortalAddress && "depositERC20Tokens";
+
+const resolvers: MethodResolver[] = [etherDepositResolver, erc20PortalResolver];
+const methodResolver: MethodResolver = (input) => {
+    for (const resolver of resolvers) {
+        const method = resolver(input);
+        if (method) return method;
+    }
+    return undefined;
+};
+
+const InputRow: FC<InputRowProps> = ({ input, timeType }) => {
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
@@ -55,115 +68,101 @@ const InputRow: FC<InputRowProps> = ({
     return (
         <>
             <Table.Tr>
-                <Table.Td>
-                    <Box
-                        display="flex"
-                        w="max-content"
-                        style={{
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                        data-testid="application-from-address"
-                    >
-                        {input.erc20Deposit ? (
-                            <Group>
-                                <Address
-                                    value={
-                                        input.erc20Deposit.from as AddressType
-                                    }
-                                    icon
-                                    shorten
-                                />
-                                <TbArrowRight />
-                                <Address value={from} icon shorten />
-                            </Group>
-                        ) : (
-                            <Address value={from} icon shorten />
-                        )}
-                    </Box>
-                </Table.Td>
-                <Table.Td>
-                    <Box
-                        display="flex"
-                        w="max-content"
-                        style={{
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Group justify="right">
-                            {erc20Deposit(input)}
-                            <TbArrowRight />
-                        </Group>
-                    </Box>
-                </Table.Td>
-                <Table.Td>
-                    <Box
-                        display="flex"
-                        w="max-content"
-                        style={{
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Address
-                            value={to}
-                            icon
-                            href={`/applications/${to}/inputs`}
-                            shorten
-                        />
-                    </Box>
-                </Table.Td>
-                <Table.Td>{method}</Table.Td>
-                <Table.Td>
-                    <Text>{input.index}</Text>
-                </Table.Td>
-                <Table.Td>
-                    <Box
-                        display="flex"
-                        w="max-content"
-                        style={{
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Text>
-                            {timeType === "age"
-                                ? `${prettyMilliseconds(
-                                      Date.now() - input.timestamp * 1000,
-                                      {
-                                          unitCount: 2,
-                                          secondsDecimalDigits: 0,
-                                          verbose: true,
-                                      },
-                                  )} ago`
-                                : new Date(
-                                      input.timestamp * 1000,
-                                  ).toISOString()}
-                        </Text>
-                    </Box>
-                </Table.Td>
-                <Table.Td
-                    pos={keepDataColVisible ? "initial" : "sticky"}
-                    top={0}
-                    right={0}
-                    p={0}
-                >
-                    <Paper
-                        shadow={keepDataColVisible ? undefined : "xl"}
-                        radius={0}
-                        p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
-                        data-testid="input-row-toggle"
-                    >
-                        <ActionIcon
-                            variant="default"
-                            data-testid="input-row-toggle"
-                            onClick={toggle}
+                <TBodyModifier>
+                    <Table.Td>
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
                         >
+                            {input.erc20Deposit ? (
+                                <Group>
+                                    <Address
+                                        value={
+                                            input.erc20Deposit
+                                                .from as AddressType
+                                        }
+                                        icon
+                                        shorten
+                                    />
+                                    <TbArrowRight />
+                                    <Address value={from} icon shorten />
+                                </Group>
+                            ) : (
+                                <Address value={from} icon shorten />
+                            )}
+                        </Box>
+                    </Table.Td>
+                    <Table.Td>
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Group justify="right">
+                                {erc20Deposit(input)}
+                                <TbArrowRight />
+                            </Group>
+                        </Box>
+                    </Table.Td>
+                    <Table.Td>
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Address
+                                value={to}
+                                icon
+                                href={`/applications/${to}`}
+                                shorten
+                            />
+                        </Box>
+                    </Table.Td>
+                    <Table.Td>{method}</Table.Td>
+                    <Table.Td>
+                        <Text>{input.index}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Text>
+                                {timeType === "age"
+                                    ? `${prettyMilliseconds(
+                                          Date.now() - input.timestamp * 1000,
+                                          {
+                                              unitCount: 2,
+                                              secondsDecimalDigits: 0,
+                                              verbose: true,
+                                          },
+                                      )} ago`
+                                    : new Date(
+                                          input.timestamp * 1000,
+                                      ).toISOString()}
+                            </Text>
+                        </Box>
+                    </Table.Td>
+                    <Table.Td>
+                        <ActionIcon variant="default" onClick={toggle}>
                             {opened ? <TbX /> : <TbFileText />}
                         </ActionIcon>
-                    </Paper>
-                </Table.Td>
+                    </Table.Td>
+                </TBodyModifier>
             </Table.Tr>
             <Table.Tr></Table.Tr>
             <Table.Tr>

@@ -1,14 +1,6 @@
-import {
-    Button,
-    Loader,
-    Table,
-    Text,
-    useMantineColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
-import { FC, useCallback, useRef, useState } from "react";
+import { Button, Loader, Table, Text } from "@mantine/core";
+import { FC, useCallback, useState } from "react";
 import { Application } from "../../graphql/explorer/types";
-import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
 import { ApplicationsTableProps } from "./applicationsTable";
 import UserApplicationsRow from "./userApplicationsRow";
@@ -24,13 +16,6 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
         totalCount,
         noResultsMessage = "No applications",
     } = props;
-    const tableRowRef = useRef<HTMLDivElement>(null);
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
-    const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
     const [timeType, setTimeType] = useState<"timestamp" | "age">("age");
 
     const onChangeTimeColumnType = useCallback(() => {
@@ -38,8 +23,8 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
     }, []);
 
     return (
-        <TableResponsiveWrapper ref={tableRowRef}>
-            <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
+        <TableResponsiveWrapper>
+            <Table>
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Id</Table.Th>
@@ -53,7 +38,7 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
                                 {timeType === "age" ? "Age" : "Timestamp (UTC)"}
                             </Button>
                         </Table.Th>
-                        <Table.Th ref={childrenRef}>Data</Table.Th>
+                        <Table.Th>Data</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -79,7 +64,6 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
                                 application as Omit<Application, "inputs">
                             }
                             timeType={timeType}
-                            keepDataColVisible={!isVisible}
                         />
                     ))}
                 </Table.Tbody>

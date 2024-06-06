@@ -1,19 +1,11 @@
 "use client";
 
-import {
-    Loader,
-    Table,
-    Text,
-    Transition,
-    useMantineColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
-import { FC, useRef } from "react";
+import { Loader, Table, Text } from "@mantine/core";
+import { FC } from "react";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { Application } from "../../graphql/explorer/types";
-import ApplicationRow from "./applicationRow";
-import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
+import ApplicationRow from "./applicationRow";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -23,49 +15,16 @@ export interface ApplicationsTableProps {
 
 const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
     const { applications, fetching, totalCount } = props;
-    const tableRowRef = useRef<HTMLDivElement>(null);
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
-    const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
 
     return (
-        <TableResponsiveWrapper ref={tableRowRef}>
-            <Table
-                width={"100%"}
-                style={{ borderCollapse: "collapse" }}
-                data-testid="applications-table"
-            >
+        <TableResponsiveWrapper>
+            <Table data-testid="applications-table">
                 <Table.Thead>
                     <Table.Tr>
                         <Table.Th>Id</Table.Th>
                         <Table.Th>Owner</Table.Th>
                         <Table.Th>URL</Table.Th>
-                        <Table.Th ref={childrenRef}>Data</Table.Th>
-                        <Transition
-                            mounted={isVisible}
-                            transition="scale-x"
-                            duration={500}
-                            timingFunction="ease-out"
-                        >
-                            {(styles) => (
-                                <th
-                                    style={{
-                                        ...styles,
-                                        position: "sticky",
-                                        top: 0,
-                                        right: 0,
-                                        backgroundColor: bgColor,
-                                        padding:
-                                            "var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-lg))",
-                                    }}
-                                >
-                                    Data
-                                </th>
-                            )}
-                        </Transition>
+                        <Table.Th>Data</Table.Th>
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -90,7 +49,6 @@ const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
                             application={
                                 application as Omit<Application, "inputs">
                             }
-                            keepDataColVisible={!isVisible}
                         />
                     ))}
                 </Table.Tbody>

@@ -1,12 +1,4 @@
-import {
-    ActionIcon,
-    Box,
-    Group,
-    Paper,
-    Table,
-    Text,
-    Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Box, Group, Table, Text, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
@@ -19,6 +11,7 @@ import {
 import { Address as AddressType } from "viem";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
+import { TBodyModifier } from "../tableResponsiveWrapper";
 import { ApplicationRowProps } from "./applicationRow";
 
 export interface UserApplicationsRowProps extends ApplicationRowProps {
@@ -26,7 +19,7 @@ export interface UserApplicationsRowProps extends ApplicationRowProps {
 }
 
 const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
-    const { application, keepDataColVisible, timeType } = props;
+    const { application, timeType } = props;
     const {
         getConnection,
         hasConnection,
@@ -37,61 +30,52 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
     const connection = getConnection(appId);
     return (
         <Table.Tr key={application.id}>
-            <Table.Td>
-                <Box
-                    display="flex"
-                    w="max-content"
-                    style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Address value={appId} icon shorten />
-                </Box>
-            </Table.Td>
-            <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
-            <Table.Td>
-                <Box
-                    display="flex"
-                    w="max-content"
-                    style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Text>
-                        {application && application?.timestamp && (
-                            <>
-                                {timeType === "age"
-                                    ? `${prettyMilliseconds(
-                                          Date.now() -
+            <TBodyModifier>
+                <Table.Td>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Address value={appId} icon shorten />
+                    </Box>
+                </Table.Td>
+                <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
+                <Table.Td>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Text>
+                            {application && application?.timestamp && (
+                                <>
+                                    {timeType === "age"
+                                        ? `${prettyMilliseconds(
+                                              Date.now() -
+                                                  application.timestamp * 1000,
+                                              {
+                                                  unitCount: 2,
+                                                  secondsDecimalDigits: 0,
+                                                  verbose: true,
+                                              },
+                                          )} ago`
+                                        : new Date(
                                               application.timestamp * 1000,
-                                          {
-                                              unitCount: 2,
-                                              secondsDecimalDigits: 0,
-                                              verbose: true,
-                                          },
-                                      )} ago`
-                                    : new Date(
-                                          application.timestamp * 1000,
-                                      ).toISOString()}
-                            </>
-                        )}
-                    </Text>
-                </Box>
-            </Table.Td>
+                                          ).toISOString()}
+                                </>
+                            )}
+                        </Text>
+                    </Box>
+                </Table.Td>
 
-            <Table.Td
-                pos={keepDataColVisible ? "initial" : "sticky"}
-                top={0}
-                right={0}
-                p={0}
-            >
-                <Paper
-                    shadow={keepDataColVisible ? undefined : "xl"}
-                    radius={0}
-                    p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
-                >
+                <Table.Td>
                     <Box
                         display="flex"
                         w="max-content"
@@ -148,8 +132,8 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                             )}
                         </Group>
                     </Box>
-                </Paper>
-            </Table.Td>
+                </Table.Td>
+            </TBodyModifier>
         </Table.Tr>
     );
 };
