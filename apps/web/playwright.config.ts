@@ -36,6 +36,7 @@ export default defineConfig({
             use: { ...devices[""] },
         },
 
+        /* Run your tests on multiple browsers */
         // {
         //     name: "firefox",
         //     grepInvert: /mobile/,
