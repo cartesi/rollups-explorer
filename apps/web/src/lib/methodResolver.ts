@@ -1,5 +1,6 @@
 "use client";
 import {
+    dAppAddressRelayAddress,
     erc1155BatchPortalAddress,
     erc1155SinglePortalAddress,
     erc20PortalAddress,
@@ -31,12 +32,17 @@ const erc1155BatchPortalResolver: MethodResolver = (input) =>
     getAddress(input.msgSender) === erc1155BatchPortalAddress &&
     "depositERC1155BatchTokens";
 
+const dAppAddressRelayResolver: MethodResolver = (input) =>
+    getAddress(input.msgSender) === dAppAddressRelayAddress &&
+    "relayDAppAddress";
+
 const resolvers: MethodResolver[] = [
     etherDepositResolver,
     erc20PortalResolver,
     erc721PortalResolver,
     erc1155SinglePortalResolver,
     erc1155BatchPortalResolver,
+    dAppAddressRelayResolver,
 ];
 
 export const methodResolver: MethodResolver = (input) => {
