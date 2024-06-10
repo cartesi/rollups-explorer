@@ -24,12 +24,6 @@ jobs:
             - name: Code format check
               run: yarn format:check
 
-            - name: Install Playwright
-              run: yarn playwright install
-
-            - name: Run e2e tests
-              run: yarn test:e2e
-
             - name: Linting
               run: yarn lint
 
@@ -44,3 +38,9 @@ jobs:
               with:
                   path-to-lcov: "coverage/lcov.info"
                   github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Install Playwright
+              run: yarn playwright install
+
+            - name: Run e2e tests
+              run: yarn test:e2e
