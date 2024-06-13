@@ -39,6 +39,4 @@ export const createConnection = async (
     ).toBeVisible({
         timeout: 30000,
     });
-
-    await urlInput.blur();
 };

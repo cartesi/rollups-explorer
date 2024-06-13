@@ -1,9 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const BASE_URL =
-    (process.env.CI
-        ? "https://sepolia.cartesiscan.io/"
-        : process.env.E2E_BASE_URL) ?? "http://localhost:3000";
+const BASE_URL = process.env.CI
+    ? "https://sepolia.cartesiscan.io/"
+    : process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -36,12 +35,11 @@ export default defineConfig({
             use: { ...devices[""] },
         },
         /* Run your tests on multiple browsers */
-        // {
-        //     name: "firefox",
-        //     grepInvert: /mobile/,
-        //     use: { ...devices["Desktop Firefox"] },
-        // },
-        //
+        {
+            name: "firefox",
+            grepInvert: /mobile/,
+            use: { ...devices["Desktop Firefox"] },
+        },
         {
             name: "webkit",
             grepInvert: /mobile/,

@@ -21,6 +21,12 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
 
+            - name: Install Playwright
+              run: yarn playwright install --with-deps
+
+            - name: Run e2e tests
+              run: yarn test:e2e
+
             - name: Code format check
               run: yarn format:check
 
@@ -38,9 +44,3 @@ jobs:
               with:
                   path-to-lcov: "coverage/lcov.info"
                   github-token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Install Playwright
-              run: yarn playwright install
-
-            - name: Run e2e tests
-              run: yarn test:e2e
