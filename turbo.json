@@ -51,7 +51,13 @@
             ]
         },
         "test:e2e": {
-            "dependsOn": ["build"]
+            "dependsOn": ["build"],
+            "outputs": ["playwright-report/**"],
+            "inputs": [
+                "src/**/*.ts",
+                "src/**/*.tsx",
+                "e2e/**/*.ts"
+            ]
         }
     }
 }
