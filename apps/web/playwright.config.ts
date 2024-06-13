@@ -35,7 +35,6 @@ export default defineConfig({
             grepInvert: /mobile/,
             use: { ...devices[""] },
         },
-
         /* Run your tests on multiple browsers */
         // {
         //     name: "firefox",
@@ -43,17 +42,16 @@ export default defineConfig({
         //     use: { ...devices["Desktop Firefox"] },
         // },
         //
-        // {
-        //     name: "webkit",
-        //     grepInvert: /mobile/,
-        //     use: { ...devices["Desktop Safari"] },
-        // },
-        //
-        // {
-        //     name: "Mobile Safari",
-        //     grep: /mobile/,
-        //     use: { ...devices["iPhone 12"] },
-        // },
+        {
+            name: "webkit",
+            grepInvert: /mobile/,
+            use: { ...devices["Desktop Safari"] },
+        },
+        {
+            name: "Mobile Safari",
+            grep: /mobile/,
+            use: { ...devices["iPhone 12"] },
+        },
     ],
 
     /* Run your local dev server before starting the tests */
