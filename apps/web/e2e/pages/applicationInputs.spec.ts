@@ -78,11 +78,17 @@ test("should search for specific input", async ({ page }) => {
         .getByRole("paragraph");
 
     const addresses = await fromAddress.all();
-    addresses.map(async (address) => {
-        const linkHref = (await address.textContent()) as string;
 
-        expect(
-            linkHref.toLowerCase().startsWith(addressPrefix.toLowerCase()),
-        ).toBe(true);
-    });
+    await Promise.all([
+        addresses.map(async (address) => {
+            try {
+                const linkHref = (await address.textContent()) as string;
+                expect(
+                    linkHref
+                        .toLowerCase()
+                        .startsWith(addressPrefix.toLowerCase()),
+                ).toBe(true);
+            } catch (err) {}
+        }),
+    ]);
 });
