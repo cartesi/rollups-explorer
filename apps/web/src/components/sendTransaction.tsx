@@ -1,11 +1,12 @@
 "use client";
 import {
-    DepositFormSuccessData,
+    AddressRelayForm,
     ERC1155DepositForm,
     ERC20DepositForm,
     ERC721DepositForm,
     EtherDepositForm,
     RawInputForm,
+    TransactionFormSuccessData,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -67,7 +68,7 @@ const SendTransaction: FC<DepositProps> = ({
     }, []);
 
     const onSuccess = useCallback(
-        ({ receipt, type }: DepositFormSuccessData) => {
+        ({ receipt, type }: TransactionFormSuccessData) => {
             const message = receipt?.transactionHash
                 ? {
                       message: (
@@ -76,9 +77,9 @@ const SendTransaction: FC<DepositProps> = ({
                               type="tx"
                           />
                       ),
-                      title: `${type} transfer completed`,
+                      title: `${type} transaction completed`,
                   }
-                : { message: `${type} transfer completed.` };
+                : { message: `${type} transaction completed.` };
 
             notifications.show({
                 withCloseButton: true,
@@ -97,7 +98,7 @@ const SendTransaction: FC<DepositProps> = ({
         <>
             <Select
                 label="Type"
-                placeholder="Select deposit type"
+                placeholder="Select transaction type"
                 mb={16}
                 allowDeselect={false}
                 data={[
@@ -112,6 +113,12 @@ const SendTransaction: FC<DepositProps> = ({
                                 value: "erc1155Batch",
                                 label: "ERC-1155 Batch Deposit",
                             },
+                        ],
+                    },
+                    {
+                        group: "Relay",
+                        items: [
+                            { value: "relay", label: "Application Address" },
                         ],
                     },
                     {
@@ -171,6 +178,13 @@ const SendTransaction: FC<DepositProps> = ({
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                     onSearchTokens={setMultiTokenId}
+                    onSuccess={onSuccess}
+                />
+            ) : depositType === "relay" ? (
+                <AddressRelayForm
+                    applications={applications}
+                    isLoadingApplications={fetching}
+                    onSearchApplications={setApplicationId}
                     onSuccess={onSuccess}
                 />
             ) : null}

@@ -1,13 +1,14 @@
-import { describe, it } from "vitest";
 import {
+    dAppAddressRelayAddress,
     erc1155BatchPortalAddress,
     erc1155SinglePortalAddress,
     erc20PortalAddress,
     erc721PortalAddress,
     etherPortalAddress,
 } from "@cartesi/rollups-wagmi";
-import { methodResolver } from "../../src/lib/methodResolver";
+import { describe, it } from "vitest";
 import { InputItemFragment } from "../../src/graphql/explorer/operations";
+import { methodResolver } from "../../src/lib/methodResolver";
 
 const defaultInput: InputItemFragment = {
     id: "0x60a7048c3136293071605a4eaffef49923e981cc-40",
@@ -26,7 +27,7 @@ const defaultInput: InputItemFragment = {
 };
 
 describe("methodResolver", () => {
-    it("should resolve correct method", () => {
+    it("should resolve correct method name", () => {
         let method = methodResolver(defaultInput);
 
         expect(method).toBe(undefined);
@@ -65,5 +66,12 @@ describe("methodResolver", () => {
         });
 
         expect(method).toBe("depositERC1155BatchTokens");
+
+        method = methodResolver({
+            ...defaultInput,
+            msgSender: dAppAddressRelayAddress,
+        });
+
+        expect(method).toEqual("relayDAppAddress");
     });
 });
