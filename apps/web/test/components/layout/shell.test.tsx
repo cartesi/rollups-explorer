@@ -173,11 +173,13 @@ describe("Shell component", () => {
 
             const menuEl = await screen.findByRole("menu");
 
-            expect(getAllByRole(menuEl, "menuitem")).toHaveLength(4);
+            expect(getAllByRole(menuEl, "menuitem")).toHaveLength(6);
             expect(getByText(menuEl, "Ethereum")).toBeInTheDocument();
             expect(getByText(menuEl, "Sepolia")).toBeInTheDocument();
             expect(getByText(menuEl, "OP Mainnet")).toBeInTheDocument();
             expect(getByText(menuEl, "OP Sepolia")).toBeInTheDocument();
+            expect(getByText(menuEl, "Base")).toBeInTheDocument();
+            expect(getByText(menuEl, "Base Sepolia")).toBeInTheDocument();
         });
     });
 

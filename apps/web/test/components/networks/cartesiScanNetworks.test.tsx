@@ -112,13 +112,15 @@ describe("CartesiScanNetworks component", () => {
 
         expect(getByText(menuEl, "Mainnets")).toBeVisible();
         expect(getByText(menuEl, "Testnets")).toBeVisible();
-        expect(menuItems).toHaveLength(4);
+        expect(menuItems).toHaveLength(6);
 
         [
             ["Ethereum", "https://cartesiscan.io"],
             ["Sepolia", "https://sepolia.cartesiscan.io"],
+            ["Base", "https://base.cartesiscan.io"],
             ["OP Mainnet", "https://optimism.cartesiscan.io"],
             ["OP Sepolia", "https://optimism-sepolia.cartesiscan.io"],
+            ["Base Sepolia", "https://base-sepolia.cartesiscan.io"],
         ].forEach(([expectedName, expectedLink]) => {
             expect(
                 getByText(menuEl, expectedName)
