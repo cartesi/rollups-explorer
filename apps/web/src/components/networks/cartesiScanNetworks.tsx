@@ -1,5 +1,6 @@
 "use client";
 import {
+    BaseCircleColorful,
     EthereumCircleColorful,
     HardhatColorful,
     OptimismCircleColorful,
@@ -21,6 +22,8 @@ import { FC } from "react";
 import { TbCaretUpFilled, TbExternalLink } from "react-icons/tb";
 import {
     anvil,
+    base,
+    baseSepolia,
     mainnet,
     optimism,
     optimismSepolia,
@@ -33,6 +36,8 @@ const chainIds = [
     sepolia.id,
     optimism.id,
     optimismSepolia.id,
+    base.id,
+    baseSepolia.id,
     anvil.id,
 ] as const;
 
@@ -64,6 +69,12 @@ const mainnets: NetworkGroup[] = [
         chainId: optimism.id,
         externalLink: "https://optimism.cartesiscan.io",
     },
+    {
+        Icon: BaseCircleColorful,
+        text: base.name,
+        chainId: base.id,
+        externalLink: "https://base.cartesiscan.io",
+    },
 ];
 
 const testnets: NetworkGroup[] = [
@@ -78,6 +89,13 @@ const testnets: NetworkGroup[] = [
         text: optimismSepolia.name,
         chainId: optimismSepolia.id,
         externalLink: "https://optimism-sepolia.cartesiscan.io",
+    },
+
+    {
+        Icon: BaseCircleColorful,
+        text: baseSepolia.name,
+        chainId: baseSepolia.id,
+        externalLink: "https://base-sepolia.cartesiscan.io",
     },
 ];
 

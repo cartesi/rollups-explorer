@@ -17,6 +17,8 @@ import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
 import {
+    base,
+    baseSepolia,
     foundry,
     mainnet,
     optimism,
@@ -28,9 +30,15 @@ import {
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const chain =
-    [foundry, mainnet, sepolia, optimism, optimismSepolia].find(
-        (c) => c.id == chainId,
-    ) || foundry;
+    [
+        foundry,
+        mainnet,
+        sepolia,
+        optimism,
+        optimismSepolia,
+        base,
+        baseSepolia,
+    ].find((c) => c.id == chainId) || foundry;
 
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
 
@@ -76,6 +84,8 @@ const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
 const [defaultOptimismRpcUrl] = optimism.rpcUrls.default.http;
 const [defaultOptimismSepoliaRpcUrl] = optimismSepolia.rpcUrls.default.http;
+const [defaultBaseRpcUrl] = base.rpcUrls.default.http;
+const [defaultBaseSepoliaRpcUrl] = baseSepolia.rpcUrls.default.http;
 
 const wagmiConfig = createConfig({
     ssr: true,
@@ -107,6 +117,22 @@ const wagmiConfig = createConfig({
                   http(defaultOptimismSepoliaRpcUrl),
               ])
             : http(defaultOptimismSepoliaRpcUrl),
+        [base.id]: alchemyApiKey
+            ? fallback([
+                  http(
+                      `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  ),
+                  http(defaultBaseRpcUrl),
+              ])
+            : http(defaultBaseRpcUrl),
+        [baseSepolia.id]: alchemyApiKey
+            ? fallback([
+                  http(
+                      `https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
+                  ),
+                  http(defaultBaseSepoliaRpcUrl),
+              ])
+            : http(defaultBaseSepoliaRpcUrl),
     },
 });
 
