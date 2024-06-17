@@ -6,6 +6,7 @@ export const initialState = {
     connections: [],
     showConnectionModal: false,
     connectionAddress: undefined,
+    fetching: false,
 } satisfies State;
 
 const sortByTimestampDesc = sort<Connection>(
@@ -39,7 +40,6 @@ export const connectionConfigReducer: Reducer = (state, action): State => {
                     action.payload.connection,
                 ]),
             };
-
         case "REMOVE_CONNECTION":
             return {
                 ...state,
@@ -49,6 +49,11 @@ export const connectionConfigReducer: Reducer = (state, action): State => {
                         state.connections,
                     ),
                 ),
+            };
+        case "SET_FETCHING":
+            return {
+                ...state,
+                fetching: action.payload,
             };
         default:
             return state;

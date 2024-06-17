@@ -115,6 +115,7 @@ const getConnections: (state: State) => Connection[] = pipe(
 
 const useConnectionConfig = () => {
     const connections = useSelector(getConnections);
+    const fetching = useSelector((state) => state.fetching);
     const {
         addConnection,
         removeConnection,
@@ -134,6 +135,7 @@ const useConnectionConfig = () => {
         removeConnection,
         hideConnectionModal,
         showConnectionModal,
+        fetching,
     };
 };
 

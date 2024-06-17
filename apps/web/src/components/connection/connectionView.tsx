@@ -14,7 +14,8 @@ import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionInfo from "./connectionInfo";
 
 const ConnectionView = () => {
-    const { listConnections, showConnectionModal } = useConnectionConfig();
+    const { listConnections, showConnectionModal, fetching } =
+        useConnectionConfig();
     const theme = useMantineTheme();
     const connections = listConnections();
     const hasConnections = connections.length > 0;
@@ -58,7 +59,9 @@ const ConnectionView = () => {
                 </Grid>
             ) : (
                 <Text c="dimmed" py="sm" ta="center">
-                    No connections found.
+                    {fetching
+                        ? "Fetching connections..."
+                        : "No connections found."}
                 </Text>
             )}
         </>

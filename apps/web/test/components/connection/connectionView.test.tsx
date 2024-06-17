@@ -22,6 +22,26 @@ describe("Connection view component", () => {
         cleanup();
     });
 
+    it("should display loading state when fetching connections", () => {
+        useConnectionConfigMock.mockReturnValue({
+            ...useConnectionConfigReturnStub,
+            fetching: true,
+        });
+        render(<View />);
+        expect(screen.getByText("Fetching connections...")).toBeInTheDocument();
+    });
+
+    it("should not display loading state when not fetching connections", () => {
+        useConnectionConfigMock.mockReturnValue({
+            ...useConnectionConfigReturnStub,
+            fetching: false,
+        });
+        render(<View />);
+        expect(() => screen.getByText("Fetching connections...")).toThrow(
+            "Unable to find an element",
+        );
+    });
+
     it("should display default state without connections", () => {
         render(<View />);
 

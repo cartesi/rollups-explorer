@@ -4,9 +4,9 @@ import React, { FC, useEffect, useReducer } from "react";
 import AppConnectionForm from "../../components/connection/connectionForm";
 import { ConnectionConfigContext } from "./connectionConfigContext";
 import { useConnectionConfig, useConnectionConfigActions } from "./hooks";
-import localRepository from "./localRepository";
 import { connectionConfigReducer, initialState } from "./reducer";
 import { ConnectionConfigProviderProps } from "./types";
+import localRepository from "./localRepository";
 
 const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
     children,
@@ -21,6 +21,10 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
     const closeModal = () => dispatch({ type: "HIDE_CONNECTION_MODAL" });
 
     useEffect(() => {
+        dispatch({
+            type: "SET_FETCHING",
+            payload: true,
+        });
         repository
             .list()
             .then((connections) =>
@@ -29,8 +33,14 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
                     payload: connections,
                 }),
             )
-            .catch((reason) =>
-                console.error(`Error trying to fetch connections: ${reason}`),
+            .catch((err) =>
+                console.error(`Error trying to fetch connections: ${err}`),
+            )
+            .finally(() =>
+                dispatch({
+                    type: "SET_FETCHING",
+                    payload: false,
+                }),
             );
     }, [repository]);
 
@@ -41,6 +51,7 @@ const ConnectionConfigProvider: FC<ConnectionConfigProviderProps> = ({
                 opened={state.showConnectionModal}
                 onClose={closeModal}
                 title="Create App Connection"
+                closeOnClickOutside={false}
             >
                 <AppConnectionForm
                     onSubmitted={closeModal}

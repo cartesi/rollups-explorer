@@ -2,8 +2,8 @@
 import { hasPath, omit, path, pathOr, values } from "ramda";
 import { Config, Connection, Repository } from "./types";
 
-const networkId = process.env.NEXT_PUBLIC_CHAIN_ID || "31337";
-const namespace = `cartesiscan:conn` as const;
+export const networkId = process.env.NEXT_PUBLIC_CHAIN_ID || "31337";
+export const namespace = `cartesiscan:conn` as const;
 const deserialize = <T>(jsonString: string) => JSON.parse(jsonString) as T;
 const serialize = (cfg: Config) => JSON.stringify(cfg);
 

@@ -7499,6 +7499,11 @@ devlop@^1.0.0, devlop@^1.1.0:
   dependencies:
     dequal "^2.0.0"
 
+dexie@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-4.0.4.tgz#a4c0bd27fe3a5aee9fcb8e4c9adeb08b4a624378"
+  integrity sha512-wFzwWSUdi+MC3jiFeQcCp9nInR7EaX8edzYY+4wmiITkQAiSnHpe4Wo2o5Ce5tJZe2nqt7mLW91MsW4GYx3ziQ==
+
 diff-sequences@^29.4.3, diff-sequences@^29.6.3:
   version "29.6.3"
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-29.6.3.tgz#4deaf894d11407c51efc8418012f9e70b84ea921"

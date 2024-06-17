@@ -28,6 +28,11 @@ export type SetConnections = {
     payload: Connection[];
 };
 
+export type SetFetching = {
+    type: "SET_FETCHING";
+    payload: boolean;
+};
+
 export type AddConnection = {
     type: "ADD_CONNECTION";
     payload: { connection: Connection };
@@ -54,16 +59,18 @@ export interface State {
     connections: Connection[];
     /** controls visibility of the modal */
     showConnectionModal: boolean;
-    /** work in conjuction with the creation modal.
+    /** work in conjunction with the creation modal.
      * When available it should pre-fill the form.*/
     connectionAddress?: Address;
+    fetching: boolean;
 }
 export type Action =
     | SetConnections
     | AddConnection
     | RemoveConnection
     | ShowConnectionModal
-    | HideConnectionModal;
+    | HideConnectionModal
+    | SetFetching;
 
 export type ContextProps = {
     state: State;

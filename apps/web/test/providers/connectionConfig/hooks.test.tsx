@@ -31,6 +31,7 @@ describe("Connection config hooks", () => {
         const propNames = Object.keys(result.current).sort();
         expect(propNames).toEqual([
             "addConnection",
+            "fetching",
             "getConnection",
             "hasConnection",
             "hideConnectionModal",

@@ -19,6 +19,7 @@ describe("Connection info component", () => {
             hideConnectionModal: vi.fn(),
             listConnections: vi.fn(),
             showConnectionModal: vi.fn(),
+            fetching: false,
         });
     });
     afterEach(() => {
