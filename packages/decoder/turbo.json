@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
+    "dev": {
+      "dotEnv": [
+        ".env"
+      ]
+    },
+    "build": {
+      "dotEnv": [
+        ".env"
+      ]
+    }
+  }
+}

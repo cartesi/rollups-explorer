@@ -1,6 +1,7 @@
 .turbo
 .next
 .idea
+.env
 dist
 node_modules
 storybook-static

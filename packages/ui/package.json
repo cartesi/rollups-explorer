@@ -25,10 +25,12 @@
         "test:ci": "vitest run --coverage"
     },
     "dependencies": {
+        "@cartesi/decoder": "*",
         "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.7.1",
         "@mantine/hooks": "^7.7.1",
         "@mantine/form": "^7.7.1",
+        "@shazow/whatsabi": "0.11.0",
         "@react-spring/web": "^9.7.3",
         "ramda": "^0.29.0",
         "react-icons": "^4",

@@ -11,8 +11,8 @@ import {
     InputDetailsQuery,
     InputDetailsQueryVariables,
 } from "../../graphql/rollups/operations";
-import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Voucher } from "../../graphql/rollups/types";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import VoucherExecution from "./voucherExecution";
 
 interface ApplicationInputDataProps {
@@ -197,7 +197,14 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showVouchers && (
                     <InputDetails.VoucherContent
-                        content={payloadOrString(vouchers)}
+                        content={{
+                            destination: pathOr(
+                                "",
+                                ["edges", 0, "node", "destination"],
+                                vouchers,
+                            ) as `0x${string}`,
+                            payload: payloadOrString(vouchers) as `0x${string}`,
+                        }}
                         contentType="raw"
                         onConnect={() => showConnectionModal(appId)}
                         isLoading={result.fetching}

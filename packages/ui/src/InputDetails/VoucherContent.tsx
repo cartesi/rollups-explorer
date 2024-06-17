@@ -11,7 +11,6 @@ const DISPLAY_NAME = "VoucherContent" as const;
 const VoucherContent: FC<VoucherContentType> = (props) => {
     const { children = null, ...restProps } = props;
     PageableContent.displayName = DISPLAY_NAME;
-
     return (
         <div>
             <PageableContent {...(restProps as PageableContentProps)} />

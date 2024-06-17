@@ -7,11 +7,15 @@
         "NEXT_PUBLIC_EXPLORER_API_URL",
         "NEXT_PUBLIC_ALCHEMY_API_KEY",
         "CI",
-        "E2E_BASE_URL"
+        "E2E_BASE_URL",
+        "NEXT_PUBLIC_WHATSABI_PROVIDER_CHAIN"
     ],
     "pipeline": {
         "build": {
-            "dependsOn": ["^build", "codegen"],
+            "dependsOn": [
+                "^build",
+                "codegen"
+            ],
             "outputs": [
                 ".next/**",
                 "!.next/cache/**",
@@ -23,16 +27,23 @@
             "cache": false
         },
         "codegen": {
-            "outputs": ["src/graphql/**", "src/contracts.ts"]
+            "outputs": [
+                "src/graphql/**",
+                "src/contracts.ts"
+            ]
         },
         "dev": {
-            "dependsOn": ["codegen"],
+            "dependsOn": [
+                "codegen"
+            ],
             "cache": false,
             "persistent": true
         },
         "lint": {},
         "test": {
-            "dependsOn": ["build"],
+            "dependsOn": [
+                "build"
+            ],
             "inputs": [
                 "src/**/*.ts",
                 "src/**/*.tsx",
@@ -41,8 +52,12 @@
             ]
         },
         "test:ci": {
-            "dependsOn": ["build"],
-            "outputs": ["coverage/**"],
+            "dependsOn": [
+                "build"
+            ],
+            "outputs": [
+                "coverage/**"
+            ],
             "inputs": [
                 "src/**/*.ts",
                 "src/**/*.tsx",
