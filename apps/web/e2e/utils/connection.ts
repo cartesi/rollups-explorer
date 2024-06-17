@@ -24,11 +24,9 @@ export const createConnection = async (
     await page.keyboard.type(url);
 
     // Wait for the success notification to appear (this notification verifies that the url is valid)
-    await expect(page.getByText("This application responded with")).toBeVisible(
-        {
-            timeout: 30000,
-        },
-    );
+    await expect(
+        page.getByText("This application responded with"),
+    ).toBeVisible();
 
     // Submit the form
     await page.keyboard.press("Enter");
@@ -36,7 +34,5 @@ export const createConnection = async (
     // Wait for the success alert to appear
     await expect(
         page.getByText(`Connection ${address} created with success`),
-    ).toBeVisible({
-        timeout: 30000,
-    });
+    ).toBeVisible();
 };
