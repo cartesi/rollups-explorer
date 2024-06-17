@@ -152,6 +152,10 @@ const getIconByChainId = cond([
         (id: number) => includes(id, [optimism.id, optimismSepolia.id]),
         () => OptimismCircleColorful,
     ],
+    [
+        (id: number) => includes(id, [base.id, baseSepolia.id]),
+        () => BaseCircleColorful,
+    ],
     [T, () => HardhatColorful],
 ]);
 
