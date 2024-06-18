@@ -248,7 +248,7 @@ describe("ERC-1155 Batch Deposit", () => {
             screen.getByText("Amount of tokens to deposit"),
         ).toBeInTheDocument();
 
-        expect(screen.getByText("ADD TO DEPOSIT LIST")).toBeVisible();
+        expect(await screen.findByText("ADD TO DEPOSIT LIST")).toBeVisible();
     });
 
     it("should display Base and Execution layer data fields after clicking the advanced button", async () => {
