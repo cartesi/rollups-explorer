@@ -2,6 +2,7 @@
 
 import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
 import { T, cond, equals, pipe, propOr } from "ramda";
+import { useEffect, useRef } from "react";
 import { Hex, hexToString } from "viem";
 
 export interface ContentProps {
@@ -43,14 +44,27 @@ export const DisplayContent = cond<
 >([
     [
         pipe(propOr("", "type"), equals("json")),
-        ({ content }) => (
-            <JsonInput
-                rows={10}
-                value={hexToString(content as Hex)}
-                readOnly
-                placeholder="No content defined"
-            />
-        ),
+        ({ content }) => {
+            const value = hexToString(content as Hex);
+            const ref = useRef<HTMLTextAreaElement>(null);
+
+            useEffect(() => {
+                if (ref.current !== null) {
+                    ref.current.blur();
+                }
+            }, [value]);
+
+            return (
+                <JsonInput
+                    autoFocus
+                    ref={ref}
+                    rows={10}
+                    defaultValue={value}
+                    placeholder="No content defined"
+                    formatOnBlur
+                />
+            );
+        },
     ],
     [
         pipe(propOr("", "type"), equals("text")),
