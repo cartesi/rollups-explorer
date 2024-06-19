@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const BASE_URL = process.env.CI
-    ? "https://sepolia.cartesiscan.io/"
+    ? process.env.VERCEL_URL ?? "https://sepolia.cartesiscan.io/"
     : process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
 /**
