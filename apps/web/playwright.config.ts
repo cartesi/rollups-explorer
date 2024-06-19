@@ -4,6 +4,8 @@ const BASE_URL = process.env.CI
     ? process.env.VERCEL_URL ?? "https://sepolia.cartesiscan.io/"
     : process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
+console.log("env::", JSON.stringify(process.env, null, 4));
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
