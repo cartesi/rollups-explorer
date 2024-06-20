@@ -23,9 +23,11 @@ export default defineConfig({
         baseURL: BASE_URL,
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: "on-first-retry",
-        extraHTTPHeaders: {
-            "x-vercel-protection-bypass": vercelBypassToken,
-        },
+        extraHTTPHeaders: process.env.CI
+            ? {
+                  "x-vercel-protection-bypass": vercelBypassToken,
+              }
+            : undefined,
     },
 
     /* Configure projects for major browsers */
