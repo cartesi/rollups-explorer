@@ -6,10 +6,6 @@ jobs:
     if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
     runs-on: ubuntu-latest
     steps:
-      - name: Echo vars
-        shell: bash
-        run: echo "${{ github.event.deployment_status.environment_url }}"
-
       - name: Check out code
         uses: actions/checkout@v4
 
@@ -28,4 +24,4 @@ jobs:
       - name: Run e2e tests
         run: yarn test:e2e
         env:
-          VERCEL_URL: ${{ github.event.deployment_status.environment_url }}
+          E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}

@@ -1,8 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const BASE_URL = process.env.CI
-    ? process.env.VERCEL_URL ?? "https://sepolia.cartesiscan.io/"
-    : process.env.E2E_BASE_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 
 console.log("env::", JSON.stringify(process.env, null, 4));
 
@@ -36,17 +34,19 @@ export default defineConfig({
             grepInvert: /mobile/,
             use: { ...devices[""] },
         },
-        /* Run your tests on multiple browsers */
+
         {
             name: "firefox",
             grepInvert: /mobile/,
             use: { ...devices["Desktop Firefox"] },
         },
+
         {
             name: "webkit",
             grepInvert: /mobile/,
             use: { ...devices["Desktop Safari"] },
         },
+
         {
             name: "Mobile Safari",
             grep: /mobile/,

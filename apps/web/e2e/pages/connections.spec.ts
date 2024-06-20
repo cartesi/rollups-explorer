@@ -39,7 +39,6 @@ test("should be able to remove a connection", async ({ page }) => {
     await expect(page.getByText("No connections found.")).toBeVisible();
 });
 
-// TODO: This test is failing in CI, so let's comment it out until we implement the e2e step as part of the build and then we'll revisit it
 test("should display correct list with connections", async ({ page }) => {
     await createConnection(page, "0x60a7048c3136293071605a4eaffef49923e981cc");
     await createConnection(page, "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c");

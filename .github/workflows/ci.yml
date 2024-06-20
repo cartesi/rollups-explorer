@@ -18,7 +18,7 @@ jobs:
                   node-version: latest
                   cache: "yarn"
 
-            - name: Install dependencies
+            - name: Install Dependencies
               run: yarn install --frozen-lockfile
 
             - name: Code format check
@@ -27,7 +27,7 @@ jobs:
             - name: Linting
               run: yarn lint
 
-            - name: Run unit tests
+            - name: Run Tests
               run: yarn test:ci
 
             - name: Merge coveralls reports
