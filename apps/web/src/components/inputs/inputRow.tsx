@@ -105,6 +105,7 @@ const InputRow: FC<InputRowProps> = ({
                             alignItems: "center",
                             justifyContent: "center",
                         }}
+                        data-testid="application-inputs-link"
                     >
                         <Address
                             value={to}

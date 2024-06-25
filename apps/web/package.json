@@ -53,6 +53,7 @@
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
         "@graphql-codegen/import-types-preset": "^3.0.0",
+        "@graphql-codegen/named-operations-object": "^3.0.0",
         "@graphql-codegen/typed-document-node": "^5",
         "@graphql-codegen/typescript": "^4",
         "@graphql-codegen/typescript-operations": "^4",

@@ -47,12 +47,20 @@ const generateConfig = (configs: CommonConfig[]): Generates => {
                     schema,
                     documents,
                     preset: "import-types",
-                    plugins: ["typescript-operations", "typescript-urql"],
+                    plugins: [
+                        "typescript-operations",
+                        "typescript-urql",
+                        "named-operations-object",
+                    ],
                     presetConfig: {
                         typesPath: `.${sep}types`,
                     },
                     config: {
                         withHooks: false,
+                        // named-operations-object plugin configs
+                        enumAsTypes: true,
+                        useConsts: true,
+                        identifierName: "allOperations",
                     },
                 },
                 [join(path, "hooks", "queries.tsx")]: {
