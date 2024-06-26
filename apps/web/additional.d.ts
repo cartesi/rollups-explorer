@@ -28,5 +28,11 @@ declare namespace NodeJS {
          * Default used in its absence is http://localhost:3000
          */
         E2E_BASE_URL?: string;
+
+        /**
+         * The Protection Bypass secret for Automation feature lets you bypass Vercel Deployment Protection
+         * for automated tooling (e.g. E2E testing).
+         */
+        VERCEL_AUTOMATION_BYPASS_SECRET?: string;
     }
 }

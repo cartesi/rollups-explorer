@@ -1,7 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
-const vercelBypassToken = "yp2zrWen9t8mqNoUDCB1QQaEZgi3flKs";
+const vercelBypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+const extraHTTPHeaders = vercelBypassToken
+    ? { "x-vercel-protection-bypass": vercelBypassToken }
+    : undefined;
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -23,11 +26,7 @@ export default defineConfig({
         baseURL: BASE_URL,
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: "on-first-retry",
-        extraHTTPHeaders: process.env.CI
-            ? {
-                  "x-vercel-protection-bypass": vercelBypassToken,
-              }
-            : undefined,
+        extraHTTPHeaders,
     },
 
     /* Configure projects for major browsers */
