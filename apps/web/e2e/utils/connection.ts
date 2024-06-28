@@ -4,7 +4,7 @@ import { Address } from "viem";
 export const createConnection = async (
     page: Page,
     address: Address,
-    url = "http://rollups-mocked.calls.to/graphql",
+    url = "https://rollups-mocked.calls.to/graphql",
 ) => {
     // Find and click the button for displaying the connection modal
     const button = page.getByTestId("add-connection");
