@@ -83,7 +83,6 @@ query inputDetails (
   }
 }
 
-
 query checkStatus {
   inputs {
     totalCount
@@ -96,5 +95,11 @@ query checkStatus {
   }
   notices {
     totalCount
+  }
+}
+
+query inputStatus($index: Int!) {
+  input(index: $index) {
+    status
   }
 }

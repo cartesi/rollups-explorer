@@ -1,14 +1,18 @@
 "use client";
 import {
+    ActionIcon,
     Button,
+    Flex,
     Loader,
     Table,
     Text,
+    Tooltip,
     Transition,
     useMantineColorScheme,
     useMantineTheme,
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
+import { TbQuestionMark } from "react-icons/tb";
 import type { InputItemFragment } from "../../graphql/explorer/operations";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
@@ -47,6 +51,18 @@ const InputsTable: FC<InputsTableProps> = ({
                         <Table.Th>To</Table.Th>
                         <Table.Th>Method</Table.Th>
                         <Table.Th>Index</Table.Th>
+                        <Table.Th>
+                            <Tooltip label="Check the status by adding a connection. Click the ? in the row to add a connection.">
+                                <Flex align="center">
+                                    <Text size="sm" fw={600}>
+                                        Status
+                                    </Text>
+                                    <ActionIcon size="xs" radius={50} ml={4}>
+                                        <TbQuestionMark />
+                                    </ActionIcon>
+                                </Flex>
+                            </Tooltip>
+                        </Table.Th>
                         <Table.Th>
                             <Button
                                 variant="transparent"

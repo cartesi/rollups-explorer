@@ -1,9 +1,18 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, it } from "vitest";
 import InputsTable, {
     InputsTableProps,
 } from "../../../src/components/inputs/inputsTable";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+import React from "react";
+import { useQuery } from "urql";
+
+vi.mock("../../../src/providers/connectionConfig/hooks");
+const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
+
+vi.mock("urql");
+const useQueryMock = vi.mocked(useQuery, true);
 
 const Component = withMantineTheme(InputsTable);
 
@@ -35,6 +44,25 @@ const IntersectionObserverMock = vi.fn(() => ({
 
 vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
 describe("InputsTable component", () => {
+    beforeEach(() => {
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => vi.fn(),
+            hasConnection: () => vi.fn(),
+            showConnectionModal: () => vi.fn(),
+        } as any);
+
+        useQueryMock.mockReturnValue([
+            {
+                fetching: false,
+                data: {
+                    input: {
+                        status: "ACTIVE",
+                    },
+                },
+            },
+        ] as any);
+    });
+
     it("should display time column with age label", () => {
         render(<Component {...defaultProps} />);
         expect(screen.getByText("Age")).toBeInTheDocument();
@@ -57,5 +85,21 @@ describe("InputsTable component", () => {
     it("should display correct label when no inputs are fetched", () => {
         render(<Component inputs={[]} fetching={false} totalCount={0} />);
         expect(screen.getByText("No inputs")).toBeInTheDocument();
+    });
+
+    it("should display correct status head column", async () => {
+        render(<Component {...defaultProps} />);
+
+        const statusCol = screen.getByText("Status");
+        expect(statusCol).toBeInTheDocument();
+
+        fireEvent.mouseEnter(statusCol.parentNode as HTMLDivElement);
+        await waitFor(() =>
+            expect(
+                screen.getByText(
+                    "Check the status by adding a connection. Click the ? in the row to add a connection.",
+                ),
+            ).toBeInTheDocument(),
+        );
     });
 });

@@ -58,7 +58,9 @@ test.describe("Navigations", () => {
 
         // Verify that table with correct columns is visible
         await expect(
-            page.getByRole("row", { name: "From To Method Index Age Data" }),
+            page.getByRole("row", {
+                name: "From To Method Index Status Age Data",
+            }),
         ).toBeVisible();
 
         // Verify table rows' count. For each input row it actually inserts 3 <tr>
@@ -152,7 +154,7 @@ test.describe("Navigations", () => {
             // Verify that table with correct columns is visible
             await expect(
                 page.getByRole("row", {
-                    name: "From To Method Index Age Data",
+                    name: "From To Method Index Status Age Data",
                 }),
             ).toBeVisible();
 
