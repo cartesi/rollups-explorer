@@ -21,7 +21,6 @@ const ConnectionInputStatusBadge: FC<ConnectionInputStatusBadgeProps> = ({
         context: useMemo(
             () => ({
                 url: graphqlUrl,
-                requestPolicy: "network-only",
             }),
             [graphqlUrl],
         ),
