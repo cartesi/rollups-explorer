@@ -14,7 +14,9 @@
         "test:ui": "vitest --ui",
         "test:ci": "vitest run --coverage",
         "test:e2e": "playwright test",
-        "test:e2e:ui": "playwright test --ui"
+        "test:e2e:ui": "playwright test --ui",
+        "test:pw": "playwright test e2e/transactions/depositEther.spec.ts",
+        "test:e2e:pw": "start-server-and-test 'yarn start' http://localhost:300 'yarn test:pw'"
     },
     "dependencies": {
         "@cartesi/rollups-explorer-ui": "*",
@@ -65,6 +67,7 @@
         "@graphql-typed-document-node/core": "^3",
         "@playwright/test": "^1.43.1",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
+        "@synthetixio/synpress": "^3.7.3",
         "@testing-library/jest-dom": "^6.5.0",
         "@testing-library/react": "^16.0.0",
         "@types/node": "^20",
