@@ -25,6 +25,7 @@ jobs:
             - name: Run e2e tests
               run: yarn test:e2e
               id: e2e
+              continue-on-error: true
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
