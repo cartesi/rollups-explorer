@@ -28,6 +28,6 @@ jobs:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
             - name: Update check status to the outcome
-              run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.test.outcome }}
+              run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
