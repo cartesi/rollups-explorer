@@ -27,6 +27,7 @@ jobs:
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
 
-            - name: Cancelling parallel jobs
-              if: failure()
-              uses: andymckay/cancel-action@0.2
+            - name: Update check status to the outcome
+              run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.test.outcome }}
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
