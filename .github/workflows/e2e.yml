@@ -27,3 +27,7 @@ jobs:
               continue-on-error: false
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+                  
+            - name: Cancelling parallel jobs
+              if: failure()
+              uses: andymckay/cancel-action@0.2
