@@ -6,6 +6,7 @@ jobs:
         if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
         timeout-minutes: 30
         runs-on: ubuntu-latest
+        continue-on-error: false
         steps:
             - name: Check out code
               uses: actions/checkout@v4
