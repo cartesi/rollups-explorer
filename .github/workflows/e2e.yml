@@ -24,10 +24,9 @@ jobs:
 
             - name: Run e2e tests
               run: yarn test:e2e
-              continue-on-error: false
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
-                  
+
             - name: Cancelling parallel jobs
               if: failure()
               uses: andymckay/cancel-action@0.2
