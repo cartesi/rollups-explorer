@@ -180,6 +180,44 @@ You can look up the signature here: https://openchain.xyz/signatures?query=0x24d
             });
         });
 
+        it("should return an error when slice target is wrongly set", () => {
+            const spec: Specification = {
+                mode: "abi_params",
+                name: "1155 Batch Portal Deposit",
+                abiParams: [
+                    "uint[] tokenIds, uint[] amount, bytes baseLayer, bytes execLayer",
+                ],
+                sliceInstructions: [
+                    {
+                        from: 0,
+                        to: 20,
+                        name: "tokenAddress",
+                    },
+                    {
+                        from: 20,
+                        to: 40,
+                        name: "from",
+                    },
+                    {
+                        from: 40,
+                        name: "data",
+                    },
+                ],
+                sliceTarget: "from",
+            };
+
+            const envelope = decodePayload(spec, batchPayload);
+
+            expect(envelope.error).toBeDefined();
+            expect(envelope.error?.message).toEqual(
+                `Data size of 20 bytes is too small for given parameters.
+
+Params: (uint256[] tokenIds, uint256[] amount, bytes baseLayer, bytes execLayer)
+Data:   0xa074683b5be015f053b5dceb064c41fc9d11b6e5 (20 bytes)
+Slice name: "from" (Is it the right one?)`,
+            );
+        });
+
         describe("Struct definition example cases", () => {
             it("should support setting a separate struct definition to decode abi-encoded data", () => {
                 const spec: Specification = {

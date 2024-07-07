@@ -1,4 +1,14 @@
-import { T, cond, head, includes, pathEq, pathOr, pipe } from "ramda";
+import {
+    T,
+    cond,
+    head,
+    includes,
+    isEmpty,
+    isNil,
+    pathEq,
+    pathOr,
+    pipe,
+} from "ramda";
 import {
     AbiFunction,
     AbiFunctionSignatureNotFoundError,
@@ -52,14 +62,14 @@ const getPieces = (
 };
 
 const addPiecesToEnvelope = (e: Envelope): Envelope => {
-    if (e.spec.mode === "abi_params") {
+    if (!e.error && e.spec.mode === "abi_params") {
         try {
             if (e.spec.sliceInstructions?.length) {
                 e.spec.sliceInstructions.forEach((instruction, index) => {
                     const { from, to, name, type } = instruction;
                     const part = slice(e.input, from, to);
                     const decodedPart =
-                        type !== undefined
+                        !isNil(type) && !isEmpty(type)
                             ? head(decodeAbiParameters([{ type, name }], part))
                             : part;
 
@@ -84,20 +94,27 @@ const addPiecesToEnvelope = (e: Envelope): Envelope => {
 };
 
 const decodeTargetSliceAndAddToPieces = (e: Envelope): Envelope => {
-    if (e.spec.mode === "abi_params") {
+    if (!e.error && e.spec.mode === "abi_params") {
         const targetName = e.spec.sliceTarget;
         const piece = e.pieces.find((piece) => piece.name === targetName);
 
-        if (piece && piece.part) {
-            const pieces = getPieces(e.spec.abiParams, piece.part);
-            e.pieces.push(...pieces);
+        try {
+            if (piece && piece.part) {
+                const pieces = getPieces(e.spec.abiParams, piece.part);
+                e.pieces.push(...pieces);
+            }
+        } catch (error: any) {
+            const message = pathOr(error.message, ["shortMessage"], error);
+            const errorMeta = pathOr([], ["metaMessages"], error).join("\n");
+            const extra = `Slice name: "${targetName}" (Is it the right one?)`;
+            e.error = new Error(`${message}\n\n${errorMeta}\n${extra}`);
         }
     }
     return e;
 };
 
 const prepareResultFromPieces = (e: Envelope): Envelope => {
-    if (e.spec.mode === "abi_params") {
+    if (!e.error && e.spec.mode === "abi_params") {
         const sliceTarget = e.spec.sliceTarget;
         e.result = e.pieces.reduce((prev, { name, decodedPart }, index) => {
             /**
