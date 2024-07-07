@@ -10,9 +10,11 @@ import {
     pipe,
 } from "ramda";
 import {
+    AbiDecodingDataSizeTooSmallError,
     AbiFunction,
     AbiFunctionSignatureNotFoundError,
     Hex,
+    InvalidAbiParametersError,
     decodeAbiParameters,
     decodeFunctionData,
     parseAbiParameters,
@@ -105,9 +107,26 @@ const decodeTargetSliceAndAddToPieces = (e: Envelope): Envelope => {
             }
         } catch (error: any) {
             const message = pathOr(error.message, ["shortMessage"], error);
-            const errorMeta = pathOr([], ["metaMessages"], error).join("\n");
-            const extra = `Slice name: "${targetName}" (Is it the right one?)`;
-            e.error = new Error(`${message}\n\n${errorMeta}\n${extra}`);
+            let errorMeta;
+            let extra;
+
+            if (error instanceof AbiDecodingDataSizeTooSmallError) {
+                errorMeta = pathOr([], ["metaMessages"], error).join("\n");
+                extra = `Slice name: "${targetName}" (Is it the right one?)`;
+            }
+
+            if (error instanceof InvalidAbiParametersError) {
+                errorMeta = `ABI Parameters : [ ${e.spec.abiParams.join(
+                    ",",
+                )} ]`;
+                extra = "Check the ABI parameters defined.";
+            }
+
+            const errorMessage = `${message}\n\n${errorMeta ?? ""}\n${
+                extra ?? ""
+            }`;
+
+            e.error = new Error(errorMessage);
         }
     }
     return e;
