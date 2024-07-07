@@ -24,7 +24,7 @@ export interface Predicate {
     conditions: Condition[];
 }
 
-interface SliceInstruction {
+export interface SliceInstruction {
     /** Start index of the hex or byte-array*/
     from: number;
     /** End index of the hex or byte-array. Undefined means getting from start onwards e.g. arbitrary data size.*/
