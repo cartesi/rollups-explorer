@@ -1,0 +1,237 @@
+import { erc1155Abi } from "@cartesi/rollups-wagmi";
+import {
+    Alert,
+    Anchor,
+    Card,
+    Code,
+    JsonInput,
+    SegmentedControl,
+    Stack,
+    Text,
+    TextInput,
+    Textarea,
+    Title,
+} from "@mantine/core";
+import { isNil } from "ramda";
+import { FC, ReactNode, useEffect, useRef } from "react";
+import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
+import { decodePayload } from "./decoder";
+import { SpecTransformedValues, useSpecFormContext } from "./formContext";
+import { ByteSlices } from "./forms/ByteSlices";
+import { Conditions } from "./forms/Conditions";
+import { HumanReadableABI } from "./forms/HumanReadableABI";
+import { Modes, Specification } from "./types";
+
+const JSON_ABI_EXAMPLE = `// Example: ERC-1155 ABI\n ${JSON.stringify(
+    erc1155Abi,
+    null,
+    " ",
+)}`;
+
+const modeInfo: Record<Modes, ReactNode> = {
+    json_abi: (
+        <Text>
+            For decoding ABI encoded data (4 byte selector & arguments). Just
+            copy/paste a full fledge ABI and as far as the encoded data has the
+            4 byte selector it will do the decoding.
+        </Text>
+    ),
+    abi_params: (
+        <Text>
+            The set of ABI parameters to decode against data, in the shape of
+            the inputs or outputs attribute of an ABI event/function. These
+            parameters must include valid{" "}
+            <Anchor href="https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#types">
+                ABI types. <TbExternalLink />
+            </Anchor>
+        </Text>
+    ),
+};
+
+const Info: FC<{ mode: Modes }> = ({ mode }) => {
+    return (
+        <Alert variant="light" color="blue" icon={<TbAlertCircle />}>
+            {modeInfo[mode]}
+        </Alert>
+    );
+};
+
+export const SpecificationForm = () => {
+    const form = useSpecFormContext();
+    const transformedValues = form.getTransformedValues();
+    const { mode } = transformedValues;
+
+    useEffect(() => {
+        mode === "json_abi"
+            ? form.setFieldValue("abiParamEntry", "")
+            : mode === "abi_params"
+            ? form.setFieldValue("abi", "")
+            : null;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mode]);
+
+    return (
+        <Card shadow="sm" withBorder>
+            <Stack>
+                <TextInput
+                    label="Name"
+                    description="Specification name for ease identification"
+                    placeholder="My Spec name"
+                    {...form.getInputProps("name")}
+                    onChange={(event) => {
+                        const entry = event.target.value;
+                        form.setFieldValue("name", entry);
+                    }}
+                />
+
+                <SegmentedControl
+                    aria-labelledby="specification-mode-label"
+                    aria-label="Specification Mode"
+                    data={[
+                        {
+                            label: "JSON ABI",
+                            value: "json_abi",
+                        },
+                        {
+                            label: "ABI Parameters",
+                            value: "abi_params",
+                        },
+                    ]}
+                    {...form.getInputProps("mode")}
+                    onChange={(value) => {
+                        const mode = value as Modes;
+                        const changes =
+                            mode === "json_abi"
+                                ? { mode, abiParamEntry: "" }
+                                : mode === "abi_params"
+                                ? { mode, abi: "" }
+                                : { mode };
+
+                        form.setValues(changes);
+                    }}
+                />
+                <Info mode={mode} />
+                {mode === "json_abi" ? (
+                    <Textarea
+                        resize="vertical"
+                        label="ABI"
+                        description="The ABI definition"
+                        placeholder={JSON_ABI_EXAMPLE}
+                        rows={5}
+                        {...form.getInputProps("abi")}
+                    />
+                ) : mode === "abi_params" ? (
+                    <Stack>
+                        <HumanReadableABI />
+                        <ByteSlices />
+                        <Conditions />
+                    </Stack>
+                ) : (
+                    <></>
+                )}
+            </Stack>
+        </Card>
+    );
+};
+const replacerForBigInt = (key: any, value: any) => {
+    return typeof value === "bigint" ? value.toString() : value;
+};
+
+const stringifyContent = (value: Record<string, any>): string => {
+    return JSON.stringify(value, replacerForBigInt);
+};
+
+const buildSpecification = (
+    values: SpecTransformedValues,
+): Specification | null => {
+    const {
+        mode,
+        name,
+        sliceInstructions,
+        abi,
+        abiParams,
+        conditionals,
+        sliceTarget,
+    } = values;
+    const version = 1;
+    const timestamp = Date.now();
+    const commons = { conditionals, timestamp, version, name };
+
+    if (mode === "abi_params") {
+        return {
+            ...commons,
+            mode,
+            abiParams,
+            sliceInstructions:
+                sliceInstructions.length > 0 ? sliceInstructions : undefined,
+            sliceTarget: sliceTarget,
+        } as Specification;
+    } else if (mode === "json_abi" && !isNil(abi)) {
+        return {
+            ...commons,
+            mode,
+            abi,
+        } as Specification;
+    }
+
+    return null;
+};
+
+export const DecodingPreview = () => {
+    const form = useSpecFormContext();
+    const ref = useRef<HTMLTextAreaElement>(null);
+    const values = form.getTransformedValues();
+    const { encodedData } = values;
+    const tempSpec = buildSpecification(values);
+    const envelope =
+        tempSpec && encodedData ? decodePayload(tempSpec, encodedData) : null;
+    const content = envelope?.result ? stringifyContent(envelope.result) : null;
+
+    console.log(tempSpec);
+
+    useEffect(() => {
+        if (content !== null) {
+            ref.current?.focus();
+            ref.current?.blur();
+        }
+    }, [content]);
+
+    return (
+        <Card shadow="sm" withBorder>
+            <Title order={3}>Preview</Title>
+            <Stack>
+                <Textarea
+                    resize="vertical"
+                    rows={5}
+                    label="Data"
+                    id="encoded-data-preview"
+                    description="Encoded data to test against specification"
+                    {...form.getInputProps("encodedData")}
+                />
+            </Stack>
+
+            <Stack gap="lg" my="lg">
+                {content && (
+                    <Code>
+                        <JsonInput
+                            key={content}
+                            ref={ref}
+                            defaultValue={`${content}`}
+                            variant="transparent"
+                            autosize
+                            formatOnBlur
+                        />
+                    </Code>
+                )}
+
+                {envelope?.error && (
+                    <Alert color="yellow" title="Keep changing your spec">
+                        <Text style={{ whiteSpace: "pre-line" }}>
+                            {envelope.error.message}
+                        </Text>
+                    </Alert>
+                )}
+            </Stack>
+        </Card>
+    );
+};
