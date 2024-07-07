@@ -20,6 +20,7 @@ import {
     TbAdjustmentsHorizontal,
     TbApps,
     TbArrowsDownUp,
+    TbFileCode,
     TbHome,
     TbInbox,
     TbMoonStars,
@@ -182,6 +183,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                             leftSection={<TbPlugConnected />}
                             href="/connections"
                             data-testid="connections-link"
+                        />
+                        <NavLink
+                            component={Link}
+                            onClick={closeMobileMenu}
+                            label="Specs"
+                            leftSection={<TbFileCode />}
+                            href="/specifications"
+                            data-testid="specifications-link"
                         />
                     </NavLink>
 
