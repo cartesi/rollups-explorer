@@ -1,19 +1,19 @@
 "use client";
 
-import {
-    Loader,
-    Table,
-    Text,
-    Transition,
-    useMantineColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
-import { FC, useRef } from "react";
+import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
+import { FC } from "react";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
-import { Application } from "../../graphql/explorer/types";
-import ApplicationRow from "./applicationRow";
-import { useElementVisibility } from "../../hooks/useElementVisibility";
-import TableResponsiveWrapper from "../tableResponsiveWrapper";
+import ResponsiveTable from "../responsiveTable";
+import { Address as AddressType } from "abitype/dist/types/abi";
+import Address from "../address";
+import {
+    TbInbox,
+    TbPlugConnected,
+    TbPlugConnectedX,
+    TbStack2,
+} from "react-icons/tb";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
+import Link from "next/link";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -21,81 +21,159 @@ export interface ApplicationsTableProps {
     totalCount: number;
 }
 
-const ApplicationsTable: FC<ApplicationsTableProps> = (props) => {
-    const { applications, fetching, totalCount } = props;
-    const tableRowRef = useRef<HTMLDivElement>(null);
-    const theme = useMantineTheme();
-    const { colorScheme } = useMantineColorScheme();
-    const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
+interface ColumnProps {
+    application: ApplicationItemFragment;
+}
+
+const ConnectionUrlColumn: FC<ColumnProps> = ({ application }) => {
+    const { getConnection } = useConnectionConfig();
+    const connection = getConnection(application.id as AddressType);
+    return (
+        <Box
+            display="flex"
+            w="max-content"
+            style={{
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            {connection?.url ?? "N/A"}
+        </Box>
+    );
+};
+
+const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
+    const { hasConnection, removeConnection, showConnectionModal } =
+        useConnectionConfig();
+    const appId = application.id as AddressType;
 
     return (
-        <TableResponsiveWrapper ref={tableRowRef}>
-            <Table
-                width={"100%"}
-                style={{ borderCollapse: "collapse" }}
-                data-testid="applications-table"
-            >
-                <Table.Thead>
-                    <Table.Tr>
-                        <Table.Th>Id</Table.Th>
-                        <Table.Th>Owner</Table.Th>
-                        <Table.Th>URL</Table.Th>
-                        <Table.Th ref={childrenRef}>Data</Table.Th>
-                        <Transition
-                            mounted={isVisible}
-                            transition="scale-x"
-                            duration={500}
-                            timingFunction="ease-out"
+        <Box
+            display="flex"
+            w="max-content"
+            style={{
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            <Group gap="xs">
+                <Tooltip label="Summary">
+                    <Link
+                        href={`/applications/${appId}`}
+                        data-testid="applications-summary-link"
+                    >
+                        <ActionIcon variant="default">
+                            <TbStack2 />
+                        </ActionIcon>
+                    </Link>
+                </Tooltip>
+                <Tooltip label="Inputs">
+                    <Link
+                        href={`/applications/${appId}/inputs`}
+                        data-testid="applications-link"
+                    >
+                        <ActionIcon variant="default">
+                            <TbInbox />
+                        </ActionIcon>
+                    </Link>
+                </Tooltip>
+                {hasConnection(appId) ? (
+                    <Tooltip label="Remove connection">
+                        <ActionIcon
+                            data-testid="remove-connection"
+                            variant="default"
+                            onClick={() => removeConnection(appId)}
                         >
-                            {(styles) => (
-                                <th
-                                    style={{
-                                        ...styles,
-                                        position: "sticky",
-                                        top: 0,
-                                        right: 0,
-                                        backgroundColor: bgColor,
-                                        padding:
-                                            "var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-lg))",
-                                    }}
-                                >
-                                    Data
-                                </th>
+                            <TbPlugConnectedX />
+                        </ActionIcon>
+                    </Tooltip>
+                ) : (
+                    <Tooltip label="Add a connection">
+                        <ActionIcon
+                            data-testid="add-connection"
+                            variant="default"
+                            onClick={() => showConnectionModal(appId)}
+                        >
+                            <TbPlugConnected />
+                        </ActionIcon>
+                    </Tooltip>
+                )}
+            </Group>
+        </Box>
+    );
+};
+
+const ApplicationsTable: FC<ApplicationsTableProps> = ({
+    applications,
+    fetching,
+    totalCount,
+}) => {
+    return (
+        <ResponsiveTable<ApplicationItemFragment>
+            items={applications}
+            fetching={fetching}
+            totalCount={totalCount}
+            columns={[
+                {
+                    key: "id",
+                    label: "Id",
+                    render: (application) => {
+                        const appId = application.id as AddressType;
+                        return (
+                            <Box
+                                display="flex"
+                                w="max-content"
+                                style={{
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Address value={appId} icon shorten />
+                            </Box>
+                        );
+                    },
+                },
+                {
+                    key: "owner",
+                    label: "Owner",
+                    render: (application) => (
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            {application.owner ? (
+                                <Address
+                                    value={application.owner as AddressType}
+                                    icon
+                                    shorten
+                                />
+                            ) : (
+                                "N/A"
                             )}
-                        </Transition>
-                    </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                    {fetching ? (
-                        <Table.Tr>
-                            <Table.Td align="center" colSpan={4}>
-                                <Loader data-testid="applications-spinner" />
-                            </Table.Td>
-                        </Table.Tr>
-                    ) : (
-                        totalCount === 0 && (
-                            <Table.Tr>
-                                <Table.Td colSpan={4} align="center">
-                                    <Text fw={700}>No applications</Text>
-                                </Table.Td>
-                            </Table.Tr>
-                        )
-                    )}
-                    {applications.map((application) => (
-                        <ApplicationRow
-                            key={application.id}
-                            application={
-                                application as Omit<Application, "inputs">
-                            }
-                            keepDataColVisible={!isVisible}
-                        />
-                    ))}
-                </Table.Tbody>
-            </Table>
-        </TableResponsiveWrapper>
+                        </Box>
+                    ),
+                },
+                {
+                    key: "url",
+                    label: "URL",
+                    render: (application) => (
+                        <ConnectionUrlColumn application={application} />
+                    ),
+                },
+                {
+                    key: "data",
+                    label: "Data",
+                    sticky: true,
+                    render: (application) => (
+                        <ApplicationDataColumn application={application} />
+                    ),
+                },
+            ]}
+        />
     );
 };
 
