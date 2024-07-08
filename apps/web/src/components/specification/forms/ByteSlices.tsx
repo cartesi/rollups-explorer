@@ -356,7 +356,7 @@ export const ByteSlices: FC = () => {
             </Group>
 
             {checked ? (
-                <Stack justify="stretch">
+                <Stack pl="sm">
                     <SliceInstructionFields />
                 </Stack>
             ) : (
