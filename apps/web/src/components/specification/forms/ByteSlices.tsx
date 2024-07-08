@@ -17,17 +17,8 @@ import {
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { AbiType } from "abitype";
-import {
-    any,
-    anyPass,
-    clone,
-    gt,
-    gte,
-    isEmpty,
-    isNil,
-    lt,
-    reject,
-} from "ramda";
+import { any, clone, gt, gte, isEmpty, isNil, lt, reject } from "ramda";
+import { isBlank, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, useEffect, useRef, useState } from "react";
 import {
     TbArrowsDiagonal,
@@ -123,8 +114,6 @@ const initialValues = {
     },
 };
 
-const isNilOrEmpty = anyPass([isNil, isEmpty]);
-
 const SliceInstructionFields: FC = () => {
     const [checked, { toggle: toggleTarget }] = useDisclosure(false);
     const [sliceTarget, setSliceTarget] = useState<string | null>(null);
@@ -137,7 +126,7 @@ const SliceInstructionFields: FC = () => {
         validate: {
             sliceInput: {
                 name: (value, values) => {
-                    if (isNilOrEmpty(value)) return "Name is required!";
+                    if (isBlank(value)) return "Name is required!";
 
                     if (
                         values.slices.length > 0 &&
@@ -152,7 +141,7 @@ const SliceInstructionFields: FC = () => {
                     if (isNilOrEmpty(value)) return "From is required!";
 
                     if (
-                        !isNilOrEmpty(values.sliceInput.to) &&
+                        isNotNilOrEmpty(values.sliceInput.to) &&
                         value > values.sliceInput.to
                     )
                         return "From can't be bigger than To value.";
@@ -162,11 +151,11 @@ const SliceInstructionFields: FC = () => {
                     if (
                         values.slices.length > 0 &&
                         any((slice) => {
-                            if (slice.to === undefined || slice.to === null) {
+                            if (isNilOrEmpty(slice.to)) {
                                 return gte(from, slice.from);
                             }
 
-                            return gt(from, slice.from) && lt(from, slice.to);
+                            return gt(from, slice.from) && lt(from, slice.to!);
                         }, values.slices)
                     ) {
                         return "Overlap with added entry! Check review.";

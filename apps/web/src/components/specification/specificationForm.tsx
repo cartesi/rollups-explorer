@@ -14,7 +14,8 @@ import {
 } from "@mantine/core";
 import { FC, ReactNode, useEffect } from "react";
 import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
-import { isNotNilOrEmpty } from "../../lib/functions";
+
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import { decodePayload } from "./decoder";
 import { SpecTransformedValues, useSpecFormContext } from "./formContext";
 import { ByteSlices } from "./forms/ByteSlices";
