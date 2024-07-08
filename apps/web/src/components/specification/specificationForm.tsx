@@ -12,9 +12,9 @@ import {
     Textarea,
     Title,
 } from "@mantine/core";
-import { isNil } from "ramda";
-import { FC, ReactNode, useEffect, useRef } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
+import { isNotNilOrEmpty } from "../../lib/functions";
 import { decodePayload } from "./decoder";
 import { SpecTransformedValues, useSpecFormContext } from "./formContext";
 import { ByteSlices } from "./forms/ByteSlices";
@@ -138,7 +138,7 @@ const replacerForBigInt = (key: any, value: any) => {
 };
 
 const stringifyContent = (value: Record<string, any>): string => {
-    return JSON.stringify(value, replacerForBigInt);
+    return JSON.stringify(value, replacerForBigInt, 2);
 };
 
 const buildSpecification = (
@@ -157,7 +157,10 @@ const buildSpecification = (
     const timestamp = Date.now();
     const commons = { conditionals, timestamp, version, name };
 
-    if (mode === "abi_params") {
+    if (
+        mode === "abi_params" &&
+        (isNotNilOrEmpty(abiParams) || isNotNilOrEmpty(sliceInstructions))
+    ) {
         return {
             ...commons,
             mode,
@@ -166,7 +169,7 @@ const buildSpecification = (
                 sliceInstructions.length > 0 ? sliceInstructions : undefined,
             sliceTarget: sliceTarget,
         } as Specification;
-    } else if (mode === "json_abi" && !isNil(abi)) {
+    } else if (mode === "json_abi" && isNotNilOrEmpty(abi)) {
         return {
             ...commons,
             mode,
@@ -179,7 +182,6 @@ const buildSpecification = (
 
 export const DecodingPreview = () => {
     const form = useSpecFormContext();
-    const ref = useRef<HTMLTextAreaElement>(null);
     const values = form.getTransformedValues();
     const { encodedData } = values;
     const tempSpec = buildSpecification(values);
@@ -187,19 +189,10 @@ export const DecodingPreview = () => {
         tempSpec && encodedData ? decodePayload(tempSpec, encodedData) : null;
     const content = envelope?.result ? stringifyContent(envelope.result) : null;
 
-    console.log(tempSpec);
-
-    useEffect(() => {
-        if (content !== null) {
-            ref.current?.focus();
-            ref.current?.blur();
-        }
-    }, [content]);
-
     return (
         <Card shadow="sm" withBorder>
             <Title order={3}>Preview</Title>
-            <Stack>
+            <Stack gap="lg">
                 <Textarea
                     resize="vertical"
                     rows={5}
@@ -208,24 +201,23 @@ export const DecodingPreview = () => {
                     description="Encoded data to test against specification"
                     {...form.getInputProps("encodedData")}
                 />
-            </Stack>
 
-            <Stack gap="lg" my="lg">
                 {content && (
                     <Code>
                         <JsonInput
-                            key={content}
-                            ref={ref}
-                            defaultValue={`${content}`}
+                            value={`${content}`}
                             variant="transparent"
                             autosize
-                            formatOnBlur
+                            readOnly
                         />
                     </Code>
                 )}
 
                 {envelope?.error && (
-                    <Alert color="yellow" title="Keep changing your spec">
+                    <Alert
+                        color="yellow"
+                        title="Keep changing your specification"
+                    >
                         <Text style={{ whiteSpace: "pre-line" }}>
                             {envelope.error.message}
                         </Text>
