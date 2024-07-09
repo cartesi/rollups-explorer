@@ -113,14 +113,17 @@ export const SpecificationForm = () => {
                 />
                 <Info mode={mode} />
                 {mode === "json_abi" ? (
-                    <Textarea
-                        resize="vertical"
-                        label="ABI"
-                        description="The ABI definition"
-                        placeholder={JSON_ABI_EXAMPLE}
-                        rows={5}
-                        {...form.getInputProps("abi")}
-                    />
+                    <Stack>
+                        <Textarea
+                            resize="vertical"
+                            label="ABI"
+                            description="The ABI definition"
+                            placeholder={JSON_ABI_EXAMPLE}
+                            rows={5}
+                            {...form.getInputProps("abi")}
+                        />
+                        <Conditions />
+                    </Stack>
                 ) : mode === "abi_params" ? (
                     <Stack>
                         <HumanReadableABI />
