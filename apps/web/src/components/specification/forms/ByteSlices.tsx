@@ -288,6 +288,7 @@ const SliceInstructionFields: FC = () => {
             {sliceNames && sliceNames.length > 0 ? (
                 <Group>
                     <Checkbox
+                        data-testid="apply-abi-on-slice-checkbox"
                         checked={checked}
                         onChange={() => {
                             toggleTarget();
@@ -302,6 +303,7 @@ const SliceInstructionFields: FC = () => {
                         label="Use ABI Parameter definition on"
                     />
                     <Select
+                        data-testid="pick-a-slice-select"
                         key={sliceNames.join(",")}
                         placeholder="Pick a slice"
                         data={sliceNames}
@@ -324,7 +326,8 @@ const SliceInstructionFields: FC = () => {
 };
 
 export const ByteSlices: FC = () => {
-    const [checked, { toggle }] = useDisclosure(false);
+    const [checked, setChecked] = useState(false);
+    const form = useSpecFormContext();
 
     return (
         <Stack>
@@ -339,7 +342,16 @@ export const ByteSlices: FC = () => {
                 </Stack>
                 <Switch
                     checked={checked}
-                    onClick={toggle}
+                    onClick={(evt) => {
+                        const val = evt.currentTarget.checked;
+                        setChecked(val);
+                        if (!val) {
+                            form.setValues({
+                                sliceTarget: undefined,
+                                sliceInstructions: [],
+                            });
+                        }
+                    }}
                     data-testid="add-byte-slice-switch"
                 />
             </Group>
