@@ -4,14 +4,20 @@ import { Abi } from "viem";
 export const JSON_ABI = "json_abi" as const;
 export const ABI_PARAMS = "abi_params" as const;
 export const specModes = [JSON_ABI, ABI_PARAMS] as const;
-export const operators = ["equals"] as const;
-export const logicalOperators = ["and", "or"] as const;
-export const inputProperties = ["application.id", "msgSender"] as const;
+export const operators = [{ value: "equals", label: "Equal" }] as const;
+export const logicalOperators = [
+    { value: "and", label: "AND" },
+    { value: "or", label: "OR" },
+] as const;
+export const inputProperties = [
+    { value: "application.id", label: "Application Address" },
+    { value: "msgSender", label: "Sender" },
+] as const;
 
 export type Modes = (typeof specModes)[number];
-export type Operator = (typeof operators)[number];
-export type ConditionalOperator = (typeof logicalOperators)[number];
-export type FieldPath = (typeof inputProperties)[number];
+export type Operator = (typeof operators)[number]["value"];
+export type ConditionalOperator = (typeof logicalOperators)[number]["value"];
+export type FieldPath = (typeof inputProperties)[number]["value"];
 
 export interface Condition {
     operator: Operator;
