@@ -22,7 +22,7 @@ interface ResponsiveTableProps<T> {
     columns: Column<T>[];
     items: T[];
     totalCount: number;
-    fetching: boolean;
+    fetching?: boolean;
     emptyLabel?: string;
 }
 
@@ -33,7 +33,7 @@ const ResponsiveTable = <T extends { id: string | number }>(
         columns,
         items,
         totalCount,
-        fetching,
+        fetching = false,
         emptyLabel = "No entries found",
     } = props;
     const tableRowRef = useRef<HTMLDivElement>(null);
