@@ -10,7 +10,7 @@ import {
 import { isEmpty, isNil } from "ramda";
 import { useState } from "react";
 import { TbLayoutColumns, TbLayoutList } from "react-icons/tb";
-import { Abi, Hex, isHex } from "viem";
+import { Hex, isHex } from "viem";
 import { SpecFormProvider, useSpecForm } from "./formContext";
 import { DecodingPreview, SpecificationForm } from "./specificationForm";
 
@@ -37,7 +37,7 @@ export const SpecificationView = () => {
             abiParams: [],
             abiParamEntry: "",
             encodedData: "",
-            abi: "",
+            abi: undefined,
             conditionals: [],
             sliceInstructions: [],
         },
@@ -46,11 +46,7 @@ export const SpecificationView = () => {
             ...values,
             mode: values.mode,
             name: values.name,
-            abi: toJSON(values.abi ?? "") as Abi,
-            // abiParams:
-            //     values.abiParams && !isEmpty(values.abiParams)
-            //         ? values.abiParams
-            //         : undefined,
+            abi: values.abi,
             encodedData: isHex(values.encodedData)
                 ? (values.encodedData as Hex)
                 : undefined,

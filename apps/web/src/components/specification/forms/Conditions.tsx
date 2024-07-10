@@ -14,10 +14,9 @@ import {
     Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDebouncedValue } from "@mantine/hooks";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { TbHelp, TbTrash } from "react-icons/tb";
 import { useSpecFormContext } from "../formContext";
 import {
@@ -91,27 +90,22 @@ export const AddConditions: FC<AddConditionsProps> = ({
             },
         },
     });
-    const formValues = form.getTransformedValues();
-    const [debouncedFormValues] = useDebouncedValue(
-        formValues,
-        LIMITS.debounce_time,
-    );
-    const [isValid] = useDebouncedValue(form.isValid(), LIMITS.debounce_time);
 
-    const { conditions } = formValues;
+    const isValid = form.isValid();
+    const { conditions, logicalOperator } = form.getTransformedValues();
     const numberOfConditions = conditions.length;
 
     useEffect(() => {
         const predicates: Predicate[] = [];
         if (isValid) {
             predicates.push({
-                conditions: clone(debouncedFormValues.conditions),
-                logicalOperator: debouncedFormValues.logicalOperator,
+                conditions: clone(conditions),
+                logicalOperator: logicalOperator,
             });
         }
 
         if (isFunction(onConditionalsChange)) onConditionalsChange(predicates);
-    }, [debouncedFormValues, isValid]);
+    }, [isValid, conditions, logicalOperator, onConditionalsChange]);
 
     return (
         <Stack>
@@ -200,6 +194,14 @@ export const AddConditions: FC<AddConditionsProps> = ({
 export const Conditions: FC = () => {
     const [checked, setChecked] = useState(false);
     const form = useSpecFormContext();
+    const { setFieldValue } = form;
+
+    const onConditionalsChange = useCallback(
+        (conditionals: Predicate[]) => {
+            setFieldValue("conditionals", conditionals);
+        },
+        [setFieldValue],
+    );
 
     return (
         <Stack>
@@ -228,9 +230,7 @@ export const Conditions: FC = () => {
             {checked ? (
                 <Stack pl="sm">
                     <AddConditions
-                        onConditionalsChange={(conditionals) => {
-                            form.setFieldValue("conditionals", conditionals);
-                        }}
+                        onConditionalsChange={onConditionalsChange}
                     />
                 </Stack>
             ) : (

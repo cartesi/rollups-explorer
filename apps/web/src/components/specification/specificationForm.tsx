@@ -12,21 +12,23 @@ import {
     Textarea,
     Title,
 } from "@mantine/core";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useCallback, useEffect } from "react";
 import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
 
 import { isNotNilOrEmpty } from "ramda-adjunct";
+import { Abi } from "viem";
 import { decodePayload } from "./decoder";
 import { SpecTransformedValues, useSpecFormContext } from "./formContext";
 import { ByteSlices } from "./forms/ByteSlices";
 import { Conditions } from "./forms/Conditions";
 import { HumanReadableABI } from "./forms/HumanReadableABI";
+import { HumanReadableABIParameter } from "./forms/HumanReadableABIParameter";
 import { Modes, Specification } from "./types";
 
-const JSON_ABI_EXAMPLE = `// Example: ERC-1155 ABI\n ${JSON.stringify(
+const JSON_ABI_EXAMPLE = `// Example: ERC-1155 ABI\n${JSON.stringify(
     erc1155Abi,
     null,
-    " ",
+    2,
 )}`;
 
 const modeInfo: Record<Modes, ReactNode> = {
@@ -61,12 +63,20 @@ export const SpecificationForm = () => {
     const form = useSpecFormContext();
     const transformedValues = form.getTransformedValues();
     const { mode } = transformedValues;
+    const { setFieldValue } = form;
+
+    const onAbiChange = useCallback(
+        (abi: Abi) => {
+            setFieldValue("abi", abi);
+        },
+        [setFieldValue],
+    );
 
     useEffect(() => {
         mode === "json_abi"
             ? form.setFieldValue("abiParamEntry", "")
             : mode === "abi_params"
-            ? form.setFieldValue("abi", "")
+            ? form.setFieldValue("abi", undefined)
             : null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mode]);
@@ -105,7 +115,7 @@ export const SpecificationForm = () => {
                             mode === "json_abi"
                                 ? { mode, abiParamEntry: "" }
                                 : mode === "abi_params"
-                                ? { mode, abi: "" }
+                                ? { mode, abi: undefined }
                                 : { mode };
 
                         form.setValues(changes);
@@ -114,19 +124,12 @@ export const SpecificationForm = () => {
                 <Info mode={mode} />
                 {mode === "json_abi" ? (
                     <Stack>
-                        <Textarea
-                            resize="vertical"
-                            label="ABI"
-                            description="The ABI definition"
-                            placeholder={JSON_ABI_EXAMPLE}
-                            rows={5}
-                            {...form.getInputProps("abi")}
-                        />
+                        <HumanReadableABI onAbiChange={onAbiChange} />
                         <Conditions />
                     </Stack>
                 ) : mode === "abi_params" ? (
                     <Stack>
-                        <HumanReadableABI />
+                        <HumanReadableABIParameter />
                         <ByteSlices />
                         <Conditions />
                     </Stack>

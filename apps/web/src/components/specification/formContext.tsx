@@ -10,7 +10,7 @@ export interface SpecFormValues {
     mode: Modes;
     abiParamEntry: string;
     abiParams: string[];
-    abi?: string;
+    abi?: Abi;
     sliceInstructions: SliceInstruction[];
     sliceTarget?: string;
     conditionals: Predicate[];
