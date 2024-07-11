@@ -13,19 +13,24 @@ import {
     Text,
     TextInput,
     Title,
+    useMantineTheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { AbiType } from "abitype";
 import { any, clone, gt, gte, isEmpty, isNil, lt, reject } from "ramda";
-import { isBlank, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
+import {
+    isBlank,
+    isFunction,
+    isNilOrEmpty,
+    isNotNilOrEmpty,
+} from "ramda-adjunct";
 import { FC, useEffect, useRef, useState } from "react";
 import {
     TbArrowsDiagonal,
     TbArrowsDiagonalMinimize2,
     TbTrash,
 } from "react-icons/tb";
-import { useSpecFormContext } from "../formContext";
 import { SliceInstruction } from "../types";
 
 interface Props {
@@ -114,54 +119,90 @@ const initialValues = {
     },
 };
 
-const SliceInstructionFields: FC = () => {
+interface SliceInstructionFieldsProps {
+    onSliceInstructionsChange: (slices: SliceInstruction[]) => void;
+    onSliceTargetChange: (sliceTarget: string | undefined) => void;
+}
+interface FormValues {
+    slices: SliceInstruction[];
+    sliceInput: {
+        name: string;
+        from: string;
+        to: string;
+        type: string;
+    };
+}
+
+const nameValidation = (value: string, values: FormValues) => {
+    if (isBlank(value)) return "Name is required!";
+
+    if (
+        values.slices.length > 0 &&
+        any((slice) => slice.name === value, values.slices)
+    ) {
+        return `Duplicated name. Check review`;
+    }
+
+    return null;
+};
+
+const hasOverlap = (value: number, slices: SliceInstruction[]) =>
+    any((slice) => {
+        if (isNilOrEmpty(slice.to)) {
+            return gte(value, slice.from);
+        }
+
+        return gt(value, slice.from) && lt(value, slice.to!);
+    }, slices);
+
+const fromValidation = (value: string, values: FormValues) => {
+    if (isBlank(value)) return "From is required!";
+
+    if (isNotNilOrEmpty(values.sliceInput.to) && value > values.sliceInput.to)
+        return "From can't be bigger than To value.";
+
+    const from = parseInt(value);
+
+    if (values.slices.length > 0 && hasOverlap(from, values.slices)) {
+        return "Overlap with added entry! Check review.";
+    }
+    return null;
+};
+
+const toValidation = (value: string, values: FormValues) => {
+    if (isBlank(value)) return null;
+
+    if (
+        isNotNilOrEmpty(values.sliceInput.from) &&
+        value < values.sliceInput.from
+    )
+        return "To value can't be smaller than From field.";
+
+    const to = parseInt(value);
+
+    if (values.slices.length > 0 && hasOverlap(to, values.slices)) {
+        return "Overlap with added entry! Check review.";
+    }
+    return null;
+};
+
+const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
+    onSliceInstructionsChange,
+    onSliceTargetChange,
+}) => {
+    const theme = useMantineTheme();
     const [checked, { toggle: toggleTarget }] = useDisclosure(false);
     const [sliceTarget, setSliceTarget] = useState<string | null>(null);
     const [expanded, { toggle }] = useDisclosure(true);
     const sliceNameRef = useRef<HTMLInputElement>(null);
-    const mainForm = useSpecFormContext();
-    const form = useForm({
+    const form = useForm<FormValues>({
         initialValues: clone(initialValues),
         validateInputOnChange: true,
         validate: {
             sliceInput: {
-                name: (value, values) => {
-                    if (isBlank(value)) return "Name is required!";
-
-                    if (
-                        values.slices.length > 0 &&
-                        any((slice) => slice.name === value, values.slices)
-                    ) {
-                        return `Duplicated name. Check review`;
-                    }
-
-                    return null;
-                },
-                from: (value, values) => {
-                    if (isNilOrEmpty(value)) return "From is required!";
-
-                    if (
-                        isNotNilOrEmpty(values.sliceInput.to) &&
-                        value > values.sliceInput.to
-                    )
-                        return "From can't be bigger than To value.";
-
-                    const from = parseInt(value);
-
-                    if (
-                        values.slices.length > 0 &&
-                        any((slice) => {
-                            if (isNilOrEmpty(slice.to)) {
-                                return gte(from, slice.from);
-                            }
-
-                            return gt(from, slice.from) && lt(from, slice.to!);
-                        }, values.slices)
-                    ) {
-                        return "Overlap with added entry! Check review.";
-                    }
-                    return null;
-                },
+                name: nameValidation,
+                from: fromValidation,
+                to: toValidation,
             },
         },
     });
@@ -169,27 +210,28 @@ const SliceInstructionFields: FC = () => {
     const { slices, sliceInput } = form.getTransformedValues();
 
     const sliceNames = slices.map((slice, idx) => slice.name ?? `slice-${idx}`);
+    const key = JSON.stringify(slices);
 
     useEffect(() => {
-        mainForm.setFieldValue("sliceInstructions", clone(slices));
+        if (isFunction(onSliceInstructionsChange))
+            onSliceInstructionsChange(clone(slices));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slices]);
+    }, [key]);
 
     return (
         <Stack>
             <Fieldset p="xs">
                 <Group justify="space-between">
                     <Text fw="bold">Define a slice</Text>
-                    <Button
-                        onClick={toggle}
-                        size="compact-sm"
-                        px="sm"
-                        variant="light"
-                    >
+                    <Button onClick={toggle} size="compact-sm" px="sm">
                         {expanded ? (
-                            <TbArrowsDiagonalMinimize2 size={21} />
+                            <TbArrowsDiagonalMinimize2
+                                size={theme?.other.iconSize ?? 21}
+                            />
                         ) : (
-                            <TbArrowsDiagonal size={21} />
+                            <TbArrowsDiagonal
+                                size={theme?.other.iconSize ?? 21}
+                            />
                         )}
                     </Button>
                 </Group>
@@ -204,7 +246,7 @@ const SliceInstructionFields: FC = () => {
                             data-testid="slice-name-input"
                             label="Name"
                             description="Name to set the decoded value in the final object result."
-                            placeholder="amount"
+                            placeholder="e.g. amount"
                             withAsterisk
                             {...form.getInputProps("sliceInput.name")}
                             error={form.getInputProps("sliceInput.name").error}
@@ -217,7 +259,7 @@ const SliceInstructionFields: FC = () => {
                             label="From"
                             description="Point to start the reading"
                             required
-                            placeholder="e.g 0"
+                            placeholder="e.g. 0"
                             key="sliceInput.from"
                             {...form.getInputProps("sliceInput.from")}
                         />
@@ -228,7 +270,7 @@ const SliceInstructionFields: FC = () => {
                             data-testid="slice-to-input"
                             label="To"
                             description="Optional: Empty means from defined number until the end of the bytes."
-                            placeholder="e.g 20"
+                            placeholder="e.g. 20"
                             key="sliceInput.to"
                             {...form.getInputProps("sliceInput.to")}
                         />
@@ -294,10 +336,8 @@ const SliceInstructionFields: FC = () => {
                             toggleTarget();
                             if (sliceTarget !== null) {
                                 setSliceTarget(null);
-                                mainForm.setFieldValue(
-                                    "sliceTarget",
-                                    undefined,
-                                );
+                                if (isFunction(onSliceTargetChange))
+                                    onSliceTargetChange(undefined);
                             }
                         }}
                         label="Use ABI Parameter definition on"
@@ -311,10 +351,8 @@ const SliceInstructionFields: FC = () => {
                         value={sliceTarget}
                         onChange={(value) => {
                             setSliceTarget(value);
-                            mainForm.setFieldValue(
-                                "sliceTarget",
-                                value ?? undefined,
-                            );
+                            if (isFunction(onSliceTargetChange))
+                                onSliceTargetChange(value ?? undefined);
                         }}
                     />
                 </Group>
@@ -325,9 +363,16 @@ const SliceInstructionFields: FC = () => {
     );
 };
 
-export const ByteSlices: FC = () => {
+interface ByteSlicesProps extends SliceInstructionFieldsProps {
+    onSwitchChange: (active: boolean) => void;
+}
+
+export const ByteSlices: FC<ByteSlicesProps> = ({
+    onSliceInstructionsChange,
+    onSliceTargetChange,
+    onSwitchChange,
+}) => {
     const [checked, setChecked] = useState(false);
-    const form = useSpecFormContext();
 
     return (
         <Stack>
@@ -345,11 +390,10 @@ export const ByteSlices: FC = () => {
                     onClick={(evt) => {
                         const val = evt.currentTarget.checked;
                         setChecked(val);
+                        onSwitchChange(val);
                         if (!val) {
-                            form.setValues({
-                                sliceTarget: undefined,
-                                sliceInstructions: [],
-                            });
+                            onSliceInstructionsChange([]);
+                            onSliceTargetChange(undefined);
                         }
                     }}
                     data-testid="add-byte-slice-switch"
@@ -358,7 +402,10 @@ export const ByteSlices: FC = () => {
 
             {checked ? (
                 <Stack pl="sm">
-                    <SliceInstructionFields />
+                    <SliceInstructionFields
+                        onSliceInstructionsChange={onSliceInstructionsChange}
+                        onSliceTargetChange={onSliceTargetChange}
+                    />
                 </Stack>
             ) : (
                 ""

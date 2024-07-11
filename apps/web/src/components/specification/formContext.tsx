@@ -15,6 +15,8 @@ export interface SpecFormValues {
     sliceTarget?: string;
     conditionals: Predicate[];
     encodedData?: string;
+    conditionalsOn: boolean;
+    sliceInstructionsOn: boolean;
 }
 
 export interface SpecTransformedValues {

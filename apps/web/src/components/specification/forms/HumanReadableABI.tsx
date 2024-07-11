@@ -78,7 +78,7 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange }) => {
                         tooltipLabel={abiTipMessage}
                     />
                 }
-                description="Define abi signatures in Human readable format"
+                description="Define signatures in Human readable format"
                 placeholder={placeholder}
                 rows={5}
                 {...form.getInputProps("humanABIEntry")}

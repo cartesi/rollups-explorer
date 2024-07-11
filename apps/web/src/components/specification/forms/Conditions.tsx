@@ -14,10 +14,9 @@ import {
 import { useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { TbTrash } from "react-icons/tb";
 import LabelWithTooltip from "../../labelWithTooltip";
-import { useSpecFormContext } from "../formContext";
 import {
     Condition,
     ConditionalOperator,
@@ -174,17 +173,16 @@ export const AddConditions: FC<AddConditionsProps> = ({
     );
 };
 
-export const Conditions: FC = () => {
-    const [checked, setChecked] = useState(false);
-    const form = useSpecFormContext();
-    const { setFieldValue } = form;
+interface Props {
+    onConditionalsChange: (conditionals: Predicate[]) => void;
+    onSwitchChange: (active: boolean) => void;
+}
 
-    const onConditionalsChange = useCallback(
-        (conditionals: Predicate[]) => {
-            setFieldValue("conditionals", conditionals);
-        },
-        [setFieldValue],
-    );
+export const Conditions: FC<Props> = ({
+    onConditionalsChange,
+    onSwitchChange,
+}) => {
+    const [checked, setChecked] = useState(false);
 
     return (
         <Stack>
@@ -203,9 +201,10 @@ export const Conditions: FC = () => {
                     checked={checked}
                     onClick={(evt) => {
                         const val = evt.currentTarget.checked;
+                        onSwitchChange(val);
                         setChecked(val);
                         if (!val) {
-                            form.setFieldValue("conditionals", []);
+                            onConditionalsChange([]);
                         }
                     }}
                 />

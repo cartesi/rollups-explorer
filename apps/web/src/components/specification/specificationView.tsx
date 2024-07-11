@@ -40,6 +40,8 @@ export const SpecificationView = () => {
             abi: undefined,
             conditionals: [],
             sliceInstructions: [],
+            conditionalsOn: false,
+            sliceInstructionsOn: false,
         },
         // @ts-ignore
         transformValues: (values) => ({

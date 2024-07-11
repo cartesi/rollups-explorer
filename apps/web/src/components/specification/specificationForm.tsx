@@ -1,9 +1,10 @@
-import { erc1155Abi } from "@cartesi/rollups-wagmi";
 import {
     Alert,
     Anchor,
+    Box,
     Card,
     Code,
+    Group,
     JsonInput,
     SegmentedControl,
     Stack,
@@ -23,20 +24,22 @@ import { ByteSlices } from "./forms/ByteSlices";
 import { Conditions } from "./forms/Conditions";
 import { HumanReadableABI } from "./forms/HumanReadableABI";
 import { HumanReadableABIParameter } from "./forms/HumanReadableABIParameter";
-import { Modes, Specification } from "./types";
-
-const JSON_ABI_EXAMPLE = `// Example: ERC-1155 ABI\n${JSON.stringify(
-    erc1155Abi,
-    null,
-    2,
-)}`;
+import { Modes, Predicate, SliceInstruction, Specification } from "./types";
 
 const modeInfo: Record<Modes, ReactNode> = {
     json_abi: (
         <Text>
             Use human readable ABI format to generate a full fledged JSON-ABI
             and decode standard ABI encoded data (i.e. 4 byte selector &
-            arguments).
+            arguments).{" "}
+            <Anchor href="https://abitype.dev/api/human" target="_blank">
+                <Group gap={2} component="span">
+                    Human-readable ABI
+                    <Box component="span" pt="4px">
+                        <TbExternalLink />
+                    </Box>
+                </Group>
+            </Anchor>
         </Text>
     ),
     abi_params: (
@@ -44,8 +47,16 @@ const modeInfo: Record<Modes, ReactNode> = {
             The set of ABI parameters to decode against data, in the shape of
             the inputs or outputs attribute of an ABI event/function. These
             parameters must include valid{" "}
-            <Anchor href="https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#types">
-                ABI types. <TbExternalLink />
+            <Anchor
+                href="https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#types"
+                target="blank"
+            >
+                <Group gap={2} component="span">
+                    ABI types
+                    <Box component="span" pt="4px">
+                        <TbExternalLink />
+                    </Box>
+                </Group>
             </Anchor>
         </Text>
     ),
@@ -69,6 +80,38 @@ export const SpecificationForm = () => {
         (abi: Abi) => {
             setFieldValue("abi", abi);
         },
+        [setFieldValue],
+    );
+
+    const onConditionalsChange = useCallback(
+        (conditionals: Predicate[]) => {
+            setFieldValue("conditionals", conditionals);
+        },
+        [setFieldValue],
+    );
+
+    const onConditionalSwitch = useCallback(
+        (active: boolean) => {
+            setFieldValue("conditionalsOn", active);
+        },
+        [setFieldValue],
+    );
+
+    const onSlicesSwitch = useCallback(
+        (active: boolean) => {
+            setFieldValue("sliceInstructionsOn", active);
+        },
+        [setFieldValue],
+    );
+
+    const onSliceInstructionsChange = useCallback(
+        (slices: SliceInstruction[]) =>
+            setFieldValue("sliceInstructions", slices),
+        [setFieldValue],
+    );
+
+    const onSliceTargetChange = useCallback(
+        (target?: string) => setFieldValue("sliceTarget", target),
         [setFieldValue],
     );
 
@@ -122,20 +165,28 @@ export const SpecificationForm = () => {
                     }}
                 />
                 <Info mode={mode} />
-                {mode === "json_abi" ? (
-                    <Stack>
+                <Stack>
+                    {mode === "json_abi" ? (
                         <HumanReadableABI onAbiChange={onAbiChange} />
-                        <Conditions />
-                    </Stack>
-                ) : mode === "abi_params" ? (
-                    <Stack>
-                        <HumanReadableABIParameter />
-                        <ByteSlices />
-                        <Conditions />
-                    </Stack>
-                ) : (
-                    <></>
-                )}
+                    ) : mode === "abi_params" ? (
+                        <>
+                            <HumanReadableABIParameter />
+                            <ByteSlices
+                                onSliceInstructionsChange={
+                                    onSliceInstructionsChange
+                                }
+                                onSliceTargetChange={onSliceTargetChange}
+                                onSwitchChange={onSlicesSwitch}
+                            />
+                        </>
+                    ) : (
+                        <></>
+                    )}
+                    <Conditions
+                        onConditionalsChange={onConditionalsChange}
+                        onSwitchChange={onConditionalSwitch}
+                    />
+                </Stack>
             </Stack>
         </Card>
     );
