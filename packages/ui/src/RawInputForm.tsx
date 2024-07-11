@@ -9,11 +9,12 @@ import {
     Collapse,
     Group,
     Loader,
+    SegmentedControl,
     Stack,
     Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC, useEffect } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     BaseError,
@@ -21,11 +22,14 @@ import {
     Hex,
     isAddress,
     isHex,
+    stringToHex,
     zeroAddress,
 } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
+
+type Format = "hex" | "utf";
 
 export interface RawInputFormProps {
     applications: string[];
@@ -40,6 +44,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         initialValues: {
             application: "",
             rawInput: "0x",
+            stringInput: "",
         },
         validate: {
             application: (value) =>
@@ -68,6 +73,11 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const loading = execute.isPending || wait.isLoading;
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
+    const [format, setFormat] = useState<Format>("hex");
+
+    const onChangeFormat = useCallback((format: string | null) => {
+        setFormat(format as Format);
+    }, []);
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -112,12 +122,48 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                     </Alert>
                 )}
 
-                <Textarea
-                    label="Raw input"
-                    description="Raw input for the application"
-                    withAsterisk
-                    {...form.getInputProps("rawInput")}
+                <SegmentedControl
+                    value={format}
+                    onChange={onChangeFormat}
+                    data={[
+                        { label: "Hex", value: "hex" },
+                        { label: "String to Hex", value: "utf" },
+                    ]}
                 />
+
+                {format === "hex" ? (
+                    <Textarea
+                        label="Raw input"
+                        description="Raw input for the application"
+                        withAsterisk
+                        {...form.getInputProps("rawInput")}
+                    />
+                ) : (
+                    <>
+                        <Textarea
+                            label="String input"
+                            description="String input for the application"
+                            mb={16}
+                            {...form.getInputProps("stringInput")}
+                            onChange={(event) => {
+                                const nextValue = event.target.value;
+                                form.setFieldValue("stringInput", nextValue);
+
+                                form.setFieldValue(
+                                    "rawInput",
+                                    stringToHex(nextValue),
+                                );
+                            }}
+                        />
+
+                        <Textarea
+                            label="Hex value"
+                            description="Encoded hex value for the application"
+                            readOnly
+                            {...form.getInputProps("rawInput")}
+                        />
+                    </>
+                )}
 
                 <Collapse
                     in={
