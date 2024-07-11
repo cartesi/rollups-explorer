@@ -34,9 +34,9 @@ const JSON_ABI_EXAMPLE = `// Example: ERC-1155 ABI\n${JSON.stringify(
 const modeInfo: Record<Modes, ReactNode> = {
     json_abi: (
         <Text>
-            For decoding ABI encoded data (4 byte selector & arguments). Just
-            copy/paste a full fledge ABI and as far as the encoded data has the
-            4 byte selector it will do the decoding.
+            Use human readable ABI format to generate a full fledged JSON-ABI
+            and decode standard ABI encoded data (i.e. 4 byte selector &
+            arguments).
         </Text>
     ),
     abi_params: (
@@ -140,6 +140,7 @@ export const SpecificationForm = () => {
         </Card>
     );
 };
+
 const replacerForBigInt = (key: any, value: any) => {
     return typeof value === "bigint" ? value.toString() : value;
 };
