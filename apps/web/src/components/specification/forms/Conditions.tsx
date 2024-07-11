@@ -1,7 +1,6 @@
 import {
     ActionIcon,
     Button,
-    Flex,
     Group,
     SegmentedControl,
     SegmentedControlItem,
@@ -11,13 +10,13 @@ import {
     Switch,
     Text,
     TextInput,
-    Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
 import { FC, useCallback, useEffect, useState } from "react";
-import { TbHelp, TbTrash } from "react-icons/tb";
+import { TbTrash } from "react-icons/tb";
+import LabelWithTooltip from "../../labelWithTooltip";
 import { useSpecFormContext } from "../formContext";
 import {
     Condition,
@@ -27,22 +26,6 @@ import {
     logicalOperators,
     operators,
 } from "../types";
-
-const LabelWithTooltip: FC<{ label: string; tooltipLabel: string }> = ({
-    label,
-    tooltipLabel,
-}) => {
-    return (
-        <Group justify="flex-start" gap="3">
-            <Text size="sm">{label}</Text>
-            <Tooltip multiline label={tooltipLabel}>
-                <Flex direction="column-reverse">
-                    <TbHelp />
-                </Flex>
-            </Tooltip>
-        </Group>
-    );
-};
 
 const ToLabel: FC = () => (
     <LabelWithTooltip
