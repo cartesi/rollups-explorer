@@ -1,6 +1,6 @@
 import { createFormContext } from "@mantine/form";
 import { Abi, Hex } from "viem";
-import { Modes, Predicate, SliceInstruction } from "./types";
+import { Modes, Predicate, SliceInstruction } from "../types";
 
 /**
  * Form context to support both specification form inputs and preview inputs
@@ -14,7 +14,7 @@ export interface SpecFormValues {
     sliceInstructions: SliceInstruction[];
     sliceTarget?: string;
     conditionals: Predicate[];
-    encodedData?: string;
+    encodedData?: Hex;
     conditionalsOn: boolean;
     sliceInstructionsOn: boolean;
 }
@@ -34,4 +34,4 @@ export interface SpecTransformedValues {
 type TransformValues = (a: SpecFormValues) => SpecTransformedValues;
 
 export const [SpecFormProvider, useSpecFormContext, useSpecForm] =
-    createFormContext<SpecFormValues, TransformValues>();
+    createFormContext<SpecFormValues>();

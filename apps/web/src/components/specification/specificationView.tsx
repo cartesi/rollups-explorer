@@ -10,8 +10,17 @@ import {
 import { isEmpty, isNil } from "ramda";
 import { useState } from "react";
 import { TbLayoutColumns, TbLayoutList } from "react-icons/tb";
-import { Hex, isHex } from "viem";
-import { SpecFormProvider, useSpecForm } from "./formContext";
+import { Hex } from "viem";
+import { SpecFormProvider, useSpecForm } from "./form/context";
+import {
+    specABIValidation,
+    specAbiParamValidation,
+    specConditionalsValidation,
+    specEncodedDataValidation,
+    specModeValidation,
+    specNameValidation,
+    specSliceInstructionsValidation,
+} from "./form/validations";
 import { DecodingPreview, SpecificationForm } from "./specificationForm";
 
 type Layout = "split_screen" | "stack_screen";
@@ -36,23 +45,22 @@ export const SpecificationView = () => {
             name: "",
             abiParams: [],
             abiParamEntry: "",
-            encodedData: "",
+            encodedData: "" as Hex,
             abi: undefined,
             conditionals: [],
             sliceInstructions: [],
             conditionalsOn: false,
             sliceInstructionsOn: false,
         },
-        // @ts-ignore
-        transformValues: (values) => ({
-            ...values,
-            mode: values.mode,
-            name: values.name,
-            abi: values.abi,
-            encodedData: isHex(values.encodedData)
-                ? (values.encodedData as Hex)
-                : undefined,
-        }),
+        validate: {
+            name: specNameValidation,
+            mode: specModeValidation,
+            abi: specABIValidation,
+            abiParams: specAbiParamValidation,
+            sliceInstructions: specSliceInstructionsValidation,
+            conditionals: specConditionalsValidation,
+            encodedData: specEncodedDataValidation,
+        },
     });
 
     return (

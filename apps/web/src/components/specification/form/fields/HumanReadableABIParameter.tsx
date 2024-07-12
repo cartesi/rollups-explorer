@@ -8,10 +8,10 @@ import {
     TextInput,
 } from "@mantine/core";
 import { isEmpty, isNotNil, reject } from "ramda";
-import { FC, useEffect, useReducer, useRef } from "react";
+import { FC, ReactNode, useEffect, useReducer, useRef } from "react";
 import { TbTrash } from "react-icons/tb";
 import { parseAbiParameters } from "viem";
-import { useSpecFormContext } from "../formContext";
+import { useSpecFormContext } from "../context";
 
 type AddEntry = {
     type: "ADD_ENTRY";
@@ -63,7 +63,13 @@ const initialState = {
     error: null,
 };
 
-export const HumanReadableABIParameter: FC = () => {
+interface HumanReadableABIParameter {
+    error?: string | ReactNode;
+}
+
+export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
+    props,
+) => {
     const form = useSpecFormContext();
     const ref = useRef<HTMLInputElement>(null);
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -99,6 +105,7 @@ export const HumanReadableABIParameter: FC = () => {
                 rightSectionWidth="lg"
                 {...form.getInputProps("abiParamEntry")}
                 rightSection={<Button onClick={addABIParam}>Add</Button>}
+                error={props.error || form.errors.abiParamEntry}
             />
 
             {entries.length > 0 && (

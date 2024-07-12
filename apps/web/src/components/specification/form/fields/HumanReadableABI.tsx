@@ -2,13 +2,14 @@ import { Accordion, JsonInput, Stack, Textarea, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { isNotNil } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
-import { FC, useEffect } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import { Abi, parseAbi } from "viem";
-import LabelWithTooltip from "../../labelWithTooltip";
+import LabelWithTooltip from "../../../labelWithTooltip";
 
 const placeholder = `function balanceOf(address owner) view returns (uint256) \nevent Transfer(address indexed from, address indexed to, uint256 amount)`;
 interface Props {
     abi?: Abi;
+    error?: string | ReactNode;
     onAbiChange: (abi: Abi) => void;
 }
 
@@ -22,7 +23,7 @@ const prepareSignatures = (multiline: string) =>
 const abiTipMessage =
     "Define the signature without wrapping it on quotes nor adding comma at the end to separate. Just hit enter and keep defining your signatures";
 
-export const HumanReadableABI: FC<Props> = ({ onAbiChange }) => {
+export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -82,6 +83,7 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange }) => {
                 placeholder={placeholder}
                 rows={5}
                 {...form.getInputProps("humanABIEntry")}
+                error={error || form.errors.humanABIEntry}
             />
 
             {displayAccordion && (

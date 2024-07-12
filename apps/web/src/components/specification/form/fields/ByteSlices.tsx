@@ -25,13 +25,13 @@ import {
     isNilOrEmpty,
     isNotNilOrEmpty,
 } from "ramda-adjunct";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import {
     TbArrowsDiagonal,
     TbArrowsDiagonalMinimize2,
     TbTrash,
 } from "react-icons/tb";
-import { SliceInstruction } from "../types";
+import { SliceInstruction } from "../../types";
 
 interface Props {
     slices: SliceInstruction[];
@@ -365,12 +365,14 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
 
 interface ByteSlicesProps extends SliceInstructionFieldsProps {
     onSwitchChange: (active: boolean) => void;
+    error?: string | ReactNode;
 }
 
 export const ByteSlices: FC<ByteSlicesProps> = ({
     onSliceInstructionsChange,
     onSliceTargetChange,
     onSwitchChange,
+    error,
 }) => {
     const [checked, setChecked] = useState(false);
 
@@ -384,6 +386,11 @@ export const ByteSlices: FC<ByteSlicesProps> = ({
                     <Text size="xs" c="dimmed" component="span">
                         Helpful when using non-standard abi-encoding.
                     </Text>
+                    {error && (
+                        <Text c="red" size="xs">
+                            {error}
+                        </Text>
+                    )}
                 </Stack>
                 <Switch
                     checked={checked}

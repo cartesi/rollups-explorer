@@ -1,7 +1,6 @@
 import {
     Alert,
-    Anchor,
-    Box,
+    Button,
     Card,
     Code,
     Group,
@@ -13,62 +12,18 @@ import {
     Textarea,
     Title,
 } from "@mantine/core";
-import { FC, ReactNode, useCallback, useEffect } from "react";
-import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
+import { useCallback, useEffect } from "react";
 
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { Abi } from "viem";
+import { SpecificationModeInfo } from "./ModeInfo";
 import { decodePayload } from "./decoder";
-import { SpecTransformedValues, useSpecFormContext } from "./formContext";
-import { ByteSlices } from "./forms/ByteSlices";
-import { Conditions } from "./forms/Conditions";
-import { HumanReadableABI } from "./forms/HumanReadableABI";
-import { HumanReadableABIParameter } from "./forms/HumanReadableABIParameter";
+import { SpecFormValues, useSpecFormContext } from "./form/context";
+import { ByteSlices } from "./form/fields/ByteSlices";
+import { Conditions } from "./form/fields/Conditions";
+import { HumanReadableABI } from "./form/fields/HumanReadableABI";
+import { HumanReadableABIParameter } from "./form/fields/HumanReadableABIParameter";
 import { Modes, Predicate, SliceInstruction, Specification } from "./types";
-
-const modeInfo: Record<Modes, ReactNode> = {
-    json_abi: (
-        <Text>
-            Use human readable ABI format to generate a full fledged JSON-ABI
-            and decode standard ABI encoded data (i.e. 4 byte selector &
-            arguments).{" "}
-            <Anchor href="https://abitype.dev/api/human" target="_blank">
-                <Group gap={2} component="span">
-                    Human-readable ABI
-                    <Box component="span" pt="4px">
-                        <TbExternalLink />
-                    </Box>
-                </Group>
-            </Anchor>
-        </Text>
-    ),
-    abi_params: (
-        <Text>
-            The set of ABI parameters to decode against data, in the shape of
-            the inputs or outputs attribute of an ABI event/function. These
-            parameters must include valid{" "}
-            <Anchor
-                href="https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#types"
-                target="blank"
-            >
-                <Group gap={2} component="span">
-                    ABI types
-                    <Box component="span" pt="4px">
-                        <TbExternalLink />
-                    </Box>
-                </Group>
-            </Anchor>
-        </Text>
-    ),
-};
-
-const Info: FC<{ mode: Modes }> = ({ mode }) => {
-    return (
-        <Alert variant="light" color="blue" icon={<TbAlertCircle />}>
-            {modeInfo[mode]}
-        </Alert>
-    );
-};
 
 export const SpecificationForm = () => {
     const form = useSpecFormContext();
@@ -115,6 +70,8 @@ export const SpecificationForm = () => {
         [setFieldValue],
     );
 
+    const { errors } = form;
+
     useEffect(() => {
         mode === "json_abi"
             ? form.setFieldValue("abiParamEntry", "")
@@ -126,57 +83,60 @@ export const SpecificationForm = () => {
 
     return (
         <Card shadow="sm" withBorder>
-            <Stack>
-                <TextInput
-                    label="Name"
-                    description="Specification name for ease identification"
-                    placeholder="My Spec name"
-                    {...form.getInputProps("name")}
-                    onChange={(event) => {
-                        const entry = event.target.value;
-                        form.setFieldValue("name", entry);
-                    }}
-                />
-
-                <SegmentedControl
-                    aria-labelledby="specification-mode-label"
-                    aria-label="Specification Mode"
-                    data={[
-                        {
-                            label: "JSON ABI",
-                            value: "json_abi",
-                        },
-                        {
-                            label: "ABI Parameters",
-                            value: "abi_params",
-                        },
-                    ]}
-                    {...form.getInputProps("mode")}
-                    onChange={(value) => {
-                        const mode = value as Modes;
-                        const changes =
-                            mode === "json_abi"
-                                ? { mode, abiParamEntry: "" }
-                                : mode === "abi_params"
-                                ? { mode, abi: undefined }
-                                : { mode };
-
-                        form.setValues(changes);
-                    }}
-                />
-                <Info mode={mode} />
+            <form>
                 <Stack>
+                    <TextInput
+                        label="Name"
+                        description="Specification name for ease identification"
+                        placeholder="My Spec name"
+                        withAsterisk
+                        {...form.getInputProps("name")}
+                    />
+
+                    <SegmentedControl
+                        aria-labelledby="specification-mode-label"
+                        aria-label="Specification Mode"
+                        data={[
+                            {
+                                label: "JSON ABI",
+                                value: "json_abi",
+                            },
+                            {
+                                label: "ABI Parameters",
+                                value: "abi_params",
+                            },
+                        ]}
+                        {...form.getInputProps("mode")}
+                        onChange={(value) => {
+                            const mode = value as Modes;
+                            const changes =
+                                mode === "json_abi"
+                                    ? { mode, abiParamEntry: "" }
+                                    : mode === "abi_params"
+                                    ? { mode, abi: undefined }
+                                    : { mode };
+
+                            form.setValues(changes);
+                        }}
+                    />
+                    <SpecificationModeInfo mode={mode} />
                     {mode === "json_abi" ? (
-                        <HumanReadableABI onAbiChange={onAbiChange} />
+                        <HumanReadableABI
+                            onAbiChange={onAbiChange}
+                            error={errors.abi}
+                        />
                     ) : mode === "abi_params" ? (
                         <>
-                            <HumanReadableABIParameter />
+                            <HumanReadableABIParameter
+                                error={errors.abiParams}
+                            />
                             <ByteSlices
                                 onSliceInstructionsChange={
                                     onSliceInstructionsChange
                                 }
                                 onSliceTargetChange={onSliceTargetChange}
                                 onSwitchChange={onSlicesSwitch}
+                                error={errors.sliceInstructions}
                             />
                         </>
                     ) : (
@@ -185,9 +145,13 @@ export const SpecificationForm = () => {
                     <Conditions
                         onConditionalsChange={onConditionalsChange}
                         onSwitchChange={onConditionalSwitch}
+                        error={errors.conditionals}
                     />
+                    <Group justify="flex-end">
+                        <Button onClick={() => form.validate()}>Save</Button>
+                    </Group>
                 </Stack>
-            </Stack>
+            </form>
         </Card>
     );
 };
@@ -200,9 +164,7 @@ const stringifyContent = (value: Record<string, any>): string => {
     return JSON.stringify(value, replacerForBigInt, 2);
 };
 
-const buildSpecification = (
-    values: SpecTransformedValues,
-): Specification | null => {
+const buildSpecification = (values: SpecFormValues): Specification | null => {
     const {
         mode,
         name,

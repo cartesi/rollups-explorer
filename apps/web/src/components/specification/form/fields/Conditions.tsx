@@ -14,9 +14,9 @@ import {
 import { useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
-import { FC, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { TbTrash } from "react-icons/tb";
-import LabelWithTooltip from "../../labelWithTooltip";
+import LabelWithTooltip from "../../../labelWithTooltip";
 import {
     Condition,
     ConditionalOperator,
@@ -24,7 +24,7 @@ import {
     inputProperties,
     logicalOperators,
     operators,
-} from "../types";
+} from "../../types";
 
 const ToLabel: FC = () => (
     <LabelWithTooltip
@@ -176,11 +176,13 @@ export const AddConditions: FC<AddConditionsProps> = ({
 interface Props {
     onConditionalsChange: (conditionals: Predicate[]) => void;
     onSwitchChange: (active: boolean) => void;
+    error?: string | ReactNode;
 }
 
 export const Conditions: FC<Props> = ({
     onConditionalsChange,
     onSwitchChange,
+    error,
 }) => {
     const [checked, setChecked] = useState(false);
 
@@ -195,6 +197,11 @@ export const Conditions: FC<Props> = ({
                         Conditionals are to auto-apply the specification on an
                         input.
                     </Text>
+                    {error && (
+                        <Text c="red" size="xs">
+                            {error}
+                        </Text>
+                    )}
                 </Stack>
                 <Switch
                     data-testid="add-conditionals-switch"
@@ -210,7 +217,7 @@ export const Conditions: FC<Props> = ({
                 />
             </Group>
             {checked ? (
-                <Stack pl="sm">
+                <Stack pl="sm" gap="xs">
                     <AddConditions
                         onConditionalsChange={onConditionalsChange}
                     />
