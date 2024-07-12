@@ -34,6 +34,7 @@
         "encoding": "^0.1",
         "graphql": "^16",
         "graphql-tag": "^2",
+        "jotai": "^2.9.0",
         "lokijs": "^1",
         "next": "^14.1.4",
         "pino-pretty": "^10",

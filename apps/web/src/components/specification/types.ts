@@ -1,5 +1,6 @@
 import { AbiType } from "abitype";
 import { Abi } from "viem";
+import { IRepository } from "../../interfaces/Repository";
 
 export const JSON_ABI = "json_abi" as const;
 export const ABI_PARAMS = "abi_params" as const;
@@ -42,6 +43,7 @@ export interface SliceInstruction {
 }
 
 type Commons = {
+    id?: string;
     name: string;
     timestamp?: number;
     conditionals?: Predicate[];
@@ -65,3 +67,5 @@ export interface JSONAbiSpecification extends Commons {
 }
 
 export type Specification = AbiParamsSpecification | JSONAbiSpecification;
+
+export type Repository = IRepository<Specification, "id">;
