@@ -8,16 +8,20 @@ import {
     Paper,
     Table,
     Text,
+    Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
-import { FC } from "react";
-import { TbArrowRight, TbFileText, TbX } from "react-icons/tb";
+import React, { FC } from "react";
+import { TbArrowRight, TbFileText, TbQuestionMark, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
 import Address from "../address";
 import InputDetailsView from "./inputDetailsView";
 import { methodResolver } from "../../lib/methodResolver";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
+import { Connection } from "../../providers/connectionConfig/types";
+import ConnectionInputStatusBadge from "../connection/connectionInputStatusBadge";
 
 export type InputRowProps = {
     input: InputItemFragment;
@@ -33,6 +37,8 @@ const InputRow: FC<InputRowProps> = ({
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
     const to = input.application.id as AddressType;
+    const { getConnection, hasConnection, showConnectionModal } =
+        useConnectionConfig();
 
     const erc20Deposit = (input: InputItemFragment) =>
         input.erc20Deposit ? (
@@ -118,6 +124,26 @@ const InputRow: FC<InputRowProps> = ({
                 <Table.Td>{method}</Table.Td>
                 <Table.Td>
                     <Text>{input.index}</Text>
+                </Table.Td>
+                <Table.Td>
+                    {hasConnection(to) ? (
+                        <ConnectionInputStatusBadge
+                            graphqlUrl={(getConnection(to) as Connection).url}
+                            index={input.index}
+                        />
+                    ) : (
+                        <Tooltip label="Click to add a connection and inspect the input status.">
+                            <ActionIcon
+                                size="xs"
+                                radius={50}
+                                ml={4}
+                                data-testid="show-connection-modal"
+                                onClick={() => showConnectionModal(to)}
+                            >
+                                <TbQuestionMark />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
                 </Table.Td>
                 <Table.Td>
                     <Box

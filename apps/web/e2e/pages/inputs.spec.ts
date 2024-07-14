@@ -15,7 +15,7 @@ test("should have correct title", async ({ page }) => {
 
 test("should display 'All inputs' table", async ({ page }) => {
     await expect(
-        page.getByRole("row", { name: "From To Method Index Age Data" }),
+        page.getByRole("row", { name: "From To Method Index Status Age Data" }),
     ).toBeVisible();
     await expect(page.getByRole("row")).toHaveCount(31);
 });

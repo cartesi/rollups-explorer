@@ -15,7 +15,7 @@ test("should have correct title", async ({ page }) => {
 
 test("should display inputs table", async ({ page }) => {
     await expect(
-        page.getByRole("row", { name: "From To Method Index Age Data" }),
+        page.getByRole("row", { name: "From To Method Index Status Age Data" }),
     ).toBeVisible();
     await expect(page.getByRole("row")).toHaveCount(31);
 });
@@ -26,7 +26,7 @@ test("should toggle date column", async ({ page }) => {
 
     await expect(
         page.getByRole("row", {
-            name: "From To Method Index Timestamp (UTC) Data",
+            name: "From To Method Index Status Timestamp (UTC) Data",
         }),
     ).toBeVisible();
 
@@ -34,7 +34,7 @@ test("should toggle date column", async ({ page }) => {
     await timestampHeaderColumn.click();
 
     await expect(
-        page.getByRole("row", { name: "From To Method Index Age Data" }),
+        page.getByRole("row", { name: "From To Method Index Status Age Data" }),
     ).toBeVisible();
 });
 

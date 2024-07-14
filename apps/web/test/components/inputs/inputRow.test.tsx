@@ -1,12 +1,20 @@
 import { Table } from "@mantine/core";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
-import { describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import InputRow, {
     InputRowProps,
 } from "../../../src/components/inputs/inputRow";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import { useQuery } from "urql";
+
+vi.mock("../../../src/providers/connectionConfig/hooks");
+const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
+
+vi.mock("urql");
+const useQueryMock = vi.mocked(useQuery, true);
 
 const TableComponent: FC<InputRowProps> = (props) => (
     <Table>
@@ -36,7 +44,32 @@ const defaultProps: InputRowProps = {
     keepDataColVisible: false,
 };
 
+const defaultInputStatusData = {
+    input: {
+        status: "ACTIVE",
+    },
+};
+
 describe("InputRow component", () => {
+    beforeEach(() => {
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => vi.fn(),
+            hasConnection: () => vi.fn(),
+            showConnectionModal: () => vi.fn(),
+        } as any);
+
+        useQueryMock.mockReturnValue([
+            {
+                fetching: false,
+                data: defaultInputStatusData,
+            },
+        ] as any);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
     it("should display correct age", () => {
         render(<Component {...defaultProps} />);
 
@@ -64,5 +97,55 @@ describe("InputRow component", () => {
             defaultProps.input.timestamp * 1000,
         ).toISOString();
         expect(screen.getByText(timestamp)).toBeInTheDocument();
+    });
+
+    it("should display correct action icon and tooltip when no connection is set", async () => {
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => vi.fn(),
+            hasConnection: () => false,
+            showConnectionModal: () => vi.fn(),
+        } as any);
+        render(<Component {...defaultProps} />);
+
+        const button = screen.getByTestId("show-connection-modal");
+        expect(button).toBeInTheDocument();
+
+        fireEvent.mouseEnter(button);
+        await waitFor(() =>
+            expect(
+                screen.getByText(
+                    "Click to add a connection and inspect the input status.",
+                ),
+            ).toBeInTheDocument(),
+        );
+    });
+
+    it("should invoke connection modal when action icon is clicked", async () => {
+        const showConnectionModalMock = vi.fn();
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => vi.fn(),
+            hasConnection: () => false,
+            showConnectionModal: showConnectionModalMock,
+        } as any);
+        render(<Component {...defaultProps} />);
+
+        const button = screen.getByTestId("show-connection-modal");
+        fireEvent.click(button);
+        expect(showConnectionModalMock).toHaveBeenCalled();
+    });
+
+    it("should display input status when connection is set", async () => {
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => ({
+                graphqlUrl: "https://drawingcanvas.fly.dev/graphql",
+                index: 0,
+            }),
+            hasConnection: () => true,
+            showConnectionModal: () => vi.fn(),
+        } as any);
+        render(<Component {...defaultProps} />);
+        expect(
+            screen.getByText(defaultInputStatusData.input.status),
+        ).toBeInTheDocument();
     });
 });
