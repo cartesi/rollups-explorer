@@ -12,20 +12,30 @@ import {
     Textarea,
     Title,
 } from "@mantine/core";
-import { useCallback, useEffect } from "react";
+import { useCallback, useState } from "react";
 
+import { notifications } from "@mantine/notifications";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { Abi } from "viem";
 import { SpecificationModeInfo } from "./ModeInfo";
 import { decodePayload } from "./decoder";
 import { SpecFormValues, useSpecFormContext } from "./form/context";
-import { ByteSlices } from "./form/fields/ByteSlices";
+import { ByteSlices, byteSlicesFormActions } from "./form/fields/ByteSlices";
 import { Conditions } from "./form/fields/Conditions";
-import { HumanReadableABI } from "./form/fields/HumanReadableABI";
-import { HumanReadableABIParameter } from "./form/fields/HumanReadableABIParameter";
+import {
+    HumanReadableABI,
+    humanReadableABIFormActions,
+} from "./form/fields/HumanReadableABI";
+import {
+    HumanReadableABIParameter,
+    humanReadableABIParameterFormActions,
+} from "./form/fields/HumanReadableABIParameter";
+import { useSpecification } from "./hooks/useSpecification";
 import { Modes, Predicate, SliceInstruction, Specification } from "./types";
 
 export const SpecificationForm = () => {
+    const [submitting, setSubmitting] = useState(false);
+    const { addSpecification } = useSpecification();
     const form = useSpecFormContext();
     const transformedValues = form.getTransformedValues();
     const { mode } = transformedValues;
@@ -70,20 +80,54 @@ export const SpecificationForm = () => {
         [setFieldValue],
     );
 
+    const onAbiParamsChange = useCallback(
+        (params: string[]) => setFieldValue("abiParams", params),
+        [setFieldValue],
+    );
+
     const { errors } = form;
 
-    useEffect(() => {
-        mode === "json_abi"
-            ? form.setFieldValue("abiParamEntry", "")
-            : mode === "abi_params"
-            ? form.setFieldValue("abi", undefined)
-            : null;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mode]);
+    const onSuccess = (name: string) => {
+        notifications.show({
+            color: "green",
+            title: "Success!",
+            message: `Specification ${name} saved!`,
+            withBorder: true,
+            withCloseButton: true,
+        });
+        form.reset();
+        humanReadableABIFormActions.reset();
+        byteSlicesFormActions.reset();
+        humanReadableABIParameterFormActions.reset();
+    };
+
+    const onFailure = (reason: Error) => {
+        notifications.show({
+            color: "red",
+            title: "Oops!",
+            message: reason.message ?? "Something went wrong!",
+            withBorder: true,
+            withCloseButton: true,
+        });
+    };
 
     return (
         <Card shadow="sm" withBorder>
-            <form>
+            <form
+                onSubmit={form.onSubmit((values) => {
+                    const specification = buildSpecification(values);
+                    if (form.isValid() && specification !== null) {
+                        setSubmitting(true);
+                        addSpecification(specification, {
+                            onFinished: () => setSubmitting((v) => !v),
+                            onSuccess: () => onSuccess(specification.name),
+                            onFailure,
+                        });
+                    } else {
+                        form.validate();
+                    }
+                })}
+            >
                 <Stack>
                     <TextInput
                         label="Name"
@@ -111,7 +155,7 @@ export const SpecificationForm = () => {
                             const mode = value as Modes;
                             const changes =
                                 mode === "json_abi"
-                                    ? { mode, abiParamEntry: "" }
+                                    ? { mode, abiParams: [] }
                                     : mode === "abi_params"
                                     ? { mode, abi: undefined }
                                     : { mode };
@@ -119,7 +163,7 @@ export const SpecificationForm = () => {
                             form.setValues(changes);
                         }}
                     />
-                    <SpecificationModeInfo mode={mode} />
+                    {mode && <SpecificationModeInfo mode={mode} />}
                     {mode === "json_abi" ? (
                         <HumanReadableABI
                             onAbiChange={onAbiChange}
@@ -129,6 +173,7 @@ export const SpecificationForm = () => {
                         <>
                             <HumanReadableABIParameter
                                 error={errors.abiParams}
+                                onAbiParamsChange={onAbiParamsChange}
                             />
                             <ByteSlices
                                 onSliceInstructionsChange={
@@ -137,6 +182,7 @@ export const SpecificationForm = () => {
                                 onSliceTargetChange={onSliceTargetChange}
                                 onSwitchChange={onSlicesSwitch}
                                 error={errors.sliceInstructions}
+                                isActive={transformedValues.sliceInstructionsOn}
                             />
                         </>
                     ) : (
@@ -146,9 +192,16 @@ export const SpecificationForm = () => {
                         onConditionalsChange={onConditionalsChange}
                         onSwitchChange={onConditionalSwitch}
                         error={errors.conditionals}
+                        isActive={transformedValues.conditionalsOn}
                     />
                     <Group justify="flex-end">
-                        <Button onClick={() => form.validate()}>Save</Button>
+                        <Button
+                            type="submit"
+                            loading={submitting}
+                            data-testid="specification-form-save"
+                        >
+                            Save
+                        </Button>
                     </Group>
                 </Stack>
             </form>
