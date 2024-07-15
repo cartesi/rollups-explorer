@@ -1,3 +1,4 @@
+import { includes } from "ramda";
 import { isBlank, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { Abi, Hex, isHex } from "viem";
 import { Modes, Predicate, SliceInstruction } from "../types";
@@ -11,6 +12,9 @@ const specNameValidation = (value: string, values: SpecFormValues) => {
 
 const specModeValidation = (value: Modes, values: SpecFormValues) => {
     if (isBlank(value)) return "Specification mode is required!";
+
+    if (!includes(value, ["json_abi", "abi_params"]))
+        return `Supported modes ["json_abi", "abi_params"] but found ${value}`;
 
     return null;
 };

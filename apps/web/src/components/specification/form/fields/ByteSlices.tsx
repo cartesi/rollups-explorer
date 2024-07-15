@@ -15,7 +15,7 @@ import {
     Title,
     useMantineTheme,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { createFormActions, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { AbiType } from "abitype";
 import { any, clone, gt, gte, isEmpty, isNil, lt, reject } from "ramda";
@@ -122,6 +122,7 @@ const initialValues = {
 interface SliceInstructionFieldsProps {
     onSliceInstructionsChange: (slices: SliceInstruction[]) => void;
     onSliceTargetChange: (sliceTarget: string | undefined) => void;
+    isActive?: boolean;
 }
 interface FormValues {
     slices: SliceInstruction[];
@@ -186,6 +187,9 @@ const toValidation = (value: string, values: FormValues) => {
     return null;
 };
 
+export const byteSlicesFormActions =
+    createFormActions<FormValues>("byte-slices-form");
+
 const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     onSliceInstructionsChange,
     onSliceTargetChange,
@@ -196,6 +200,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     const [expanded, { toggle }] = useDisclosure(true);
     const sliceNameRef = useRef<HTMLInputElement>(null);
     const form = useForm<FormValues>({
+        name: "byte-slices-form",
         initialValues: clone(initialValues),
         validateInputOnChange: true,
         validate: {
@@ -258,9 +263,8 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                             data-testid="slice-from-input"
                             label="From"
                             description="Point to start the reading"
-                            required
+                            withAsterisk
                             placeholder="e.g. 0"
-                            key="sliceInput.from"
                             {...form.getInputProps("sliceInput.from")}
                         />
                         <NumberInput
@@ -271,7 +275,6 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                             label="To"
                             description="Optional: Empty means from defined number until the end of the bytes."
                             placeholder="e.g. 20"
-                            key="sliceInput.to"
                             {...form.getInputProps("sliceInput.to")}
                         />
                         <TextInput
@@ -279,7 +282,6 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                             data-testid="slice-type-input"
                             placeholder="e.g. uint"
                             description="Optional: Empty means return slice value as-is (i.e. Hex.)"
-                            key="sliceInput.type"
                             {...form.getInputProps("sliceInput.type")}
                         />
                     </Stack>
@@ -366,6 +368,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
 interface ByteSlicesProps extends SliceInstructionFieldsProps {
     onSwitchChange: (active: boolean) => void;
     error?: string | ReactNode;
+    isActive: boolean;
 }
 
 export const ByteSlices: FC<ByteSlicesProps> = ({
@@ -373,9 +376,8 @@ export const ByteSlices: FC<ByteSlicesProps> = ({
     onSliceTargetChange,
     onSwitchChange,
     error,
+    isActive,
 }) => {
-    const [checked, setChecked] = useState(false);
-
     return (
         <Stack>
             <Group justify="space-between" align="normal" wrap="nowrap">
@@ -393,10 +395,9 @@ export const ByteSlices: FC<ByteSlicesProps> = ({
                     )}
                 </Stack>
                 <Switch
-                    checked={checked}
+                    checked={isActive}
                     onClick={(evt) => {
                         const val = evt.currentTarget.checked;
-                        setChecked(val);
                         onSwitchChange(val);
                         if (!val) {
                             onSliceInstructionsChange([]);
@@ -407,7 +408,7 @@ export const ByteSlices: FC<ByteSlicesProps> = ({
                 />
             </Group>
 
-            {checked ? (
+            {isActive ? (
                 <Stack pl="sm">
                     <SliceInstructionFields
                         onSliceInstructionsChange={onSliceInstructionsChange}

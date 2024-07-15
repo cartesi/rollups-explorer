@@ -14,7 +14,7 @@ import {
 import { useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import { TbTrash } from "react-icons/tb";
 import LabelWithTooltip from "../../../labelWithTooltip";
 import {
@@ -177,15 +177,15 @@ interface Props {
     onConditionalsChange: (conditionals: Predicate[]) => void;
     onSwitchChange: (active: boolean) => void;
     error?: string | ReactNode;
+    isActive?: boolean;
 }
 
 export const Conditions: FC<Props> = ({
     onConditionalsChange,
     onSwitchChange,
     error,
+    isActive,
 }) => {
-    const [checked, setChecked] = useState(false);
-
     return (
         <Stack>
             <Group justify="space-between" align="normal" wrap="nowrap">
@@ -205,18 +205,17 @@ export const Conditions: FC<Props> = ({
                 </Stack>
                 <Switch
                     data-testid="add-conditionals-switch"
-                    checked={checked}
+                    checked={isActive}
                     onClick={(evt) => {
                         const val = evt.currentTarget.checked;
                         onSwitchChange(val);
-                        setChecked(val);
                         if (!val) {
                             onConditionalsChange([]);
                         }
                     }}
                 />
             </Group>
-            {checked ? (
+            {isActive ? (
                 <Stack pl="sm" gap="xs">
                     <AddConditions
                         onConditionalsChange={onConditionalsChange}

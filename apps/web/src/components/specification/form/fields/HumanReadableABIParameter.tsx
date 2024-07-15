@@ -7,30 +7,12 @@ import {
     Text,
     TextInput,
 } from "@mantine/core";
-import { isEmpty, isNotNil, reject } from "ramda";
-import { FC, ReactNode, useEffect, useReducer, useRef } from "react";
+import { createFormActions, useForm } from "@mantine/form";
+import { clone } from "ramda";
+import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import { TbTrash } from "react-icons/tb";
 import { parseAbiParameters } from "viem";
-import { useSpecFormContext } from "../context";
-
-type AddEntry = {
-    type: "ADD_ENTRY";
-    payload: string;
-};
-
-type RemoveEntry = {
-    type: "REMOVE_ENTRY";
-    payload: string;
-};
-
-interface State {
-    entries: string[];
-    error: Error | null;
-}
-
-type Action = AddEntry | RemoveEntry;
-
-type Reducer = (state: State, action: Action) => State;
 
 const checkError = (entries: string[]) => {
     try {
@@ -41,59 +23,50 @@ const checkError = (entries: string[]) => {
     }
 };
 
-const reducer: Reducer = (state, action) => {
-    let entries = state.entries;
-    if (action.type === "ADD_ENTRY") {
-        entries = [...state.entries, action.payload];
-    }
-
-    if (action.type === "REMOVE_ENTRY") {
-        entries = reject((v) => v === action.payload, state.entries);
-    }
-
-    return {
-        ...state,
-        entries,
-        error: checkError(entries),
-    };
-};
-
-const initialState = {
-    entries: [],
-    error: null,
-};
-
+interface FormValues {
+    entries: string[];
+    abiParamEntry: string;
+}
 interface HumanReadableABIParameter {
     error?: string | ReactNode;
+    onAbiParamsChange: (abiParams: string[]) => void;
 }
+
+export const humanReadableABIParameterFormActions =
+    createFormActions<FormValues>("human-readable-abi-parameter-form");
 
 export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
     props,
 ) => {
-    const form = useSpecFormContext();
+    const form = useForm<FormValues>({
+        name: "human-readable-abi-parameter-form",
+        initialValues: {
+            abiParamEntry: "",
+            entries: [],
+        },
+    });
+
     const ref = useRef<HTMLInputElement>(null);
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const { entries, error } = state;
+    const { entries, abiParamEntry } = form.getTransformedValues();
+    const error = isNotNilOrEmpty(entries) ? checkError(entries) : null;
+    const onAbiParamsChange = props.onAbiParamsChange;
 
     const addABIParam = () => {
-        const entry = form.getInputProps("abiParamEntry").value;
-
-        if (isNotNil(entry) && !isEmpty(entry)) {
-            dispatch({ type: "ADD_ENTRY", payload: entry });
+        if (isNotNilOrEmpty(abiParamEntry)) {
+            form.insertListItem("entries", clone(abiParamEntry));
             form.setFieldValue("abiParamEntry", "");
             ref.current?.focus();
         }
     };
 
-    const removeABIParam = (entry: string) => {
-        dispatch({ type: "REMOVE_ENTRY", payload: entry });
+    const removeABIParam = (index: number) => {
+        form.removeListItem("entries", index);
         ref.current?.focus();
     };
 
     useEffect(() => {
-        form.setFieldValue("abiParams", [...entries]);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [entries]);
+        if (isFunction(onAbiParamsChange)) onAbiParamsChange([...entries]);
+    }, [entries, onAbiParamsChange]);
 
     return (
         <Stack>
@@ -127,7 +100,7 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
                                 <ActionIcon
                                     variant="transparent"
                                     color="red"
-                                    onClick={() => removeABIParam(entry)}
+                                    onClick={() => removeABIParam(idx)}
                                 >
                                     <TbTrash size={21} />
                                 </ActionIcon>
