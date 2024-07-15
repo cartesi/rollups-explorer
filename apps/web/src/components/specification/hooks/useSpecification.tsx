@@ -60,7 +60,9 @@ const removeSpecificationAtom = atom(
                 isFunction(action.opt.onSuccess) && action.opt.onSuccess();
             })
             .catch((reason: Error) => {
-                console.log(`Failed to add specification: ${reason.message}`);
+                console.log(
+                    `Failed to remove specification: ${reason.message}`,
+                );
                 isFunction(action.opt.onFailure) &&
                     action.opt.onFailure(reason);
             })
@@ -90,10 +92,9 @@ const useActions = () => {
 
 export const useSpecification = () => {
     const [specifications, setSpecifications] = useAtom(specificationsAtom);
+    const { addSpecification, removeSpecification } = useActions();
     const value = useAtomValue(loadSpecificationAtom);
     const fetching = value.state === "loading";
-
-    const { addSpecification, removeSpecification } = useActions();
 
     const getSpecification = (id: string) =>
         find((val) => val.id === id, specifications ?? []);

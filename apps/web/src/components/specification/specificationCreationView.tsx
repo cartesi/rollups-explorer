@@ -36,7 +36,7 @@ const toJSON = (value: string) => {
     }
 };
 
-export const SpecificationView = () => {
+export const SpecificationCreationView = () => {
     const [layout, setLayout] = useState<Layout>("split_screen");
     const colSpan = layout === "split_screen" ? 6 : 12;
     const form = useSpecForm({
@@ -66,6 +66,7 @@ export const SpecificationView = () => {
         <Stack>
             <Flex justify="flex-start">
                 <SegmentedControl
+                    data-testid="specification-creation-view-switch"
                     value={layout}
                     onChange={(value) => {
                         setLayout(value as Layout);

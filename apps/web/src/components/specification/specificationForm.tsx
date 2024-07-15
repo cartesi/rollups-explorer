@@ -130,6 +130,7 @@ export const SpecificationForm = () => {
             >
                 <Stack>
                     <TextInput
+                        data-testid="specification-name-input"
                         label="Name"
                         description="Specification name for ease identification"
                         placeholder="My Spec name"

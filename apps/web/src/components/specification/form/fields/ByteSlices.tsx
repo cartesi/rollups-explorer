@@ -228,7 +228,12 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
             <Fieldset p="xs">
                 <Group justify="space-between">
                     <Text fw="bold">Define a slice</Text>
-                    <Button onClick={toggle} size="compact-sm" px="sm">
+                    <Button
+                        onClick={toggle}
+                        size="compact-sm"
+                        px="sm"
+                        data-testid="byte-slice-form-resize"
+                    >
                         {expanded ? (
                             <TbArrowsDiagonalMinimize2
                                 size={theme?.other.iconSize ?? 21}
