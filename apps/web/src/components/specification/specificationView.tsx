@@ -44,7 +44,6 @@ export const SpecificationView = () => {
             mode: "json_abi",
             name: "",
             abiParams: [],
-            abiParamEntry: "",
             encodedData: "" as Hex,
             abi: undefined,
             conditionals: [],
