@@ -5,6 +5,7 @@ import { isBlank, isFunction } from "ramda-adjunct";
 import { FC, ReactNode, useEffect } from "react";
 import { Abi, parseAbi } from "viem";
 import LabelWithTooltip from "../../../labelWithTooltip";
+import { prepareSignatures, stringifyContent } from "../../utils";
 
 const placeholder = `function balanceOf(address owner) view returns (uint256) \nevent Transfer(address indexed from, address indexed to, uint256 amount)`;
 interface Props {
@@ -12,13 +13,6 @@ interface Props {
     onAbiChange: (abi: Abi) => void;
     error?: string | ReactNode;
 }
-
-const Separator = "\n" as const;
-
-const stringifyContent = (value: any) => JSON.stringify(value, null, 2);
-
-const prepareSignatures = (multiline: string) =>
-    multiline.split(Separator).map((signature) => signature?.trim());
 
 const abiTipMessage =
     "Define the signature without wrapping it on quotes nor adding comma at the end to separate. Just hit enter and keep defining your signatures";
