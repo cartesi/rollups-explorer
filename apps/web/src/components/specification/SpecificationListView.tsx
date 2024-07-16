@@ -5,9 +5,11 @@ import {
     Badge,
     Button,
     Card,
+    Center,
     Grid,
     Group,
-    JsonInput,
+    SegmentedControl,
+    Skeleton,
     Stack,
     Table,
     Text,
@@ -15,21 +17,29 @@ import {
     VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
-import { isEmpty } from "ramda";
+import Link from "next/link";
+import { T, cond, filter, isEmpty, propEq, range } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { TbTrash } from "react-icons/tb";
+import { Abi } from "viem";
 import { useSpecification } from "./hooks/useSpecification";
 import {
+    ABI_PARAMS,
     Condition,
     ConditionalOperator,
+    JSON_ABI,
+    Modes,
     Predicate,
     SliceInstruction,
+    Specification,
     inputProperties,
     logicalOperators,
     operators,
 } from "./types";
 import { stringifyContent } from "./utils";
+
+const CARD_MIN_HEIGHT = 300 as const;
 
 type ValueLabelList =
     | typeof operators
@@ -47,6 +57,51 @@ const reduceValueLabel = (list: ValueLabelList): Record<string, string> =>
 const inputPropLabel = reduceValueLabel(inputProperties);
 const operatorLabel = reduceValueLabel(operators);
 const logicalOperatorsLabel = reduceValueLabel(logicalOperators);
+
+const DisplayABIParams: FC<{
+    abiParams: readonly string[];
+    sliceTarget?: string;
+}> = ({ abiParams, sliceTarget }) => (
+    <Accordion.Item key="abi-params-item" value="abi-params-item">
+        <Accordion.Control>
+            <Title order={4}>ABI Parameters</Title>
+        </Accordion.Control>
+
+        <Accordion.Panel>
+            <Stack>
+                {abiParams.map((param, idx) => (
+                    <CodeHighlight
+                        withCopyButton={false}
+                        language="solidity"
+                        code={param}
+                        key={idx}
+                    />
+                ))}
+                {isNotNilOrEmpty(sliceTarget) && (
+                    <Text c="dimmed">
+                        It will be used on slice named {sliceTarget}
+                    </Text>
+                )}
+            </Stack>
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
+const DisplayABI: FC<{ abi: Abi }> = ({ abi }) => (
+    <Accordion.Item key="abi-item" value="abi-item">
+        <Accordion.Control>
+            <Title order={4}>ABI</Title>
+        </Accordion.Control>
+
+        <Accordion.Panel>
+            <CodeHighlight
+                code={stringifyContent(abi ?? [])}
+                withCopyButton={false}
+                language="json"
+            />
+        </Accordion.Panel>
+    </Accordion.Item>
+);
 
 const DisplayInstructions: FC<{ slices: SliceInstruction[] | undefined }> = ({
     slices,
@@ -101,19 +156,23 @@ const DisplayInstructions: FC<{ slices: SliceInstruction[] | undefined }> = ({
 };
 
 const buildConditionalExpression = (cond: Condition) =>
-    `\n  ${inputPropLabel[cond.field]} ${operatorLabel[cond.operator]} "${cond.value}"`;
+    `\n  ${inputPropLabel[cond.field]} ${operatorLabel[cond.operator]} "${
+        cond.value
+    }"`;
 
 const codeGenerator = (
     conditions: Condition[],
     logicalOperator: ConditionalOperator,
 ) => {
-    let template = `if(`;
+    let template = `if (`;
 
     conditions.forEach((cond, idx) => {
         if (idx === 0) {
             template += buildConditionalExpression(cond);
         } else {
-            template += ` ${logicalOperatorsLabel[logicalOperator]}${buildConditionalExpression(cond)}`;
+            template += ` ${
+                logicalOperatorsLabel[logicalOperator]
+            }${buildConditionalExpression(cond)}`;
         }
     });
 
@@ -150,125 +209,152 @@ const DisplayConditional: FC<{ conditionals: Predicate[] }> = ({
     );
 };
 
+const Feedback: FC = () => (
+    <Grid justify="flex-start" align="stretch">
+        {range(0, 4).map((n) => (
+            <Grid.Col span={{ base: 12, md: 6 }} key={n}>
+                <Card style={{ minHeight: CARD_MIN_HEIGHT }}>
+                    <Group justify="space-between">
+                        <Skeleton height={18} mb="xl" width="70%" />
+                        <Skeleton height={18} mb="xl" width="5%" />
+                    </Group>
+                    <Skeleton height={8} mb="xl" width="20%" />
+                    <Skeleton height={21} my="xs" />
+                    <Skeleton height={21} my="xs" />
+                    <Skeleton height={21} my="xs" />
+                </Card>
+            </Grid.Col>
+        ))}
+    </Grid>
+);
+
+const NewSpecificationButton: FC<{ btnText?: string }> = ({
+    btnText = "New",
+}) => (
+    <Button component={Link} href="/specifications/new">
+        {btnText}
+    </Button>
+);
+
+const NoSpecifications: FC = () => (
+    <Center>
+        <Group>
+            <Title order={3} c="dimmed">
+                No Specifications Found!
+            </Title>
+            <NewSpecificationButton btnText="Create One!" />
+        </Group>
+    </Center>
+);
+
+type ModeFilter = "all" | Modes;
+
+type FilterByMode = (value: {
+    filterBy: ModeFilter;
+    list: Specification[];
+}) => Specification[];
+
+const filterByMode: FilterByMode = cond([
+    [({ filterBy }) => filterBy === "all", ({ list }) => list],
+    [T, ({ filterBy, list }) => filter(propEq(filterBy, "mode"), list)],
+]);
+
 export const SpecificationListView: FC = () => {
     const theme = useMantineTheme();
+    const [filter, setFilter] = useState<ModeFilter>("all");
     const { fetching, listSpecifications, removeSpecification } =
         useSpecification();
+
     const specifications = listSpecifications();
 
-    if (fetching) return <h1>Loading!!!</h1>;
+    if (fetching) return <Feedback />;
+    if (isNilOrEmpty(specifications)) return <NoSpecifications />;
 
-    if (isNilOrEmpty(specifications)) return <h1>No Specifications found!</h1>;
+    const filteredSpecs = filterByMode({
+        filterBy: filter,
+        list: specifications ?? [],
+    });
 
     return (
-        <Grid justify="flex-start" align="stretch">
-            {specifications?.map((spec) => (
-                <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
-                    <Card style={{ minHeight: 300 }}>
-                        <Card.Section inheritPadding py="sm">
-                            <Group justify="space-between" wrap="nowrap">
-                                <Title
-                                    order={3}
-                                    lineClamp={1}
-                                    title={spec.name}
-                                >
-                                    {spec.name}
-                                </Title>
-                                <Button
-                                    aria-label={`remove-${spec.id!}`}
-                                    role="button"
-                                    size="compact-sm"
-                                    variant="transparent"
-                                    color="red"
-                                    data-testid="remove-connection"
-                                    onClick={() =>
-                                        removeSpecification(spec.id!)
-                                    }
-                                >
-                                    <TbTrash size={theme.other.iconSize} />
-                                    <VisuallyHidden>
-                                        Remove specification id {spec.id}
-                                    </VisuallyHidden>
-                                </Button>
-                            </Group>
-                        </Card.Section>
-                        <Badge>
-                            {spec.mode === "abi_params"
-                                ? "ABI Parameters"
-                                : "Json ABI"}
-                        </Badge>
-
-                        <Accordion
-                            variant="default"
-                            chevronPosition="right"
-                            py="sm"
-                        >
-                            {spec.mode === "json_abi" && (
-                                <Accordion.Item key="abi-item" value="abi-item">
-                                    <Accordion.Control>
-                                        <Title order={4}>ABI</Title>
-                                    </Accordion.Control>
-
-                                    <Accordion.Panel>
-                                        <JsonInput
-                                            value={stringifyContent(
-                                                spec.abi ?? [],
-                                            )}
-                                            readOnly
-                                            variant="transparent"
-                                            autosize
-                                        />
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-                            )}
-
-                            {spec.mode === "abi_params" && (
-                                <>
-                                    <Accordion.Item
-                                        key="abi-params-item"
-                                        value="abi-params-item"
+        <Stack>
+            <Group>
+                <SegmentedControl
+                    data-testid="specification-filter-control"
+                    data={[
+                        { value: "all", label: "All" },
+                        { value: JSON_ABI, label: "JSON ABI" },
+                        { value: ABI_PARAMS, label: "ABI Params" },
+                    ]}
+                    value={filter}
+                    onChange={(value) => setFilter(value as ModeFilter)}
+                />
+                <NewSpecificationButton />
+            </Group>
+            <Grid justify="flex-start" align="stretch">
+                {filteredSpecs?.map((spec) => (
+                    <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
+                        <Card style={{ minHeight: CARD_MIN_HEIGHT }}>
+                            <Card.Section inheritPadding py="sm">
+                                <Group justify="space-between" wrap="nowrap">
+                                    <Title
+                                        order={3}
+                                        lineClamp={1}
+                                        title={spec.name}
                                     >
-                                        <Accordion.Control>
-                                            <Title order={4}>
-                                                ABI Parameters
-                                            </Title>
-                                        </Accordion.Control>
+                                        {spec.name}
+                                    </Title>
+                                    <Button
+                                        aria-label={`remove-${spec.id!}`}
+                                        role="button"
+                                        size="compact-sm"
+                                        variant="transparent"
+                                        color="red"
+                                        data-testid="remove-connection"
+                                        onClick={() =>
+                                            removeSpecification(spec.id!)
+                                        }
+                                    >
+                                        <TbTrash size={theme.other.iconSize} />
+                                        <VisuallyHidden>
+                                            Remove specification id {spec.id}
+                                        </VisuallyHidden>
+                                    </Button>
+                                </Group>
+                            </Card.Section>
+                            <Badge>
+                                {spec.mode === "abi_params"
+                                    ? "ABI Parameters"
+                                    : "Json ABI"}
+                            </Badge>
 
-                                        <Accordion.Panel>
-                                            <Stack>
-                                                <JsonInput
-                                                    variant="transparent"
-                                                    readOnly
-                                                    autosize
-                                                    value={stringifyContent(
-                                                        spec.abiParams,
-                                                    )}
-                                                />
+                            <Accordion
+                                variant="default"
+                                chevronPosition="right"
+                                py="sm"
+                            >
+                                {spec.mode === "json_abi" && (
+                                    <DisplayABI abi={spec.abi} />
+                                )}
 
-                                                {isNotNilOrEmpty(
-                                                    spec.sliceTarget,
-                                                ) && (
-                                                    <Text c="dimmed">
-                                                        It will be used on slice
-                                                        named {spec.sliceTarget}
-                                                    </Text>
-                                                )}
-                                            </Stack>
-                                        </Accordion.Panel>
-                                    </Accordion.Item>
-
-                                    <DisplayInstructions
-                                        slices={spec.sliceInstructions}
-                                    />
-                                </>
-                            )}
-                            <DisplayConditional
-                                conditionals={spec.conditionals ?? []}
-                            />
-                        </Accordion>
-                    </Card>
-                </Grid.Col>
-            ))}
-        </Grid>
+                                {spec.mode === "abi_params" && (
+                                    <>
+                                        <DisplayABIParams
+                                            abiParams={spec.abiParams}
+                                            sliceTarget={spec.sliceTarget}
+                                        />
+                                        <DisplayInstructions
+                                            slices={spec.sliceInstructions}
+                                        />
+                                    </>
+                                )}
+                                <DisplayConditional
+                                    conditionals={spec.conditionals ?? []}
+                                />
+                            </Accordion>
+                        </Card>
+                    </Grid.Col>
+                ))}
+            </Grid>
+        </Stack>
     );
 };

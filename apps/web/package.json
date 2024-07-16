@@ -35,6 +35,8 @@
         "encoding": "^0.1",
         "graphql": "^16",
         "graphql-tag": "^2",
+        "highlight.js": "11.10.0",
+        "highlightjs-solidity": "^2.0.6",
         "jotai": "^2.9.0",
         "lokijs": "^1",
         "next": "^14.1.4",
