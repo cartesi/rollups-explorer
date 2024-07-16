@@ -1,4 +1,5 @@
 "use client";
+import { CodeHighlight } from "@mantine/code-highlight";
 import {
     Accordion,
     Badge,
@@ -14,33 +15,38 @@ import {
     VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
-import { isEmpty, prop } from "ramda";
+import { isEmpty } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC } from "react";
 import { TbTrash } from "react-icons/tb";
 import { useSpecification } from "./hooks/useSpecification";
 import {
+    Condition,
+    ConditionalOperator,
     Predicate,
     SliceInstruction,
     inputProperties,
+    logicalOperators,
     operators,
 } from "./types";
 import { stringifyContent } from "./utils";
 
-const inputPropLabel: Record<string, string> = inputProperties.reduce(
-    (prev, curr) => {
+type ValueLabelList =
+    | typeof operators
+    | typeof logicalOperators
+    | typeof inputProperties;
+
+const reduceValueLabel = (list: ValueLabelList): Record<string, string> =>
+    list.reduce((prev, curr) => {
         return {
             ...prev,
-            [curr.value]: curr.label,
+            [curr.value]: curr.programmingLabel,
         };
-    },
-    {},
-);
+    }, {});
 
-const operatorLabel: Record<string, string> = operators.reduce(
-    (prev, curr) => ({ ...prev, [curr.value]: curr.label }),
-    {},
-);
+const inputPropLabel = reduceValueLabel(inputProperties);
+const operatorLabel = reduceValueLabel(operators);
+const logicalOperatorsLabel = reduceValueLabel(logicalOperators);
 
 const DisplayInstructions: FC<{ slices: SliceInstruction[] | undefined }> = ({
     slices,
@@ -94,6 +100,28 @@ const DisplayInstructions: FC<{ slices: SliceInstruction[] | undefined }> = ({
     );
 };
 
+const buildConditionalExpression = (cond: Condition) =>
+    `\n  ${inputPropLabel[cond.field]} ${operatorLabel[cond.operator]} "${cond.value}"`;
+
+const codeGenerator = (
+    conditions: Condition[],
+    logicalOperator: ConditionalOperator,
+) => {
+    let template = `if(`;
+
+    conditions.forEach((cond, idx) => {
+        if (idx === 0) {
+            template += buildConditionalExpression(cond);
+        } else {
+            template += ` ${logicalOperatorsLabel[logicalOperator]}${buildConditionalExpression(cond)}`;
+        }
+    });
+
+    template += "\n)";
+
+    return template;
+};
+
 const DisplayConditional: FC<{ conditionals: Predicate[] }> = ({
     conditionals,
 }) => {
@@ -101,7 +129,6 @@ const DisplayConditional: FC<{ conditionals: Predicate[] }> = ({
 
     const conditions = conditionals[0].conditions;
     const logicalOperator = conditionals[0].logicalOperator;
-    const addLogicalOperator = conditions.length > 1;
 
     return (
         <Accordion.Item
@@ -113,30 +140,11 @@ const DisplayConditional: FC<{ conditionals: Predicate[] }> = ({
             </Accordion.Control>
 
             <Accordion.Panel>
-                {conditions.map((condition, idx) => (
-                    <Stack key={idx} gap="xs">
-                        {idx < 1 && <Title order={4}>When</Title>}
-                        <Group pl="md">
-                            <Text fw="bold">
-                                {prop(condition.field, inputPropLabel)}
-                            </Text>
-                            <Text c="dimmed">is</Text>
-                            <Text style={{ textTransform: "lowercase" }}>
-                                {prop(condition.operator, operatorLabel)}
-                            </Text>
-                            <Text c="dimmed">to</Text>
-                            <Text fw="bold">{condition.value}</Text>
-                            {idx === 0 && addLogicalOperator && (
-                                <Text
-                                    fw="bold"
-                                    style={{ textTransform: "uppercase" }}
-                                >
-                                    {logicalOperator}
-                                </Text>
-                            )}
-                        </Group>
-                    </Stack>
-                ))}
+                <CodeHighlight
+                    code={codeGenerator(conditions, logicalOperator)}
+                    language="ts"
+                    withCopyButton={false}
+                />
             </Accordion.Panel>
         </Accordion.Item>
     );

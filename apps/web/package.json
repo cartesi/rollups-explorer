@@ -19,6 +19,7 @@
         "@ant-design/web3-icons": "^1.6.0",
         "@cartesi/rollups-explorer-ui": "*",
         "@cartesi/rollups-wagmi": "*",
+        "@mantine/code-highlight": "^7.7.1",
         "@mantine/core": "^7.7.1",
         "@mantine/form": "^7.7.1",
         "@mantine/hooks": "^7.7.1",

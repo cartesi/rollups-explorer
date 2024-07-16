@@ -5,14 +5,20 @@ import { IRepository } from "../../interfaces/Repository";
 export const JSON_ABI = "json_abi" as const;
 export const ABI_PARAMS = "abi_params" as const;
 export const specModes = [JSON_ABI, ABI_PARAMS] as const;
-export const operators = [{ value: "equals", label: "Equal" }] as const;
+export const operators = [
+    { value: "equals", label: "Equal", programmingLabel: "===" },
+] as const;
 export const logicalOperators = [
-    { value: "and", label: "AND" },
-    { value: "or", label: "OR" },
+    { value: "and", label: "AND", programmingLabel: "&&" },
+    { value: "or", label: "OR", programmingLabel: "||" },
 ] as const;
 export const inputProperties = [
-    { value: "application.id", label: "Application Address" },
-    { value: "msgSender", label: "Sender" },
+    {
+        value: "application.id",
+        label: "Application Address",
+        programmingLabel: "applicationAddress",
+    },
+    { value: "msgSender", label: "Sender", programmingLabel: "sender" },
 ] as const;
 
 export type Modes = (typeof specModes)[number];
