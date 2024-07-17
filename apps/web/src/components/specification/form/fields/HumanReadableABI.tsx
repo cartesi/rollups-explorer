@@ -1,4 +1,5 @@
-import { Accordion, JsonInput, Stack, Textarea, Title } from "@mantine/core";
+import { CodeHighlight } from "@mantine/code-highlight";
+import { Accordion, Stack, Textarea, Title } from "@mantine/core";
 import { createFormActions, useForm } from "@mantine/form";
 import { isNotNil } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
@@ -106,11 +107,10 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
                         </Accordion.Control>
 
                         <Accordion.Panel>
-                            <JsonInput
-                                value={stringifyContent(readableList ?? [])}
-                                readOnly
-                                variant="transparent"
-                                autosize
+                            <CodeHighlight
+                                withCopyButton={false}
+                                language="solidity"
+                                code={stringifyContent(readableList ?? [])}
                             />
                         </Accordion.Panel>
                     </Accordion.Item>
@@ -124,11 +124,10 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
                         </Accordion.Control>
 
                         <Accordion.Panel>
-                            <JsonInput
-                                variant="transparent"
-                                readOnly
-                                autosize
-                                value={stringifyContent(generatedAbi ?? {})}
+                            <CodeHighlight
+                                withCopyButton={false}
+                                language="JSON"
+                                code={stringifyContent(generatedAbi ?? [])}
                             />
                         </Accordion.Panel>
                     </Accordion.Item>
