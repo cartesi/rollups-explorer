@@ -27,6 +27,9 @@ jobs:
             - name: Code format check
               run: yarn format:check
 
+            - name: Install turbo
+              run: yarn global add turbo@1.13.3
+
             - name: Linting
               run: yarn lint
 
