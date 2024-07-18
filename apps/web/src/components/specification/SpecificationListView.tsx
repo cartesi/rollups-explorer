@@ -240,6 +240,26 @@ const NoSpecifications: FC = () => (
     </Center>
 );
 
+const NoSpecificationsFiltered: FC<{
+    quantity: number;
+    filterName: string;
+}> = ({ filterName, quantity }) => {
+    const filterType = filterName === JSON_ABI ? "JSON ABI" : "ABI Params";
+    return (
+        <Center py="lg">
+            <Group gap="xs">
+                <Title order={3} c="dimmed">
+                    {quantity > 1 &&
+                        `You have ${quantity} specifications, but none of them are the type`}{" "}
+                    {quantity === 1 &&
+                        `You have one specification but it is not the type`}
+                </Title>
+                <Badge>{filterType}</Badge>
+            </Group>
+        </Center>
+    );
+};
+
 type ModeFilter = "all" | Modes;
 
 type FilterByMode = (value: {
@@ -283,6 +303,14 @@ export const SpecificationListView: FC = () => {
                 />
                 <NewSpecificationButton />
             </Group>
+
+            {isNilOrEmpty(filteredSpecs) && (
+                <NoSpecificationsFiltered
+                    filterName={filter}
+                    quantity={specifications?.length ?? 0}
+                />
+            )}
+
             <Grid justify="flex-start" align="stretch">
                 {filteredSpecs?.map((spec) => (
                     <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
