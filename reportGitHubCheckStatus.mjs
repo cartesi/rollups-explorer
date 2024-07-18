@@ -1,5 +1,5 @@
-import { createActionAuth } from '@octokit/auth-action';
-import { Octokit } from '@octokit/rest';
+import { createActionAuth } from "@octokit/auth-action";
+import { Octokit } from "@octokit/rest";
 
 async function main() {
     const [context, sha, state] = process.argv.slice(2);
@@ -10,8 +10,8 @@ async function main() {
     });
 
     await octokit.rest.repos.createCommitStatus({
-        owner: 'cartesi',
-        repo: 'rollups-explorer',
+        owner: "cartesi",
+        repo: "rollups-explorer",
         context,
         sha,
         state,
