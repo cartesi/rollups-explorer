@@ -1,10 +1,13 @@
 import { expect, Page } from "@playwright/test";
 import { Address } from "viem";
 
+export const graphqlEndpoint = "https://drawingcanvas.fly.dev/graphql";
+
 export const createConnection = async (
     page: Page,
     address: Address,
-    url = "https://rollups-mocked.calls.to/graphql",
+    url = graphqlEndpoint,
+    shouldTypeAddress = true,
 ) => {
     // Find and click the button for displaying the connection modal
     const button = page.getByTestId("add-connection");
@@ -14,9 +17,11 @@ export const createConnection = async (
     await expect(page.getByText("Create App Connection")).toBeVisible();
 
     // Fill in the address
-    const addressInput = await page.getByTestId("connection-address");
-    await addressInput.focus();
-    await page.keyboard.type(address);
+    if (shouldTypeAddress) {
+        const addressInput = await page.getByTestId("connection-address");
+        await addressInput.focus();
+        await page.keyboard.type(address);
+    }
 
     // Fill in the url
     const urlInput = await page.getByTestId("connection-url");
