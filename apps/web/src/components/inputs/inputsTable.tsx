@@ -17,6 +17,7 @@ import type { InputItemFragment } from "../../graphql/explorer/operations";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
 import InputRow from "./inputRow";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 export interface InputsTableProps {
     inputs: InputItemFragment[];
@@ -40,6 +41,8 @@ const InputsTable: FC<InputsTableProps> = ({
     const { childrenRef, isVisible } = useElementVisibility({
         element: tableRowRef,
     });
+    const { listConnections } = useConnectionConfig();
+    const connectionsLength = listConnections().length;
 
     return (
         <TableResponsiveWrapper ref={tableRowRef}>
@@ -52,14 +55,24 @@ const InputsTable: FC<InputsTableProps> = ({
                         <Table.Th>Method</Table.Th>
                         <Table.Th>Index</Table.Th>
                         <Table.Th>
-                            <Tooltip label="Check the status by adding a connection. Click the ? in the row to add a connection.">
+                            <Tooltip
+                                label="Check the status by adding a connection. Click the ? in the row to add a connection."
+                                disabled={connectionsLength > 0}
+                            >
                                 <Flex align="center">
                                     <Text size="sm" fw={600}>
                                         Status
                                     </Text>
-                                    <ActionIcon size="xs" radius={50} ml={4}>
-                                        <TbQuestionMark />
-                                    </ActionIcon>
+                                    {connectionsLength === 0 && (
+                                        <ActionIcon
+                                            size="xs"
+                                            radius={50}
+                                            ml={4}
+                                            data-testid="tooltip-icon"
+                                        >
+                                            <TbQuestionMark />
+                                        </ActionIcon>
+                                    )}
                                 </Flex>
                             </Tooltip>
                         </Table.Th>

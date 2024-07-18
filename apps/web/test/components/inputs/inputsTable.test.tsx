@@ -49,6 +49,7 @@ describe("InputsTable component", () => {
             getConnection: () => vi.fn(),
             hasConnection: () => vi.fn(),
             showConnectionModal: () => vi.fn(),
+            listConnections: () => [],
         } as any);
 
         useQueryMock.mockReturnValue([
@@ -100,6 +101,37 @@ describe("InputsTable component", () => {
                     "Check the status by adding a connection. Click the ? in the row to add a connection.",
                 ),
             ).toBeInTheDocument(),
+        );
+    });
+
+    it("should hide status tooltip when there are some connections", async () => {
+        useConnectionConfigMock.mockReturnValue({
+            getConnection: () => vi.fn(),
+            hasConnection: () => vi.fn(),
+            showConnectionModal: () => vi.fn(),
+            listConnections: () => [
+                {
+                    url: "https://drawingcanvas.fly.dev/graphql",
+                    address: "0x60a7048c3136293071605a4eaffef49923e981cd",
+                },
+            ],
+        } as any);
+        render(<Component {...defaultProps} />);
+
+        expect(() => screen.getByTestId("tooltip-icon")).toThrow(
+            "Unable to find an element",
+        );
+
+        const statusCol = screen.getByText("Status");
+        expect(statusCol).toBeInTheDocument();
+
+        fireEvent.mouseEnter(statusCol.parentNode as HTMLDivElement);
+        await waitFor(() =>
+            expect(() =>
+                screen.getByText(
+                    "Check the status by adding a connection. Click the ? in the row to add a connection.",
+                ),
+            ).toThrow("Unable to find an element"),
         );
     });
 });
