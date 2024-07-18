@@ -21,14 +21,8 @@ jobs:
             - name: Install Dependencies
               run: yarn install --frozen-lockfile
 
-            - name: Install prettier
-              run: yarn global add prettier@3.0.3
-
             - name: Code format check
               run: yarn format:check
-
-            - name: Install turbo
-              run: yarn global add turbo@1.13.3
 
             - name: Linting
               run: yarn lint
