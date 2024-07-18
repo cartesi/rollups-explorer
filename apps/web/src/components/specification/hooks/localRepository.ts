@@ -23,6 +23,7 @@ const localRepository: Repository = {
     async add(spec: Specification) {
         const cfg = getConfig();
         spec.id = Date.now().toString();
+        spec.timestamp = Date.now();
         cfg[spec.id] = spec;
         localStorage.setItem(namespace, serialize(cfg));
 
@@ -50,6 +51,17 @@ const localRepository: Repository = {
 
     async list() {
         return values(getConfig());
+    },
+
+    async update(spec: Specification) {
+        if (!spec.id)
+            throw new Error("Trying to update a specification without Id");
+        const cfg = getConfig();
+        spec.timestamp = Date.now();
+        cfg[spec.id] = spec;
+        localStorage.setItem(namespace, serialize(cfg));
+
+        return clone(spec);
     },
 };
 

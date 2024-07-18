@@ -1,45 +1,97 @@
 import {
-    Alert,
     Button,
     Card,
-    Code,
     Group,
-    JsonInput,
     SegmentedControl,
     Stack,
-    Text,
     TextInput,
-    Textarea,
-    Title,
 } from "@mantine/core";
-import { useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 
-import { notifications } from "@mantine/notifications";
-import { isNotNilOrEmpty } from "ramda-adjunct";
+import { useScrollIntoView } from "@mantine/hooks";
+import { formatAbi } from "abitype";
+import { useRouter } from "next/navigation";
+import { clone, pathOr, propOr } from "ramda";
+import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
 import { Abi } from "viem";
-import { SpecificationModeInfo } from "./ModeInfo";
-import { decodePayload } from "./decoder";
-import { SpecFormValues, useSpecFormContext } from "./form/context";
-import { ByteSlices, byteSlicesFormActions } from "./form/fields/ByteSlices";
-import { Conditions } from "./form/fields/Conditions";
+import { SpecificationModeInfo } from "../components/ModeInfo";
+import { useSpecification } from "../hooks/useSpecification";
+import { Modes, Predicate, SliceInstruction, Specification } from "../types";
+import { buildSpecification } from "../utils";
+import { SpecFormValues, useSpecFormContext } from "./context";
+import { ByteSlices, byteSlicesFormActions } from "./fields/ByteSlices";
+import { Conditions, conditionsFormActions } from "./fields/Conditions";
 import {
     HumanReadableABI,
     humanReadableABIFormActions,
-} from "./form/fields/HumanReadableABI";
+} from "./fields/HumanReadableABI";
 import {
     HumanReadableABIParameter,
     humanReadableABIParameterFormActions,
-} from "./form/fields/HumanReadableABIParameter";
-import { useSpecification } from "./hooks/useSpecification";
-import { Modes, Predicate, SliceInstruction, Specification } from "./types";
+} from "./fields/HumanReadableABIParameter";
 
-export const SpecificationForm = () => {
+const editModeStartup = (transformedValues: SpecFormValues) => {
+    humanReadableABIFormActions.setFieldValue(
+        "humanABIEntry",
+        formatAbi(transformedValues.abi ?? []).join("\n"),
+    );
+    humanReadableABIParameterFormActions.setFieldValue(
+        "entries",
+        transformedValues.abiParams,
+    );
+
+    byteSlicesFormActions.setValues((prev) => {
+        return {
+            slices: propOr(prev.slices, "sliceInstructions", transformedValues),
+            sliceTarget: propOr(
+                prev.sliceTarget,
+                "sliceTarget",
+                transformedValues,
+            ),
+            sliceTargetChecked: isNotNilOrEmpty(transformedValues.sliceTarget),
+        };
+    });
+
+    conditionsFormActions.setValues((prev) => ({
+        conditions: pathOr(
+            prev.conditions,
+            ["conditionals", "0", "conditions"],
+            transformedValues,
+        ),
+        logicalOperator: pathOr(
+            prev.logicalOperator,
+            ["conditionals", "0", "logicalOperator"],
+            transformedValues,
+        ),
+    }));
+};
+
+interface SpecificationFormProps {
+    onSuccess: (newSpecification: Specification) => void;
+    onFailure: (reason: Error) => void;
+}
+
+export const SpecificationForm: FC<SpecificationFormProps> = ({
+    onFailure,
+    onSuccess,
+}) => {
     const [submitting, setSubmitting] = useState(false);
-    const { addSpecification } = useSpecification();
+    const router = useRouter();
+    const { addSpecification, updateSpecification } = useSpecification();
     const form = useSpecFormContext();
     const transformedValues = form.getTransformedValues();
+    const { scrollIntoView, targetRef } = useScrollIntoView<HTMLInputElement>({
+        duration: 700,
+        offset: 150,
+        cancelable: true,
+    });
+
+    const initialValRef = useRef<SpecFormValues | null>(null);
     const { mode } = transformedValues;
     const { setFieldValue } = form;
+
+    if (transformedValues.formMode === "EDITION" && !initialValRef.current)
+        initialValRef.current = clone(transformedValues);
 
     const onAbiChange = useCallback(
         (abi: Abi) => {
@@ -87,29 +139,23 @@ export const SpecificationForm = () => {
 
     const { errors } = form;
 
-    const onSuccess = (name: string) => {
-        notifications.show({
-            color: "green",
-            title: "Success!",
-            message: `Specification ${name} saved!`,
-            withBorder: true,
-            withCloseButton: true,
-        });
+    const onComplete = (specification: Specification) => {
+        isFunction(onSuccess) && onSuccess(specification);
+
+        scrollIntoView({ alignment: "center" });
+        initialValRef.current = null;
         form.reset();
         humanReadableABIFormActions.reset();
         byteSlicesFormActions.reset();
         humanReadableABIParameterFormActions.reset();
+        conditionsFormActions.reset();
     };
 
-    const onFailure = (reason: Error) => {
-        notifications.show({
-            color: "red",
-            title: "Oops!",
-            message: reason.message ?? "Something went wrong!",
-            withBorder: true,
-            withCloseButton: true,
-        });
-    };
+    useEffect(() => {
+        if (initialValRef.current) {
+            editModeStartup(initialValRef.current);
+        }
+    }, []);
 
     return (
         <Card shadow="sm" withBorder>
@@ -118,11 +164,15 @@ export const SpecificationForm = () => {
                     const specification = buildSpecification(values);
                     if (form.isValid() && specification !== null) {
                         setSubmitting(true);
-                        addSpecification(specification, {
+                        const lifecycle = {
                             onFinished: () => setSubmitting((v) => !v),
-                            onSuccess: () => onSuccess(specification.name),
+                            onSuccess: () => onComplete(specification),
                             onFailure,
-                        });
+                        };
+
+                        values.formMode === "EDITION"
+                            ? updateSpecification(specification, lifecycle)
+                            : addSpecification(specification, lifecycle);
                     } else {
                         form.validate();
                     }
@@ -130,6 +180,7 @@ export const SpecificationForm = () => {
             >
                 <Stack>
                     <TextInput
+                        ref={targetRef}
                         data-testid="specification-name-input"
                         label="Name"
                         description="Specification name for ease identification"
@@ -164,7 +215,7 @@ export const SpecificationForm = () => {
                             form.setValues(changes);
                         }}
                     />
-                    {mode && <SpecificationModeInfo mode={mode} />}
+                    <SpecificationModeInfo mode={mode} />
                     {mode === "json_abi" ? (
                         <HumanReadableABI
                             onAbiChange={onAbiChange}
@@ -201,104 +252,13 @@ export const SpecificationForm = () => {
                             loading={submitting}
                             data-testid="specification-form-save"
                         >
-                            Save
+                            {transformedValues.formMode === "EDITION"
+                                ? "Update"
+                                : "Save"}
                         </Button>
                     </Group>
                 </Stack>
             </form>
-        </Card>
-    );
-};
-
-const replacerForBigInt = (key: any, value: any) => {
-    return typeof value === "bigint" ? value.toString() : value;
-};
-
-const stringifyContent = (value: Record<string, any>): string => {
-    return JSON.stringify(value, replacerForBigInt, 2);
-};
-
-const buildSpecification = (values: SpecFormValues): Specification | null => {
-    const {
-        mode,
-        name,
-        sliceInstructions,
-        abi,
-        abiParams,
-        conditionals,
-        sliceTarget,
-    } = values;
-    const version = 1;
-    const timestamp = Date.now();
-    const commons = { conditionals, timestamp, version, name };
-
-    if (
-        mode === "abi_params" &&
-        (isNotNilOrEmpty(abiParams) || isNotNilOrEmpty(sliceInstructions))
-    ) {
-        return {
-            ...commons,
-            mode,
-            abiParams,
-            sliceInstructions:
-                sliceInstructions.length > 0 ? sliceInstructions : undefined,
-            sliceTarget: sliceTarget,
-        } as Specification;
-    } else if (mode === "json_abi" && isNotNilOrEmpty(abi)) {
-        return {
-            ...commons,
-            mode,
-            abi,
-        } as Specification;
-    }
-
-    return null;
-};
-
-export const DecodingPreview = () => {
-    const form = useSpecFormContext();
-    const values = form.getTransformedValues();
-    const { encodedData } = values;
-    const tempSpec = buildSpecification(values);
-    const envelope =
-        tempSpec && encodedData ? decodePayload(tempSpec, encodedData) : null;
-    const content = envelope?.result ? stringifyContent(envelope.result) : null;
-
-    return (
-        <Card shadow="sm" withBorder>
-            <Title order={3}>Preview</Title>
-            <Stack gap="lg">
-                <Textarea
-                    resize="vertical"
-                    rows={5}
-                    label="Data"
-                    id="encoded-data-preview"
-                    description="Encoded data to test against specification"
-                    {...form.getInputProps("encodedData")}
-                />
-
-                {content && (
-                    <Code>
-                        <JsonInput
-                            value={`${content}`}
-                            variant="transparent"
-                            autosize
-                            readOnly
-                        />
-                    </Code>
-                )}
-
-                {envelope?.error && (
-                    <Alert
-                        color="yellow"
-                        title="Keep changing your specification"
-                    >
-                        <Text style={{ whiteSpace: "pre-line" }}>
-                            {envelope.error.message}
-                        </Text>
-                    </Alert>
-                )}
-            </Stack>
         </Card>
     );
 };

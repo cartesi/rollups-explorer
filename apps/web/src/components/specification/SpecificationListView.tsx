@@ -17,12 +17,13 @@ import {
     VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
-import Link from "next/link";
 import { T, cond, filter, isEmpty, propEq, range } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, useState } from "react";
 import { TbTrash } from "react-icons/tb";
 import { Abi } from "viem";
+import { EditSpecificationButton } from "./components/EditSpecificationButton";
+import { NewSpecificationButton } from "./components/NewSpecificationButton";
 import { useSpecification } from "./hooks/useSpecification";
 import {
     ABI_PARAMS,
@@ -228,14 +229,6 @@ const Feedback: FC = () => (
     </Grid>
 );
 
-const NewSpecificationButton: FC<{ btnText?: string }> = ({
-    btnText = "New",
-}) => (
-    <Button component={Link} href="/specifications/new">
-        {btnText}
-    </Button>
-);
-
 const NoSpecifications: FC = () => (
     <Center>
         <Group>
@@ -303,22 +296,31 @@ export const SpecificationListView: FC = () => {
                                     >
                                         {spec.name}
                                     </Title>
-                                    <Button
-                                        aria-label={`remove-${spec.id!}`}
-                                        role="button"
-                                        size="compact-sm"
-                                        variant="transparent"
-                                        color="red"
-                                        data-testid="remove-connection"
-                                        onClick={() =>
-                                            removeSpecification(spec.id!)
-                                        }
-                                    >
-                                        <TbTrash size={theme.other.iconSize} />
-                                        <VisuallyHidden>
-                                            Remove specification id {spec.id}
-                                        </VisuallyHidden>
-                                    </Button>
+                                    <Group gap={0} wrap="nowrap">
+                                        <EditSpecificationButton
+                                            id={spec.id!}
+                                            iconSize={theme.other.iconSize}
+                                        />
+                                        <Button
+                                            aria-label={`remove-${spec.id!}`}
+                                            role="button"
+                                            size="compact-sm"
+                                            variant="transparent"
+                                            color="red"
+                                            data-testid={`remove-specification-${spec.id}`}
+                                            onClick={() =>
+                                                removeSpecification(spec.id!)
+                                            }
+                                        >
+                                            <TbTrash
+                                                size={theme.other.iconSize}
+                                            />
+                                            <VisuallyHidden>
+                                                Remove specification id{" "}
+                                                {spec.id}
+                                            </VisuallyHidden>
+                                        </Button>
+                                    </Group>
                                 </Group>
                             </Card.Section>
                             <Badge>

@@ -11,7 +11,7 @@ import {
     Text,
     TextInput,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { createFormActions, useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isBlank, isFunction } from "ramda-adjunct";
 import { FC, ReactNode, useEffect } from "react";
@@ -54,11 +54,19 @@ const LIMITS = {
 interface AddConditionsProps {
     onConditionalsChange: (conditionals: Predicate[]) => void;
 }
+interface ConditionsFormValues {
+    conditions: Condition[];
+    logicalOperator: ConditionalOperator;
+}
+
+export const conditionsFormActions =
+    createFormActions<ConditionsFormValues>("conditions-form");
 
 export const AddConditions: FC<AddConditionsProps> = ({
     onConditionalsChange,
 }) => {
-    const form = useForm({
+    const form = useForm<ConditionsFormValues>({
+        name: "conditions-form",
         validateInputOnChange: true,
         initialValues: clone(initialValues),
         validate: {

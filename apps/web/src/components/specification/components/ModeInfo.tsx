@@ -1,7 +1,7 @@
 import { Alert, Anchor, Box, Group, Text } from "@mantine/core";
 import { FC, ReactNode } from "react";
 import { TbAlertCircle, TbExternalLink } from "react-icons/tb";
-import { Modes } from "./types";
+import { Modes } from "../types";
 
 const modeInfo: Record<Modes, ReactNode> = {
     json_abi: (

@@ -1,14 +1,20 @@
 import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import { TbFileCode } from "react-icons/tb";
-import Breadcrumbs from "../../../components/breadcrumbs";
-import { SpecificationContainer } from "../../../components/specification/SpecificationContainer";
+import Breadcrumbs from "../../../../components/breadcrumbs";
+import { SpecificationContainer } from "../../../../components/specification/SpecificationContainer";
 
 export const metadata: Metadata = {
-    title: "Decoding Specifications",
+    title: "Edit Specifications",
 };
 
-export default function SpecificationsPage() {
+interface PageProps {
+    params: {
+        id: string;
+    };
+}
+
+export default function EditSpecificationPage({ params }: PageProps) {
     return (
         <Stack>
             <Breadcrumbs
@@ -26,10 +32,10 @@ export default function SpecificationsPage() {
 
             <Group mb="xl">
                 <TbFileCode size={40} />
-                <Title order={1}>Create a Specification</Title>
+                <Title order={1}>Edit Specifications</Title>
             </Group>
 
-            <SpecificationContainer />
+            <SpecificationContainer specificationId={params.id} />
         </Stack>
     );
 }

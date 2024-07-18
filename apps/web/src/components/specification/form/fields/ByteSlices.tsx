@@ -25,7 +25,7 @@ import {
     isNilOrEmpty,
     isNotNilOrEmpty,
 } from "ramda-adjunct";
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import {
     TbArrowsDiagonal,
     TbArrowsDiagonalMinimize2,
@@ -109,22 +109,14 @@ const InstructionsReview: FC<Props> = ({ slices, onSliceChange }) => {
     );
 };
 
-const initialValues = {
-    slices: [] as SliceInstruction[],
-    sliceInput: {
-        name: "",
-        from: "",
-        to: "",
-        type: "",
-    },
-};
-
 interface SliceInstructionFieldsProps {
     onSliceInstructionsChange: (slices: SliceInstruction[]) => void;
     onSliceTargetChange: (sliceTarget: string | undefined) => void;
     isActive?: boolean;
 }
 interface FormValues {
+    sliceTarget: string | null;
+    sliceTargetChecked: boolean;
     slices: SliceInstruction[];
     sliceInput: {
         name: string;
@@ -187,6 +179,18 @@ const toValidation = (value: string, values: FormValues) => {
     return null;
 };
 
+const initialValues: FormValues = {
+    sliceTarget: null,
+    sliceTargetChecked: false,
+    slices: [] as SliceInstruction[],
+    sliceInput: {
+        name: "",
+        from: "",
+        to: "",
+        type: "",
+    },
+};
+
 export const byteSlicesFormActions =
     createFormActions<FormValues>("byte-slices-form");
 
@@ -195,8 +199,8 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     onSliceTargetChange,
 }) => {
     const theme = useMantineTheme();
-    const [checked, { toggle: toggleTarget }] = useDisclosure(false);
-    const [sliceTarget, setSliceTarget] = useState<string | null>(null);
+    // const [checked, { toggle: toggleTarget }] = useDisclosure(false);
+    // const [sliceTarget, setSliceTarget] = useState<string | null>(null);
     const [expanded, { toggle }] = useDisclosure(true);
     const sliceNameRef = useRef<HTMLInputElement>(null);
     const form = useForm<FormValues>({
@@ -212,7 +216,8 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
         },
     });
 
-    const { slices, sliceInput } = form.getTransformedValues();
+    const { slices, sliceInput, sliceTarget, sliceTargetChecked } =
+        form.getTransformedValues();
 
     const sliceNames = slices.map((slice, idx) => slice.name ?? `slice-${idx}`);
     const key = JSON.stringify(slices);
@@ -338,11 +343,14 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                 <Group>
                     <Checkbox
                         data-testid="apply-abi-on-slice-checkbox"
-                        checked={checked}
+                        checked={sliceTargetChecked}
                         onChange={() => {
-                            toggleTarget();
+                            form.setFieldValue(
+                                "sliceTargetChecked",
+                                !sliceTargetChecked,
+                            );
                             if (sliceTarget !== null) {
-                                setSliceTarget(null);
+                                form.setFieldValue("sliceTarget", null);
                                 if (isFunction(onSliceTargetChange))
                                     onSliceTargetChange(undefined);
                             }
@@ -354,10 +362,10 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                         key={sliceNames.join(",")}
                         placeholder="Pick a slice"
                         data={sliceNames}
-                        disabled={!checked}
+                        disabled={!sliceTargetChecked}
                         value={sliceTarget}
                         onChange={(value) => {
-                            setSliceTarget(value);
+                            form.setFieldValue("sliceTarget", value);
                             if (isFunction(onSliceTargetChange))
                                 onSliceTargetChange(value ?? undefined);
                         }}

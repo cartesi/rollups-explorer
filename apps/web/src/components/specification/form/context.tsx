@@ -1,6 +1,9 @@
+"use client";
 import { createFormContext } from "@mantine/form";
 import { Abi, Hex } from "viem";
-import { Modes, Predicate, SliceInstruction } from "../types";
+import { Modes, Predicate, SliceInstruction, Specification } from "../types";
+
+type EditingData = undefined | { originalSpec: Specification };
 
 /**
  * Form context to support both specification form inputs and preview inputs
@@ -16,6 +19,8 @@ export interface SpecFormValues {
     encodedData?: Hex;
     conditionalsOn: boolean;
     sliceInstructionsOn: boolean;
+    formMode: "CREATION" | "EDITION";
+    editingData: EditingData;
 }
 
 export const [SpecFormProvider, useSpecFormContext, useSpecForm] =

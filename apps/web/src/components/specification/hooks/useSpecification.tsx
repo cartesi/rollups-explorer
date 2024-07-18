@@ -6,10 +6,35 @@ import { useEffect } from "react";
 import { Specification } from "../types";
 import localRepository from "./localRepository";
 
-type ActionLifecycle = {
+interface ActionLifecycle {
     onSuccess?: () => void;
     onFailure?: (reason?: any) => void;
     onFinished?: () => void;
+}
+
+type AtomActionType = "create" | "update" | "remove";
+interface AtomActionLifecycle extends ActionLifecycle {
+    actionName: AtomActionType;
+}
+
+interface Action<PayloadT> {
+    opt: AtomActionLifecycle;
+    payload: PayloadT;
+}
+
+type AddSpecificationAction = Action<Specification>;
+type RemoveSpecificationAction = Action<string>;
+type UpdateSpecificationAction = AddSpecificationAction;
+
+const catchBuilder = (opt: AtomActionLifecycle) => (reason: Error) => {
+    console.error(
+        `Error when trying to ${opt.actionName} specification: ${reason.message}`,
+    );
+    isFunction(opt.onFailure) && opt.onFailure(reason);
+};
+
+const finallyBuilder = (opt: AtomActionLifecycle) => () => {
+    isFunction(opt.onFinished) && opt.onFinished();
 };
 
 const repositoryAtom = atom(localRepository);
@@ -23,67 +48,81 @@ const specificationsAtom = atom<Specification[] | undefined>(undefined);
 
 const addSpecificationAtom = atom(
     null,
-    (get, set, action: { spec: Specification; opt: ActionLifecycle }) => {
+    (get, set, action: AddSpecificationAction) => {
         const repository = get(repositoryAtom);
         const specs = get(specificationsAtom) ?? [];
         repository
-            .add(action.spec)
+            .add(action.payload)
             .then((newSpec) => {
                 set(specificationsAtom, [...specs, newSpec]);
                 isFunction(action.opt.onSuccess) && action.opt.onSuccess();
             })
-            .catch((reason: Error) => {
-                console.log(`Failed to add specification: ${reason.message}`);
-                isFunction(action.opt.onFailure) &&
-                    action.opt.onFailure(reason);
+            .catch(catchBuilder(action.opt))
+            .finally(finallyBuilder(action.opt));
+    },
+);
+
+const updateSpecificationAtom = atom(
+    null,
+    (get, set, action: UpdateSpecificationAction) => {
+        const repository = get(repositoryAtom);
+        const specs = get(specificationsAtom) ?? [];
+        repository
+            .update(action.payload)
+            .then((updatedSpec) => {
+                const newList = specs.map((val) => {
+                    return val.id === updatedSpec.id ? updatedSpec : val;
+                });
+                set(specificationsAtom, newList);
+                isFunction(action.opt.onSuccess) && action.opt.onSuccess();
             })
-            .finally(
-                () =>
-                    isFunction(action.opt.onFinished) &&
-                    action.opt.onFinished(),
-            );
+            .catch(catchBuilder(action.opt))
+            .finally(finallyBuilder(action.opt));
     },
 );
 
 const removeSpecificationAtom = atom(
     null,
-    (get, set, action: { id: string; opt: ActionLifecycle }) => {
+    (get, set, action: RemoveSpecificationAction) => {
         const repository = get(repositoryAtom);
         const specs = get(specificationsAtom) ?? [];
         repository
-            .remove(action.id)
+            .remove(action.payload)
             .then(() => {
                 set(
                     specificationsAtom,
-                    reject((spec) => spec.id === action.id, specs),
+                    reject((spec) => spec.id === action.payload, specs),
                 );
                 isFunction(action.opt.onSuccess) && action.opt.onSuccess();
             })
-            .catch((reason: Error) => {
-                console.log(
-                    `Failed to remove specification: ${reason.message}`,
-                );
-                isFunction(action.opt.onFailure) &&
-                    action.opt.onFailure(reason);
-            })
-            .finally(
-                () =>
-                    isFunction(action.opt.onFinished) &&
-                    action.opt.onFinished(),
-            );
+            .catch(catchBuilder(action.opt))
+            .finally(finallyBuilder(action.opt));
     },
 );
 
 const useActions = () => {
     const addSpecification = useSetAtom(addSpecificationAtom);
     const removeSpecification = useSetAtom(removeSpecificationAtom);
+    const updateSpecification = useSetAtom(updateSpecificationAtom);
 
     const actions = {
         addSpecification(spec: Specification, opt?: ActionLifecycle) {
-            addSpecification({ spec, opt: { ...opt } });
+            addSpecification({
+                payload: spec,
+                opt: { ...opt, actionName: "create" },
+            });
         },
         removeSpecification(id: string, opt?: ActionLifecycle) {
-            removeSpecification({ id, opt: { ...opt } });
+            removeSpecification({
+                payload: id,
+                opt: { ...opt, actionName: "remove" },
+            });
+        },
+        updateSpecification(spec: Specification, opt?: ActionLifecycle) {
+            updateSpecification({
+                payload: spec,
+                opt: { ...opt, actionName: "update" },
+            });
         },
     };
 
@@ -92,7 +131,7 @@ const useActions = () => {
 
 export const useSpecification = () => {
     const [specifications, setSpecifications] = useAtom(specificationsAtom);
-    const { addSpecification, removeSpecification } = useActions();
+    const actions = useActions();
     const value = useAtomValue(loadSpecificationAtom);
     const fetching = value.state === "loading";
 
@@ -109,10 +148,9 @@ export const useSpecification = () => {
     }, [setSpecifications, value, specifications]);
 
     return {
+        ...actions,
         fetching,
         listSpecifications,
-        addSpecification,
-        removeSpecification,
         getSpecification,
         hasSpecification,
     };

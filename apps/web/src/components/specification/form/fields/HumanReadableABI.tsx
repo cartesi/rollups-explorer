@@ -29,8 +29,9 @@ interface FormTransformedValues {
 
 type FormTransform = (v: FormValues) => FormTransformedValues;
 
-export const humanReadableABIFormActions =
-    createFormActions<FormTransformedValues>("human-readable-abi-form");
+export const humanReadableABIFormActions = createFormActions<FormValues>(
+    "human-readable-abi-form",
+);
 
 export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
     const form = useForm<FormValues, FormTransform>({
