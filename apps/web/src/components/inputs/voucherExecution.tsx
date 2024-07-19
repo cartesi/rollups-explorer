@@ -7,12 +7,12 @@ import {
 import { Button, Flex, Loader, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FC, useEffect } from "react";
-import { Address } from "viem";
+import type { Address } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { Voucher } from "../../graphql/rollups/types";
 
 const typeCastProof = (voucher: Partial<Voucher>) => ({
-    context: voucher.proof?.context as `0x${string}`,
+    context: voucher.proof?.context as Address,
     validity: {
         inputIndexWithinEpoch: BigInt(
             (voucher.proof?.validity?.inputIndexWithinEpoch as number) ?? 0,
@@ -21,17 +21,16 @@ const typeCastProof = (voucher: Partial<Voucher>) => ({
             (voucher.proof?.validity?.outputIndexWithinInput as number) ?? 0,
         ),
         outputHashesRootHash: voucher.proof?.validity
-            ?.outputHashesRootHash as `0x${string}`,
+            ?.outputHashesRootHash as Address,
         vouchersEpochRootHash: voucher.proof?.validity
-            ?.vouchersEpochRootHash as `0x${string}`,
+            ?.vouchersEpochRootHash as Address,
         noticesEpochRootHash: voucher.proof?.validity
-            ?.noticesEpochRootHash as `0x${string}`,
-        machineStateHash: voucher.proof?.validity
-            ?.machineStateHash as `0x${string}`,
+            ?.noticesEpochRootHash as Address,
+        machineStateHash: voucher.proof?.validity?.machineStateHash as Address,
         outputHashInOutputHashesSiblings: voucher.proof?.validity
-            ?.outputHashInOutputHashesSiblings as readonly `0x${string}`[],
+            ?.outputHashInOutputHashesSiblings as readonly Address[],
         outputHashesInEpochSiblings: voucher.proof?.validity
-            ?.outputHashesInEpochSiblings as readonly `0x${string}`[],
+            ?.outputHashesInEpochSiblings as readonly Address[],
     },
 });
 
@@ -55,8 +54,8 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     });
     const prepare = useSimulateCartesiDAppExecuteVoucher({
         args: [
-            voucher.destination as `0x${string}`,
-            voucher.payload as `0x${string}`,
+            voucher.destination as Address,
+            voucher.payload as Address,
             typeCastProof(voucher),
         ],
         address: appId,
@@ -69,7 +68,12 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     const isExecuted = wasExecuted.data || wait.status === "success";
     const isTooltipEnabled =
         (!isConnected && !isExecuted) || (isConnected && !hasVoucherProof);
-    const isExecuteDisabled = isExecuted || !hasVoucherProof || !isConnected;
+    const isExecuteDisabled =
+        isExecuted ||
+        !hasVoucherProof ||
+        !isConnected ||
+        prepare.isPending ||
+        prepare.isError;
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -80,6 +84,24 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
             });
         }
     }, [wait.isSuccess]);
+
+    useEffect(() => {
+        if (prepare.isError) {
+            notifications.show({
+                message: prepare.error.message,
+                color: "red",
+                withBorder: true,
+                withCloseButton: true,
+                autoClose: false,
+                styles: {
+                    body: {
+                        maxHeight: 200,
+                        overflowY: "auto",
+                    },
+                },
+            });
+        }
+    }, [prepare.error]);
 
     return (
         <div>
@@ -103,7 +125,11 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                             execute.writeContract(prepare.data!.request)
                         }
                     >
-                        {isExecuted ? "Executed" : "Execute"}
+                        {prepare.isPending
+                            ? "Preparing voucher..."
+                            : isExecuted
+                            ? "Executed"
+                            : "Execute"}
                     </Button>
                 </Tooltip>
             )}
