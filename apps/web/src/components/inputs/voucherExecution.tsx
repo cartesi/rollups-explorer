@@ -101,7 +101,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                 },
             });
         }
-    }, [prepare.error]);
+    }, [prepare.error, prepare.isError]);
 
     return (
         <div>
