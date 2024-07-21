@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, describe, it } from "vitest";
 import { RawInputForm } from "../src/RawInputForm";
 import withMantineTheme from "./utils/WithMantineTheme";
-import { getAddress } from "viem";
+import { getAddress, stringToHex } from "viem";
 
 const Component = withMantineTheme(RawInputForm);
 
@@ -142,6 +142,48 @@ describe("Rollups RawInputForm", () => {
                 },
                 value: undefined,
             });
+        });
+
+        it("should display format tabs", () => {
+            render(<Component {...defaultProps} />);
+
+            expect(screen.getByText("Hex")).toBeInTheDocument();
+            expect(screen.getByText("String to Hex")).toBeInTheDocument();
+        });
+
+        it('should display string and hex textareas when "String to Hex" format is selected', () => {
+            render(<Component {...defaultProps} />);
+
+            const button = screen.getByText("String to Hex");
+            fireEvent.click(button);
+
+            expect(screen.getByText("String input")).toBeInTheDocument();
+            expect(
+                screen.getByText("String input for the application"),
+            ).toBeInTheDocument();
+            expect(screen.getByText("Hex value")).toBeInTheDocument();
+            expect(
+                screen.getByText("Encoded hex value for the application"),
+            ).toBeInTheDocument();
+        });
+
+        it("should correctly encode string to hex", () => {
+            const { container } = render(<Component {...defaultProps} />);
+            const button = screen.getByText("String to Hex");
+            fireEvent.click(button);
+
+            const stringValue = '{"name": "James", "action":"create-game"}';
+            const textareas = container.querySelectorAll("textarea");
+            const stringTextarea = textareas[0];
+            const hexTextarea = textareas[1];
+
+            fireEvent.change(stringTextarea, {
+                target: {
+                    value: stringValue,
+                },
+            });
+
+            expect(hexTextarea.value).toBe(stringToHex(stringValue));
         });
     });
 
