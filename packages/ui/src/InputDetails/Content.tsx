@@ -2,16 +2,20 @@
 
 import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
 import { T, cond, equals, pipe, propOr } from "ramda";
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Hex, hexToString } from "viem";
-
-export interface ContentProps {
-    content: string;
-    contentType: ContentType;
-}
 
 export type ContentType = "raw" | "text" | "json";
 
+export type ContentChildrenPosition = "top" | "middle" | "bottom";
+export interface ContentProps {
+    content: string;
+    contentType: ContentType;
+    onContentTypeChange?: (contentType: ContentType) => void;
+    children?: ReactNode;
+    /**default to be located at the bottom, after the textarea element.*/
+    childrenPosition?: ContentChildrenPosition;
+}
 interface ContentTypeGroupedButtons {
     type: ContentType;
     onTypeChange: (v: ContentType) => void;

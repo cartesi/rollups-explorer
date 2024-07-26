@@ -51,6 +51,90 @@ describe("Rollups InputDetails", () => {
         ).toBeInTheDocument();
     });
 
+    it("should inform client that the content-type control change in the input-content section", () => {
+        const inputContentCB = vi.fn();
+        render(
+            <InputDetailsE>
+                <InputContent
+                    content={queryContentAsHex}
+                    contentType="raw"
+                    onContentTypeChange={inputContentCB}
+                />
+            </InputDetailsE>,
+        );
+
+        fireEvent.click(screen.getByText("As JSON"));
+        fireEvent.click(screen.getByText("As Text"));
+        fireEvent.click(screen.getByText("Raw"));
+        expect(inputContentCB).toHaveBeenCalledTimes(3);
+        expect(inputContentCB).toHaveBeenCalledWith("json");
+        expect(inputContentCB).toHaveBeenCalledWith("text");
+        expect(inputContentCB).toHaveBeenCalledWith("raw");
+    });
+
+    it("should inform client that the content-type control change in the report-content section", () => {
+        const callback = vi.fn();
+        render(
+            <InputDetailsE>
+                <ReportContent
+                    content={reportText}
+                    contentType="raw"
+                    onContentTypeChange={callback}
+                />
+            </InputDetailsE>,
+        );
+
+        fireEvent.click(screen.getByText("As JSON"));
+        fireEvent.click(screen.getByText("As Text"));
+        fireEvent.click(screen.getByText("Raw"));
+        expect(callback).toHaveBeenCalledTimes(3);
+        expect(callback).toHaveBeenCalledWith("json");
+        expect(callback).toHaveBeenCalledWith("text");
+        expect(callback).toHaveBeenCalledWith("raw");
+    });
+
+    it("should inform client that the content-type control change in the voucher-content section", () => {
+        const callback = vi.fn();
+        render(
+            <InputDetailsE>
+                <VoucherContent
+                    content={jsonWithdraw0}
+                    contentType="raw"
+                    onContentTypeChange={callback}
+                />
+            </InputDetailsE>,
+        );
+
+        fireEvent.click(screen.getByText("As JSON"));
+        fireEvent.click(screen.getByText("As Text"));
+        fireEvent.click(screen.getByText("Raw"));
+        expect(callback).toHaveBeenCalledTimes(3);
+        expect(callback).toHaveBeenCalledWith("json");
+        expect(callback).toHaveBeenCalledWith("text");
+        expect(callback).toHaveBeenCalledWith("raw");
+    });
+
+    it("should inform client that the content-type control change in the notice-content section", () => {
+        const callback = vi.fn();
+        render(
+            <InputDetailsE>
+                <NoticeContent
+                    content={reportText}
+                    contentType="raw"
+                    onContentTypeChange={callback}
+                />
+            </InputDetailsE>,
+        );
+
+        fireEvent.click(screen.getByText("As JSON"));
+        fireEvent.click(screen.getByText("As Text"));
+        fireEvent.click(screen.getByText("Raw"));
+        expect(callback).toHaveBeenCalledTimes(3);
+        expect(callback).toHaveBeenCalledWith("json");
+        expect(callback).toHaveBeenCalledWith("text");
+        expect(callback).toHaveBeenCalledWith("raw");
+    });
+
     it("should disable the tabs when an specific content is logically not rendered", () => {
         render(
             <InputDetailsE>
