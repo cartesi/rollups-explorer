@@ -1,11 +1,18 @@
-import { Button } from "@mantine/core";
+import { Button, ButtonProps } from "@mantine/core";
 import Link from "next/link";
 import { FC } from "react";
 
-export const NewSpecificationButton: FC<{ btnText?: string }> = ({
-    btnText = "New",
-}) => (
-    <Button component={Link} href="/specifications/new">
-        {btnText}
-    </Button>
-);
+interface NewSpecificationButtonProps extends ButtonProps {
+    btnText?: string;
+}
+
+export const NewSpecificationButton: FC<NewSpecificationButtonProps> = (
+    props,
+) => {
+    const { btnText, ...rest } = props;
+    return (
+        <Button component={Link} href="/specifications/new" {...rest}>
+            {btnText}
+        </Button>
+    );
+};
