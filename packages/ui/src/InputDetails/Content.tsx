@@ -3,7 +3,7 @@
 import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
 import { T, cond, equals, pipe, propOr } from "ramda";
 import { ReactNode, useEffect, useRef } from "react";
-import { Hex, hexToString } from "viem";
+import { hexToString, isHex } from "viem";
 
 export type ContentType = "raw" | "text" | "json";
 
@@ -49,7 +49,7 @@ export const DisplayContent = cond<
     [
         pipe(propOr("", "type"), equals("json")),
         ({ content }) => {
-            const value = hexToString(content as Hex);
+            const value = isHex(content) ? hexToString(content) : content;
             const ref = useRef<HTMLTextAreaElement>(null);
 
             useEffect(() => {
@@ -75,7 +75,7 @@ export const DisplayContent = cond<
         ({ content }) => (
             <Textarea
                 rows={10}
-                value={hexToString(content as Hex)}
+                value={isHex(content) ? hexToString(content) : content}
                 readOnly
                 placeholder="No content defined"
             />
