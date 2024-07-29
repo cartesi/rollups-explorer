@@ -87,6 +87,20 @@ const erc721DepositInput = {
     erc20Deposit: null,
 } as const;
 
+const dappAddressRelayInput = {
+    id: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e-0",
+    application: {
+        id: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e",
+    },
+    index: 0,
+    payload: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e",
+    msgSender: "0xf5de34d6bbc0446e2a45719e718efebaae179dae",
+    timestamp: "1719249378",
+    transactionHash:
+        "0x0e9cc22122edd7d10eb75e9c3868845d0ba89afab66a987b5fabc84ba46c947f",
+    erc20Deposit: null,
+} as const;
+
 /**
  * Input response structure based on current graphQL queries
  */
@@ -96,4 +110,5 @@ export const inputResponses = {
     erc20DepositInput,
     erc721DepositInput,
     nonPortalRelatedInput,
+    dappAddressRelayInput,
 } as const;

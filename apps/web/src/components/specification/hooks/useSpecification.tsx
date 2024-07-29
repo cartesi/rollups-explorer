@@ -128,7 +128,10 @@ const useActions = () => {
 
     return actions;
 };
-
+/**
+ * Specifications created by users.
+ * @returns
+ */
 export const useSpecification = () => {
     const [specifications, setSpecifications] = useAtom(specificationsAtom);
     const actions = useActions();

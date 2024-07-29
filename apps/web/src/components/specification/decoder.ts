@@ -29,7 +29,7 @@ interface Piece {
     decodedPart?: any;
 }
 
-interface Envelope {
+export interface Envelope {
     spec: Specification;
     input: Hex | Uint8Array;
     pieces: Piece[];

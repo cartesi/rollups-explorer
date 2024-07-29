@@ -100,6 +100,21 @@ describe("Specification Conditionals", () => {
         });
     });
 
+    describe("Matching by msgSender for Relays (System Specifications)", () => {
+        it("should match msgSender and return decoding specification for DApp Address Relay", () => {
+            const { dappAddressRelayInput } = inputResponses;
+            const specification = findSpecificationFor(
+                dappAddressRelayInput,
+                systemSpecificationAsList,
+            );
+
+            expect(specification).not.toBeNull();
+            expect(specification?.name).toEqual(
+                "DApp Address Relay @cartesi/rollups@1.x",
+            );
+        });
+    });
+
     describe("Matching by application.id", () => {
         it("should return specification when application.id match input information", () => {
             const dummyInput = {

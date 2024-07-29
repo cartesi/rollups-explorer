@@ -3,6 +3,7 @@
  * They can't be deleted or edited by the user.
  */
 import {
+    dAppAddressRelayConfig,
     erc1155BatchPortalConfig,
     erc1155SinglePortalConfig,
     erc20PortalConfig,
@@ -121,11 +122,32 @@ const ERC721PortalSpec: Specification = {
     ],
 } as const;
 
+const DAppAddressRelaySpec: Specification = {
+    version: 1,
+    mode: "abi_params",
+    name: "DApp Address Relay @cartesi/rollups@1.x",
+    sliceInstructions: [{ from: 0, to: 20, name: "dappAddress" }],
+    abiParams: [],
+    conditionals: [
+        {
+            logicalOperator: "or",
+            conditions: [
+                {
+                    field: "msgSender",
+                    operator: "equals",
+                    value: dAppAddressRelayConfig.address.toLowerCase(),
+                },
+            ],
+        },
+    ],
+};
+
 export const systemSpecification = {
     ERC1155SinglePortalSpec,
     ERC1155BatchPortalSpec,
     ERC20PortalSpec,
     ERC721PortalSpec,
+    DAppAddressRelaySpec,
 } as const;
 
 export const systemSpecificationAsList = Object.values(systemSpecification);
