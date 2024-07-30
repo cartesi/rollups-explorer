@@ -13,6 +13,7 @@ import {
     Text,
     TextInput,
     Title,
+    VisuallyHidden,
     useMantineTheme,
 } from "@mantine/core";
 import { createFormActions, useForm } from "@mantine/form";
@@ -60,6 +61,7 @@ const InstructionsReview: FC<Props> = ({ slices, onSliceChange }) => {
                         onSliceChange(newVal);
                     }}
                 >
+                    <VisuallyHidden>{`Remove slice-${slice.name}`}</VisuallyHidden>
                     <TbTrash />
                 </Button>
             </Table.Td>
@@ -199,8 +201,6 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     onSliceTargetChange,
 }) => {
     const theme = useMantineTheme();
-    // const [checked, { toggle: toggleTarget }] = useDisclosure(false);
-    // const [sliceTarget, setSliceTarget] = useState<string | null>(null);
     const [expanded, { toggle }] = useDisclosure(true);
     const sliceNameRef = useRef<HTMLInputElement>(null);
     const form = useForm<FormValues>({
@@ -229,7 +229,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     }, [key]);
 
     return (
-        <Stack>
+        <Stack data-testid="slice-instruction-fields">
             <Fieldset p="xs">
                 <Group justify="space-between">
                     <Text fw="bold">Define a slice</Text>
@@ -299,7 +299,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                         <Button
                             size="sm"
                             disabled={!form.isValid("sliceInput")}
-                            data-testid="add-byte-slice-button"
+                            data-testid="slice-add-button"
                             onClick={() => {
                                 const name = sliceInput.name;
                                 const type = sliceInput.type as AbiType;
@@ -342,7 +342,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
             {sliceNames && sliceNames.length > 0 ? (
                 <Group>
                     <Checkbox
-                        data-testid="apply-abi-on-slice-checkbox"
+                        data-testid="slice-apply-abi-on-checkbox"
                         checked={sliceTargetChecked}
                         onChange={() => {
                             form.setFieldValue(
@@ -358,7 +358,8 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                         label="Use ABI Parameter definition on"
                     />
                     <Select
-                        data-testid="pick-a-slice-select"
+                        name="slice"
+                        data-testid="slice-select"
                         key={sliceNames.join(",")}
                         placeholder="Pick a slice"
                         data={sliceNames}

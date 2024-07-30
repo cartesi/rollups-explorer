@@ -5,6 +5,8 @@ import { Modes, Predicate, SliceInstruction, Specification } from "../types";
 
 type EditingData = undefined | { originalSpec: Specification };
 
+export type FormMode = "CREATION" | "EDITION";
+
 /**
  * Form context to support both specification form inputs and preview inputs
  */
@@ -19,7 +21,7 @@ export interface SpecFormValues {
     encodedData?: Hex;
     conditionalsOn: boolean;
     sliceInstructionsOn: boolean;
-    formMode: "CREATION" | "EDITION";
+    formMode: FormMode;
     editingData: EditingData;
 }
 

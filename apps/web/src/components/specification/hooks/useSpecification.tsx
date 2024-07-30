@@ -37,14 +37,14 @@ const finallyBuilder = (opt: AtomActionLifecycle) => () => {
     isFunction(opt.onFinished) && opt.onFinished();
 };
 
-const repositoryAtom = atom(localRepository);
+export const repositoryAtom = atom(localRepository);
 const loadSpecificationAtom = loadable(
     atom(async (get) => {
         return await get(repositoryAtom).list();
     }),
 );
 
-const specificationsAtom = atom<Specification[] | undefined>(undefined);
+export const specificationsAtom = atom<Specification[] | undefined>(undefined);
 
 const addSpecificationAtom = atom(
     null,

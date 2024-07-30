@@ -100,6 +100,7 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
             {displayAccordion && (
                 <Accordion variant="contained" chevronPosition="right" py="sm">
                     <Accordion.Item
+                        data-testid="abi-signatures-item"
                         key="abi-signatures-item"
                         value="abi-signatures-item"
                     >
@@ -117,6 +118,7 @@ export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
                     </Accordion.Item>
 
                     <Accordion.Item
+                        data-testid="json-abi-generated-item"
                         key="abi-generated-json-item"
                         value="abi-generated-json-item"
                     >

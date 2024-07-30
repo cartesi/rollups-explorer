@@ -6,6 +6,7 @@ import {
     Stack,
     Text,
     TextInput,
+    VisuallyHidden,
 } from "@mantine/core";
 import { createFormActions, useForm } from "@mantine/form";
 import { clone } from "ramda";
@@ -77,7 +78,14 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
                 placeholder="address to, uint256 amount, bool succ"
                 rightSectionWidth="lg"
                 {...form.getInputProps("abiParamEntry")}
-                rightSection={<Button onClick={addABIParam}>Add</Button>}
+                rightSection={
+                    <Button
+                        data-testid="abi-parameter-add-button"
+                        onClick={addABIParam}
+                    >
+                        Add
+                    </Button>
+                }
                 error={props.error || form.errors.abiParamEntry}
             />
 
@@ -102,6 +110,9 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
                                     color="red"
                                     onClick={() => removeABIParam(idx)}
                                 >
+                                    <VisuallyHidden>
+                                        Remove abi parameter {entry}
+                                    </VisuallyHidden>
                                     <TbTrash size={21} />
                                 </ActionIcon>
                             </Group>

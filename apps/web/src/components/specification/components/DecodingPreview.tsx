@@ -29,6 +29,7 @@ export const DecodingPreview = () => {
 
                 {content && (
                     <CodeHighlight
+                        data-testid="preview-decoded-data"
                         withCopyButton={false}
                         language="json"
                         code={content}

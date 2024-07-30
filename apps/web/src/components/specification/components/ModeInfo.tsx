@@ -46,7 +46,12 @@ const modeInfo: Record<Modes, ReactNode> = {
 
 export const SpecificationModeInfo: FC<{ mode: Modes }> = ({ mode }) => {
     return (
-        <Alert variant="light" color="blue" icon={<TbAlertCircle />}>
+        <Alert
+            variant="light"
+            color="blue"
+            icon={<TbAlertCircle />}
+            data-testid={`specification-mode-info`}
+        >
             {modeInfo[mode]}
         </Alert>
     );

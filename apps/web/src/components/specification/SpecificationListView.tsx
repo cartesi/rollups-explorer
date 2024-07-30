@@ -211,7 +211,7 @@ const DisplayConditional: FC<{ conditionals: Predicate[] }> = ({
 };
 
 const Feedback: FC = () => (
-    <Grid justify="flex-start" align="stretch">
+    <Grid justify="flex-start" align="stretch" data-testid="fetching-feedback">
         {range(0, 4).map((n) => (
             <Grid.Col span={{ base: 12, md: 6 }} key={n}>
                 <Card style={{ minHeight: CARD_MIN_HEIGHT }}>
@@ -247,7 +247,7 @@ const NoSpecificationsFiltered: FC<{
     const filterType = filterName === JSON_ABI ? "JSON ABI" : "ABI Params";
     return (
         <Center py="lg">
-            <Group gap="xs">
+            <Group gap="xs" data-testid="no-specification-filtered-message">
                 <Title order={3} c="dimmed">
                     {quantity > 1 &&
                         `You have ${quantity} specifications, but none of them are the type`}{" "}
@@ -311,11 +311,18 @@ export const SpecificationListView: FC = () => {
                 />
             )}
 
-            <Grid justify="flex-start" align="stretch">
-                {filteredSpecs?.map((spec) => (
+            <Grid justify="flex-start" align="stretch" data-testid="specs-grid">
+                {filteredSpecs?.map((spec, idx) => (
                     <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
-                        <Card style={{ minHeight: CARD_MIN_HEIGHT }}>
-                            <Card.Section inheritPadding py="sm">
+                        <Card
+                            style={{ minHeight: CARD_MIN_HEIGHT }}
+                            data-testid={`specification-${spec.id}-card`}
+                        >
+                            <Card.Section
+                                inheritPadding
+                                py="sm"
+                                data-testid={`specification-${spec.id}`}
+                            >
                                 <Group justify="space-between" wrap="nowrap">
                                     <Title
                                         order={3}
@@ -330,7 +337,7 @@ export const SpecificationListView: FC = () => {
                                             iconSize={theme.other.iconSize}
                                         />
                                         <Button
-                                            aria-label={`remove-${spec.id!}`}
+                                            aria-label={`remove-${spec.name}`}
                                             role="button"
                                             size="compact-sm"
                                             variant="transparent"
@@ -361,6 +368,7 @@ export const SpecificationListView: FC = () => {
                                 variant="default"
                                 chevronPosition="right"
                                 py="sm"
+                                data-testid={`specification-${spec.id}-accordion`}
                             >
                                 {spec.mode === "json_abi" && (
                                     <DisplayABI abi={spec.abi} />
