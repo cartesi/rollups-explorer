@@ -9,7 +9,7 @@ interface NewSpecificationButtonProps extends ButtonProps {
 export const NewSpecificationButton: FC<NewSpecificationButtonProps> = (
     props,
 ) => {
-    const { btnText, ...rest } = props;
+    const { btnText = "New", ...rest } = props;
     return (
         <Button component={Link} href="/specifications/new" {...rest}>
             {btnText}
