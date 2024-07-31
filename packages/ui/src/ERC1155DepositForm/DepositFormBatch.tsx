@@ -87,7 +87,7 @@ const DepositFormBatch: FC<Props> = (props) => {
     const { address } = useAccount();
 
     const form = useForm({
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         initialValues: {
             mode: "batch",
             application: "",
