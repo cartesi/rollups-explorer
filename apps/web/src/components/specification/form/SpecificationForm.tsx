@@ -10,7 +10,6 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import { useScrollIntoView } from "@mantine/hooks";
 import { formatAbi } from "abitype";
-import { useRouter } from "next/navigation";
 import { clone, pathOr, propOr } from "ramda";
 import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
 import { Abi } from "viem";
@@ -76,7 +75,6 @@ export const SpecificationForm: FC<SpecificationFormProps> = ({
     onSuccess,
 }) => {
     const [submitting, setSubmitting] = useState(false);
-    const router = useRouter();
     const { addSpecification, updateSpecification } = useSpecification();
     const form = useSpecFormContext();
     const transformedValues = form.getTransformedValues();

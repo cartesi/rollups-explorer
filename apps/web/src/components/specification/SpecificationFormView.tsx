@@ -8,14 +8,18 @@ import {
     Stack,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
 import { propOr } from "ramda";
-import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
+import { isFunction, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, useCallback, useState } from "react";
 import { TbLayoutColumns, TbLayoutList } from "react-icons/tb";
 import { DecodingPreview } from "./components/DecodingPreview";
 import { SpecificationForm } from "./form/SpecificationForm";
-import { SpecFormProvider, SpecFormValues, useSpecForm } from "./form/context";
+import {
+    FormMode,
+    SpecFormProvider,
+    SpecFormValues,
+    useSpecForm,
+} from "./form/context";
 import {
     specABIValidation,
     specAbiParamValidation,
@@ -49,12 +53,17 @@ const getInitialValues = (spec?: Specification): SpecFormValues => {
     return values;
 };
 
+type SuccessData = { spec: Specification; formMode: FormMode };
+export type SpecificationFormViewOnSuccess = (data: SuccessData) => void;
 interface ViewProps {
     specification?: Specification;
+    onSuccess?: SpecificationFormViewOnSuccess;
 }
 
-export const SpecificationFormView: FC<ViewProps> = ({ specification }) => {
-    const router = useRouter();
+export const SpecificationFormView: FC<ViewProps> = ({
+    specification,
+    onSuccess,
+}) => {
     const [layout, setLayout] = useState<Layout>("split_screen");
     const colSpan = layout === "split_screen" ? 6 : 12;
     const form = useSpecForm({
@@ -71,7 +80,7 @@ export const SpecificationFormView: FC<ViewProps> = ({ specification }) => {
     });
     const { formMode } = form.getTransformedValues();
 
-    const onSuccess = useCallback(
+    const onFinished = useCallback(
         (spec: Specification) => {
             const isEditionMode = formMode === "EDITION";
             const action = isEditionMode ? "Updated!" : "Saved!";
@@ -84,9 +93,9 @@ export const SpecificationFormView: FC<ViewProps> = ({ specification }) => {
                 message,
             });
 
-            if (isEditionMode) router.push("/specifications");
+            isFunction(onSuccess) && onSuccess({ formMode, spec });
         },
-        [formMode, router],
+        [formMode, onSuccess],
     );
 
     const onFailure = useCallback((reason: Error) => {
@@ -134,7 +143,7 @@ export const SpecificationFormView: FC<ViewProps> = ({ specification }) => {
                 <Grid>
                     <GridCol span={colSpan}>
                         <SpecificationForm
-                            onSuccess={onSuccess}
+                            onSuccess={onFinished}
                             onFailure={onFailure}
                         />
                     </GridCol>
