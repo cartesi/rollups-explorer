@@ -5,7 +5,7 @@ import Breadcrumbs from "../../components/breadcrumbs";
 import { SpecificationListView } from "../../components/specification/SpecificationListView";
 
 export const metadata: Metadata = {
-    title: "Decoding Specifications",
+    title: "Specifications",
 };
 
 export default function SpecificationsPage() {

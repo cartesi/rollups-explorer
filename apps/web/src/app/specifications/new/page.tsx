@@ -5,10 +5,10 @@ import Breadcrumbs from "../../../components/breadcrumbs";
 import { SpecificationContainer } from "../../../components/specification/SpecificationContainer";
 
 export const metadata: Metadata = {
-    title: "Decoding Specifications",
+    title: "New Specification",
 };
 
-export default function SpecificationsPage() {
+export default function NewSpecificationPage() {
     return (
         <Stack>
             <Breadcrumbs

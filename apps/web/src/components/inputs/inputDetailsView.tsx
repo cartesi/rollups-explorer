@@ -289,7 +289,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                         {!specApplied && (
                             <Group gap={3}>
                                 <Text c="dimmed">
-                                    {`Is that Application's ABI encoding it's inputs?`}
+                                    {`Is this Application ABI encoding it's inputs?`}
                                 </Text>
                                 <NewSpecificationButton
                                     p={0}
