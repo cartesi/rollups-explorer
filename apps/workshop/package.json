@@ -12,8 +12,8 @@
     },
     "dependencies": {
         "@cartesi/rollups-explorer-ui": "*",
-        "@mantine/core": "^7.7.1",
-        "@mantine/hooks": "^7.7.1",
+        "@mantine/core": "^7.11.2",
+        "@mantine/hooks": "^7.11.2",
         "@rainbow-me/rainbowkit": "2",
         "@tanstack/react-query": "^5.27.5",
         "react": "^18.3.1",
