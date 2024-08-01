@@ -229,12 +229,6 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         if (connection) execQuery({ url: connection.url });
     }, [connection, execQuery, variables]);
 
-    useEffect(() => {
-        if (specApplied !== null) {
-            setSelectedSpec(specApplied.id!);
-        }
-    }, [specApplied]);
-
     const isSystemSpecAppliedManually =
         wasSpecManuallySelected && included(systemSpecifications, specApplied);
 
@@ -251,7 +245,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                                 label="Decode Specification"
                                 description="When a specification condition(s) match(es), it will be auto-selected."
                                 placeholder="Decode content with..."
-                                value={selectedSpec ?? specApplied}
+                                value={specApplied?.id ?? selectedSpec}
                                 size="md"
                                 checkIconPosition="right"
                                 data={selectData}
