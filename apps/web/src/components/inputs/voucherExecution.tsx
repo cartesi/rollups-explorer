@@ -1,14 +1,14 @@
 "use client";
-import { FC, useEffect } from "react";
+import {
+    useReadCartesiDAppWasVoucherExecuted,
+    useSimulateCartesiDAppExecuteVoucher,
+    useWriteCartesiDAppExecuteVoucher,
+} from "@cartesi/rollups-wagmi";
 import { Button, Flex, Loader, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { FC, useEffect } from "react";
 import { Address } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import {
-    useWriteCartesiDAppExecuteVoucher,
-    useSimulateCartesiDAppExecuteVoucher,
-    useReadCartesiDAppWasVoucherExecuted,
-} from "@cartesi/rollups-wagmi";
 import { Voucher } from "../../graphql/rollups/types";
 
 const typeCastProof = (voucher: Partial<Voucher>) => ({
@@ -84,7 +84,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     return (
         <div>
             {wasExecuted.isLoading ? (
-                <Flex justify="center" align="center" mt={6}>
+                <Flex justify="center" align="center">
                     <Loader data-testid="voucher-execution-loader" size={26} />
                 </Flex>
             ) : (
@@ -97,7 +97,6 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                     disabled={!isTooltipEnabled}
                 >
                     <Button
-                        mt={6}
                         disabled={isExecuteDisabled}
                         loading={isLoading}
                         onClick={() =>

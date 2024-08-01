@@ -20,6 +20,7 @@ import {
     TbAdjustmentsHorizontal,
     TbApps,
     TbArrowsDownUp,
+    TbFileCode,
     TbHome,
     TbInbox,
     TbMoonStars,
@@ -33,7 +34,8 @@ import SendTransaction from "../../components/sendTransaction";
 import { CartesiScanChains } from "../networks/cartesiScanNetworks";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
-    const [opened, { toggle: toggleMobileMenu }] = useDisclosure();
+    const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
+        useDisclosure();
     const [
         transaction,
         {
@@ -146,14 +148,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Home"
                         href="/"
                         leftSection={<TbHome />}
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
                         label="Applications"
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         href="/applications"
                         leftSection={<TbApps />}
                         data-testid="applications-link"
@@ -162,7 +164,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <NavLink
                         component={Link}
                         label="Inputs"
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         href="/inputs"
                         leftSection={<TbInbox />}
                         data-testid="inputs-link"
@@ -176,11 +178,19 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     >
                         <NavLink
                             component={Link}
-                            onClick={toggleMobileMenu}
+                            onClick={closeMobileMenu}
                             label="Connections"
                             leftSection={<TbPlugConnected />}
                             href="/connections"
                             data-testid="connections-link"
+                        />
+                        <NavLink
+                            component={Link}
+                            onClick={closeMobileMenu}
+                            label="Specs"
+                            leftSection={<TbFileCode />}
+                            href="/specifications"
+                            data-testid="specifications-link"
                         />
                     </NavLink>
 

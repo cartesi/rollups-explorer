@@ -12,6 +12,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { allPass, complement, isEmpty, isNotNil } from "ramda";
+import { isFunction } from "ramda-adjunct";
 import { FC, FunctionComponent, useState } from "react";
 import { TbChevronLeft, TbChevronRight } from "react-icons/tb";
 import {
@@ -75,12 +76,17 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     content,
     contentType,
     paging,
+    onContentTypeChange,
+    children,
+    childrenPosition,
 }) => {
     const theme = useMantineTheme();
     const [type, setContentType] = useState<ContentType>(contentType);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const hasPaging = paging?.total && paging.total > 1;
     const hasContent = isNotNilOrEmpty(content);
+    const position = childrenPosition ?? "bottom";
+    const hasChildren = isNotNilOrEmpty(children);
 
     const nextPage = () => {
         if (paging?.total) {
@@ -113,12 +119,17 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
 
             {isConnected && (
                 <Stack h="100%" justify="center">
+                    {position === "top" && hasChildren && children}
                     {hasContent || isLoading ? (
                         <>
                             <Group gap={1} justify="space-between">
                                 <ContentTypeControl
                                     type={type}
-                                    onTypeChange={setContentType}
+                                    onTypeChange={(contentType) => {
+                                        setContentType(contentType);
+                                        isFunction(onContentTypeChange) &&
+                                            onContentTypeChange(contentType);
+                                    }}
                                 />
                                 {hasPaging && (
                                     <Group gap={3} align="end">
@@ -152,6 +163,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                     </Group>
                                 )}
                             </Group>
+                            {position === "middle" && hasChildren && children}
                             <DisplayContent type={type} content={content} />
                         </>
                     ) : (
@@ -159,6 +171,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                             <Text c="dimmed">No content to be displayed</Text>
                         </Group>
                     )}
+                    {position === "bottom" && hasChildren && children}
                 </Stack>
             )}
         </Box>

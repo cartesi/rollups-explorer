@@ -10,6 +10,7 @@ export {
     NoticeContent,
     ReportContent,
     VoucherContent,
+    type ContentType,
 } from "./InputDetails";
 export { RawInputForm } from "./RawInputForm";
 export { Summary } from "./Summary";

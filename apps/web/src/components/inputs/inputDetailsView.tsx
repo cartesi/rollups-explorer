@@ -1,18 +1,28 @@
 "use client";
 import { InputDetails } from "@cartesi/rollups-explorer-ui";
-import { Box } from "@mantine/core";
-import { omit, pathOr } from "ramda";
+import { Alert, Box, Group, Select, Stack, Text } from "@mantine/core";
+import { find, omit, pathOr } from "ramda";
+import { included, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, useEffect, useState } from "react";
+import { TbExclamationCircle } from "react-icons/tb";
 import { useQuery } from "urql";
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
 import {
     InputDetailsDocument,
     InputDetailsQuery,
     InputDetailsQueryVariables,
 } from "../../graphql/rollups/operations";
-import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Voucher } from "../../graphql/rollups/types";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
+import { theme } from "../../providers/theme";
+import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
+import { findSpecificationFor } from "../specification/conditionals";
+import { Envelope, decodePayload } from "../specification/decoder";
+import { useSpecification } from "../specification/hooks/useSpecification";
+import { useSystemSpecifications } from "../specification/hooks/useSystemSpecifications";
+import { Specification } from "../specification/types";
+import { stringifyContent } from "../specification/utils";
 import VoucherExecution from "./voucherExecution";
 
 interface ApplicationInputDataProps {
@@ -55,6 +65,105 @@ const updateForPrevPage = (
     }
 };
 
+const getStringifiedDecodedValueOrPayload = (
+    envelope: Envelope | undefined,
+    originalPayload: string,
+) => {
+    if (envelope?.error) {
+        console.error(envelope.error);
+        return originalPayload;
+    }
+
+    if (!envelope || isNilOrEmpty(envelope?.result)) {
+        return originalPayload;
+    }
+
+    return stringifyContent(envelope.result);
+};
+
+type UseDecodingOnInputResult = [
+    string,
+    {
+        specApplied: Specification | null;
+        userSpecifications: Specification[];
+        systemSpecifications: Specification[];
+        error?: Error;
+        wasSpecManuallySelected: boolean;
+    },
+];
+
+/**
+ * Receive the input from a graphQL call and
+ * It may find a specification that matches a defined condition, therefore decoding the content.
+ * If an specification is not found it returns the original payload.
+ * @param input Input data returned by graphQL.
+ * @param specName Specification id to apply instead of check for matching conditions. (optional)
+ * @returns { UseDecodingOnInputResult }
+ */
+const useDecodingOnInput = (
+    input: InputItemFragment,
+    specId?: string,
+): UseDecodingOnInputResult => {
+    const { listSpecifications } = useSpecification();
+    const { systemSpecificationAsList } = useSystemSpecifications();
+
+    const userSpecifications = listSpecifications() ?? [];
+    const specifications = [
+        ...systemSpecificationAsList,
+        ...userSpecifications,
+    ];
+
+    const specification = isNilOrEmpty(specId)
+        ? findSpecificationFor(input, specifications)
+        : find((spec) => spec.id === specId, specifications) ?? null;
+
+    const envelope = specification
+        ? decodePayload(specification, input.payload as Hex)
+        : undefined;
+
+    const result = getStringifiedDecodedValueOrPayload(envelope, input.payload);
+
+    return [
+        result,
+        {
+            specApplied: specification,
+            systemSpecifications: systemSpecificationAsList,
+            userSpecifications,
+            error: envelope?.error,
+            wasSpecManuallySelected: isNotNilOrEmpty(specId),
+        },
+    ];
+};
+
+const buildSelectData = (
+    userSpecifications: Specification[],
+    systemSpecifications: Specification[],
+) => {
+    const groups = [];
+
+    if (userSpecifications.length) {
+        groups.push({
+            group: "Your Specifications",
+            items: userSpecifications.map((spec) => ({
+                label: spec.name,
+                value: spec.id!,
+            })),
+        });
+    }
+
+    if (systemSpecifications.length) {
+        groups.push({
+            group: "System Specifications",
+            items: systemSpecifications.map((spec) => ({
+                label: spec.name,
+                value: spec.id!,
+            })),
+        });
+    }
+
+    return groups;
+};
+
 /**
  * InputDetailsView should be lazy rendered.
  * to avoid multiple eager network calls.
@@ -65,6 +174,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const appId = input.application.id as Address;
     const inputIdx = input.index;
     const connection = getConnection(appId);
+    const [selectedSpec, setSelectedSpec] = useState<string>("");
     const [variables, updateQueryVars] = useState<InputDetailsQueryVariables>({
         firstNotices: 1,
         firstReports: 1,
@@ -99,17 +209,91 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const showVoucherForExecution =
         showVouchers && vouchersForExecution.length > 0;
 
+    const [
+        inputContent,
+        {
+            specApplied,
+            error,
+            systemSpecifications,
+            userSpecifications,
+            wasSpecManuallySelected,
+        },
+    ] = useDecodingOnInput(input, selectedSpec);
+
+    const selectData = buildSelectData(
+        userSpecifications,
+        systemSpecifications,
+    );
+
     useEffect(() => {
         if (connection) execQuery({ url: connection.url });
     }, [connection, execQuery, variables]);
+
+    const isSystemSpecAppliedManually =
+        wasSpecManuallySelected && included(systemSpecifications, specApplied);
 
     return (
         <Box py="md">
             <InputDetails>
                 <InputDetails.InputContent
-                    content={input.payload}
+                    content={inputContent}
                     contentType="raw"
-                />
+                >
+                    <Stack gap="sm">
+                        <Group>
+                            <Select
+                                label="Decode Specification"
+                                description="When a specification condition(s) match(es), it will be auto-selected."
+                                placeholder="Decode content with..."
+                                value={specApplied?.id ?? selectedSpec}
+                                size="md"
+                                checkIconPosition="right"
+                                data={selectData}
+                                onChange={(value) => {
+                                    setSelectedSpec(value ?? "");
+                                }}
+                                error={
+                                    error
+                                        ? `We're not able to decode using ${specApplied?.name}`
+                                        : null
+                                }
+                            />
+                        </Group>
+                        {isSystemSpecAppliedManually && (
+                            <Group>
+                                <Alert
+                                    data-testid="system-spec-applied-warning"
+                                    icon={
+                                        <TbExclamationCircle
+                                            size={theme.other.iconSize}
+                                        />
+                                    }
+                                    color="orange"
+                                    title="System Specifications"
+                                >
+                                    Be careful when manually selecting system
+                                    specifications.
+                                    <br /> It may show readable information by
+                                    sheer luck of byte length.
+                                    <br /> They are always auto-selected.
+                                </Alert>
+                            </Group>
+                        )}
+
+                        {!specApplied && (
+                            <Group gap={3}>
+                                <Text c="dimmed">
+                                    {`Is this Application ABI encoding it's inputs?`}
+                                </Text>
+                                <NewSpecificationButton
+                                    p={0}
+                                    variant="transparent"
+                                    btnText="Add a Spec!"
+                                />
+                            </Group>
+                        )}
+                    </Stack>
+                </InputDetails.InputContent>
 
                 {showReports && (
                     <InputDetails.ReportContent

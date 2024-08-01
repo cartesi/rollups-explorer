@@ -12,6 +12,7 @@ import React, {
     useEffect,
     useMemo,
 } from "react";
+import { ContentType } from "./Content";
 import InputContent from "./InputContent";
 import {
     InputDetailsProvider,
@@ -168,4 +169,5 @@ export {
     NoticeContent,
     ReportContent,
     VoucherContent,
+    type ContentType,
 };
