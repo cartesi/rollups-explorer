@@ -44,7 +44,7 @@ const defaultProps: AddressRelayFormProps = {
     onSuccess: vi.fn(),
 };
 
-describe("AddressRelayform", () => {
+describe("AddressRelayForm", () => {
     beforeEach(() => {
         useSimulateRelayDAppAddressMock.mockReturnValue({
             isPending: false,
@@ -85,6 +85,7 @@ describe("AddressRelayform", () => {
         fireEvent.change(screen.getByTestId("application"), {
             target: { value: "non-valid-address" },
         });
+        fireEvent.blur(screen.getByTestId("application"));
 
         expect(
             screen.getByText("Invalid application address"),
@@ -97,6 +98,7 @@ describe("AddressRelayform", () => {
         fireEvent.change(screen.getByTestId("application"), {
             target: { value: "0x7bd3565af78d8457c81ff8b4870a174fa3783eb0" },
         });
+        fireEvent.blur(screen.getByTestId("application"));
 
         expect(
             await screen.findByText("This is an undeployed application."),
