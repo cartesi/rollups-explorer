@@ -37,7 +37,7 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
         onSuccess,
     } = props;
     const form = useForm({
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         initialValues: {
             application: "",
         },
