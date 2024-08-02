@@ -1,6 +1,7 @@
 import { erc1155BatchPortalAbi, erc20Abi } from "@cartesi/rollups-wagmi";
 import { describe, it } from "vitest";
 import { decodePayload } from "../../../src/components/specification/decoder";
+import { systemSpecification } from "../../../src/components/specification/systemSpecs";
 import { Specification } from "../../../src/components/specification/types";
 import { encodedDataSamples } from "./encodedData.stubs";
 
@@ -216,6 +217,20 @@ Params: (uint256[] tokenIds, uint256[] amount, bytes baseLayer, bytes execLayer)
 Data:   0xa074683b5be015f053b5dceb064c41fc9d11b6e5 (20 bytes)
 Slice name: "from" (Is it the right one?)`,
             );
+        });
+
+        describe("Portal cases", () => {
+            it("should decode ether-portal data without the exec-layer information", () => {
+                const envelope = decodePayload(
+                    systemSpecification.EtherPortalSpec,
+                    encodedDataSamples.etherPortalSampleWithoutExecLayer,
+                );
+
+                expect(envelope.result).toEqual({
+                    amount: 10000000000000000n,
+                    sender: "0x0c70e9a737aa92055c8c1217bf887a65cb2292f4",
+                });
+            });
         });
 
         describe("Struct definition example cases", () => {

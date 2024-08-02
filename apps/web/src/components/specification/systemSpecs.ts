@@ -8,6 +8,7 @@ import {
     erc1155SinglePortalConfig,
     erc20PortalConfig,
     erc721PortalConfig,
+    etherPortalConfig,
 } from "@cartesi/rollups-wagmi";
 import { Specification } from "./types";
 
@@ -126,6 +127,30 @@ const ERC721PortalSpec: Specification = {
     ],
 } as const;
 
+const EtherPortalSpec: Specification = {
+    id: "84abc4d2-a41b-426b-b294-181d82598415",
+    version: 1,
+    mode: "abi_params",
+    name: "Ether Portal @cartesi/rollups@1.x",
+    sliceInstructions: [
+        { from: 0, to: 20, name: "sender" },
+        { from: 20, to: 52, name: "amount", type: "uint256" },
+    ],
+    abiParams: [],
+    conditionals: [
+        {
+            logicalOperator: "or",
+            conditions: [
+                {
+                    field: "msgSender",
+                    operator: "equals",
+                    value: etherPortalConfig.address.toLowerCase(),
+                },
+            ],
+        },
+    ],
+} as const;
+
 const DAppAddressRelaySpec: Specification = {
     id: "7ec6e12d-ac9c-4034-9090-9be169ac6912",
     version: 1,
@@ -152,6 +177,7 @@ export const systemSpecification = {
     ERC1155BatchPortalSpec,
     ERC20PortalSpec,
     ERC721PortalSpec,
+    EtherPortalSpec,
     DAppAddressRelaySpec,
 } as const;
 
