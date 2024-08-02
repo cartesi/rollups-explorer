@@ -92,6 +92,7 @@ describe("VoucherExecution component", () => {
             data: {
                 request: {},
             },
+            isSuccess: true,
         } as any);
         useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
@@ -305,5 +306,94 @@ describe("VoucherExecution component", () => {
             color: "green",
             withBorder: true,
         });
+    });
+
+    it("should disable execute button while voucher execution is being prepared or has failed", () => {
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
+            data: false,
+            isPending: true,
+        } as any);
+
+        const { rerender } = render(<Component {...defaultProps} />);
+
+        let button = screen
+            .getByText("Preparing voucher...")
+            .closest("button") as HTMLButtonElement;
+        expect(button.hasAttribute("disabled")).toBe(true);
+
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
+            data: false,
+            isPending: false,
+            isError: true,
+            error: {
+                message: "Some error message",
+            },
+        } as any);
+
+        rerender(<Component {...defaultProps} />);
+        expect(button.hasAttribute("disabled")).toBe(true);
+    });
+
+    it("should display prepare error", async () => {
+        const mantineNotifications = await import("@mantine/notifications");
+        const showMock = vi.fn();
+        mantineNotifications.notifications = {
+            ...mantineNotifications.notifications,
+            show: showMock,
+        } as any;
+
+        const prepareData = {
+            data: false,
+            isError: true,
+            error: {
+                message: "Some error message",
+            },
+        };
+
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue(
+            prepareData as any,
+        );
+        render(<Component {...defaultProps} />);
+
+        expect(showMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                message: prepareData.error.message,
+                color: "red",
+                withBorder: true,
+                withCloseButton: true,
+                autoClose: false,
+            }),
+        );
+    });
+
+    it("should not execute voucher when preparation has failed and execute button is clicked", () => {
+        useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
+            data: false,
+            isLoading: false,
+        } as any);
+
+        const mockedWrite = vi.fn();
+        useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
+            status: "idle",
+            isLoading: false,
+            writeContract: mockedWrite,
+        } as any);
+
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
+            data: false,
+            isError: true,
+            error: {
+                message: "Some error message",
+            },
+        } as any);
+
+        render(<Component {...defaultProps} />);
+
+        const button = screen
+            .getByText("Execute")
+            .closest("button") as HTMLButtonElement;
+
+        fireEvent.click(button);
+        expect(mockedWrite).toHaveBeenCalledTimes(0);
     });
 });
