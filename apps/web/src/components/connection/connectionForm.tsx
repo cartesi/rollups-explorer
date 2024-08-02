@@ -139,7 +139,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     const { addConnection, hasConnection } = useConnectionConfig();
     const theme = useMantineTheme();
     const form = useForm({
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         initialValues: {
             address: application ?? "",
             url: "",

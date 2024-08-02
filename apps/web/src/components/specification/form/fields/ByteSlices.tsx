@@ -206,7 +206,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     const form = useForm<FormValues>({
         name: "byte-slices-form",
         initialValues: clone(initialValues),
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         validate: {
             sliceInput: {
                 name: nameValidation,
