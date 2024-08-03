@@ -86,10 +86,15 @@ export const SpecificationForm: FC<SpecificationFormProps> = ({
 
     const initialValRef = useRef<SpecFormValues | null>(null);
     const { mode } = transformedValues;
-    const { setFieldValue } = form;
 
-    if (transformedValues.formMode === "EDITION" && !initialValRef.current)
+    const setFieldValue = useCallback((name: string, value: unknown) => {
+        form.setFieldValue(name, value);
+        // eslint-disable-next-line -- Do not include the form dependency here because Mantine's form has an unstable reference causing infinite state update loops
+    }, []);
+
+    if (transformedValues.formMode === "EDITION" && !initialValRef.current) {
         initialValRef.current = clone(transformedValues);
+    }
 
     const onAbiChange = useCallback(
         (abi: Abi) => {
