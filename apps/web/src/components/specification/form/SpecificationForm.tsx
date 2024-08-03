@@ -89,7 +89,7 @@ export const SpecificationForm: FC<SpecificationFormProps> = ({
 
     const setFieldValue = useCallback((name: string, value: unknown) => {
         form.setFieldValue(name, value);
-        // eslint-disable-next-line -- Do not include the form dependency here because Mantine's form has an unstable reference causing infinite state update loops
+        // eslint-disable-next-line -- Please do not include the form dependency here because it has an unstable reference that can potentially cause infinite state update loops
     }, []);
 
     if (transformedValues.formMode === "EDITION" && !initialValRef.current) {
