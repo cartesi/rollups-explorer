@@ -566,6 +566,7 @@ describe("Specification Form View", () => {
                     fireEvent.change(screen.getByTestId("slice-from-input"), {
                         target: { value: "" },
                     });
+                    fireEvent.blur(screen.getByTestId("slice-from-input"));
                 });
 
                 const sliceInstructionFieldsEl = screen.getByTestId(
@@ -606,6 +607,7 @@ describe("Specification Form View", () => {
                     fireEvent.change(screen.getByTestId("slice-from-input"), {
                         target: { value: "15" },
                     });
+                    fireEvent.blur(screen.getByTestId("slice-from-input"));
                 });
 
                 const sliceInstructionFieldsEl = screen.getByTestId(
@@ -641,9 +643,10 @@ describe("Specification Form View", () => {
                     fireEvent.click(screen.getByTestId("slice-add-button"));
                 });
 
-                await fireEvent.change(screen.getByTestId("slice-name-input"), {
+                fireEvent.change(screen.getByTestId("slice-name-input"), {
                     target: { value: "tokenAddress" },
                 });
+                fireEvent.blur(screen.getByTestId("slice-name-input"));
 
                 const sliceInstructionFieldsEl = screen.getByTestId(
                     "slice-instruction-fields",
