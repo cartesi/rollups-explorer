@@ -93,6 +93,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                             tt="uppercase"
                             mx={6}
                             fullWidth={isSmallDevice}
+                            data-testid="add-connection"
                             onClick={() =>
                                 showConnectionModal(applicationId as Address)
                             }

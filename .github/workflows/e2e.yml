@@ -32,4 +32,4 @@ jobs:
             - name: Update check status to the outcome
               run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
