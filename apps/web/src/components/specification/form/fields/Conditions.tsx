@@ -67,7 +67,7 @@ export const AddConditions: FC<AddConditionsProps> = ({
 }) => {
     const form = useForm<ConditionsFormValues>({
         name: "conditions-form",
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: clone(initialValues),
         validate: {
             conditions: {

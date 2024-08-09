@@ -36,7 +36,7 @@ export const humanReadableABIFormActions = createFormActions<FormValues>(
 export const HumanReadableABI: FC<Props> = ({ onAbiChange, error }) => {
     const form = useForm<FormValues, FormTransform>({
         name: "human-readable-abi-form",
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: {
             humanABIEntry: "",
         },
