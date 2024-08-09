@@ -239,7 +239,6 @@ describe("ERC-1155 Single Deposit", () => {
                 });
 
                 fireEvent.change(input, { target: { value: "" } });
-                fireEvent.blur(input);
 
                 expect(
                     await screen.findByText("Application address is required."),
@@ -254,7 +253,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(input, {
                     target: { value: "invalid-address-here" },
                 });
-                fireEvent.blur(input);
 
                 expect(
                     await screen.findByText("Invalid Application address"),
@@ -272,7 +270,6 @@ describe("ERC-1155 Single Deposit", () => {
                 });
 
                 fireEvent.change(input, { target: { value: "" } });
-                fireEvent.blur(input);
 
                 expect(
                     await screen.findByText("ERC1155 address is required"),
@@ -287,7 +284,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(input, {
                     target: { value: "invalid-text" },
                 });
-                fireEvent.blur(input);
 
                 expect(
                     await screen.findByText("Invalid ERC1155 address"),
@@ -370,7 +366,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "" },
                 });
-                fireEvent.blur(screen.getByTestId("token-id-input"));
 
                 expect(
                     await screen.findByText("Token id is required!"),
@@ -395,7 +390,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "0.01" },
                 });
-                fireEvent.blur(screen.getByTestId("token-id-input"));
 
                 expect(
                     await screen.findByText(
@@ -428,7 +422,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(screen.getByTestId("amount-input"), {
                     target: { value: "0" },
                 });
-                fireEvent.blur(screen.getByTestId("amount-input"));
 
                 expect(
                     await screen.findByText("Invalid amount."),
@@ -462,7 +455,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(screen.getByTestId("amount-input"), {
                     target: { value: "200" },
                 });
-                fireEvent.blur(screen.getByTestId("amount-input"));
 
                 expect(
                     await screen.findByText(
@@ -481,7 +473,6 @@ describe("ERC-1155 Single Deposit", () => {
                 fireEvent.change(screen.getByTestId("base-layer-data-input"), {
                     target: { value: "hello-world" },
                 });
-                fireEvent.blur(screen.getByTestId("base-layer-data-input"));
                 expect(
                     await screen.findByText("Invalid hex string"),
                 ).toBeInTheDocument();
@@ -497,9 +488,6 @@ describe("ERC-1155 Single Deposit", () => {
                     {
                         target: { value: "hello-execution-layer" },
                     },
-                );
-                fireEvent.blur(
-                    screen.getByTestId("execution-layer-data-input"),
                 );
                 expect(
                     await screen.findByText("Invalid hex string"),
