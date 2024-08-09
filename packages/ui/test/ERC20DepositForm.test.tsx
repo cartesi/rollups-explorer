@@ -165,6 +165,8 @@ describe("Rollups ERC20DepositForm", () => {
                 },
             });
 
+            fireEvent.blur(input);
+
             expect(input.getAttribute("aria-invalid")).toBe("true");
             expect(
                 screen.getByText("Invalid Application address"),
@@ -258,6 +260,7 @@ describe("Rollups ERC20DepositForm", () => {
                 },
             });
 
+            fireEvent.blur(input);
             expect(
                 screen.getByText("Invalid ERC20 address"),
             ).toBeInTheDocument();
