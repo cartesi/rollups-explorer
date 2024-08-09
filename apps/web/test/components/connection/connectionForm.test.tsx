@@ -83,7 +83,6 @@ describe("connectionForm", () => {
         const input = screen.getByPlaceholderText("0x");
 
         fireEvent.change(input, { target: { value: "mellow" } });
-        fireEvent.blur(input);
 
         expect(
             screen.getByText("It is not a valid address format."),
@@ -103,7 +102,6 @@ describe("connectionForm", () => {
         fireEvent.change(input, {
             target: { value: "0x60a7048c3136293071605a4eaffef49923e981cc" },
         });
-        fireEvent.blur(input);
 
         expect(
             screen.getByText("There is a connection for that address"),
