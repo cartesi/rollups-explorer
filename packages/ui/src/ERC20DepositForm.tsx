@@ -97,7 +97,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     const [decimals, setDecimals] = useState<number | undefined>();
 
     const form = useForm({
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: {
             application: "",
             erc20Address: "",

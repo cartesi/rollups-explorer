@@ -33,7 +33,6 @@ const DepositBatchReview = () => {
                             deposits,
                         );
                         form.setFieldValue("batch", newVal);
-                        form.validateField("batch");
                     }}
                 >
                     <TbTrash />

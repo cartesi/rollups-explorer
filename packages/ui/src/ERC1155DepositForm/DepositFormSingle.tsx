@@ -29,8 +29,8 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    Hex,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     parseUnits,
@@ -71,7 +71,7 @@ const DepositFormSingle: FC<Props> = (props) => {
     const { address } = useAccount();
 
     const form = useForm({
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: {
             mode: "single",
             application: "",
@@ -307,7 +307,8 @@ const DepositFormSingle: FC<Props> = (props) => {
                                 "erc1155Address",
                                 formattedValue,
                             );
-                            form.setValues({ amount: "", tokenId: "" });
+                            form.setFieldValue("amount", "");
+                            form.setFieldValue("tokenId", "");
                             onSearchTokens(formattedValue);
                         }}
                     />
