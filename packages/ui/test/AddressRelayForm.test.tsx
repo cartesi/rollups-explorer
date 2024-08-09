@@ -44,7 +44,7 @@ const defaultProps: AddressRelayFormProps = {
     onSuccess: vi.fn(),
 };
 
-describe("AddressRelayForm", () => {
+describe("AddressRelayform", () => {
     beforeEach(() => {
         useSimulateRelayDAppAddressMock.mockReturnValue({
             isPending: false,
