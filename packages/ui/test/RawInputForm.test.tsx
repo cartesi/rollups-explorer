@@ -16,6 +16,7 @@ const defaultProps = {
     applications,
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
+    onSuccess: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
@@ -28,6 +29,8 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
         }),
         useWriteInputBoxAddInput: () => ({
             wait: vi.fn(),
+            reset: vi.fn(),
+            execute: vi.fn(),
         }),
     };
 });
@@ -220,6 +223,8 @@ describe("Rollups RawInputForm", () => {
             rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
                 ...rollupsWagmi.useWriteInputBoxAddInput,
                 writeContract: mockedWrite,
+                execute: vi.fn(),
+                reset: vi.fn(),
             });
 
             const { container } = render(<Component {...defaultProps} />);
@@ -334,6 +339,20 @@ describe("Rollups RawInputForm", () => {
                     enabled: true,
                 },
             });
+        });
+
+        it("should invoke onSuccess callback after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
+                error: null,
+                isSuccess: true,
+            });
+
+            const onSuccessMock = vi.fn();
+            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
+
+            expect(onSuccessMock).toHaveBeenCalled();
         });
     });
 

@@ -1,6 +1,6 @@
 import {
-    useWriteEtherPortalDepositEther,
     useSimulateEtherPortalDepositEther,
+    useWriteEtherPortalDepositEther,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -11,8 +11,8 @@ import {
     Loader,
     Stack,
     Text,
-    TextInput,
     Textarea,
+    TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -25,8 +25,8 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    Hex,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     parseUnits,
@@ -35,15 +35,22 @@ import {
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
+import { TransactionFormSuccessData } from "./DepositFormTypes";
 
 export interface EtherDepositFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
 export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
-    const { applications, isLoadingApplications, onSearchApplications } = props;
+    const {
+        applications,
+        isLoadingApplications,
+        onSearchApplications,
+        onSuccess,
+    } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { chain } = useAccount();
     const form = useForm({
@@ -96,11 +103,13 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
 
     useEffect(() => {
         if (wait.isSuccess) {
+            onSuccess({ receipt: wait.data, type: "ETHER" });
             form.reset();
+            execute.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.isSuccess, onSearchApplications]);
+    }, [wait, onSearchApplications, onSuccess]);
 
     return (
         <form data-testid="ether-deposit-form">

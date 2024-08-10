@@ -29,6 +29,7 @@ const defaultProps = {
     onSearchTokens: () => undefined,
     tokensQuery: mockChangeTokenQuery,
     applicationsQuery: mockChangeApplicationQuery,
+    onSuccess: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
@@ -44,6 +45,7 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
         useWriteErc20Approve: () => ({
             data: {},
             wait: vi.fn(),
+            reset: vi.fn(),
         }),
         useSimulateErc20PortalDepositErc20Tokens: () => ({
             data: {
@@ -54,6 +56,7 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
         useWriteErc20PortalDepositErc20Tokens: () => ({
             data: {},
             wait: vi.fn(),
+            reset: vi.fn(),
         }),
     };
 });
@@ -171,6 +174,20 @@ describe("Rollups ERC20DepositForm", () => {
             expect(
                 screen.getByText("Invalid Application address"),
             ).toBeInTheDocument();
+        });
+
+        it("should invoke onSuccess callback after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
+                error: null,
+                isSuccess: true,
+            });
+
+            const onSuccessMock = vi.fn();
+            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
+
+            expect(onSuccessMock).toHaveBeenCalled();
         });
 
         it("should correctly format address", async () => {

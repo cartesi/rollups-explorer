@@ -12,7 +12,6 @@ import {
     Stack,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { is } from "ramda";
 import { FC, useEffect } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import { BaseError, getAddress, isAddress, zeroAddress } from "viem";
@@ -26,7 +25,7 @@ export interface AddressRelayFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
-    onSuccess?: (receipt: TransactionFormSuccessData) => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
 export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
@@ -77,12 +76,12 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
 
     useEffect(() => {
         if (wait.isSuccess) {
-            if (is(Function, onSuccess))
-                onSuccess({ receipt: wait.data, type: "ADDRESS-RELAY" });
+            onSuccess({ receipt: wait.data, type: "ADDRESS-RELAY" });
             form.reset();
             execute.reset();
         }
-    }, [wait.isSuccess, wait.data, form, execute, onSuccess]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wait, onSuccess]);
 
     return (
         <form data-testid="address-relay-form">

@@ -1,10 +1,10 @@
 import {
     erc721Abi,
     erc721PortalAddress,
-    useWriteErc721Approve,
     useSimulateErc721Approve,
-    useWriteErc721PortalDepositErc721Token,
     useSimulateErc721PortalDepositErc721Token,
+    useWriteErc721Approve,
+    useWriteErc721PortalDepositErc721Token,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -17,8 +17,8 @@ import {
     Select,
     Stack,
     Text,
-    TextInput,
     Textarea,
+    TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -32,8 +32,8 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    Hex,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     zeroAddress,
@@ -51,6 +51,8 @@ import {
 import useWatchQueryOnBlockChange from "./hooks/useWatchQueryOnBlockChange";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 import useTokensOfOwnerByIndex from "./hooks/useTokensOfOwnerByIndex";
+import { TransactionFormSuccessData } from "./DepositFormTypes";
+import { isFunction } from "ramda-adjunct";
 
 export const transactionButtonState = (
     prepare: TransactionWaitStatus,
@@ -74,7 +76,7 @@ export interface ERC721DepositFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
-    onDeposit: () => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
 export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
@@ -82,7 +84,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
         applications,
         isLoadingApplications,
         onSearchApplications,
-        onDeposit,
+        onSuccess,
     } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { address } = useAccount();
@@ -233,6 +235,7 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
 
     useEffect(() => {
         if (depositWait.isSuccess) {
+            onSuccess({ receipt: depositWait.data, type: "ERC-721" });
             setDepositedTokens((tokens) => [
                 ...tokens,
                 tokenIdBigInt as bigint,
@@ -240,11 +243,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
             form.reset();
             approve.reset();
             deposit.reset();
-            onDeposit();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.isSuccess, tokenIdBigInt, onDeposit, onSearchApplications]);
+    }, [depositWait, tokenIdBigInt, onSearchApplications, onSuccess]);
 
     return (
         <form data-testid="erc721-deposit-form">

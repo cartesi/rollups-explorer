@@ -63,7 +63,7 @@ const defaultProps = {
     ],
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
-    onDeposit: () => undefined,
+    onSuccess: () => undefined,
 };
 
 describe("ERC721DepositForm", () => {
@@ -321,7 +321,7 @@ describe("ERC721DepositForm", () => {
             expect(depositResetMock).toHaveBeenCalled();
         });
 
-        it("should invoke onDeposit callback after successful deposit", async () => {
+        it("should invoke onSuccess callback after successful deposit", async () => {
             const wagmi = await import("wagmi");
             wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
                 ...wagmi.useWaitForTransactionReceipt,
@@ -329,10 +329,10 @@ describe("ERC721DepositForm", () => {
                 isSuccess: true,
             });
 
-            const onDepositMock = vi.fn();
-            render(<Component {...defaultProps} onDeposit={onDepositMock} />);
+            const onSuccessMock = vi.fn();
+            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
 
-            expect(onDepositMock).toHaveBeenCalled();
+            expect(onSuccessMock).toHaveBeenCalled();
         });
 
         it("should display error when application is invalid", () => {

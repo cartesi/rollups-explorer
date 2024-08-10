@@ -28,6 +28,7 @@ import {
 import { useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
+import { TransactionFormSuccessData } from "./DepositFormTypes";
 
 type Format = "hex" | "utf";
 
@@ -35,10 +36,16 @@ export interface RawInputFormProps {
     applications: string[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
-    const { applications, isLoadingApplications, onSearchApplications } = props;
+    const {
+        applications,
+        isLoadingApplications,
+        onSearchApplications,
+        onSuccess,
+    } = props;
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -81,11 +88,13 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
 
     useEffect(() => {
         if (wait.isSuccess) {
+            onSuccess({ receipt: wait.data, type: "RAW" });
             form.reset();
+            execute.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait.isSuccess, onSearchApplications]);
+    }, [wait, onSearchApplications, onSuccess]);
 
     return (
         <form data-testid="raw-input-form">
