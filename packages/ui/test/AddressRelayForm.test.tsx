@@ -250,13 +250,19 @@ describe("AddressRelayForm", () => {
     });
 
     it("should invoke onSuccess callback after successful deposit", () => {
-        useWaitForTransactionReceiptMock.mockReturnValue({
-            error: null,
-            isSuccess: true,
+        let counter = 0;
+        useWaitForTransactionReceiptMock.mockImplementation(() => {
+            const value = { error: null, isSuccess: counter === 0 };
+            counter += 1;
+            return value;
         });
 
         const onSuccessMock = vi.fn();
         render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            error: null,
+            isSuccess: false,
+        });
 
         expect(onSuccessMock).toHaveBeenCalled();
     });

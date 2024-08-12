@@ -80,8 +80,7 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
             form.reset();
             execute.reset();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait, onSuccess]);
+    }, [wait, form, execute, onSuccess]);
 
     return (
         <form data-testid="address-relay-form">
