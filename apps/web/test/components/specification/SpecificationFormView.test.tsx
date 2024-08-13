@@ -641,7 +641,7 @@ describe("Specification Form View", () => {
                     fireEvent.click(screen.getByTestId("slice-add-button"));
                 });
 
-                await fireEvent.change(screen.getByTestId("slice-name-input"), {
+                fireEvent.change(screen.getByTestId("slice-name-input"), {
                     target: { value: "tokenAddress" },
                 });
 

@@ -327,11 +327,9 @@ const DepositFormBatch: FC<Props> = (props) => {
                                 "erc1155Address",
                                 formattedValue,
                             );
-                            form.setValues({
-                                amount: "",
-                                tokenId: "",
-                                batch: undefined,
-                            });
+                            form.setFieldValue("amount", "");
+                            form.setFieldValue("tokenId", "");
+                            form.setFieldValue("batch", undefined);
                             onSearchTokens(formattedValue);
                         }}
                     />

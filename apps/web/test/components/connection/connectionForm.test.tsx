@@ -37,7 +37,7 @@ describe("connectionForm", () => {
             hideConnectionModal: vi.fn(),
             showConnectionModal: vi.fn(),
             listConnections: vi.fn(),
-        });
+        } as any);
     });
 
     afterEach(() => {

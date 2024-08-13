@@ -319,10 +319,11 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
 
                                 const newSlices = [...(slices ?? []), slice];
 
-                                form.setValues({
-                                    sliceInput: clone(initialValues.sliceInput),
-                                    slices: newSlices,
-                                });
+                                form.setFieldValue(
+                                    "sliceInput",
+                                    clone(initialValues.sliceInput),
+                                );
+                                form.setFieldValue("slices", newSlices);
                                 sliceNameRef.current?.focus();
                             }}
                         >
