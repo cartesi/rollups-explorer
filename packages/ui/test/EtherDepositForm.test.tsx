@@ -16,6 +16,7 @@ const defaultProps = {
     applications,
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
+    onSuccess: () => undefined,
 };
 
 vi.mock("@cartesi/rollups-wagmi", async () => {
@@ -25,9 +26,11 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
                 request: {},
             },
             config: {},
+            reset: vi.fn(),
         }),
         useWriteEtherPortalDepositEther: () => ({
             wait: vi.fn(),
+            reset: vi.fn(),
         }),
     };
 });
@@ -192,6 +195,7 @@ describe("Rollups EtherDepositForm", () => {
                 .mockReturnValue({
                     ...rollupsWagmi.useWriteEtherPortalDepositEther,
                     writeContract: mockedWrite,
+                    reset: vi.fn(),
                 });
 
             const { container } = render(<Component {...defaultProps} />);
@@ -369,6 +373,20 @@ describe("Rollups EtherDepositForm", () => {
                 },
                 value: 100000000000000000n,
             });
+        });
+
+        it("should invoke onSuccess callback after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
+                error: null,
+                isSuccess: true,
+            });
+
+            const onSuccessMock = vi.fn();
+            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
+
+            expect(onSuccessMock).toHaveBeenCalled();
         });
     });
 

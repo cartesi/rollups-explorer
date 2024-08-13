@@ -1,10 +1,10 @@
 import {
     erc20Abi,
     erc20PortalAddress,
-    useWriteErc20Approve,
     useSimulateErc20Approve,
-    useWriteErc20PortalDepositErc20Tokens,
     useSimulateErc20PortalDepositErc20Tokens,
+    useWriteErc20Approve,
+    useWriteErc20PortalDepositErc20Tokens,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -16,8 +16,8 @@ import {
     Loader,
     Stack,
     Text,
-    TextInput,
     Textarea,
+    TextInput,
     UnstyledButton,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -33,9 +33,9 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    Hex,
     formatUnits,
     getAddress,
+    Hex,
     isAddress,
     isHex,
     parseUnits,
@@ -53,6 +53,7 @@ import {
 } from "./TransactionStatus";
 import useWatchQueryOnBlockChange from "./hooks/useWatchQueryOnBlockChange";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
+import { TransactionFormSuccessData } from "./DepositFormTypes";
 
 export const transactionButtonState = (
     prepare: TransactionWaitStatus,
@@ -78,6 +79,7 @@ export interface ERC20DepositFormProps {
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSearchTokens: (tokenId: string) => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
 export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
@@ -87,6 +89,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         isLoadingApplications,
         onSearchApplications,
         onSearchTokens,
+        onSuccess,
     } = props;
 
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
@@ -252,11 +255,14 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
 
     useEffect(() => {
         if (depositWait.isSuccess) {
+            onSuccess({ receipt: depositWait.data, type: "ERC-20" });
             form.reset();
+            approve.reset();
+            deposit.reset();
             onSearchApplications("");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [depositWait.isSuccess, onSearchApplications]);
+    }, [depositWait, onSearchApplications, onSuccess]);
 
     return (
         <form data-testid="erc20-deposit-form">

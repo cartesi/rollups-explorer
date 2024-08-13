@@ -44,7 +44,7 @@ const defaultProps: AddressRelayFormProps = {
     onSuccess: vi.fn(),
 };
 
-describe("AddressRelayform", () => {
+describe("AddressRelayForm", () => {
     beforeEach(() => {
         useSimulateRelayDAppAddressMock.mockReturnValue({
             isPending: false,
@@ -247,5 +247,23 @@ describe("AddressRelayform", () => {
         expect(
             screen.queryByText("Waiting for confirmation..."),
         ).not.toBeInTheDocument();
+    });
+
+    it("should invoke onSuccess callback after successful deposit", () => {
+        let counter = 0;
+        useWaitForTransactionReceiptMock.mockImplementation(() => {
+            const value = { error: null, isSuccess: counter === 0 };
+            counter += 1;
+            return value;
+        });
+
+        const onSuccessMock = vi.fn();
+        render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            error: null,
+            isSuccess: false,
+        });
+
+        expect(onSuccessMock).toHaveBeenCalled();
     });
 });

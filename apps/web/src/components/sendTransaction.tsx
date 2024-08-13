@@ -59,14 +59,6 @@ const SendTransaction: FC<DepositProps> = ({
         address: debouncedMultiTokenId,
     });
 
-    const onDepositErc721 = useCallback(() => {
-        notifications.show({
-            message: "Token was deposited successfully",
-            color: "green",
-            withBorder: true,
-        });
-    }, []);
-
     const onSuccess = useCallback(
         ({ receipt, type }: TransactionFormSuccessData) => {
             const message = receipt?.transactionHash
@@ -138,6 +130,7 @@ const SendTransaction: FC<DepositProps> = ({
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                    onSuccess={onSuccess}
                 />
             ) : depositType === "erc20" ? (
                 <ERC20DepositForm
@@ -146,19 +139,21 @@ const SendTransaction: FC<DepositProps> = ({
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                     onSearchTokens={setTokenId}
+                    onSuccess={onSuccess}
                 />
             ) : depositType === "erc721" ? (
                 <ERC721DepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
-                    onDeposit={onDepositErc721}
+                    onSuccess={onSuccess}
                 />
             ) : depositType === "input" ? (
                 <RawInputForm
                     applications={applications}
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
+                    onSuccess={onSuccess}
                 />
             ) : depositType === "erc1155" ? (
                 <ERC1155DepositForm

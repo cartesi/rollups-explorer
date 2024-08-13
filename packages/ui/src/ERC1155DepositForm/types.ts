@@ -7,5 +7,5 @@ export interface ERC1155DepositFormProps {
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSearchTokens: (tokenId: string) => void;
-    onSuccess?: (receipt: TransactionFormSuccessData) => void;
+    onSuccess: (receipt: TransactionFormSuccessData) => void;
 }

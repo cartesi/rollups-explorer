@@ -233,8 +233,7 @@ const DepositFormSingle: FC<Props> = (props) => {
 
     useEffect(() => {
         if (depositWait.isSuccess) {
-            if (onSuccess)
-                onSuccess({ receipt: depositWait.data, type: "ERC-1155" });
+            onSuccess({ receipt: depositWait.data, type: "ERC-1155" });
             form.reset();
             approve.reset();
             deposit.reset();
