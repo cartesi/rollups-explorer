@@ -41,7 +41,7 @@ describe("Specification Listing View", () => {
         expect(
             screen.getByText("No Specifications Found!"),
         ).toBeInTheDocument();
-        expect(screen.getByText("Create One!")).toBeInTheDocument();
+        expect(screen.getByText("Create one")).toBeInTheDocument();
         expect(link.getAttribute("href")).toEqual("/specifications/new");
     });
 
