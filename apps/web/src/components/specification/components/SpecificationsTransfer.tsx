@@ -5,7 +5,7 @@ import { ActionIcon, FileButton, Group, Tooltip } from "@mantine/core";
 import { TbDownload, TbUpload } from "react-icons/tb";
 import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
 
-export const SpecificationTransfer = () => {
+export const SpecificationsTransfer = () => {
     const { onChangeFile, exportLink } = useSpecificationsTransfer();
 
     return (

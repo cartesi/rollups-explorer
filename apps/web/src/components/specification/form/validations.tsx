@@ -270,12 +270,9 @@ const validateSpecificationImport = (
                     check the following errors:
                 </div>
                 <div>
-                    {specificationErrors.map(
-                        (error) =>
-                            isNonEmptyString(error) && (
-                                <div key={error}>{error}</div>
-                            ),
-                    )}
+                    {specificationErrors.map((error) => (
+                        <div key={error}>{error}</div>
+                    ))}
                 </div>
             </>,
         );

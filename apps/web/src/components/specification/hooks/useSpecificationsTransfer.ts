@@ -26,9 +26,13 @@ export const useSpecificationsTransfer = () => {
         [specifications, version],
     );
 
-    const exportLink = `data:text/json;charset=utf-8,${encodeURIComponent(
-        JSON.stringify(specificationExport, null, 4),
-    )}`;
+    const exportLink = useMemo(
+        () =>
+            `data:text/json;charset=utf-8,${encodeURIComponent(
+                JSON.stringify(specificationExport, null, 4),
+            )}`,
+        [specificationExport],
+    );
 
     const displayAlert = useCallback(
         (message: ReactNode, type: ValidationType = "error") => {
@@ -65,18 +69,27 @@ export const useSpecificationsTransfer = () => {
                                             addSpecification(specification, {
                                                 onSuccess: () =>
                                                     resolve(undefined),
-                                                onFailure: () => reject(),
+                                                onFailure: (err) => reject(err),
                                             }),
                                         );
                                     });
                                 },
                             ),
-                        ).then(() => {
-                            return displayAlert(
-                                "Specifications were imported successfully.",
-                                type,
-                            );
-                        });
+                        )
+                            .then(() => {
+                                return displayAlert(
+                                    "Specifications were imported successfully.",
+                                    type,
+                                );
+                            })
+                            .catch((err) => {
+                                return displayAlert(
+                                    `Unable to add specifications. Error is: ${
+                                        err?.message ?? err
+                                    }`,
+                                    type,
+                                );
+                            });
                     },
                 );
             } catch (err) {
