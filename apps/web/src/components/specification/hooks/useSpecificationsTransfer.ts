@@ -57,24 +57,17 @@ export const useSpecificationsTransfer = () => {
                             return displayAlert(message);
                         }
 
-                        console.log(
-                            "specificationImport::",
-                            specificationImport,
-                        );
-
                         Promise.all(
                             specificationImport.specifications.map(
                                 (specification: Specification) => {
-                                    console.log(
-                                        "specification::",
-                                        specification,
-                                    );
-
                                     return new Promise((resolve, reject) => {
-                                        addSpecification(specification, {
-                                            onSuccess: () => resolve(undefined),
-                                            onFailure: () => reject(),
-                                        });
+                                        setTimeout(() =>
+                                            addSpecification(specification, {
+                                                onSuccess: () =>
+                                                    resolve(undefined),
+                                                onFailure: () => reject(),
+                                            }),
+                                        );
                                     });
                                 },
                             ),
