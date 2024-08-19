@@ -3,9 +3,11 @@ import { CodeHighlight } from "@mantine/code-highlight";
 import {
     Accordion,
     Badge,
+    Box,
     Button,
     Card,
     Center,
+    FileButton,
     Flex,
     Grid,
     Group,
@@ -20,7 +22,7 @@ import {
 } from "@mantine/core";
 import { cond, filter, isEmpty, propEq, range, T } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { TbTrash } from "react-icons/tb";
 import { Abi } from "viem";
 import { EditSpecificationButton } from "./components/EditSpecificationButton";
@@ -42,6 +44,7 @@ import {
 } from "./types";
 import { stringifyContent } from "./utils";
 import { SpecificationTransfer } from "./components/SpecificationsTransfer";
+import { useSpecificationsTransfer } from "./hooks/useSpecificationsTransfer";
 
 const CARD_MIN_HEIGHT = 300 as const;
 
@@ -232,16 +235,33 @@ const Feedback: FC = () => (
     </Grid>
 );
 
-const NoSpecifications: FC = () => (
-    <Center>
-        <Group>
-            <Title order={3} c="dimmed">
-                No Specifications Found!
-            </Title>
-            <NewSpecificationButton btnText="Create One!" />
-        </Group>
-    </Center>
-);
+const NoSpecifications: FC = () => {
+    const { onChangeFile } = useSpecificationsTransfer();
+
+    return (
+        <Center>
+            <Flex direction="column" align="center" justify="center">
+                <Title order={3} c="dimmed">
+                    No Specifications Found!
+                </Title>
+                <Box my={8}>
+                    <NewSpecificationButton btnText="Create one" />
+                </Box>
+                <Box>or</Box>
+                <Box mt={9}>
+                    <FileButton
+                        accept="application/json"
+                        onChange={onChangeFile}
+                    >
+                        {(props) => (
+                            <Button {...props}>Import specifications</Button>
+                        )}
+                    </FileButton>
+                </Box>
+            </Flex>
+        </Center>
+    );
+};
 
 const NoSpecificationsFiltered: FC<{
     quantity: number;
