@@ -1,38 +1,12 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { ActionIcon, FileButton, Group, Tooltip } from "@mantine/core";
 import { TbDownload, TbUpload } from "react-icons/tb";
-import { useSpecification } from "../hooks/useSpecification";
-import { Specification } from "../types";
-
-interface SpecificationExport {
-    name: "cartesiscan_specifications_export";
-    version: number;
-    timestamp: number;
-    specifications: Specification[];
-}
+import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
 
 export const SpecificationTransfer = () => {
-    const { listSpecifications } = useSpecification();
-    const specifications = listSpecifications();
-    const [file, setFile] = useState<File | null>(null);
-    const specificationExport: SpecificationExport = {
-        name: "cartesiscan_specifications_export",
-        version: specifications?.[0].version ?? 1,
-        timestamp: new Date().getTime(),
-        specifications: specifications ?? [],
-    };
-
-    const exportLink = `data:text/json;charset=utf-8,${encodeURIComponent(
-        JSON.stringify(specificationExport, null, 4),
-    )}`;
-
-    const onChangeFile = useCallback((file: File | null) => {
-        console.log("onChangeFile::", file);
-        // TODO: Parse file contents and validate the json
-        setFile(file);
-    }, []);
+    const { onChangeFile, exportLink } = useSpecificationsTransfer();
 
     return (
         <Group>
@@ -49,7 +23,7 @@ export const SpecificationTransfer = () => {
             </Tooltip>
 
             <Tooltip label="Import specifications">
-                <FileButton onChange={onChangeFile} accept="application/json">
+                <FileButton accept="application/json" onChange={onChangeFile}>
                     {(props) => (
                         <ActionIcon variant="light" size="lg" {...props}>
                             <TbUpload />

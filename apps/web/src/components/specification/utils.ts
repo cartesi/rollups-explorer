@@ -27,6 +27,11 @@ const Separator = "\n" as const;
 export const prepareSignatures = (multiline: string) =>
     multiline.split(Separator).map((signature) => signature?.trim());
 
+export const getSpecificationVersion = () => {
+    const version = 1;
+    return version;
+};
+
 /**
  * When the form values has the minimum necessary for the defined
  * specification mode it will return a Specification otherwise it returns null;
@@ -47,7 +52,7 @@ export const buildSpecification = (
         editingData,
         formMode,
     } = values;
-    const version = 1;
+    const version = getSpecificationVersion();
     const timestamp = Date.now();
     const id =
         formMode === "EDITION" ? editingData?.originalSpec.id : undefined;
