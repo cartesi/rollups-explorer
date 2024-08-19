@@ -107,7 +107,7 @@ const validateSpecifications = (
             const modeError = specModeValidation(specification.mode);
             const idError = isNonEmptyString(initialSpecification.id)
                 ? null
-                : "Id field with numeric value is required.";
+                : "Id field with string value is required.";
             const timestampError = isNumber(initialSpecification.timestamp)
                 ? null
                 : "Timestamp field with numeric value is required.";
@@ -163,12 +163,11 @@ const validateSpecifications = (
                         [],
                     );
 
-                    const errors = [logicalOperatorError, ...schemaErrors];
-
-                    return [...conditionAccumulator, errors] as (
-                        | string
-                        | null
-                    )[];
+                    return [
+                        ...conditionAccumulator,
+                        logicalOperatorError,
+                        ...schemaErrors,
+                    ];
                 },
                 [],
             );
