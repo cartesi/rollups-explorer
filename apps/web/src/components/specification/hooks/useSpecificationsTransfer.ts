@@ -47,6 +47,47 @@ export const useSpecificationsTransfer = () => {
         [],
     );
 
+    const onComplete = useCallback(
+        (
+            message: ReactNode,
+            type: ValidationType,
+            specificationImport: SpecificationTransferModel,
+        ) => {
+            if (type === "error") {
+                return displayAlert(message);
+            }
+
+            Promise.all(
+                specificationImport.specifications.map(
+                    (specification: Specification) =>
+                        new Promise((resolve, reject) => {
+                            setTimeout(() =>
+                                addSpecification(specification, {
+                                    onSuccess: () => resolve(undefined),
+                                    onFailure: (err) => reject(err),
+                                }),
+                            );
+                        }),
+                ),
+            )
+                .then(() =>
+                    displayAlert(
+                        "Specifications were imported successfully.",
+                        "success",
+                    ),
+                )
+                .catch((err) =>
+                    displayAlert(
+                        `Unable to import specifications. Error is: ${
+                            err?.message ?? err
+                        }`,
+                        "error",
+                    ),
+                );
+        },
+        [addSpecification, displayAlert],
+    );
+
     const onFileLoad = useCallback(
         (fileContents: string) => {
             try {
@@ -56,47 +97,15 @@ export const useSpecificationsTransfer = () => {
                     specificationImport,
                     version,
                     name,
-                    (message: ReactNode, type?: ValidationType) => {
-                        if (type === "error") {
-                            return displayAlert(message);
-                        }
-
-                        Promise.all(
-                            specificationImport.specifications.map(
-                                (specification: Specification) => {
-                                    return new Promise((resolve, reject) => {
-                                        setTimeout(() =>
-                                            addSpecification(specification, {
-                                                onSuccess: () =>
-                                                    resolve(undefined),
-                                                onFailure: (err) => reject(err),
-                                            }),
-                                        );
-                                    });
-                                },
-                            ),
-                        )
-                            .then(() => {
-                                return displayAlert(
-                                    "Specifications were imported successfully.",
-                                    type,
-                                );
-                            })
-                            .catch((err) => {
-                                return displayAlert(
-                                    `Unable to add specifications. Error is: ${
-                                        err?.message ?? err
-                                    }`,
-                                    type,
-                                );
-                            });
+                    (message: ReactNode, type: ValidationType = "error") => {
+                        onComplete(message, type, specificationImport);
                     },
                 );
             } catch (err) {
                 displayAlert("Unable to parse specification import.");
             }
         },
-        [addSpecification, displayAlert, version],
+        [displayAlert, onComplete, version],
     );
 
     const readFileContent = useCallback(
