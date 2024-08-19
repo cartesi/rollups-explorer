@@ -43,7 +43,7 @@ import {
     Specification,
 } from "./types";
 import { stringifyContent } from "./utils";
-import { SpecificationTransfer } from "./components/SpecificationsTransfer";
+import { SpecificationsTransfer } from "./components/SpecificationsTransfer";
 import { useSpecificationsTransfer } from "./hooks/useSpecificationsTransfer";
 
 const CARD_MIN_HEIGHT = 300 as const;
@@ -328,7 +328,7 @@ export const SpecificationListView: FC = () => {
                     <NewSpecificationButton />
                 </Group>
 
-                <SpecificationTransfer />
+                <SpecificationsTransfer />
             </Flex>
 
             {isNilOrEmpty(filteredSpecs) && (

@@ -30,11 +30,6 @@ import {
 } from "./fields/HumanReadableABIParameter";
 
 const editModeStartup = (transformedValues: SpecFormValues) => {
-    console.log("editModeStartup::", transformedValues);
-    console.log(
-        "humanABIEntry::",
-        formatAbi(transformedValues.abi ?? []).join("\n"),
-    );
     humanReadableABIFormActions.setFieldValue(
         "humanABIEntry",
         formatAbi(transformedValues.abi ?? []).join("\n"),
