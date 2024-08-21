@@ -1,35 +1,43 @@
 "use client";
 
 import React from "react";
-import { ActionIcon, FileButton, Group, Tooltip } from "@mantine/core";
+import { ActionIcon, Box, FileButton, Group, Tooltip } from "@mantine/core";
 import { TbDownload, TbUpload } from "react-icons/tb";
 import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
 
 export const SpecificationsTransfer = () => {
-    const { onChangeFile, exportLink } = useSpecificationsTransfer();
+    const { onUploadFile, specificationExportLink } =
+        useSpecificationsTransfer();
 
     return (
         <Group>
             <Tooltip label="Export specifications">
                 <ActionIcon
                     component="a"
-                    href={exportLink}
+                    href={specificationExportLink}
                     download="cartesiscan_specifications_export.json"
                     variant="light"
                     size="lg"
+                    data-testid="specification-export-link"
                 >
                     <TbDownload />
                 </ActionIcon>
             </Tooltip>
 
             <Tooltip label="Import specifications">
-                <FileButton accept="application/json" onChange={onChangeFile}>
-                    {(props) => (
-                        <ActionIcon variant="light" size="lg" {...props}>
-                            <TbUpload />
-                        </ActionIcon>
-                    )}
-                </FileButton>
+                <Box>
+                    <FileButton
+                        accept="application/json"
+                        data-testid="import-specification-button"
+                        onChange={onUploadFile}
+                    >
+                        {(props) => (
+                            <ActionIcon variant="light" size="lg" {...props}>
+                                <TbUpload />
+                            </ActionIcon>
+                        )}
+                    </FileButton>
+                </Box>
             </Tooltip>
         </Group>
     );

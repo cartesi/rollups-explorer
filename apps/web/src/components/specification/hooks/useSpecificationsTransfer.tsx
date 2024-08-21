@@ -6,7 +6,6 @@ import { useSpecification } from "./useSpecification";
 import {
     Specification,
     SpecificationTransfer as SpecificationTransferModel,
-    ValidationType,
     SPECIFICATION_TRANSFER_NAME,
 } from "../types";
 import {
@@ -28,7 +27,7 @@ export const useSpecificationsTransfer = () => {
         [specifications, version],
     );
 
-    const exportLink = useMemo(
+    const specificationExportLink = useMemo(
         () =>
             `data:text/json;charset=utf-8,${encodeURIComponent(
                 JSON.stringify(specificationExport, null, 4),
@@ -37,7 +36,7 @@ export const useSpecificationsTransfer = () => {
     );
 
     const displayAlert = useCallback(
-        (message: ReactNode, type: ValidationType = "error") => {
+        (message: ReactNode, type: "success" | "error" = "error") => {
             const isSuccess = type === "success";
             notifications.show({
                 message,
@@ -122,7 +121,7 @@ export const useSpecificationsTransfer = () => {
         [displayAlert, onValidateSuccessfully],
     );
 
-    const onChangeFile = useCallback(
+    const onUploadFile = useCallback(
         (file: File | null) => {
             if (file) {
                 readFileContent(file);
@@ -133,9 +132,12 @@ export const useSpecificationsTransfer = () => {
 
     return useMemo(
         () => ({
-            exportLink,
-            onChangeFile,
+            specificationExport,
+            specificationExportLink,
+            onUploadFile,
         }),
-        [exportLink, onChangeFile],
+        [specificationExport, specificationExportLink, onUploadFile],
     );
 };
+
+export default useSpecificationsTransfer;
