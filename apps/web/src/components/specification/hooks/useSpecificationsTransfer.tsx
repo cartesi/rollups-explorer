@@ -9,7 +9,10 @@ import {
     ValidationType,
     SPECIFICATION_TRANSFER_NAME,
 } from "../types";
-import { validateSpecification, VALIDATOR_VERSION } from "../transfer";
+import {
+    validateSpecification,
+    VALIDATOR_VERSION,
+} from "../transfer/validator";
 
 export const useSpecificationsTransfer = () => {
     const { listSpecifications, addSpecification } = useSpecification();

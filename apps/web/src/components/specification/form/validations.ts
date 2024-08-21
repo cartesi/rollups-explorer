@@ -1,28 +1,8 @@
-import { includes, uniq } from "ramda";
-import {
-    isBlank,
-    isNilOrEmpty,
-    isNonEmptyString,
-    isNotNilOrEmpty,
-    isNotString,
-    isNumber,
-} from "ramda-adjunct";
-import { Abi, Hex, isHex, parseAbi, parseAbiParameters } from "viem";
-import {
-    logicalOperators,
-    Modes,
-    operators,
-    Predicate,
-    SliceInstruction,
-    Specification,
-    SpecificationTransfer,
-    ValidationType,
-} from "../types";
+import { includes } from "ramda";
+import { isBlank, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
+import { Abi, Hex, isHex } from "viem";
+import { Modes, Predicate, SliceInstruction } from "../types";
 import { SpecFormValues } from "./context";
-import { getInitialValues } from "../SpecificationFormView";
-import { formatAbi } from "abitype";
-import { prepareSignatures } from "../utils";
-import { ReactNode } from "react";
 
 const specNameValidation = (value: string) => {
     if (isBlank(value)) return "Name is required.";
