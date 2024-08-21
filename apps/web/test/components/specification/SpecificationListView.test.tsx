@@ -43,6 +43,7 @@ describe("Specification Listing View", () => {
         ).toBeInTheDocument();
         expect(screen.getByText("Create one")).toBeInTheDocument();
         expect(link.getAttribute("href")).toEqual("/specifications/new");
+        expect(screen.getByText("Import specifications")).toBeInTheDocument();
     });
 
     it("should be able to delete a specification", async () => {

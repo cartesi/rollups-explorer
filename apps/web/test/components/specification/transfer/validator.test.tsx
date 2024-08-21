@@ -7,12 +7,22 @@ import {
     logicalOperators,
     SPECIFICATION_TRANSFER_NAME,
 } from "../../../../src/components/specification/types";
-import { defaultSpecification, generateInvalidVersion } from "./stubs";
+import { defaultSpecificationExport } from "../stubs";
+
+export const generateInvalidVersion = (max = Number.MAX_SAFE_INTEGER) => {
+    let randomVersion;
+
+    do {
+        randomVersion = Math.floor(Math.random() * max);
+    } while (VALIDATOR_VERSIONS.includes(randomVersion.toString()));
+
+    return randomVersion;
+};
 
 describe("Specification transfer validator", () => {
     describe("V1 validator", () => {
         const v1Specification = {
-            ...defaultSpecification,
+            ...defaultSpecificationExport,
             version: 1,
         };
 
