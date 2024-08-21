@@ -32,7 +32,7 @@ import {
 import { JSON_ABI, Specification } from "./types";
 
 type Layout = "split_screen" | "stack_screen";
-export const getInitialValues = (spec?: Specification): SpecFormValues => {
+const getInitialValues = (spec?: Specification): SpecFormValues => {
     const values: SpecFormValues = {
         formMode: isNilOrEmpty(spec) ? "CREATION" : "EDITION",
         name: propOr("", "name", spec),
