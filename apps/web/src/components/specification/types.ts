@@ -84,3 +84,6 @@ export interface SpecificationTransfer {
 }
 
 export type ValidationType = "success" | "error";
+
+export const SPECIFICATION_TRANSFER_NAME =
+    "cartesiscan_specifications_export" as const;

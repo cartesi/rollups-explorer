@@ -7,18 +7,17 @@ import {
     Specification,
     SpecificationTransfer as SpecificationTransferModel,
     ValidationType,
+    SPECIFICATION_TRANSFER_NAME,
 } from "../types";
-import { validateSpecificationImport } from "../form/validations";
-import { getSpecificationVersion } from "../utils";
+import { validateSpecification, VALIDATOR_VERSION } from "../transfer";
 
 export const useSpecificationsTransfer = () => {
     const { listSpecifications, addSpecification } = useSpecification();
     const specifications = listSpecifications();
-    const version = getSpecificationVersion();
-    const name = "cartesiscan_specifications_export";
+    const version = Number(VALIDATOR_VERSION);
     const specificationExport: SpecificationTransferModel = useMemo(
         () => ({
-            name,
+            name: SPECIFICATION_TRANSFER_NAME,
             version,
             timestamp: new Date().getTime(),
             specifications: specifications ?? [],
@@ -47,16 +46,8 @@ export const useSpecificationsTransfer = () => {
         [],
     );
 
-    const onComplete = useCallback(
-        (
-            message: ReactNode,
-            type: ValidationType,
-            specificationImport: SpecificationTransferModel,
-        ) => {
-            if (type === "error") {
-                return displayAlert(message);
-            }
-
+    const onValidateSuccessfully = useCallback(
+        (specificationImport: SpecificationTransferModel) => {
             Promise.all(
                 specificationImport.specifications.map(
                     (specification: Specification) =>
@@ -81,38 +72,43 @@ export const useSpecificationsTransfer = () => {
                         `Unable to import specifications. Error is: ${
                             err?.message ?? err
                         }`,
-                        "error",
                     ),
                 );
         },
         [addSpecification, displayAlert],
     );
 
-    const onFileLoad = useCallback(
-        (fileContents: string) => {
-            try {
-                const specificationImport = JSON.parse(fileContents);
-
-                validateSpecificationImport(
-                    specificationImport,
-                    version,
-                    name,
-                    (message: ReactNode, type: ValidationType = "error") => {
-                        onComplete(message, type, specificationImport);
-                    },
-                );
-            } catch (err) {
-                displayAlert("Unable to parse specification import.");
-            }
-        },
-        [displayAlert, onComplete, version],
-    );
-
     const readFileContent = useCallback(
         (file: File) => {
             const fileReader = new FileReader();
 
-            fileReader.onload = () => onFileLoad(fileReader.result as string);
+            fileReader.onload = () => {
+                try {
+                    const specificationImport = JSON.parse(
+                        fileReader.result as string,
+                    );
+
+                    validateSpecification(specificationImport)
+                        .then(() => onValidateSuccessfully(specificationImport))
+                        .catch((errors: string[]) => {
+                            displayAlert(
+                                <>
+                                    <div>
+                                        The imported file is not valid. Please
+                                        check the following errors:
+                                    </div>
+                                    <div>
+                                        {errors.map((error) => (
+                                            <div key={error}>{error}</div>
+                                        ))}
+                                    </div>
+                                </>,
+                            );
+                        });
+                } catch (err) {
+                    displayAlert("Unable to parse specification import.");
+                }
+            };
             fileReader.onerror = () =>
                 displayAlert(
                     "Unable to import file. File content may not be readable.",
@@ -120,7 +116,7 @@ export const useSpecificationsTransfer = () => {
 
             fileReader.readAsText(file);
         },
-        [onFileLoad, displayAlert],
+        [displayAlert, onValidateSuccessfully],
     );
 
     const onChangeFile = useCallback(
