@@ -1,5 +1,6 @@
 import { validateSpecificationImport as v1Validator } from "./validators/v1";
 import { SpecificationTransfer } from "../types";
+import { isFunction } from "ramda-adjunct";
 
 interface Validators {
     [key: string]: (specification: SpecificationTransfer) => Promise<void>;
@@ -19,20 +20,22 @@ export const validateSpecification = (specification: SpecificationTransfer) => {
 
     return new Promise((resolve, reject) => {
         if (!VALIDATOR_VERSIONS.includes(specificationVersion)) {
-            return reject(
-                new Error(
-                    `Invalid 'version' field. Version must be of numeric value and must match one of the following values: ${VALIDATOR_VERSIONS.join(
-                        ", ",
-                    )}.`,
-                ),
-            );
+            return reject([
+                `Invalid 'version' field. Version must be of numeric value and must match one of the following values: ${VALIDATOR_VERSIONS.join(
+                    ", ",
+                )}.`,
+            ]);
         }
 
         const validator =
             validators[specificationVersion as keyof typeof validators];
 
-        if (validator) {
-            validator(specification).then(resolve).catch(reject);
+        if (!isFunction(validator)) {
+            return reject([
+                "Missing validator for this specification version. Please contact support for further assistance.",
+            ]);
         }
+
+        validator(specification).then(resolve).catch(reject);
     });
 };
