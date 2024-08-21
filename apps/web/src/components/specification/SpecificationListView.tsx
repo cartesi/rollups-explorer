@@ -236,7 +236,7 @@ const Feedback: FC = () => (
 );
 
 const NoSpecifications: FC = () => {
-    const { onChangeFile } = useSpecificationsTransfer();
+    const { onUploadFile } = useSpecificationsTransfer();
 
     return (
         <Center>
@@ -251,7 +251,7 @@ const NoSpecifications: FC = () => {
                 <Box mt={9}>
                     <FileButton
                         accept="application/json"
-                        onChange={onChangeFile}
+                        onChange={onUploadFile}
                     >
                         {(props) => (
                             <Button {...props}>Import specifications</Button>
