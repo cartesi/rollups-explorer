@@ -15,9 +15,9 @@ import { FC, useCallback, useRef, useState } from "react";
 import { TbQuestionMark } from "react-icons/tb";
 import type { InputItemFragment } from "../../graphql/explorer/operations";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
+import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";
 import InputRow from "./inputRow";
-import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 export interface InputsTableProps {
     inputs: InputItemFragment[];

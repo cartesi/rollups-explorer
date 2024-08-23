@@ -8,6 +8,7 @@ import {
     useApplicationsConnectionQuery,
 } from "../../graphql/explorer/hooks/queries";
 import { ApplicationOrderByInput } from "../../graphql/explorer/types";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 import ApplicationsTable from "../applications/applicationsTable";
 import Paginated from "../paginated";
 import UserApplicationsTable from "./userApplicationsTable";
@@ -17,12 +18,14 @@ const UserApplications: FC = () => {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
+    const chainId = getConfiguredChainId();
     const [query] = useApplicationsConnectionOwnerQuery({
         variables: {
             after,
             limit,
             orderBy: ApplicationOrderByInput.IdAsc,
             ownerId: address?.toLowerCase(),
+            chainId,
         },
         pause: !isConnected,
     });
@@ -66,8 +69,14 @@ const AllApplications: FC = () => {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
+    const chainId = getConfiguredChainId();
     const [query] = useApplicationsConnectionQuery({
-        variables: { orderBy: ApplicationOrderByInput.IdAsc, limit, after },
+        variables: {
+            orderBy: ApplicationOrderByInput.IdAsc,
+            limit,
+            after,
+            chainId,
+        },
     });
     const applications =
         query.data?.applicationsConnection.edges.map((edge) => edge.node) ?? [];

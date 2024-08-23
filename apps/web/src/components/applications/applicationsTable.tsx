@@ -1,19 +1,19 @@
 "use client";
 
 import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
-import { FC } from "react";
-import { ApplicationItemFragment } from "../../graphql/explorer/operations";
-import ResponsiveTable from "../responsiveTable";
 import { Address as AddressType } from "abitype/dist/types/abi";
-import Address from "../address";
+import Link from "next/link";
+import { FC } from "react";
 import {
     TbInbox,
     TbPlugConnected,
     TbPlugConnectedX,
     TbStack2,
 } from "react-icons/tb";
+import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
-import Link from "next/link";
+import Address from "../address";
+import ResponsiveTable from "../responsiveTable";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -27,7 +27,7 @@ interface ColumnProps {
 
 const ConnectionUrlColumn: FC<ColumnProps> = ({ application }) => {
     const { getConnection } = useConnectionConfig();
-    const connection = getConnection(application.id as AddressType);
+    const connection = getConnection(application.address as AddressType);
     return (
         <Box
             display="flex"
@@ -45,7 +45,7 @@ const ConnectionUrlColumn: FC<ColumnProps> = ({ application }) => {
 const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
     const { hasConnection, removeConnection, showConnectionModal } =
         useConnectionConfig();
-    const appId = application.id as AddressType;
+    const appId = application.address as AddressType;
 
     return (
         <Box
@@ -118,7 +118,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = ({
                     key: "id",
                     label: "Id",
                     render: (application) => {
-                        const appId = application.id as AddressType;
+                        const address = application.address as AddressType;
                         return (
                             <Box
                                 display="flex"
@@ -128,7 +128,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = ({
                                     justifyContent: "center",
                                 }}
                             >
-                                <Address value={appId} icon shorten />
+                                <Address value={address} icon shorten />
                             </Box>
                         );
                     },
