@@ -21,30 +21,21 @@ import {
     TbPlugConnected,
     TbPlugConnectedX,
 } from "react-icons/tb";
-import { UseQueryExecute, UseQueryState, useQuery } from "urql";
+import { UseQueryState, useQuery } from "urql";
 import { Address, isAddress } from "viem";
-import {
-    ApplicationsDocument,
-    ApplicationsQuery,
-    ApplicationsQueryVariables,
-} from "../../graphql/explorer/operations";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
     CheckStatusQueryVariables,
 } from "../../graphql/rollups/operations";
+import { useSearchApplications } from "../../hooks/useSearchApplications";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 interface AppConnectionFormProps {
     application?: Address;
     onSubmitted?: () => void;
 }
-
-type UseSearchApplications = (params: {
-    address: Address;
-    limit?: number;
-}) => [{ applications: string[]; fetching: boolean }, UseQueryExecute];
-
 interface DisplayQueryResultProps {
     result: UseQueryState<CheckStatusQuery, CheckStatusQueryVariables>;
 }
@@ -107,37 +98,13 @@ const checkURL = (url: string) => {
     }
 };
 
-const useSearchApplications: UseSearchApplications = ({
-    address,
-    limit,
-}): [{ applications: string[]; fetching: boolean }, UseQueryExecute] => {
-    const [result, executeQuery] = useQuery<
-        ApplicationsQuery,
-        ApplicationsQueryVariables
-    >({
-        query: ApplicationsDocument,
-        variables: {
-            limit: limit ?? 10,
-            where: {
-                id_containsInsensitive: address ?? "",
-            },
-        },
-    });
-    const data = result.data;
-    const applications = React.useMemo(
-        () => (data?.applications ?? []).map((a) => a.id),
-        [data],
-    );
-
-    return [{ applications, fetching: result.fetching }, executeQuery];
-};
-
 const AppConnectionForm: FC<AppConnectionFormProps> = ({
     application,
     onSubmitted,
 }) => {
     const { addConnection, hasConnection } = useConnectionConfig();
     const theme = useMantineTheme();
+    const chainId = getConfiguredChainId();
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -173,8 +140,9 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
     const [debouncedAddress] = useDebouncedValue(address, 400);
     const [debouncedUrl] = useDebouncedValue(url, 300);
 
-    const [{ applications, fetching }] = useSearchApplications({
+    const { applications, fetching } = useSearchApplications({
         address: debouncedAddress,
+        chainId,
     });
 
     const showLoader = !isEmpty(debouncedAddress) && fetching;

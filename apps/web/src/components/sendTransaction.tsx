@@ -15,6 +15,7 @@ import { FC, useCallback, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
+import getConfiguredChainId from "../lib/getConfiguredChain";
 import { BlockExplorerLink } from "./BlockExplorerLink";
 
 export type DepositType =
@@ -49,14 +50,18 @@ const SendTransaction: FC<DepositProps> = ({
         multiTokenId,
         DEBOUNCE_TIME,
     );
+    const chainId = getConfiguredChainId();
     const { applications, fetching } = useSearchApplications({
         address: debouncedApplicationId,
+        chainId,
     });
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
+        chainId,
     });
     const { multiTokens } = useSearchMultiTokens({
         address: debouncedMultiTokenId,
+        chainId,
     });
 
     const onSuccess = useCallback(
