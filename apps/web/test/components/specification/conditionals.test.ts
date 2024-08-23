@@ -115,10 +115,10 @@ describe("Specification Conditionals", () => {
         });
     });
 
-    describe("Matching by application.id", () => {
-        it("should return specification when application.id match input information", () => {
+    describe("Matching by old application.id (Retrocompatibility)", () => {
+        it("should return specification when defined old application.id is used", () => {
             const dummyInput = {
-                application: { id: "my-app-hex-address" },
+                application: { address: "my-app-hex-address" },
                 payload: encodedDataSamples.wagmiSample,
             };
             const spec: Specification = {
@@ -130,7 +130,94 @@ describe("Specification Conditionals", () => {
                         logicalOperator: "or",
                         conditions: [
                             {
+                                // @ts-ignore
                                 field: "application.id",
+                                operator: "equals",
+                                value: "my-app-hex-address",
+                            },
+                        ],
+                    },
+                ],
+            };
+            // lets add all the system-specs first and our custom last.
+            const specifications = [...systemSpecificationAsList, spec];
+            const specification = findSpecificationFor(
+                dummyInput,
+                specifications,
+            );
+
+            expect(specification).not.toBeNull();
+            expect(specification?.name).toEqual(
+                "Conditional Test by application.id",
+            );
+
+            expect(
+                decodePayload(specification!, dummyInput.payload as Hex).result,
+            ).toEqual({
+                amount: 420n,
+                name: "wagmi",
+                success: true,
+            });
+        });
+
+        it("should return specification when multiple conditions match", () => {
+            const input = {
+                msgSender: "an-address-to-match-here",
+                application: { address: "my-app-address" },
+            };
+
+            const spec: Specification = {
+                mode: "abi_params",
+                abiParams: ["string name, uint amount, bool success"],
+                name: "Conditional Test match both conditions",
+                conditionals: [
+                    {
+                        logicalOperator: "and",
+                        conditions: [
+                            {
+                                // @ts-ignore
+                                field: "application.id",
+                                operator: "equals",
+                                value: "my-app-address",
+                            },
+                            {
+                                field: "msgSender",
+                                operator: "equals",
+                                value: "an-address-to-match-here",
+                            },
+                        ],
+                    },
+                ],
+            };
+
+            const specification = findSpecificationFor(input, [
+                ...systemSpecificationAsList,
+                spec,
+            ]);
+
+            expect(specification).not.toBeNull();
+            expect(specification?.name).toEqual(
+                "Conditional Test match both conditions",
+            );
+        });
+    });
+
+    describe("Matching by application.address", () => {
+        it("should return specification when application.id match input information", () => {
+            const dummyInput = {
+                application: { address: "my-app-hex-address" },
+                payload: encodedDataSamples.wagmiSample,
+            };
+            const spec: Specification = {
+                mode: "abi_params",
+                abiParams: ["string name, uint amount, bool success"],
+                name: "Conditional Test by application.id",
+                conditionals: [
+                    {
+                        logicalOperator: "or",
+                        conditions: [
+                            {
+                                field: "application.address",
                                 operator: "equals",
                                 value: "my-app-hex-address",
                             },
@@ -164,7 +251,7 @@ describe("Specification Conditionals", () => {
         it("should return specification when both conditions match", () => {
             const input = {
                 msgSender: "an-address-to-match-here",
-                application: { id: "my-app-address" },
+                application: { address: "my-app-address" },
             };
 
             const spec: Specification = {
@@ -176,7 +263,7 @@ describe("Specification Conditionals", () => {
                         logicalOperator: "and",
                         conditions: [
                             {
-                                field: "application.id",
+                                field: "application.address",
                                 operator: "equals",
                                 value: "my-app-address",
                             },
@@ -204,7 +291,7 @@ describe("Specification Conditionals", () => {
         it("should not return specification when one condition does not match", () => {
             const input = {
                 msgSender: "the-not-matching-address",
-                application: { id: "my-app-address" },
+                application: { address: "my-app-address" },
                 payload: encodedDataSamples.wagmiSample,
             };
 
@@ -217,7 +304,7 @@ describe("Specification Conditionals", () => {
                         logicalOperator: "and",
                         conditions: [
                             {
-                                field: "application.id",
+                                field: "application.address",
                                 operator: "equals",
                                 value: "my-app-address",
                             },
@@ -244,7 +331,7 @@ describe("Specification Conditionals", () => {
         it("should return specification when at least one condition match", () => {
             const input = {
                 msgSender: "that-will-not-match",
-                application: { id: "but-the-app-address-will" },
+                application: { address: "but-the-app-address-will" },
                 payload: encodedDataSamples.wagmiSample,
             };
 
@@ -262,7 +349,7 @@ describe("Specification Conditionals", () => {
                                 value: "expected-msg-sender",
                             },
                             {
-                                field: "application.id",
+                                field: "application.address",
                                 operator: "equals",
                                 value: "but-the-app-address-will",
                             },
@@ -285,7 +372,7 @@ describe("Specification Conditionals", () => {
         it("should return specification when both conditions match", () => {
             const input = {
                 msgSender: "msg-sender-address",
-                application: { id: "cartesi-app-address" },
+                application: { address: "cartesi-app-address" },
             };
 
             const spec: Specification = {
@@ -297,7 +384,7 @@ describe("Specification Conditionals", () => {
                         logicalOperator: "or",
                         conditions: [
                             {
-                                field: "application.id",
+                                field: "application.address",
                                 operator: "equals",
                                 value: "cartesi-app-address",
                             },

@@ -2,13 +2,13 @@ import { Table } from "@mantine/core";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
+import { useQuery } from "urql";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import InputRow, {
     InputRowProps,
 } from "../../../src/components/inputs/inputRow";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
-import { useQuery } from "urql";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -28,9 +28,10 @@ const Component = withMantineTheme(TableComponent);
 
 const defaultProps: InputRowProps = {
     input: {
-        id: "0xdb84080e7d2b4654a7e384de851a6cf7281643de-1",
+        id: "11155111-0xdb84080e7d2b4654a7e384de851a6cf7281643de-1",
         application: {
-            id: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+            id: `11155111-0xdb84080e7d2b4654a7e384de851a6cf7281643de`,
+            address: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
         },
         index: 1,
         payload: "0x68656c6c6f2032",
@@ -39,6 +40,9 @@ const defaultProps: InputRowProps = {
         transactionHash:
             "0x4ad73b8f46dc16bc27d75b3f8f584e8785a8cb6fdf97a6c2a5a5dcfbda3e75c0",
         erc20Deposit: null,
+        chain: {
+            id: "11155111",
+        },
     },
     timeType: "age",
     keepDataColVisible: false,

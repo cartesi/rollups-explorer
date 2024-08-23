@@ -2,10 +2,12 @@
  * @file Contains real samples from our graphQL API. This file should only hold this kind of data.
  */
 
+const chainId = "11155111";
 const nonPortalRelatedInput = {
-    id: "0xc65bf4b414cdb9e7625a33be0fc993d44030e89a-43",
+    id: `${chainId}-0xc65bf4b414cdb9e7625a33be0fc993d44030e89a-43`,
     application: {
-        id: "0xc65bf4b414cdb9e7625a33be0fc993d44030e89a",
+        id: `${chainId}-0xc65bf4b414cdb9e7625a33be0fc993d44030e89a`,
+        address: "0xc65bf4b414cdb9e7625a33be0fc993d44030e89a",
     },
     index: 43,
     payload:
@@ -15,12 +17,16 @@ const nonPortalRelatedInput = {
     transactionHash:
         "0x77f2fcd3eecbd067f3786be862af2fb0e89775dbf8314d169c0e4f09bb752f7a",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 const singleERC1155DepositInput = {
-    id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8-802",
+    id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-802`,
     application: {
-        id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
+        id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8`,
+        address: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
     },
     index: 802,
     payload:
@@ -30,12 +36,16 @@ const singleERC1155DepositInput = {
     transactionHash:
         "0x8f0a0db51c8bcd6edd9e9d44adb778339fd39b76388c93bdc170fe944e8caf39",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 const batchERC1155DepositInput = {
-    id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8-805",
+    id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-805`,
     application: {
-        id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
+        id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8`,
+        address: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
     },
     index: 805,
     payload:
@@ -45,12 +55,16 @@ const batchERC1155DepositInput = {
     transactionHash:
         "0x9b7e68052231cbfae202b1902d2efc2b04ea0feac6dcba1397d4ad4f9b4af292",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 const erc20DepositInput = {
-    id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8-788",
+    id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-788`,
     application: {
-        id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
+        id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8`,
+        address: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
     },
     index: 788,
     payload:
@@ -70,12 +84,16 @@ const erc20DepositInput = {
         },
         amount: "100000000000",
     },
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 const erc721DepositInput = {
-    id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8-782",
+    id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-782`,
     application: {
-        id: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
+        id: `${chainId}-0x4ca2f6935200b9a782a78f408f640f17b29809d8`,
+        address: "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
     },
     index: 782,
     payload:
@@ -85,12 +103,16 @@ const erc721DepositInput = {
     transactionHash:
         "0xcca56c45f486886a5d3669392440ef9127007226d9d456dd6da4ac9020322c34",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 const dappAddressRelayInput = {
-    id: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e-0",
+    id: `${chainId}-0x56d9baa89f84ebda027bca24950f61fc6dabd16e-0`,
     application: {
-        id: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e",
+        id: `${chainId}-0x56d9baa89f84ebda027bca24950f61fc6dabd16e`,
+        address: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e",
     },
     index: 0,
     payload: "0x56d9baa89f84ebda027bca24950f61fc6dabd16e",
@@ -99,6 +121,9 @@ const dappAddressRelayInput = {
     transactionHash:
         "0x0e9cc22122edd7d10eb75e9c3868845d0ba89afab66a987b5fabc84ba46c947f",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 } as const;
 
 /**

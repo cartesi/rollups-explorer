@@ -15,7 +15,7 @@ export const erc1155JSONABISpecStub: Specification = {
         {
             conditions: [
                 {
-                    field: "application.id",
+                    field: "application.address",
                     operator: "equals",
                     value: "some-value-here",
                 },

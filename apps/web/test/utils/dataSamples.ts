@@ -1,12 +1,22 @@
 import { VoucherEdge } from "../../src/graphql/rollups/types";
 
+export const chainId = "11155111";
 /**
  * A list of applications with only id property
  */
 export const applicationsSample = [
-    { id: "0x60a7048c3136293071605a4eaffef49923e981cc" },
-    { id: "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c" },
-    { id: "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3" },
+    {
+        address: "0x60a7048c3136293071605a4eaffef49923e981cc",
+        id: `${chainId}-0x60a7048c3136293071605a4eaffef49923e981cc`,
+    },
+    {
+        address: "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
+        id: `${chainId}-0x70ac08179605af2d9e75782b8decdd3c22aa4d0c`,
+    },
+    {
+        address: "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
+        id: `${chainId}-0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3`,
+    },
 ];
 
 /**
@@ -144,7 +154,8 @@ export const inputDetailsSampleForPaging = {
 export const inputSample = {
     id: "0x721be000f6054b5e0e57aaab791015b53f0a18f4-0",
     application: {
-        id: "0x721be000f6054b5e0e57aaab791015b53f0a18f4",
+        id: `${chainId}-0x721be000f6054b5e0e57aaab791015b53f0a18f4`,
+        address: "0x721be000f6054b5e0e57aaab791015b53f0a18f4",
     },
     index: 0,
     payload: "0x6a6f696e47616d65",
@@ -153,4 +164,7 @@ export const inputSample = {
     transactionHash:
         "0x6ce72329f44a9548753170b62db6f43f40911f0a3149cdc41a445e03a433e87b",
     erc20Deposit: null,
+    chain: {
+        id: chainId,
+    },
 };

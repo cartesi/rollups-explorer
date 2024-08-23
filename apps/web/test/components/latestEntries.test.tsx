@@ -1,14 +1,16 @@
-import { describe, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { withMantineTheme } from "../utils/WithMantineTheme";
+import { describe, it } from "vitest";
 import LatestEntries from "../../src/components/latestEntries";
+import { withMantineTheme } from "../utils/WithMantineTheme";
 
+const chainId = "11155111";
 const inputs = [
     {
         node: {
-            id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-2",
+            id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-2`,
             application: {
-                id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
+                id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6`,
+                address: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
                 __typename: "Application",
             },
             index: 2,
@@ -24,9 +26,10 @@ const inputs = [
     },
     {
         node: {
-            id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-1",
+            id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-1`,
             application: {
-                id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
+                id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6`,
+                address: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
                 __typename: "Application",
             },
             index: 1,
@@ -42,9 +45,10 @@ const inputs = [
     },
     {
         node: {
-            id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-0",
+            id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6-0`,
             application: {
-                id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
+                id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6`,
+                address: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
                 __typename: "Application",
             },
             index: 0,
@@ -60,9 +64,10 @@ const inputs = [
     },
     {
         node: {
-            id: "0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d-0",
+            id: `${chainId}-0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d-0`,
             application: {
-                id: "0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d",
+                id: `${chainId}-0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d`,
+                address: "0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d",
                 __typename: "Application",
             },
             index: 0,
@@ -78,9 +83,10 @@ const inputs = [
     },
     {
         node: {
-            id: "0x60a7048c3136293071605a4eaffef49923e981cc-5",
+            id: `${chainId}-0x60a7048c3136293071605a4eaffef49923e981cc-5`,
             application: {
-                id: "0x60a7048c3136293071605a4eaffef49923e981cc",
+                id: `${chainId}-0x60a7048c3136293071605a4eaffef49923e981cc`,
+                address: "0x60a7048c3136293071605a4eaffef49923e981cc",
                 __typename: "Application",
             },
             index: 5,
@@ -97,9 +103,10 @@ const inputs = [
     },
     {
         node: {
-            id: "0x60a7048c3136293071605a4eaffef49923e981cc-4",
+            id: `${chainId}-0x60a7048c3136293071605a4eaffef49923e981cc-4`,
             application: {
-                id: "0x60a7048c3136293071605a4eaffef49923e981cc",
+                id: `${chainId}-0x60a7048c3136293071605a4eaffef49923e981cc`,
+                address: "0x60a7048c3136293071605a4eaffef49923e981cc",
                 __typename: "Application",
             },
             index: 4,
@@ -118,7 +125,8 @@ const inputs = [
 const applications = [
     {
         node: {
-            id: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
+            id: `${chainId}-0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6`,
+            address: "0xf9f5c74acf5a20f1e91aeb057fd7f13db305a0e6",
             owner: "0x5408cbca7740df5c8c4cbf494c6844d5f3029e04",
             timestamp: "1701358740",
             factory: {
@@ -131,7 +139,8 @@ const applications = [
     },
     {
         node: {
-            id: "0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d",
+            id: `${chainId}-0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d`,
+            address: "0x2dc155cb107b0ebe621b927f9e7acc4819e79a0d",
             owner: "0xcba4fdb66456b0a9f30f0714ed0f79fe2ba5901b",
             timestamp: "1701353460",
             factory: {
@@ -144,7 +153,8 @@ const applications = [
     },
     {
         node: {
-            id: "0xd3fb544b9ce4725733e1b1e4114ce228b624099f",
+            id: `${chainId}-0xd3fb544b9ce4725733e1b1e4114ce228b624099f`,
+            address: "0xd3fb544b9ce4725733e1b1e4114ce228b624099f",
             owner: "0xcba4fdb66456b0a9f30f0714ed0f79fe2ba5901b",
             timestamp: "1700770080",
             factory: {
@@ -157,7 +167,8 @@ const applications = [
     },
     {
         node: {
-            id: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+            id: `${chainId}-0xdb84080e7d2b4654a7e384de851a6cf7281643de`,
+            address: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
             owner: "0x8a12cf75000cd2e73ab16469826838d5f137f444",
             timestamp: "1700592756",
             factory: {
@@ -170,7 +181,8 @@ const applications = [
     },
     {
         node: {
-            id: "0xfdc52064fc8077bc48ad307bae41aebb050a58f2",
+            id: `${chainId}-0xfdc52064fc8077bc48ad307bae41aebb050a58f2`,
+            address: "0xfdc52064fc8077bc48ad307bae41aebb050a58f2",
             owner: "0x8a12cf75000cd2e73ab16469826838d5f137f444",
             timestamp: "1700579652",
             factory: {
@@ -183,7 +195,8 @@ const applications = [
     },
     {
         node: {
-            id: "0xb76fddfdfa6a0f00213e5ea8491e103729eb1add",
+            id: `${chainId}-0xb76fddfdfa6a0f00213e5ea8491e103729eb1add`,
+            address: "0xb76fddfdfa6a0f00213e5ea8491e103729eb1add",
             owner: "0x8a12cf75000cd2e73ab16469826838d5f137f444",
             timestamp: "1700577348",
             factory: {
