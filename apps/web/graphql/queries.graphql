@@ -2,6 +2,10 @@ fragment InputItem on Input {
     id
     application {
         id
+        address
+    }
+    chain {
+        id
     }
     index
     payload
@@ -21,20 +25,25 @@ fragment InputItem on Input {
     }
 }
 
-query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String, $applicationId: String) {
-    inputsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {application: {id_startsWith: $applicationId}}) {
-        totalCount
-        pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
-        }
-        edges {
-            node {
-                ...InputItem
+query inputs($orderBy: [InputOrderByInput!]!, $limit: Int, $after: String, $applicationId: String, $chainId: String) {
+    inputsConnection(
+            orderBy: $orderBy, 
+            first: $limit, 
+            after: $after, 
+            where: {application: {id_startsWith: $applicationId}, chain: {id_eq: $chainId}}
+        ) {
+            totalCount
+            pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
             }
-        }
+            edges {
+                node {
+                    ...InputItem
+                }
+            }
     }
 }
 
@@ -56,17 +65,23 @@ query inputsConnection($orderBy: [InputOrderByInput!]!, $limit: Int, $after: Str
     }
 }
 
-query stats($applicationId: String) {
-    inputsConnection(orderBy: id_ASC, where: {application: {id_startsWith: $applicationId}}) {
+query stats($applicationId: String, $chainId: String) {
+    inputsConnection(orderBy: id_ASC, 
+      where: {application: {id_startsWith: $applicationId}, chain: {id_eq: $chainId}}
+    ) {
         totalCount
     }
-    applicationsConnection(orderBy: id_ASC, where: {id_startsWith: $applicationId}) {
+
+    applicationsConnection(
+      orderBy: id_ASC, 
+      where: {id_startsWith: $applicationId, chain: {id_eq: $chainId}}
+    ) {
         totalCount
     }
 }
 
-query statsApplicationsOwner($ownerAddress: String) {
-    applicationsConnection(orderBy: id_ASC, where: {owner_eq: $ownerAddress}) {
+query statsApplicationsOwner($ownerAddress: String, $chainId: String) {
+    applicationsConnection(orderBy: id_ASC, where: {owner_eq: $ownerAddress, chain:{ id_eq: $chainId} }) {
         totalCount
     }
 }
@@ -74,12 +89,14 @@ query statsApplicationsOwner($ownerAddress: String) {
 query applications($limit: Int, $where: ApplicationWhereInput) {
     applications(where: $where, limit: $limit) {
         id
+        address
     }
 }
 
 query tokens($limit: Int, $where: TokenWhereInput) {
     tokens(limit: $limit, where: $where) {
         id
+        address
         name
         symbol
     }
@@ -88,6 +105,7 @@ query tokens($limit: Int, $where: TokenWhereInput) {
 query multiTokens($limit: Int, $where: MultiTokenWhereInput) {
     multiTokens(limit: $limit, where: $where) {
         id
+        address
     }
 }
 
@@ -95,13 +113,26 @@ fragment ApplicationItem on Application {
     id
     owner
     timestamp
+		address
     factory {
         id
+      	address
     }
 }
 
-query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $factoryId: String) {
-    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {factory: {id_startsWith: $factoryId}}) {
+query applicationsConnection(
+        $orderBy: [ApplicationOrderByInput!]!, 
+        $limit: Int, 
+        $after: String, 
+        $factoryId: String, 
+        $chainId:String
+    ) {
+    applicationsConnection(
+            orderBy: $orderBy, 
+            first: $limit, 
+            after: $after, 
+            where: {factory: {id_startsWith: $factoryId}, chain: {id_eq: $chainId}}
+        ) {
         totalCount
         pageInfo {
             hasNextPage
@@ -117,21 +148,32 @@ query applicationsConnection($orderBy: [ApplicationOrderByInput!]!, $limit: Int,
     }
 }
 
-query applicationsConnectionOwner($orderBy: [ApplicationOrderByInput!]!, $limit: Int, $after: String, $ownerId: String) {
-    applicationsConnection(orderBy: $orderBy, first: $limit, after: $after, where: {owner_eq: $ownerId}) {
-        totalCount
-        pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
-        }
-        edges {
-            node {
-                ...ApplicationItem
+query applicationsConnectionOwner(
+        $orderBy: [ApplicationOrderByInput!]!, 
+        $limit: Int, 
+        $after: String, 
+        $ownerId: String, 
+        $chainId: String
+    ) {
+        applicationsConnection(
+                orderBy: $orderBy, 
+                first: $limit, 
+                after: $after, 
+                where: {owner_eq: $ownerId, chain:{id_eq: $chainId}}
+            ) {
+            totalCount
+            pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+            }
+            edges {
+                node {
+                    ...ApplicationItem
+                }
             }
         }
-    }
 }
 
 query applicationById($id: String!) {
