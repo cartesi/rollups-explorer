@@ -34,7 +34,7 @@ const ToLabel: FC = () => (
 );
 
 const initialCondition: Condition = {
-    field: "application.id",
+    field: "application.address",
     operator: "equals",
     value: "",
 };

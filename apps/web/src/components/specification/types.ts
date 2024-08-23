@@ -14,7 +14,7 @@ export const logicalOperators = [
 ] as const;
 export const inputProperties = [
     {
-        value: "application.id",
+        value: "application.address",
         label: "Application Address",
         programmingLabel: "applicationAddress",
     },
