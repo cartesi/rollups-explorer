@@ -7,12 +7,20 @@ import {
     useStatsApplicationsOwnerQuery,
     useStatsQuery,
 } from "../graphql/explorer/hooks/queries";
+import getConfiguredChainId from "../lib/getConfiguredChain";
+
 const EntriesSummary: FC = () => {
+    const chainId = getConfiguredChainId();
     const { address, isConnected } = useAccount();
-    const [{ data: stats }] = useStatsQuery();
+    const [{ data: stats }] = useStatsQuery({
+        variables: {
+            chainId,
+        },
+    });
     const [{ data: applicationsOwned }] = useStatsApplicationsOwnerQuery({
         variables: {
             ownerAddress: address?.toLowerCase(),
+            chainId,
         },
         pause: !isConnected,
     });

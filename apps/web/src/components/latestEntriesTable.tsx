@@ -6,7 +6,8 @@ import { FC, useCallback, useState } from "react";
 import Address from "./address";
 
 export interface Entry {
-    appId: AddressType;
+    appId: String;
+    appAddress: AddressType;
     timestamp: number;
     href: string;
 }
@@ -64,7 +65,7 @@ const LatestEntriesTable: FC<LatestEntriesTableProps> = ({
                     <Table.Tr key={`${entry.appId}-${entry.timestamp}`}>
                         <Table.Td>
                             <Address
-                                value={entry.appId}
+                                value={entry.appAddress}
                                 icon
                                 shorten
                                 href={entry.href}
