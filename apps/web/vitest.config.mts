@@ -15,6 +15,7 @@ export default defineConfig({
                 "**/.next/**",
                 "**/e2e/**",
                 "**/test/**",
+                "**/app/**",
                 "**/playwright-report/**",
                 "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
             ],
