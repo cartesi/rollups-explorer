@@ -49,7 +49,7 @@ interface BuilderArgs {
     apps?: MockResult<Applications>;
     checkStatus?: MockResult<CheckStatusData>;
     inputDetails?: MockResult<InputDetailsData>;
-    execQuery?: Mock<any, any>;
+    execQuery?: Mock<any>;
 }
 
 type CheckStatusResult = UseQueryState<
