@@ -30,7 +30,7 @@ describe("SpecificationsTransfer", () => {
         cleanup();
     });
 
-    it("should display link with correct attributes downloading the specifications export", () => {
+    it("should display link with correct attributes for downloading the specifications export", () => {
         renderHook(() => useSpecificationsTransfer(), {
             wrapper: ({ children }) => (
                 <div>

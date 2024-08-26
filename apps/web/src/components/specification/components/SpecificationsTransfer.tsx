@@ -6,7 +6,7 @@ import { TbDownload, TbUpload } from "react-icons/tb";
 import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
 
 export const SpecificationsTransfer = () => {
-    const { onUploadFile, specificationExportLink } =
+    const { specificationExportLink, onUploadFile } =
         useSpecificationsTransfer();
 
     return (

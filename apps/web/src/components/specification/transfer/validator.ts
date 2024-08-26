@@ -2,9 +2,10 @@ import { validateSpecificationImport as v1Validator } from "./validators/v1";
 import { SpecificationTransfer } from "../types";
 import { isFunction } from "ramda-adjunct";
 
-interface Validators {
-    [key: string]: (specification: SpecificationTransfer) => Promise<void>;
-}
+type Validators = Record<
+    string,
+    (specification: SpecificationTransfer) => Promise<void>
+>;
 
 const validators: Validators = {
     "1": v1Validator,
