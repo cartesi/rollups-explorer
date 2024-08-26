@@ -8,7 +8,7 @@ const ContentSecurityPolicy = `
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    swcMinify: false,
+    swcMinify: true,
     output: "standalone",
     basePath: process.env.BASE_PATH || "",
     async headers() {
