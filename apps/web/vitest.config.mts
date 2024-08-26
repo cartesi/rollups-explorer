@@ -4,9 +4,9 @@ import { defineConfig, UserConfig } from "vitest/config";
 export default defineConfig({
     plugins: [react()],
     test: {
-        exclude: ["e2e/**"],
+        exclude: ["e2e/**", "node_modules/**"],
         globals: true,
-        environment: "jsdom",
+        environment: "happy-dom",
         setupFiles: "vitest-setup.ts",
         coverage: {
             reporter: ["text", "lcov"],
