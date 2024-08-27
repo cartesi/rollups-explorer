@@ -11,7 +11,6 @@ const nextConfig = {
     swcMinify: true,
     output: "standalone",
     basePath: process.env.BASE_PATH || "",
-    transpilePackages: ["@ant-design", "antd"],
     async headers() {
         return [
             {
