@@ -10,15 +10,7 @@ export default defineConfig({
         setupFiles: "vitest-setup.ts",
         coverage: {
             reporter: ["text", "lcov"],
-            exclude: [
-                "**/graphql/**",
-                "**/.next/**",
-                "**/e2e/**",
-                "**/test/**",
-                "**/app/**",
-                "**/playwright-report/**",
-                "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
-            ],
+            exclude: ["**/graphql/**", "**/app/**"],
             include: ["**/src"],
         },
         server: {
