@@ -19,6 +19,7 @@ export default defineConfig({
                 "**/playwright-report/**",
                 "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
             ],
+            include: ["**/src"],
         },
         server: {
             deps: {
