@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import ApplicationSummary from "../../../src/components/applications/applicationSummary";
-import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { useInputsConnectionQuery } from "../../../src/graphql/explorer/hooks/queries";
-import { inputsConnectionMock } from "./mocks";
 import { InputOrderByInput } from "../../../src/graphql/explorer/types";
+import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { inputsConnectionMock } from "./mocks";
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -27,6 +27,7 @@ const connectionConfig = {
     hideConnectionModal: vi.fn(),
     showConnectionModal: vi.fn(),
     listConnections: vi.fn(),
+    fetching: false,
 };
 
 describe("ApplicationSummary component", () => {
@@ -64,7 +65,10 @@ describe("ApplicationSummary component", () => {
                 limit: 6,
                 where: {
                     application: {
-                        id_eq: defaultProps.applicationId.toLowerCase(),
+                        address_eq: defaultProps.applicationId.toLowerCase(),
+                        chain: {
+                            id_eq: "11155111",
+                        },
                     },
                 },
             },

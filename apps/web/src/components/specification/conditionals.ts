@@ -7,6 +7,7 @@ import {
     isNil,
     isNotNil,
     path,
+    pathOr,
     pipe,
     thunkify,
 } from "ramda";
@@ -56,6 +57,16 @@ const logicalOperators = {
 };
 
 /**
+ * Map of conditional fields/etc to be replaced on the fly.
+ */
+const patcheables = {
+    "application.id": "application.address",
+} as const;
+
+export const patchField = (value: Condition["field"]) =>
+    pathOr(value, [value], patcheables);
+
+/**
  * Return a list of lazy functions to be evaluated later as parameters for Logical Operators e.g. or(fn1, fn2)()
  * @param conditions
  * @param input
@@ -63,7 +74,7 @@ const logicalOperators = {
  */
 const buildConditions = (conditions: Condition[], input: MaybeInput) => {
     return conditions.map((condition) => {
-        const inputValue = path(condition.field?.split("."), input);
+        const inputValue = path(patchField(condition.field)?.split("."), input);
         const operatorFn = operators[condition.operator];
         return thunkify(operatorFn)(inputValue, condition.value);
     });

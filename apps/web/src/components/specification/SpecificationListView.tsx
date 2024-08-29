@@ -24,6 +24,7 @@ import { TbTrash } from "react-icons/tb";
 import { Abi } from "viem";
 import { EditSpecificationButton } from "./components/EditSpecificationButton";
 import { NewSpecificationButton } from "./components/NewSpecificationButton";
+import { patchField } from "./conditionals";
 import { useSpecification } from "./hooks/useSpecification";
 import {
     ABI_PARAMS,
@@ -157,9 +158,9 @@ const DisplayInstructions: FC<{ slices: SliceInstruction[] | undefined }> = ({
 };
 
 const buildConditionalExpression = (cond: Condition) =>
-    `\n  ${inputPropLabel[cond.field]} ${operatorLabel[cond.operator]} "${
-        cond.value
-    }"`;
+    `\n  ${inputPropLabel[patchField(cond.field)]} ${
+        operatorLabel[cond.operator]
+    } "${cond.value}"`;
 
 const codeGenerator = (
     conditions: Condition[],

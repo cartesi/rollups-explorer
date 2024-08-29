@@ -7,21 +7,22 @@ import {
     Text,
     useMantineTheme,
 } from "@mantine/core";
-import type { FC } from "react";
+import { useMediaQuery } from "@mantine/hooks";
+import type { Address as AddressType } from "abitype/dist/types/abi";
 import Link from "next/link";
+import type { FC } from "react";
+import { IconType } from "react-icons";
 import { TbApps, TbInbox } from "react-icons/tb";
-import LatestEntriesTable, { Entry } from "./latestEntriesTable";
-import {
-    ApplicationOrderByInput,
-    InputOrderByInput,
-} from "../graphql/explorer/types";
 import {
     useApplicationsConnectionQuery,
     useInputsQuery,
 } from "../graphql/explorer/hooks/queries";
-import type { Address as AddressType } from "abitype/dist/types/abi";
-import { IconType } from "react-icons";
-import { useMediaQuery } from "@mantine/hooks";
+import {
+    ApplicationOrderByInput,
+    InputOrderByInput,
+} from "../graphql/explorer/types";
+import getConfiguredChainId from "../lib/getConfiguredChain";
+import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 
 interface LatestEntriesCard {
     title: string;
@@ -82,10 +83,12 @@ export const LatestEntriesCard: FC<LatestEntriesCard> = (props) => {
 };
 
 const LatestEntries: FC = () => {
+    const chainIdConfigured = getConfiguredChainId();
     const [{ data: inputsData, fetching: isFetchingInputs }] = useInputsQuery({
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,
             limit: 6,
+            chainId: chainIdConfigured,
         },
     });
     const [{ data: applicationsData, fetching: isFetchingApplications }] =
@@ -93,19 +96,22 @@ const LatestEntries: FC = () => {
             variables: {
                 orderBy: ApplicationOrderByInput.TimestampDesc,
                 limit: 6,
+                chainId: chainIdConfigured,
             },
         });
     const inputs =
         inputsData?.inputsConnection.edges.map((edge) => ({
-            appId: edge.node.application.id as AddressType,
+            appId: edge.node.application.id,
+            appAddress: edge.node.application.address as AddressType,
             timestamp: Number(edge.node.timestamp),
-            href: `/applications/${edge.node.application.id}/inputs`,
+            href: `/applications/${edge.node.application.address}/inputs`,
         })) ?? [];
     const applications =
         applicationsData?.applicationsConnection.edges.map((edge) => ({
-            appId: edge.node.id as AddressType,
+            appId: edge.node.id,
+            appAddress: edge.node.address as AddressType,
             timestamp: Number(edge.node.timestamp),
-            href: `/applications/${edge.node.id}`,
+            href: `/applications/${edge.node.address}`,
         })) ?? [];
 
     return (

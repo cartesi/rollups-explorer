@@ -1,11 +1,5 @@
 "use client";
 import {
-    BaseCircleColorful,
-    EthereumCircleColorful,
-    HardhatColorful,
-    OptimismCircleColorful,
-} from "@ant-design/web3-icons";
-import {
     Button,
     Divider,
     Group,
@@ -30,6 +24,10 @@ import {
     sepolia,
 } from "viem/chains";
 import { useConfig } from "wagmi";
+import BaseIcon from "../icons/Base";
+import EthereumIcon from "../icons/Ethereum";
+import HardhatIcon from "../icons/Hardhat";
+import OptimismIcon from "../icons/Optimism";
 
 const chainIds = [
     mainnet.id,
@@ -41,7 +39,7 @@ const chainIds = [
     anvil.id,
 ] as const;
 
-type IconType = typeof EthereumCircleColorful;
+type IconType = typeof EthereumIcon;
 type SupportedChains = (typeof chainIds)[number];
 
 interface NetworkGroupProps extends NetworkGroup {
@@ -57,20 +55,20 @@ interface NetworkGroup {
 
 const mainnets: NetworkGroup[] = [
     {
-        Icon: EthereumCircleColorful,
+        Icon: EthereumIcon,
         text: mainnet.name,
         chainId: mainnet.id,
         externalLink: "https://cartesiscan.io",
     },
 
     {
-        Icon: OptimismCircleColorful,
+        Icon: OptimismIcon,
         text: optimism.name,
         chainId: optimism.id,
         externalLink: "https://optimism.cartesiscan.io",
     },
     {
-        Icon: BaseCircleColorful,
+        Icon: BaseIcon,
         text: base.name,
         chainId: base.id,
         externalLink: "https://base.cartesiscan.io",
@@ -79,20 +77,20 @@ const mainnets: NetworkGroup[] = [
 
 const testnets: NetworkGroup[] = [
     {
-        Icon: EthereumCircleColorful,
+        Icon: EthereumIcon,
         text: sepolia.name,
         chainId: sepolia.id,
         externalLink: "https://sepolia.cartesiscan.io",
     },
     {
-        Icon: OptimismCircleColorful,
+        Icon: OptimismIcon,
         text: optimismSepolia.name,
         chainId: optimismSepolia.id,
         externalLink: "https://optimism-sepolia.cartesiscan.io",
     },
 
     {
-        Icon: BaseCircleColorful,
+        Icon: BaseIcon,
         text: baseSepolia.name,
         chainId: baseSepolia.id,
         externalLink: "https://base-sepolia.cartesiscan.io",
@@ -121,7 +119,7 @@ const NetworkGroup: FC<NetworkGroupProps> = ({
                 <Indicator autoContrast disabled={!disabled} processing>
                     <Group justify="space-between" wrap="nowrap">
                         <Group justify="flex-start">
-                            <Icon style={{ fontSize: chainIconSize }} />
+                            <Icon size={chainIconSize} />
                             <Text>{text}</Text>
                         </Group>
                         <TbExternalLink />
@@ -146,22 +144,19 @@ const CaretIcon: FC<{ up: boolean }> = ({ up }) => {
 const getIconByChainId = cond([
     [
         (id: number) => includes(id, [mainnet.id, sepolia.id]),
-        () => EthereumCircleColorful,
+        () => EthereumIcon,
     ],
     [
         (id: number) => includes(id, [optimism.id, optimismSepolia.id]),
-        () => OptimismCircleColorful,
+        () => OptimismIcon,
     ],
-    [
-        (id: number) => includes(id, [base.id, baseSepolia.id]),
-        () => BaseCircleColorful,
-    ],
-    [T, () => HardhatColorful],
+    [(id: number) => includes(id, [base.id, baseSepolia.id]), () => BaseIcon],
+    [T, () => HardhatIcon],
 ]);
 
 const MainIcon: FC<{ chainId: number }> = ({ chainId }) => {
     const Icon = getIconByChainId(chainId);
-    return <Icon style={{ fontSize: 28 }} id={`chain-${chainId}-icon`} />;
+    return <Icon size={28} id={`chain-${chainId}-icon`} />;
 };
 
 export const CartesiScanChains = () => {

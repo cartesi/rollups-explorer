@@ -7,13 +7,14 @@ import { Address as AddressType } from "viem";
 import Address from "../../../../components/address";
 import Breadcrumbs from "../../../../components/breadcrumbs";
 import Inputs from "../../../../components/inputs/inputs";
+import PageTitle from "../../../../components/layout/pageTitle";
 import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
 } from "../../../../graphql/explorer/operations";
+import getConfiguredChainId from "../../../../lib/getConfiguredChain";
 import { getUrqlServerClient } from "../../../../lib/urql";
-import PageTitle from "../../../../components/layout/pageTitle";
 
 export async function generateMetadata({
     params,
@@ -23,13 +24,13 @@ export async function generateMetadata({
     };
 }
 
-async function getApplication(address: string) {
+async function getApplication(appId: string) {
     const client = getUrqlServerClient();
     const result = await client.query<
         ApplicationByIdQuery,
         ApplicationByIdQueryVariables
     >(ApplicationByIdDocument, {
-        id: address.toLowerCase(),
+        id: appId.toLowerCase(),
     });
 
     return result.data?.applicationById;
@@ -42,7 +43,9 @@ export type ApplicationInputsPageProps = {
 const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
     params,
 }) => {
-    const application = await getApplication(params.address);
+    const chainId = getConfiguredChainId();
+    const appId = `${chainId}-${params.address?.toLowerCase()}`;
+    const application = await getApplication(appId);
 
     if (!application) {
         notFound();

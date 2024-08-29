@@ -39,8 +39,8 @@ describe("CartesiScanNetworks component", () => {
         render(<Component />);
 
         expect(screen.getByText("Ethereum")).toBeInTheDocument();
-        expect(screen.getByRole("img").getAttribute("class")).toEqual(
-            "anticon ant-web3-icon-ethereum-circle-colorful",
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Ethereum icon",
         );
     });
 
@@ -52,8 +52,8 @@ describe("CartesiScanNetworks component", () => {
         render(<Component />);
 
         expect(screen.getByText("Sepolia")).toBeInTheDocument();
-        expect(screen.getByRole("img").getAttribute("class")).toEqual(
-            "anticon ant-web3-icon-ethereum-circle-colorful",
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Ethereum icon",
         );
     });
 
@@ -65,8 +65,8 @@ describe("CartesiScanNetworks component", () => {
         render(<Component />);
 
         expect(screen.getByText("OP Mainnet")).toBeInTheDocument();
-        expect(screen.getByRole("img").getAttribute("class")).toEqual(
-            "anticon ant-web3-icon-optimism-circle-colorful",
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Optimism icon",
         );
     });
 
@@ -78,8 +78,8 @@ describe("CartesiScanNetworks component", () => {
         render(<Component />);
 
         expect(screen.getByText("OP Sepolia")).toBeInTheDocument();
-        expect(screen.getByRole("img").getAttribute("class")).toEqual(
-            "anticon ant-web3-icon-optimism-circle-colorful",
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Optimism icon",
         );
     });
 
@@ -91,8 +91,8 @@ describe("CartesiScanNetworks component", () => {
         render(<Component />);
 
         expect(screen.getByText("Anvil")).toBeInTheDocument();
-        expect(screen.getByRole("img").getAttribute("class")).toEqual(
-            "anticon ant-web3-icon-hardhat-colorful",
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Hardhat icon",
         );
     });
 

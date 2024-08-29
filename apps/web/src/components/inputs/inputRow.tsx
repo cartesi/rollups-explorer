@@ -12,16 +12,16 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMilliseconds from "pretty-ms";
-import React, { FC } from "react";
+import { FC } from "react";
 import { TbArrowRight, TbFileText, TbQuestionMark, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
-import Address from "../address";
-import InputDetailsView from "./inputDetailsView";
 import { methodResolver } from "../../lib/methodResolver";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Connection } from "../../providers/connectionConfig/types";
+import Address from "../address";
 import ConnectionInputStatusBadge from "../connection/connectionInputStatusBadge";
+import InputDetailsView from "./inputDetailsView";
 
 export type InputRowProps = {
     input: InputItemFragment;
@@ -36,7 +36,7 @@ const InputRow: FC<InputRowProps> = ({
 }) => {
     const [opened, { toggle }] = useDisclosure(false);
     const from = input.msgSender as AddressType;
-    const to = input.application.id as AddressType;
+    const to = input.application.address as AddressType;
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
 

@@ -97,7 +97,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: "",
+                    address_containsInsensitive: "",
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });
@@ -133,7 +136,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: "",
+                    address_containsInsensitive: "",
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });
@@ -146,7 +152,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: search,
+                    address_containsInsensitive: search,
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });
@@ -165,7 +174,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: "",
+                    address_containsInsensitive: "",
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });
@@ -197,7 +209,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: "",
+                    address_containsInsensitive: "",
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });
@@ -210,7 +225,10 @@ describe("SendTransaction component", () => {
             variables: {
                 limit: 10,
                 where: {
-                    id_containsInsensitive: formattedValue,
+                    address_containsInsensitive: formattedValue,
+                    chain: {
+                        id_eq: "11155111",
+                    },
                 },
             },
         });

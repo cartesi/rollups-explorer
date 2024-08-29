@@ -171,7 +171,7 @@ const buildSelectData = (
 const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
-    const appId = input.application.id as Address;
+    const appId = input.application.address as Address;
     const inputIdx = input.index;
     const connection = getConnection(appId);
     const [selectedSpec, setSelectedSpec] = useState<string>("");

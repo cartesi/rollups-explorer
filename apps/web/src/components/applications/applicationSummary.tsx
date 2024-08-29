@@ -1,5 +1,6 @@
 "use client";
 
+import { SummaryCard } from "@cartesi/rollups-explorer-ui";
 import {
     Button,
     Card,
@@ -12,16 +13,16 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import React, { FC } from "react";
-import { SummaryCard } from "@cartesi/rollups-explorer-ui";
+import Link from "next/link";
+import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
+import { Address } from "viem";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
-import { Address } from "viem";
-import Link from "next/link";
-import LatestInputsTable from "./latestInputsTable";
 import ConnectionSummary from "../connection/connectionSummary";
+import LatestInputsTable from "./latestInputsTable";
 
 const SummarySkeletonCard = () => (
     <Card shadow="xs" w="100%">
@@ -37,13 +38,17 @@ export type ApplicationSummaryProps = {
 };
 
 const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
+    const chainId = getConfiguredChainId();
     const [{ data, fetching }] = useInputsConnectionQuery({
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,
             limit: 6,
             where: {
                 application: {
-                    id_eq: applicationId.toLowerCase(),
+                    address_eq: applicationId.toLowerCase(),
+                    chain: {
+                        id_eq: chainId,
+                    },
                 },
             },
         },
