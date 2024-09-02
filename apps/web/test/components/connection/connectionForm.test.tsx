@@ -58,7 +58,7 @@ describe("connectionForm", () => {
         ).toBeInTheDocument();
 
         expect(screen.getByTestId("icon-test-inactive")).toBeInTheDocument();
-        expect(screen.getByText("Save")).toBeInTheDocument();
+        expect(screen.getByTestId("connection-save")).toBeInTheDocument();
     });
 
     it("should present a list of applications suggestions when click on address input", () => {
@@ -229,7 +229,7 @@ describe("connectionForm", () => {
 
         render(<AppConnectionFormE />);
 
-        fireEvent.click(screen.getByText("Save"));
+        fireEvent.click(screen.getByTestId("connection-save"));
 
         expect(
             screen.getByText("Address is a required field!"),
@@ -277,7 +277,7 @@ describe("connectionForm", () => {
             screen.getByText("This application responded with"),
         ).toBeInTheDocument();
 
-        fireEvent.click(screen.getByText("Save"));
+        fireEvent.click(screen.getByTestId("connection-save"));
 
         expect(addConnection).toHaveBeenCalledWith(
             { address, url },
@@ -324,7 +324,7 @@ describe("connectionForm", () => {
             screen.getByText("This application responded with"),
         ).toBeInTheDocument();
 
-        fireEvent.click(screen.getByText("Save"));
+        fireEvent.click(screen.getByTestId("connection-save"));
 
         expect(addConnection).toHaveBeenCalledWith(
             { address, url },
@@ -371,7 +371,7 @@ describe("connectionForm", () => {
             screen.getByText("This application responded with"),
         ).toBeInTheDocument();
 
-        fireEvent.click(screen.getByText("Save"));
+        fireEvent.click(screen.getByTestId("connection-save"));
 
         expect(addConnection).toHaveBeenCalledTimes(0);
     });
@@ -407,7 +407,7 @@ describe("connectionForm", () => {
             target: { value: url },
         });
 
-        fireEvent.click(screen.getByText("Save"));
+        fireEvent.click(screen.getByTestId("connection-save"));
 
         expect(addConnection).not.toHaveBeenCalled();
         expect(notificationsMock.show).toHaveBeenCalledWith({
