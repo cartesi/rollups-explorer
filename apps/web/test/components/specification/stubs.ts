@@ -148,7 +148,7 @@ export const inputResponses = {
  */
 export const defaultSpecificationExport: SpecificationTransfer = {
     version: 1,
-    timestamp: new Date().getTime(),
+    timestamp: new Date("2024-01-01 00:00:00").getTime(),
     name: SPECIFICATION_TRANSFER_NAME,
     specifications: [
         {
@@ -156,7 +156,7 @@ export const defaultSpecificationExport: SpecificationTransfer = {
                 {
                     conditions: [
                         {
-                            field: "application.id",
+                            field: "application.address",
                             operator: "equals",
                             value: "0x60a7048c3136293071605a4eaffef49923e981cc",
                         },
@@ -193,7 +193,7 @@ export const defaultSpecificationExport: SpecificationTransfer = {
                 {
                     conditions: [
                         {
-                            field: "application.id",
+                            field: "application.address",
                             operator: "equals",
                             value: "0x60a7048c3136293071605a4eaffef49923e981cc",
                         },
