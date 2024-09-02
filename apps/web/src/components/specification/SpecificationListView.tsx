@@ -236,7 +236,7 @@ const Feedback: FC = () => (
 );
 
 const NoSpecifications: FC = () => {
-    const { onUploadFile } = useSpecificationsTransfer();
+    const { resetFileRef, onUploadFile } = useSpecificationsTransfer();
 
     return (
         <Center>
@@ -250,6 +250,7 @@ const NoSpecifications: FC = () => {
                 <Box>or</Box>
                 <Box mt={9}>
                     <FileButton
+                        resetRef={resetFileRef}
                         accept="application/json"
                         onChange={onUploadFile}
                     >

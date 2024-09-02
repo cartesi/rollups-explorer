@@ -1,8 +1,9 @@
 "use client";
 
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useMemo, useRef } from "react";
 import { notifications } from "@mantine/notifications";
 import { useSpecification } from "./useSpecification";
+import { isFunction } from "ramda-adjunct";
 import {
     Specification,
     SpecificationTransfer as SpecificationTransferModel,
@@ -26,6 +27,7 @@ export const useSpecificationsTransfer = () => {
         }),
         [specifications, version],
     );
+    const resetFileRef = useRef<() => void>(null);
 
     const specificationExportLink = useMemo(
         () =>
@@ -125,6 +127,10 @@ export const useSpecificationsTransfer = () => {
         (file: File | null) => {
             if (file) {
                 readFileContent(file);
+
+                if (isFunction(resetFileRef.current)) {
+                    resetFileRef.current();
+                }
             }
         },
         [readFileContent],
@@ -135,8 +141,14 @@ export const useSpecificationsTransfer = () => {
             specificationExport,
             specificationExportLink,
             onUploadFile,
+            resetFileRef,
         }),
-        [specificationExport, specificationExportLink, onUploadFile],
+        [
+            specificationExport,
+            specificationExportLink,
+            onUploadFile,
+            resetFileRef,
+        ],
     );
 };
 
