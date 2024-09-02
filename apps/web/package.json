@@ -11,6 +11,7 @@
         "lint": "next lint",
         "test": "vitest run",
         "test:watch": "vitest",
+        "test:ui": "vitest --ui",
         "test:ci": "vitest run --coverage",
         "test:e2e": "playwright test",
         "test:e2e:ui": "playwright test --ui"
@@ -72,6 +73,7 @@
         "@types/react-dom": "^18.3.0",
         "@vitejs/plugin-react": "^4.1.0",
         "@vitest/coverage-v8": "^2.0.5",
+        "@vitest/ui": "^2.0.5",
         "@wagmi/cli": "^2",
         "dotenv-cli": "7.3.0",
         "eslint": "^8",
