@@ -3,6 +3,8 @@ import {
     isNonEmptyString,
     isNotString,
     isNumber,
+    isString,
+    isUndefined,
 } from "ramda-adjunct";
 import { parseAbi, parseAbiParameters } from "viem";
 import {
@@ -11,11 +13,15 @@ import {
     Specification,
     SPECIFICATION_TRANSFER_NAME,
     SpecificationTransfer,
+    inputProperties,
 } from "../../types";
 import { formatAbi } from "abitype";
 import { prepareSignatures } from "../../utils";
 import { specModeValidation, specNameValidation } from "../../form/validations";
 import { uniq } from "ramda";
+import { patchField } from "../../conditionals";
+
+const inputPropertyValues = inputProperties.map((p) => p.value);
 
 const validateSpecifications = (
     specifications: Specification[],
@@ -75,6 +81,9 @@ const validateSpecifications = (
                                 ) => {
                                     const error =
                                         isNonEmptyString(conditionItem.field) &&
+                                        inputPropertyValues.includes(
+                                            patchField(conditionItem.field),
+                                        ) &&
                                         operators.some(
                                             (o) =>
                                                 o.value ===
@@ -100,11 +109,16 @@ const validateSpecifications = (
 
                     let sliceErrors: (string | null)[] = [];
                     if (specification.mode === "abi_params") {
-                        const sliceTargetError = (
-                            specification?.sliceInstructions ?? []
-                        ).some((s) => s.name === specification.sliceTarget)
-                            ? null
-                            : "Invalid slice target.";
+                        const sliceTargetError =
+                            isString(specification.sliceTarget) &&
+                            (specification?.sliceInstructions ?? []).length > 0
+                                ? (specification?.sliceInstructions ?? []).some(
+                                      (s) =>
+                                          s.name === specification.sliceTarget,
+                                  )
+                                    ? null
+                                    : "Invalid slice target."
+                                : null;
 
                         sliceErrors = [
                             ...(specification?.sliceInstructions ?? []).reduce(
@@ -114,11 +128,16 @@ const validateSpecifications = (
                                 ) => {
                                     const error =
                                         isNumber(sliceInstruction.from) &&
-                                        isNumber(sliceInstruction.to) &&
-                                        isNonEmptyString(
-                                            sliceInstruction.name,
-                                        ) &&
-                                        isNonEmptyString(sliceInstruction.type)
+                                        (isUndefined(sliceInstruction.to) ||
+                                            isNumber(sliceInstruction.to)) &&
+                                        (isUndefined(sliceInstruction.name) ||
+                                            isNonEmptyString(
+                                                sliceInstruction.name,
+                                            )) &&
+                                        (isUndefined(sliceInstruction.type) ||
+                                            isNonEmptyString(
+                                                sliceInstruction.type,
+                                            ))
                                             ? null
                                             : "Invalid slice schema.";
 
