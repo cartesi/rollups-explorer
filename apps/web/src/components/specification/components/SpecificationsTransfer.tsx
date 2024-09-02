@@ -6,7 +6,7 @@ import { TbDownload, TbUpload } from "react-icons/tb";
 import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
 
 export const SpecificationsTransfer = () => {
-    const { specificationExportLink, onUploadFile } =
+    const { resetFileRef, specificationExportLink, onUploadFile } =
         useSpecificationsTransfer();
 
     return (
@@ -27,6 +27,7 @@ export const SpecificationsTransfer = () => {
             <Tooltip label="Import specifications">
                 <Box>
                     <FileButton
+                        resetRef={resetFileRef}
                         accept="application/json"
                         data-testid="import-specification-button"
                         onChange={onUploadFile}
