@@ -12,6 +12,7 @@ export default defineConfig({
             reporter: ["text", "lcov"],
             exclude: ["**/graphql/**", "**/app/**"],
             include: ["**/src"],
+            ignoreEmptyLines: true,
         },
     },
 } as UserConfig);
