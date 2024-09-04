@@ -11,8 +11,8 @@ export default defineConfig({
         coverage: {
             provider: "istanbul",
             reporter: ["text", "lcov"],
-            exclude: ["**/graphql/**", "**/app/**"],
-            include: ["**/src"],
+            // exclude: ["**/graphql/**", "**/app/**"],
+            // include: ["**/src"],
         },
     },
 } as UserConfig);
