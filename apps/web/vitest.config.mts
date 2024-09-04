@@ -9,10 +9,9 @@ export default defineConfig({
         environment: "happy-dom",
         setupFiles: "vitest-setup.ts",
         coverage: {
-            provider: "istanbul",
             reporter: ["text", "lcov"],
-            // exclude: ["**/graphql/**", "**/app/**"],
-            // include: ["**/src"],
+            exclude: ["**/graphql/**", "**/app/**"],
+            include: ["**/src"],
         },
     },
 } as UserConfig);
