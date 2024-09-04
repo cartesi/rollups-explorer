@@ -9,14 +9,10 @@ export default defineConfig({
         environment: "happy-dom",
         setupFiles: "vitest-setup.ts",
         coverage: {
+            provider: "istanbul",
             reporter: ["text", "lcov"],
             exclude: ["**/graphql/**", "**/app/**"],
             include: ["**/src"],
-        },
-        server: {
-            deps: {
-                inline: ["antd", "@ant-design", "@ant-design/web3-icons"],
-            },
         },
     },
 } as UserConfig);
