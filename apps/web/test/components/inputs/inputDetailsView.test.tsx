@@ -94,7 +94,9 @@ describe("Input details view component", () => {
     it("should try to parse the inputs payload As Text", () => {
         render(<View input={inputSample} />);
 
-        fireEvent.click(screen.getByText("As Text"));
+        fireEvent.click(
+            screen.getByText("As Text").parentNode as HTMLLabelElement,
+        );
 
         expect(screen.getByDisplayValue("joinGame")).toBeInTheDocument();
     });
@@ -102,7 +104,9 @@ describe("Input details view component", () => {
     it("should try to parse the inputs payload As JSON", () => {
         render(<View input={inputSample} />);
 
-        fireEvent.click(screen.getByText("As JSON"));
+        fireEvent.click(
+            screen.getByText("As JSON").parentNode as HTMLLabelElement,
+        );
 
         expect(screen.getByDisplayValue("joinGame")).toBeInTheDocument();
     });
@@ -196,7 +200,10 @@ describe("Input details view component", () => {
 
             const reportsPanel = screen.getByTestId("panel-reports");
 
-            fireEvent.click(getByText(reportsPanel, "As Text"));
+            fireEvent.click(
+                getByText(reportsPanel, "As Text")
+                    .parentNode as HTMLLabelElement,
+            );
 
             expect(screen.getByDisplayValue("Qh4+")).toBeVisible();
         });

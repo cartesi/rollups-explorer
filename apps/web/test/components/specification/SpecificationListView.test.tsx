@@ -152,7 +152,9 @@ describe("Specification Listing View", () => {
                     screen.getByText("ERC-1155 Specification"),
                 ).toBeInTheDocument();
 
-                await fireEvent.click(screen.getByText("JSON ABI"));
+                fireEvent.click(
+                    screen.getByText("JSON ABI").parentNode as HTMLLabelElement,
+                );
 
                 expect(
                     screen.queryByText(
@@ -172,7 +174,9 @@ describe("Specification Listing View", () => {
                     screen.getByTestId("fetching-feedback"),
                 );
 
-                await fireEvent.click(screen.getByText("JSON ABI"));
+                fireEvent.click(
+                    screen.getByText("JSON ABI").parentNode as HTMLLabelElement,
+                );
 
                 const elem = screen.getByTestId(
                     "no-specification-filtered-message",
@@ -194,7 +198,9 @@ describe("Specification Listing View", () => {
                     screen.getByTestId("fetching-feedback"),
                 );
 
-                await fireEvent.click(screen.getByText("JSON ABI"));
+                fireEvent.click(
+                    screen.getByText("JSON ABI").parentNode as HTMLLabelElement,
+                );
 
                 const elem = screen.getByTestId(
                     "no-specification-filtered-message",
@@ -235,7 +241,10 @@ describe("Specification Listing View", () => {
                     screen.getByText("ERC-1155 Specification"),
                 ).toBeInTheDocument();
 
-                await fireEvent.click(screen.getByText("ABI Params"));
+                fireEvent.click(
+                    screen.getByText("ABI Params")
+                        .parentNode as HTMLLabelElement,
+                );
 
                 expect(
                     screen.getByText(
@@ -254,7 +263,10 @@ describe("Specification Listing View", () => {
                     screen.getByTestId("fetching-feedback"),
                 );
 
-                await fireEvent.click(screen.getByText("ABI Params"));
+                fireEvent.click(
+                    screen.getByText("ABI Params")
+                        .parentNode as HTMLLabelElement,
+                );
 
                 const elem = screen.getByTestId(
                     "no-specification-filtered-message",
@@ -281,7 +293,10 @@ describe("Specification Listing View", () => {
                     screen.getByTestId("fetching-feedback"),
                 );
 
-                await fireEvent.click(screen.getByText("ABI Params"));
+                fireEvent.click(
+                    screen.getByText("ABI Params")
+                        .parentNode as HTMLLabelElement,
+                );
 
                 const elem = screen.getByTestId(
                     "no-specification-filtered-message",
@@ -300,9 +315,7 @@ describe("Specification Listing View", () => {
 
     describe("JSON ABI type information", () => {
         it("should display the ABI section and conditions", async () => {
-            const { container } = render(
-                <StatefulView specs={[erc1155JSONABISpecStub]} />,
-            );
+            render(<StatefulView specs={[erc1155JSONABISpecStub]} />);
 
             await waitForElementToBeRemoved(
                 screen.getByTestId("fetching-feedback"),

@@ -93,7 +93,13 @@ describe("Specification Form View", () => {
                 });
             });
 
-            act(() => fireEvent.click(screen.getByText("Save")));
+            act(() =>
+                fireEvent.click(
+                    screen
+                        .getByText("Save")
+                        .closest("button") as HTMLButtonElement,
+                ),
+            );
 
             await waitFor(() =>
                 expect(showSpy).toHaveBeenCalledWith({
@@ -153,7 +159,13 @@ describe("Specification Form View", () => {
                 });
             });
 
-            act(() => fireEvent.click(screen.getByText("Save")));
+            act(() =>
+                fireEvent.click(
+                    screen
+                        .getByText("Save")
+                        .closest("button") as HTMLButtonElement,
+                ),
+            );
 
             await waitFor(() =>
                 expect(showSpy).toHaveBeenCalledWith({
@@ -195,7 +207,13 @@ describe("Specification Form View", () => {
                 );
             });
 
-            act(() => fireEvent.click(screen.getByText("Update")));
+            act(() =>
+                fireEvent.click(
+                    screen
+                        .getByText("Update")
+                        .closest("button") as HTMLButtonElement,
+                ),
+            );
 
             await waitFor(() =>
                 expect(showSpy).toHaveBeenCalledWith({
@@ -247,7 +265,11 @@ describe("Specification Form View", () => {
                 );
             });
 
-            fireEvent.click(screen.getByText("Update"));
+            fireEvent.click(
+                screen
+                    .getByText("Update")
+                    .closest("button") as HTMLButtonElement,
+            );
 
             await waitFor(() =>
                 expect(showSpy).toHaveBeenCalledWith({
@@ -267,7 +289,12 @@ describe("Specification Form View", () => {
         it("should display info message including external link to solidity v0.8.25 docs abi-spec section", async () => {
             await act(async () => render(<StatefulView />));
 
-            act(() => fireEvent.click(screen.getByText("ABI Parameters")));
+            act(() =>
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                ),
+            );
 
             const modeInfoEl = screen.getByTestId("specification-mode-info");
 
@@ -292,7 +319,10 @@ describe("Specification Form View", () => {
             const abiParameter = "address from, uint amount";
 
             act(() => {
-                fireEvent.click(screen.getByText("ABI Parameters"));
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
 
                 fireEvent.change(screen.getByLabelText("ABI Parameter"), {
                     target: { value: abiParameter },
@@ -316,7 +346,10 @@ describe("Specification Form View", () => {
             await act(async () => render(<StatefulView />));
 
             act(() => {
-                fireEvent.click(screen.getByText("ABI Parameters"));
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
                 fireEvent.click(screen.getByTestId("add-byte-slice-switch"));
 
                 fireEvent.change(screen.getByTestId("slice-name-input"), {
@@ -355,7 +388,10 @@ describe("Specification Form View", () => {
             );
 
             act(() => {
-                fireEvent.click(screen.getByText("ABI Parameters"));
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
 
                 fireEvent.change(
                     screen.getByTestId("specification-name-input"),
@@ -399,7 +435,9 @@ describe("Specification Form View", () => {
                 screen.getByRole("option", { name: "tokenAddress" }),
             );
 
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(
+                screen.getByText("Save").closest("button") as HTMLButtonElement,
+            );
 
             await waitFor(() =>
                 expect(showSpy).toHaveBeenCalledWith({
@@ -435,7 +473,13 @@ describe("Specification Form View", () => {
     describe("validations", () => {
         it("should display error message when name is not filled", async () => {
             await act(async () => render(<StatefulView />));
-            act(() => fireEvent.click(screen.getByText("Save")));
+            act(() =>
+                fireEvent.click(
+                    screen
+                        .getByText("Save")
+                        .closest("button") as HTMLButtonElement,
+                ),
+            );
             expect(screen.getByText("Name is required.")).toBeInTheDocument();
         });
 
@@ -444,7 +488,11 @@ describe("Specification Form View", () => {
 
             act(() => {
                 fireEvent.click(screen.getByTestId("add-conditionals-switch"));
-                fireEvent.click(screen.getByText("Save"));
+                fireEvent.click(
+                    screen
+                        .getByText("Save")
+                        .closest("button") as HTMLButtonElement,
+                );
             });
 
             expect(
@@ -457,7 +505,13 @@ describe("Specification Form View", () => {
         describe("For JSON ABI mode", () => {
             it("should display error message for ABI text field when not filled", async () => {
                 await act(async () => render(<StatefulView />));
-                act(() => fireEvent.click(screen.getByText("Save")));
+                act(() =>
+                    fireEvent.click(
+                        screen
+                            .getByText("Save")
+                            .closest("button") as HTMLButtonElement,
+                    ),
+                );
 
                 expect(
                     screen.getByText("The ABI is required on JSON ABI mode."),
@@ -470,8 +524,15 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
-                    fireEvent.click(screen.getByText("Save"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
+                    fireEvent.click(
+                        screen
+                            .getByText("Save")
+                            .closest("button") as HTMLButtonElement,
+                    );
                 });
 
                 expect(
@@ -485,11 +546,18 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
                     fireEvent.click(
                         screen.getByTestId("add-byte-slice-switch"),
                     );
-                    fireEvent.click(screen.getByText("Save"));
+                    fireEvent.click(
+                        screen
+                            .getByText("Save")
+                            .closest("button") as HTMLButtonElement,
+                    );
                 });
 
                 expect(
@@ -503,7 +571,10 @@ describe("Specification Form View", () => {
                 it("should display error message when invalid abi type is used", async () => {
                     await act(async () => render(<StatefulView />));
                     act(() => {
-                        fireEvent.click(screen.getByText("ABI Parameters"));
+                        fireEvent.click(
+                            screen.getByText("ABI Parameters")
+                                .parentNode as HTMLLabelElement,
+                        );
                         fireEvent.change(
                             screen.getByLabelText("ABI Parameter"),
                             {
@@ -525,7 +596,10 @@ describe("Specification Form View", () => {
                 it("should display error message when using reserved word as variable name", async () => {
                     await act(async () => render(<StatefulView />));
                     act(() => {
-                        fireEvent.click(screen.getByText("ABI Parameters"));
+                        fireEvent.click(
+                            screen.getByText("ABI Parameters")
+                                .parentNode as HTMLLabelElement,
+                        );
                         fireEvent.change(
                             screen.getByLabelText("ABI Parameter"),
                             {
@@ -549,7 +623,10 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
                     fireEvent.click(
                         screen.getByTestId("add-byte-slice-switch"),
                     );
@@ -584,7 +661,10 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
                     fireEvent.click(
                         screen.getByTestId("add-byte-slice-switch"),
                     );
@@ -624,7 +704,10 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
                     fireEvent.click(
                         screen.getByTestId("add-byte-slice-switch"),
                     );
@@ -661,7 +744,10 @@ describe("Specification Form View", () => {
                 await act(async () => render(<StatefulView />));
 
                 act(() => {
-                    fireEvent.click(screen.getByText("ABI Parameters"));
+                    fireEvent.click(
+                        screen.getByText("ABI Parameters")
+                            .parentNode as HTMLLabelElement,
+                    );
 
                     fireEvent.click(
                         screen.getByTestId("add-byte-slice-switch"),
@@ -692,7 +778,11 @@ describe("Specification Form View", () => {
                     screen.getByRole("option", { name: "tokenAddress" }),
                 );
 
-                await fireEvent.click(screen.getByText("Save"));
+                await fireEvent.click(
+                    screen
+                        .getByText("Save")
+                        .closest("button") as HTMLButtonElement,
+                );
 
                 expect(
                     screen.getByText(
@@ -710,7 +800,10 @@ describe("Specification Form View", () => {
             const abiParameter = "string name, uint amount, bool success";
 
             act(() => {
-                fireEvent.click(screen.getByText("ABI Parameters"));
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
                 fireEvent.change(screen.getByLabelText("Data"), {
                     target: { value: encodedDataSamples.wagmiSample },
                 });
