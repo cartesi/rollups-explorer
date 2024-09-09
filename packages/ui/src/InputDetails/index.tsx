@@ -143,6 +143,7 @@ const Details: FC<InputDetailsProps> = (props) => {
         <Tabs
             defaultValue={selected}
             orientation={isSmallDevice ? "horizontal" : "vertical"}
+            keepMounted={false}
         >
             <InputDetailsTabs />
             <InputDetailsContent />
