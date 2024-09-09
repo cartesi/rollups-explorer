@@ -357,13 +357,42 @@ describe("VoucherExecution component", () => {
 
         expect(showMock).toHaveBeenCalledWith(
             expect.objectContaining({
-                message: prepareData.error.message,
+                message: `Voucher error: ${prepareData.error.message}`,
                 color: "red",
                 withBorder: true,
                 withCloseButton: true,
                 autoClose: false,
             }),
         );
+    });
+
+    it("should not display prepare error when proof is pending", async () => {
+        const mantineNotifications = await import("@mantine/notifications");
+        const showMock = vi.fn();
+        mantineNotifications.notifications = {
+            ...mantineNotifications.notifications,
+            show: showMock,
+        } as any;
+
+        const prepareData = {
+            data: false,
+            isError: true,
+            error: {
+                message: "Some error message",
+            },
+        };
+
+        useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue(
+            prepareData as any,
+        );
+        render(
+            <Component
+                {...defaultProps}
+                voucher={{ ...defaultProps.voucher, proof: null }}
+            />,
+        );
+
+        expect(showMock).toHaveBeenCalledTimes(0);
     });
 
     it("should not execute voucher when preparation has failed and execute button is clicked", () => {

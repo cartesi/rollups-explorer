@@ -84,6 +84,7 @@ describe("Rollups InputDetails", () => {
             </InputDetailsE>,
         );
 
+        fireEvent.click(screen.getByText("Reports"));
         fireEvent.click(screen.getByText("As JSON"));
         fireEvent.click(screen.getByText("As Text"));
         fireEvent.click(screen.getByText("Raw"));
@@ -105,6 +106,7 @@ describe("Rollups InputDetails", () => {
             </InputDetailsE>,
         );
 
+        fireEvent.click(screen.getByText("Vouchers"));
         fireEvent.click(screen.getByText("As JSON"));
         fireEvent.click(screen.getByText("As Text"));
         fireEvent.click(screen.getByText("Raw"));
@@ -126,6 +128,7 @@ describe("Rollups InputDetails", () => {
             </InputDetailsE>,
         );
 
+        fireEvent.click(screen.getByText("Notices"));
         fireEvent.click(screen.getByText("As JSON"));
         fireEvent.click(screen.getByText("As Text"));
         fireEvent.click(screen.getByText("Raw"));
