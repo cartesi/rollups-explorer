@@ -86,9 +86,9 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     }, [wait.isSuccess]);
 
     useEffect(() => {
-        if (prepare.isError) {
+        if (hasVoucherProof && prepare.isError) {
             notifications.show({
-                message: prepare.error.message,
+                message: `Voucher error: ${prepare.error.message}`,
                 color: "red",
                 withBorder: true,
                 withCloseButton: true,
@@ -101,7 +101,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                 },
             });
         }
-    }, [prepare.error, prepare.isError]);
+    }, [hasVoucherProof, prepare.error, prepare.isError]);
 
     return (
         <div>
