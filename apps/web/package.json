@@ -65,7 +65,7 @@
         "@graphql-codegen/typescript-operations": "^4",
         "@graphql-codegen/typescript-urql": "^4",
         "@graphql-typed-document-node/core": "^3",
-        "@playwright/test": "^1.43.1",
+        "@playwright/test": "^1.37.0",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.2",
         "@synthetixio/synpress": "^3.7.3",
         "@testing-library/jest-dom": "^6.5.0",
