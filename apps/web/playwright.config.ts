@@ -37,23 +37,23 @@ export default defineConfig({
             use: { ...devices[""] },
         },
 
-        // {
-        //     name: "firefox",
-        //     grepInvert: /mobile/,
-        //     use: { ...devices["Desktop Firefox"] },
-        // },
-        //
-        // {
-        //     name: "webkit",
-        //     grepInvert: /mobile/,
-        //     use: { ...devices["Desktop Safari"] },
-        // },
-        //
-        // {
-        //     name: "Mobile Safari",
-        //     grep: /mobile/,
-        //     use: { ...devices["iPhone 12"] },
-        // },
+        {
+            name: "firefox",
+            grepInvert: /mobile/,
+            use: { ...devices["Desktop Firefox"] },
+        },
+
+        {
+            name: "webkit",
+            grepInvert: /mobile/,
+            use: { ...devices["Desktop Safari"] },
+        },
+
+        {
+            name: "Mobile Safari",
+            grep: /mobile/,
+            use: { ...devices["iPhone 12"] },
+        },
     ],
 
     /* Run your local dev server before starting the tests */
