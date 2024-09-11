@@ -28,14 +28,9 @@ export const test = baseTest.extend<{
             browserArgs.push("--headless=new");
         }
 
-        // Enable headless if needed
-        // if (process.env.HEADLESS_MODE) {
-        //     browserArgs.push("--headless=new");
-        // }
-
         // Launch browser
         const context = await chromium.launchPersistentContext("", {
-            headless: true,
+            headless: false,
             args: browserArgs,
         });
 
