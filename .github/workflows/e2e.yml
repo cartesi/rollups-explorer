@@ -19,6 +19,19 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
 
+            - name: Install linux deps
+              run: |
+                sudo apt-get install --no-install-recommends -y \
+                fluxbox \
+                xvfb
+
+            - name: Run xvfb and fluxbox
+              run: |
+                Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+                fluxbox &
+              env:
+                DISPLAY: :0.0
+
             - name: Install Playwright
               run: yarn playwright install --with-deps
 
