@@ -25,12 +25,13 @@ export const test = baseTest.extend<{
         // Disable GPU in CI
         if (process.env.CI) {
             browserArgs.push("--disable-gpu");
+            browserArgs.push("--headless=new");
         }
 
         // Enable headless if needed
-        if (process.env.HEADLESS_MODE) {
-            browserArgs.push("--headless=new");
-        }
+        // if (process.env.HEADLESS_MODE) {
+        //     browserArgs.push("--headless=new");
+        // }
 
         // Launch browser
         const context = await chromium.launchPersistentContext("", {
