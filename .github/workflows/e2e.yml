@@ -19,6 +19,9 @@ jobs:
             - name: Install dependencies
               run: yarn install --frozen-lockfile
 
+            - name: Install Playwright
+              run: yarn playwright install --with-deps
+
             - name: Install linux deps
               run: |
                 sudo apt-get install --no-install-recommends -y \
@@ -31,9 +34,6 @@ jobs:
                 fluxbox
               env:
                 DISPLAY: :0.0
-
-            - name: Install Playwright
-              run: yarn playwright install --with-deps
 
             - name: Run e2e tests
               run: yarn test:e2e
