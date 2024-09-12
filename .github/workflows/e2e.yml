@@ -21,11 +21,14 @@ jobs:
 
             - name: Install linux deps
               run: |
-                sudo apt-get install --no-install-recommends -y \ fluxbox \ xvfb
+                sudo apt-get install --no-install-recommends -y \
+                fluxbox \
+                xvfb
 
             - name: Run xvfb and fluxbox
               run: |
-                Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac & fluxbox
+                Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+                fluxbox
               env:
                 DISPLAY: :0.0
 
