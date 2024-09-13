@@ -1,29 +1,36 @@
 name: End-to-end testing
 on:
-  push:
-    branches:
-      - '**'
+    deployment_status:
 jobs:
-  playwright:
-    name: 'Playwright Tests'
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.47.0-jammy
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+    e2e:
+        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-mainnet')
+        timeout-minutes: 30
+        runs-on: ubuntu-latest
+        container:
+          image: mcr.microsoft.com/playwright:v1.47.0-jammy
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 18
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
 
-      - name: Install Playwright
-        run: yarn playwright install --with-deps
+            - name: Install Playwright
+              run: yarn playwright install --with-deps
 
-      - name: Run your tests
-        run: yarn test:e2e
-        env:
-          HOME: /root
+            - name: Run e2e tests
+              run: yarn test:e2e
+              id: e2e
+              continue-on-error: true
+              env:
+                  E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+                  HOME: /root
+
+            - name: Update check status to the outcome
+              run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
