@@ -6,6 +6,8 @@ jobs:
         if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
         timeout-minutes: 30
         runs-on: ubuntu-latest
+        container:
+          image: mcr.microsoft.com/playwright:v1.47.0-jammy
         steps:
             - name: Check out code
               uses: actions/checkout@v4
@@ -22,21 +24,8 @@ jobs:
             - name: Install Playwright
               run: yarn playwright install --with-deps
 
-            - name: Install linux deps
-              run: |
-                sudo apt-get install --no-install-recommends -y \
-                fluxbox \
-                xvfb
-
-            - name: Run xvfb and fluxbox
-              run: |
-                Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
-                fluxbox
-              env:
-                DISPLAY: :0.0
-
             - name: Run e2e tests
-              run: yarn test:e2e
+              run: xvfb-run npx playwright test
               id: e2e
               continue-on-error: true
               env:

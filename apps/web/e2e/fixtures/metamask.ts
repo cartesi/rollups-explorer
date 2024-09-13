@@ -22,12 +22,6 @@ export const test = baseTest.extend<{
             "--remote-debugging-port=9222",
         ];
 
-        // Disable GPU in CI
-        if (process.env.CI) {
-            browserArgs.push("--disable-gpu");
-            browserArgs.push("--headless=new");
-        }
-
         // Launch browser
         const context = await chromium.launchPersistentContext("", {
             headless: false,
