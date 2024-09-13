@@ -33,7 +33,7 @@ export const test = baseTest.extend<{
             baseURL: BASE_URL,
             headless: false,
             args: browserArgs,
-            extraHTTPHeaders
+            extraHTTPHeaders,
         });
 
         // Wait for Metamask window to be shown.
