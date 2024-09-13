@@ -3,7 +3,7 @@ on:
     deployment_status:
 jobs:
     e2e:
-        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
+        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-optimism-mainnet')
         timeout-minutes: 30
         runs-on: ubuntu-latest
         container:
@@ -25,7 +25,7 @@ jobs:
               run: yarn playwright install --with-deps
 
             - name: Run e2e tests
-              run: xvfb-run npx playwright test
+              run: yarn test:e2e
               id: e2e
               continue-on-error: true
               env:
