@@ -28,6 +28,7 @@ jobs:
               continue-on-error: true
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+                  HOME: /root
 
             - name: Update check status to the outcome
               run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}
