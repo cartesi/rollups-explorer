@@ -3,7 +3,7 @@ on:
     deployment_status:
 jobs:
     e2e:
-        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-optimism-mainnet')
+        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-mainnet')
         timeout-minutes: 30
         runs-on: ubuntu-latest
         container:
@@ -12,11 +12,9 @@ jobs:
             - name: Check out code
               uses: actions/checkout@v4
 
-            - name: Setup Node.js environment
-              uses: actions/setup-node@v4
+            - uses: actions/setup-node@v4
               with:
-                  node-version: 22.6.0
-                  cache: "yarn"
+                node-version: 18
 
             - name: Install dependencies
               run: yarn install --frozen-lockfile
