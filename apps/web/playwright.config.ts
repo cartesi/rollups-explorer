@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const BASE_URL = process.env.E2E_BASE_URL ?? "https://sepolia.cartesiscan.io"; // "http://localhost:3000";
+const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 const vercelBypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 const extraHTTPHeaders = vercelBypassToken
     ? { "x-vercel-protection-bypass": vercelBypassToken }
