@@ -3,12 +3,6 @@ import { chromium, test as baseTest } from "@playwright/test";
 import { initialSetup } from "@synthetixio/synpress/commands/metamask";
 import { prepareMetamask } from "@synthetixio/synpress/helpers";
 
-export const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
-const vercelBypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
-export const extraHTTPHeaders = vercelBypassToken
-    ? { "x-vercel-protection-bypass": vercelBypassToken }
-    : undefined;
-
 export const test = baseTest.extend<{
     context: BrowserContext;
 }>({
@@ -30,10 +24,8 @@ export const test = baseTest.extend<{
 
         // Launch browser
         const context = await chromium.launchPersistentContext("", {
-            baseURL: BASE_URL,
             headless: false,
             args: browserArgs,
-            extraHTTPHeaders,
         });
 
         // Wait for Metamask window to be shown.

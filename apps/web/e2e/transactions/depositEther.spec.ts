@@ -2,7 +2,10 @@ import { expect } from "@playwright/test";
 import { test } from "../fixtures/metamask";
 import * as metamask from "@synthetixio/synpress/commands/metamask";
 
-test.describe.configure({ mode: "serial", timeout: 120000 });
+test.describe.configure({
+    mode: "serial",
+    timeout: 120000,
+});
 
 test.afterAll(async ({ context }) => {
     await context.close();

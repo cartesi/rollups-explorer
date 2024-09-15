@@ -3,7 +3,7 @@ on:
     deployment_status:
 jobs:
     e2e:
-        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-mainnet')
+        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
         timeout-minutes: 30
         runs-on: ubuntu-latest
         container:
