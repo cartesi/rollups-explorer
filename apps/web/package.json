@@ -13,7 +13,7 @@
         "test:watch": "vitest",
         "test:ui": "vitest --ui",
         "test:ci": "vitest run --coverage",
-        "test:e2e": "xvfb-run npx playwright test ./e2e/transactions/depositEther.spec.ts",
+        "test:e2e": "playwright test ./e2e/layout/ ./e2e/pages && xvfb-run npx playwright test ./e2e/transactions/",
         "test:e2e:ui": "playwright test --ui"
     },
     "dependencies": {
