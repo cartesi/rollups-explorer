@@ -7,7 +7,7 @@ jobs:
         timeout-minutes: 30
         runs-on: ubuntu-latest
         container:
-          image: mcr.microsoft.com/playwright:v1.47.0-jammy
+            image: mcr.microsoft.com/playwright:v1.47.0-jammy
         steps:
             - name: Check out code
               uses: actions/checkout@v4
@@ -15,8 +15,8 @@ jobs:
             - name: Setup Node.js environment
               uses: actions/setup-node@v4
               with:
-                node-version: 22.6.0
-                cache: "yarn"
+                  node-version: 22.6.0
+                  cache: "yarn"
 
             - name: Install dependencies
               run: yarn install --frozen-lockfile
