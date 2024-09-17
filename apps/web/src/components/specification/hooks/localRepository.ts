@@ -1,5 +1,6 @@
 "use client";
 import { clone, hasPath, omit, pathOr, values } from "ramda";
+import { v4 as uuidv4 } from "uuid";
 import { Repository, Specification } from "../types";
 
 export const namespace = `cartesiscan:specs` as const;
@@ -22,7 +23,7 @@ const getConfig = () => {
 const localRepository: Repository = {
     async add(spec: Specification) {
         const cfg = getConfig();
-        spec.id = Date.now().toString();
+        spec.id = uuidv4();
         spec.timestamp = Date.now();
         cfg[spec.id] = spec;
         localStorage.setItem(namespace, serialize(cfg));
