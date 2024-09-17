@@ -16,7 +16,6 @@ export const SpecificationsTransfer = () => {
                     component="a"
                     href={specificationExportLink}
                     download="cartesiscan_specifications_export.json"
-                    variant="light"
                     size="lg"
                     data-testid="specification-export-link"
                 >
@@ -33,7 +32,7 @@ export const SpecificationsTransfer = () => {
                         onChange={onUploadFile}
                     >
                         {(props) => (
-                            <ActionIcon variant="light" size="lg" {...props}>
+                            <ActionIcon size="lg" {...props}>
                                 <TbUpload />
                             </ActionIcon>
                         )}
