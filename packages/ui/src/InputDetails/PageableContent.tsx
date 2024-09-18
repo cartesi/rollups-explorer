@@ -23,6 +23,7 @@ import {
 } from "./Content";
 
 export type ContentState = "LOADING" | "FAIL" | "FULFILLED";
+export type OutputType = "VoucherContent" | "ReportContent" | "NoticeContent";
 
 export interface Paging {
     total: number;
@@ -35,6 +36,7 @@ export interface PageableContentProps extends ContentProps {
     isConnected?: boolean;
     onConnect?: () => void;
     paging?: Paging;
+    outputType: OutputType;
 }
 
 const isNotNilOrEmpty = allPass([complement(isEmpty), isNotNil]);
@@ -79,6 +81,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     onContentTypeChange,
     children,
     childrenPosition,
+    outputType,
 }) => {
     const theme = useMantineTheme();
     const [type, setContentType] = useState<ContentType>(contentType);
@@ -109,7 +112,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     return (
         <Box pos="relative" h="100%">
             <LoadingOverlay
-                data-testid={`loading-overlay-${PageableContent.displayName?.toLowerCase()}`}
+                data-testid={`loading-overlay-${outputType.toLowerCase()}`}
                 visible={isLoading}
                 zIndex={1000}
                 overlayProps={{ blur: 2 }}
