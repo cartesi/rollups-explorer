@@ -311,7 +311,7 @@ describe("VoucherExecution component", () => {
     it("should disable execute button while voucher execution is being prepared or has failed", () => {
         useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
             data: false,
-            isPending: true,
+            isLoading: true,
         } as any);
 
         const { rerender } = render(<Component {...defaultProps} />);
@@ -323,7 +323,7 @@ describe("VoucherExecution component", () => {
 
         useSimulateCartesiDAppExecuteVoucherMock.mockReturnValue({
             data: false,
-            isPending: false,
+            isLoading: false,
             isError: true,
             error: {
                 message: "Some error message",
