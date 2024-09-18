@@ -1,8 +1,7 @@
 "use client";
 
 import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
-import { T, cond, equals, pipe, propOr } from "ramda";
-import { ReactNode, useEffect, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import { hexToString, isHex } from "viem";
 
 export type ContentType = "raw" | "text" | "json";
@@ -42,54 +41,44 @@ export const ContentTypeControl = ({
     );
 };
 
-export const DisplayContent = cond<
-    [props: { type?: ContentType; content: string }],
-    JSX.Element
->([
-    [
-        pipe(propOr("", "type"), equals("json")),
-        ({ content }) => {
-            const value = isHex(content) ? hexToString(content) : content;
-            const ref = useRef<HTMLTextAreaElement>(null);
+export const DisplayContent: FC<{ type?: ContentType; content: string }> = ({
+    content,
+    type,
+}) => {
+    const value =
+        type === "raw"
+            ? content
+            : isHex(content)
+            ? hexToString(content)
+            : content;
+    const ref = useRef<HTMLTextAreaElement | null>(null);
 
-            useEffect(() => {
-                if (ref.current !== null) {
-                    ref.current.blur();
-                }
-            }, [value]);
+    useEffect(() => {
+        if (ref.current !== null) {
+            ref.current.blur();
+        }
+    });
 
-            return (
-                <JsonInput
-                    autoFocus
-                    ref={ref}
-                    rows={10}
-                    defaultValue={value}
-                    placeholder="No content defined"
-                    formatOnBlur
-                />
-            );
-        },
-    ],
-    [
-        pipe(propOr("", "type"), equals("text")),
-        ({ content }) => (
+    if (type === "raw" || type === "text")
+        return (
             <Textarea
+                key={`${type}-${value}`}
                 rows={10}
-                value={isHex(content) ? hexToString(content) : content}
+                value={value}
                 readOnly
                 placeholder="No content defined"
             />
-        ),
-    ],
-    [
-        T,
-        ({ content }) => (
-            <Textarea
-                rows={10}
-                value={content}
-                readOnly
-                placeholder="No content defined"
-            />
-        ),
-    ],
-]);
+        );
+
+    return (
+        <JsonInput
+            key={`${type}-${value}`}
+            autoFocus
+            ref={ref}
+            rows={10}
+            defaultValue={value}
+            placeholder="No content defined"
+            formatOnBlur
+        />
+    );
+};
