@@ -17,6 +17,8 @@ import { Voucher } from "../../graphql/rollups/types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { theme } from "../../providers/theme";
+import { useBlockExplorerData } from "../BlockExplorerLink";
+import AddressEl from "../address";
 import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
 import { findSpecificationFor } from "../specification/conditionals";
 import { Envelope, decodePayload } from "../specification/decoder";
@@ -225,9 +227,15 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         },
     ] = useDecodingOnInput(input, selectedSpec);
 
+    const voucherDestination = destinationOrString(vouchers) as Hex;
+    const voucherBlockExplorer = useBlockExplorerData(
+        "address",
+        voucherDestination,
+    );
+
     const voucherDecoderRes = useVoucherDecoder({
         payload: payloadOrString(vouchers) as Hex,
-        destination: destinationOrString(vouchers) as Hex,
+        destination: voucherDestination,
         chainId: chainId,
     });
 
@@ -439,6 +447,22 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                                 });
                             },
                         }}
+                        middlePosition={
+                            isNotNilOrEmpty(voucherDestination) && (
+                                <Group
+                                    gap="xs"
+                                    data-testid="voucher-destination-block-explorer-link"
+                                >
+                                    <Text fw="bold">Destination Address:</Text>
+                                    <AddressEl
+                                        value={voucherDestination}
+                                        href={voucherBlockExplorer.url}
+                                        hrefTarget="_blank"
+                                        shorten
+                                    />
+                                </Group>
+                            )
+                        }
                     >
                         {showVoucherForExecution ? (
                             <VoucherExecution
