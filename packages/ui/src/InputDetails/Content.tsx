@@ -14,6 +14,14 @@ export interface ContentProps {
     children?: ReactNode;
     /**default to be located at the bottom, after the textarea element.*/
     childrenPosition?: ContentChildrenPosition;
+    /**
+     *  Add a react node independently above the segment control.
+     */
+    topPosition?: ReactNode;
+    /**
+     * add a react node independently between the content and the segment control.
+     */
+    middlePosition?: ReactNode;
 }
 interface ContentTypeGroupedButtons {
     type: ContentType;

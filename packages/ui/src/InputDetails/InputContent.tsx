@@ -18,6 +18,8 @@ const InputContent: InputContentType = ({
     onContentTypeChange,
     children,
     childrenPosition,
+    middlePosition,
+    topPosition,
 }) => {
     const [type, setContentType] = useState<ContentType>(contentType);
     const position = childrenPosition ?? "bottom";
@@ -26,6 +28,7 @@ const InputContent: InputContentType = ({
     return (
         <Stack>
             {position === "top" && hasChildren && children}
+            {isNotNilOrEmpty(topPosition) && topPosition}
             <Group>
                 <ContentTypeControl
                     type={type}
@@ -37,6 +40,7 @@ const InputContent: InputContentType = ({
                 />
             </Group>
             {position === "middle" && hasChildren && children}
+            {isNotNilOrEmpty(middlePosition) && middlePosition}
             <DisplayContent type={type} content={content} />
             {position === "bottom" && hasChildren && children}
         </Stack>

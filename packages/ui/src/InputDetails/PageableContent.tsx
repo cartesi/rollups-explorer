@@ -82,6 +82,8 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     children,
     childrenPosition,
     outputType,
+    topPosition,
+    middlePosition,
 }) => {
     const theme = useMantineTheme();
     const [type, setContentType] = useState<ContentType>(contentType);
@@ -123,6 +125,9 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
             {isConnected && (
                 <Stack h="100%" justify="center">
                     {position === "top" && hasChildren && children}
+
+                    {isNotNilOrEmpty(topPosition) && topPosition}
+
                     {hasContent || isLoading ? (
                         <>
                             <Group gap={1} justify="space-between">
@@ -167,6 +172,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                                 )}
                             </Group>
                             {position === "middle" && hasChildren && children}
+                            {isNotNilOrEmpty(middlePosition) && middlePosition}
                             <DisplayContent type={type} content={content} />
                         </>
                     ) : (
