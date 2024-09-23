@@ -7,7 +7,7 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import { SpecificationsTransfer } from "../../../../src/components/specification/components/SpecificationsTransfer";
+import { SpecificationsActionsMenu } from "../../../../src/components/specification/components/SpecificationsActionsMenu";
 import { withMantineTheme } from "../../../utils/WithMantineTheme";
 import useSpecificationsTransfer from "../../../../src/components/specification/hooks/useSpecificationsTransfer";
 import { specificationsAtom } from "../../../../src/components/specification/hooks/useSpecification";
@@ -20,17 +20,48 @@ const initialValues = [
 
 const Component = withMantineTheme(() => (
     <JotaiTestProvider initialValues={initialValues}>
-        <SpecificationsTransfer />
+        <SpecificationsActionsMenu />
     </JotaiTestProvider>
 ));
 
-describe("SpecificationsTransfer", () => {
+describe("SpecificationsActionsMenu component", () => {
     afterEach(() => {
         vi.clearAllMocks();
         cleanup();
     });
 
-    it("should display link with correct attributes for downloading the specifications export", () => {
+    it("should display correct menu tooltip", async () => {
+        render(<Component />);
+
+        const menuTarget = screen.getByTestId("specifications-actions-menu");
+        fireEvent.mouseEnter(menuTarget);
+
+        await waitFor(() =>
+            expect(screen.getByText("Actions")).toBeInTheDocument(),
+        );
+    });
+
+    it("should display correct menu items", async () => {
+        render(<Component />);
+
+        const menuTarget = screen.getByTestId(
+            "specifications-actions-menu-target",
+        );
+        fireEvent.click(menuTarget);
+
+        await waitFor(() =>
+            expect(
+                screen.getByText("Download specifications"),
+            ).toBeInTheDocument(),
+        );
+        await waitFor(() =>
+            expect(
+                screen.getByText("Upload specifications"),
+            ).toBeInTheDocument(),
+        );
+    });
+
+    it("should display link with correct attributes for downloading the specifications export", async () => {
         renderHook(() => useSpecificationsTransfer(), {
             wrapper: ({ children }) => (
                 <div>
@@ -39,6 +70,17 @@ describe("SpecificationsTransfer", () => {
                 </div>
             ),
         });
+
+        const menuTarget = screen.getByTestId(
+            "specifications-actions-menu-target",
+        );
+        fireEvent.click(menuTarget);
+
+        await waitFor(() =>
+            expect(
+                screen.getByText("Download specifications"),
+            ).toBeInTheDocument(),
+        );
 
         const specificationsExportLink = screen.getByTestId(
             "specification-export-link",
@@ -55,31 +97,19 @@ describe("SpecificationsTransfer", () => {
         );
     });
 
-    it("should display correct tooltips", async () => {
-        render(<Component />);
-        const specificationsExportLink = screen.getByTestId(
-            "specification-export-link",
-        );
-
-        fireEvent.mouseEnter(specificationsExportLink);
-        await waitFor(() =>
-            expect(
-                screen.getByText("Export specifications"),
-            ).toBeInTheDocument(),
-        );
-
-        const uploadButton = screen.getByTestId("import-specification-button");
-
-        fireEvent.mouseEnter(uploadButton.parentNode as HTMLDivElement);
-        await waitFor(() =>
-            expect(
-                screen.getByText("Import specifications"),
-            ).toBeInTheDocument(),
-        );
-    });
-
     it("should display file upload button", async () => {
         render(<Component />);
+
+        const menuTarget = screen.getByTestId(
+            "specifications-actions-menu-target",
+        );
+        fireEvent.click(menuTarget);
+
+        await waitFor(() =>
+            expect(
+                screen.getByText("Upload specifications"),
+            ).toBeInTheDocument(),
+        );
 
         const uploadButton = screen.getByTestId("import-specification-button");
         expect(uploadButton).toBeInTheDocument();
