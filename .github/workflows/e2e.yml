@@ -6,6 +6,8 @@ jobs:
         if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
         timeout-minutes: 30
         runs-on: ubuntu-latest
+        container:
+            image: mcr.microsoft.com/playwright:v1.47.0-jammy
         steps:
             - name: Check out code
               uses: actions/checkout@v4
@@ -28,6 +30,7 @@ jobs:
               continue-on-error: true
               env:
                   E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+                  HOME: /root
 
             - name: Update check status to the outcome
               run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}

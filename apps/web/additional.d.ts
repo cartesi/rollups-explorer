@@ -36,3 +36,7 @@ declare namespace NodeJS {
         VERCEL_AUTOMATION_BYPASS_SECRET?: string;
     }
 }
+
+declare module "@synthetixio/synpress/commands/metamask";
+
+declare module "@synthetixio/synpress/helpers";
