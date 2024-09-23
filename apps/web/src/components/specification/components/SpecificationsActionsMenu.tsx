@@ -19,7 +19,7 @@ export const SpecificationsActionsMenu = () => {
     return (
         <Tooltip label="Actions">
             <Group data-testid="specifications-actions-menu">
-                <Menu shadow="md" width={220}>
+                <Menu shadow="md" width={220} closeOnItemClick={false}>
                     <Menu.Target>
                         <ActionIcon
                             size="lg"
