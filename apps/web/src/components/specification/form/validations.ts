@@ -4,13 +4,13 @@ import { Abi, Hex, isHex } from "viem";
 import { Modes, Predicate, SliceInstruction } from "../types";
 import { SpecFormValues } from "./context";
 
-const specNameValidation = (value: string, values: SpecFormValues) => {
+const specNameValidation = (value: string) => {
     if (isBlank(value)) return "Name is required.";
 
     return null;
 };
 
-const specModeValidation = (value: Modes, values: SpecFormValues) => {
+const specModeValidation = (value: Modes) => {
     if (isBlank(value)) return "Specification mode is required!";
 
     if (!includes(value, ["json_abi", "abi_params"]))

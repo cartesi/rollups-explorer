@@ -1,6 +1,11 @@
 /**
  * @file Contains real samples from our graphQL API. This file should only hold this kind of data.
  */
+import {
+    SPECIFICATION_TRANSFER_NAME,
+    SpecificationTransfer,
+} from "../../../src/components/specification/types";
+import { AbiType } from "abitype";
 
 const chainId = "11155111";
 const nonPortalRelatedInput = {
@@ -137,3 +142,80 @@ export const inputResponses = {
     nonPortalRelatedInput,
     dappAddressRelayInput,
 } as const;
+
+/**
+ * Specifications export
+ */
+export const defaultSpecificationExport: SpecificationTransfer = {
+    version: 1,
+    timestamp: new Date("2024-01-01 00:00:00").getTime(),
+    name: SPECIFICATION_TRANSFER_NAME,
+    specifications: [
+        {
+            conditionals: [
+                {
+                    conditions: [
+                        {
+                            field: "application.address",
+                            operator: "equals",
+                            value: "0x60a7048c3136293071605a4eaffef49923e981cc",
+                        },
+                    ],
+                    logicalOperator: "or",
+                },
+            ],
+            timestamp: 1724239104387,
+            version: 1,
+            name: "My first JSON ABI spec",
+            id: "1724239104387",
+            mode: "json_abi",
+            abi: [
+                {
+                    name: "balanceOf",
+                    type: "function",
+                    stateMutability: "view",
+                    inputs: [
+                        {
+                            type: "address",
+                            name: "owner",
+                        },
+                    ],
+                    outputs: [
+                        {
+                            type: "uint256",
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            conditionals: [
+                {
+                    conditions: [
+                        {
+                            field: "application.address",
+                            operator: "equals",
+                            value: "0x60a7048c3136293071605a4eaffef49923e981cc",
+                        },
+                    ],
+                    logicalOperator: "or",
+                },
+            ],
+            timestamp: 1724239104388,
+            version: 1,
+            name: "My first ABI Params spec",
+            id: "1724239104388",
+            mode: "abi_params",
+            abiParams: ["address to, uint256 amount, bool succ"],
+            sliceInstructions: [
+                {
+                    from: 0,
+                    to: 20,
+                    name: "amount",
+                    type: "unit" as AbiType,
+                },
+            ],
+            sliceTarget: "amount",
+        },
+    ],
+};

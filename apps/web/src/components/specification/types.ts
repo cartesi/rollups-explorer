@@ -75,3 +75,13 @@ export interface JSONAbiSpecification extends Commons {
 export type Specification = AbiParamsSpecification | JSONAbiSpecification;
 
 export type Repository = IRepository<Specification, "id">;
+
+export interface SpecificationTransfer {
+    name: "cartesiscan_specifications_export";
+    version: number;
+    timestamp: number;
+    specifications: Specification[];
+}
+
+export const SPECIFICATION_TRANSFER_NAME =
+    "cartesiscan_specifications_export" as const;

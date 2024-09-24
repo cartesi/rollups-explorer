@@ -3,9 +3,12 @@ import { CodeHighlight } from "@mantine/code-highlight";
 import {
     Accordion,
     Badge,
+    Box,
     Button,
     Card,
     Center,
+    FileButton,
+    Flex,
     Grid,
     Group,
     SegmentedControl,
@@ -14,12 +17,12 @@ import {
     Table,
     Text,
     Title,
-    VisuallyHidden,
     useMantineTheme,
+    VisuallyHidden,
 } from "@mantine/core";
-import { T, cond, filter, isEmpty, propEq, range } from "ramda";
+import { cond, filter, isEmpty, propEq, range, T } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { TbTrash } from "react-icons/tb";
 import { Abi } from "viem";
 import { EditSpecificationButton } from "./components/EditSpecificationButton";
@@ -30,16 +33,18 @@ import {
     ABI_PARAMS,
     Condition,
     ConditionalOperator,
+    inputProperties,
     JSON_ABI,
+    logicalOperators,
     Modes,
+    operators,
     Predicate,
     SliceInstruction,
     Specification,
-    inputProperties,
-    logicalOperators,
-    operators,
 } from "./types";
 import { stringifyContent } from "./utils";
+import { SpecificationsActionsMenu } from "./components/SpecificationsActionsMenu";
+import { useSpecificationsTransfer } from "./hooks/useSpecificationsTransfer";
 
 const CARD_MIN_HEIGHT = 300 as const;
 
@@ -230,16 +235,34 @@ const Feedback: FC = () => (
     </Grid>
 );
 
-const NoSpecifications: FC = () => (
-    <Center>
-        <Group>
-            <Title order={3} c="dimmed">
-                No Specifications Found!
-            </Title>
-            <NewSpecificationButton btnText="Create One!" />
-        </Group>
-    </Center>
-);
+const NoSpecifications: FC = () => {
+    const { resetFileRef, onUploadFile } = useSpecificationsTransfer();
+
+    return (
+        <Center>
+            <Flex direction="column" align="center" justify="center">
+                <Title order={3} c="dimmed">
+                    No Specifications Found!
+                </Title>
+                <Box my={8}>
+                    <NewSpecificationButton btnText="Create one" />
+                </Box>
+                <Box>or</Box>
+                <Box mt={9}>
+                    <FileButton
+                        resetRef={resetFileRef}
+                        accept="application/json"
+                        onChange={onUploadFile}
+                    >
+                        {(props) => (
+                            <Button {...props}>Import specifications</Button>
+                        )}
+                    </FileButton>
+                </Box>
+            </Flex>
+        </Center>
+    );
+};
 
 const NoSpecificationsFiltered: FC<{
     quantity: number;
@@ -291,19 +314,22 @@ export const SpecificationListView: FC = () => {
 
     return (
         <Stack>
-            <Group>
-                <SegmentedControl
-                    data-testid="specification-filter-control"
-                    data={[
-                        { value: "all", label: "All" },
-                        { value: JSON_ABI, label: "JSON ABI" },
-                        { value: ABI_PARAMS, label: "ABI Params" },
-                    ]}
-                    value={filter}
-                    onChange={(value) => setFilter(value as ModeFilter)}
-                />
-                <NewSpecificationButton />
-            </Group>
+            <Flex justify="stretch">
+                <Group mr="auto">
+                    <SegmentedControl
+                        data-testid="specification-filter-control"
+                        data={[
+                            { value: "all", label: "All" },
+                            { value: JSON_ABI, label: "JSON ABI" },
+                            { value: ABI_PARAMS, label: "ABI Params" },
+                        ]}
+                        value={filter}
+                        onChange={(value) => setFilter(value as ModeFilter)}
+                    />
+                    <NewSpecificationButton />
+                    <SpecificationsActionsMenu />
+                </Group>
+            </Flex>
 
             {isNilOrEmpty(filteredSpecs) && (
                 <NoSpecificationsFiltered
