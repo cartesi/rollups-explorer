@@ -76,9 +76,8 @@ test.describe.serial("Ether Deposit form", () => {
         await amountInput.blur();
         await expect(form.getByText("Invalid amount")).toBeVisible();
 
-        const advancedButton = form.locator(
-            'button[data-variant="transparent"]',
-        );
+        const modalFooterActionButtons = form.locator(".mantine-Button-root");
+        const advancedButton = modalFooterActionButtons.first();
         await advancedButton.click();
         const extraDataLocator = form.locator("textarea");
         await extraDataLocator.focus();
@@ -127,8 +126,17 @@ test.describe.serial("Ether Deposit form", () => {
         await page.keyboard.type("0.0000001");
         await amountInput.blur();
         await expect(form.getByText("Invalid amount")).not.toBeVisible();
-
-        const submitButton = form.getByText("Deposit");
-        expect(submitButton.getAttribute("disabled")).toBe(undefined);
+        const modalFooterActionButtons = form.locator(".mantine-Button-root");
+        const advancedButton = modalFooterActionButtons.first();
+        await advancedButton.click();
+        const extraDataLocator = form.locator("textarea");
+        await extraDataLocator.click();
+        await extraDataLocator.click();
+        for (let i = 0; i <= 2; i++) {
+            await page.keyboard.press("Backspace");
+        }
+        await page.keyboard.type("0x123");
+        await extraDataLocator.blur();
+        await expect(form.getByText("Invalid hex string")).not.toBeVisible();
     });
 });
