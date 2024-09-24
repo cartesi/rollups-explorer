@@ -9,7 +9,9 @@ test.describe.configure({
 
 test.describe.serial("Ether Deposit form", () => {
     test.afterEach(async ({ context }) => {
-        await context.close();
+        if (context) {
+            await context.close();
+        }
     });
 
     test("should render 'Ether Deposit' transaction form", async ({ page }) => {
