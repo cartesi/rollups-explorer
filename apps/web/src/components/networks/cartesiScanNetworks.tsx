@@ -11,11 +11,12 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { T, cond, includes } from "ramda";
 import { FC } from "react";
 import { TbCaretUpFilled, TbExternalLink } from "react-icons/tb";
 import {
     anvil,
+    arbitrum,
+    arbitrumSepolia,
     base,
     baseSepolia,
     mainnet,
@@ -24,6 +25,7 @@ import {
     sepolia,
 } from "viem/chains";
 import { useConfig } from "wagmi";
+import ArbitrumIcon from "../icons/Arbitrum";
 import BaseIcon from "../icons/Base";
 import EthereumIcon from "../icons/Ethereum";
 import HardhatIcon from "../icons/Hardhat";
@@ -37,6 +39,8 @@ const chainIds = [
     base.id,
     baseSepolia.id,
     anvil.id,
+    arbitrum.id,
+    arbitrumSepolia.id,
 ] as const;
 
 type IconType = typeof EthereumIcon;
@@ -73,6 +77,12 @@ const mainnets: NetworkGroup[] = [
         chainId: base.id,
         externalLink: "https://base.cartesiscan.io",
     },
+    {
+        Icon: ArbitrumIcon,
+        text: arbitrum.name,
+        chainId: arbitrum.id,
+        externalLink: "https://arbitrum.cartesiscan.io",
+    },
 ];
 
 const testnets: NetworkGroup[] = [
@@ -94,6 +104,12 @@ const testnets: NetworkGroup[] = [
         text: baseSepolia.name,
         chainId: baseSepolia.id,
         externalLink: "https://base-sepolia.cartesiscan.io",
+    },
+    {
+        Icon: ArbitrumIcon,
+        text: arbitrumSepolia.name,
+        chainId: arbitrumSepolia.id,
+        externalLink: "https://arbitrum-sepolia.cartesiscan.io",
     },
 ];
 
@@ -141,18 +157,14 @@ const CaretIcon: FC<{ up: boolean }> = ({ up }) => {
     return <TbCaretUpFilled style={styles} size={18} />;
 };
 
-const getIconByChainId = cond([
-    [
-        (id: number) => includes(id, [mainnet.id, sepolia.id]),
-        () => EthereumIcon,
-    ],
-    [
-        (id: number) => includes(id, [optimism.id, optimismSepolia.id]),
-        () => OptimismIcon,
-    ],
-    [(id: number) => includes(id, [base.id, baseSepolia.id]), () => BaseIcon],
-    [T, () => HardhatIcon],
-]);
+const allNetworks = [...mainnets, ...testnets];
+
+const getIconByChainId = (id: number) => {
+    const network = allNetworks.find((network) => network.chainId === id);
+    if (network) return network.Icon;
+
+    return HardhatIcon;
+};
 
 const MainIcon: FC<{ chainId: number }> = ({ chainId }) => {
     const Icon = getIconByChainId(chainId);
