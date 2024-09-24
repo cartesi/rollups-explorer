@@ -9,6 +9,10 @@ import {
 } from "@testing-library/react";
 import {
     anvil,
+    arbitrum,
+    arbitrumSepolia,
+    base,
+    baseSepolia,
     mainnet,
     optimism,
     optimismSepolia,
@@ -83,7 +87,7 @@ describe("CartesiScanNetworks component", () => {
         );
     });
 
-    it("Should display the Optimism network icon when chain set is Optimism Sepolia", () => {
+    it("Should display the Hardhat icon when chain set is anvil", () => {
         useConfigMock.mockReturnValue({
             chains: [anvil],
         });
@@ -93,6 +97,58 @@ describe("CartesiScanNetworks component", () => {
         expect(screen.getByText("Anvil")).toBeInTheDocument();
         expect(screen.getByRole("img").getAttribute("alt")).toEqual(
             "The Hardhat icon",
+        );
+    });
+
+    it("Should display the Base network icon when chain set is Base Mainnet", () => {
+        useConfigMock.mockReturnValue({
+            chains: [base],
+        });
+
+        render(<Component />);
+
+        expect(screen.getByText("Base")).toBeInTheDocument();
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Base icon",
+        );
+    });
+
+    it("Should display the Base network icon when chain set is Base Sepolia", () => {
+        useConfigMock.mockReturnValue({
+            chains: [baseSepolia],
+        });
+
+        render(<Component />);
+
+        expect(screen.getByText("Base Sepolia")).toBeInTheDocument();
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Base icon",
+        );
+    });
+
+    it("Should display the Arbitrum network icon when chain set is Arbitrum Mainnet", () => {
+        useConfigMock.mockReturnValue({
+            chains: [arbitrum],
+        });
+
+        render(<Component />);
+
+        expect(screen.getByText("Arbitrum One")).toBeInTheDocument();
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Arbitrum icon",
+        );
+    });
+
+    it("Should display the Arbitrum network icon when chain set is Arbitrum Sepolia", () => {
+        useConfigMock.mockReturnValue({
+            chains: [arbitrumSepolia],
+        });
+
+        render(<Component />);
+
+        expect(screen.getByText("Arbitrum Sepolia")).toBeInTheDocument();
+        expect(screen.getByRole("img").getAttribute("alt")).toEqual(
+            "The Arbitrum icon",
         );
     });
 
@@ -112,7 +168,7 @@ describe("CartesiScanNetworks component", () => {
 
         expect(getByText(menuEl, "Mainnets")).toBeVisible();
         expect(getByText(menuEl, "Testnets")).toBeVisible();
-        expect(menuItems).toHaveLength(6);
+        expect(menuItems).toHaveLength(8);
 
         [
             ["Ethereum", "https://cartesiscan.io"],
@@ -121,6 +177,8 @@ describe("CartesiScanNetworks component", () => {
             ["OP Mainnet", "https://optimism.cartesiscan.io"],
             ["OP Sepolia", "https://optimism-sepolia.cartesiscan.io"],
             ["Base Sepolia", "https://base-sepolia.cartesiscan.io"],
+            ["Arbitrum One", "https://arbitrum.cartesiscan.io"],
+            ["Arbitrum Sepolia", "https://arbitrum-sepolia.cartesiscan.io"],
         ].forEach(([expectedName, expectedLink]) => {
             expect(
                 getByText(menuEl, expectedName)

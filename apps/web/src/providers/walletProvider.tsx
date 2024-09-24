@@ -17,6 +17,8 @@ import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
 import {
+    arbitrum,
+    arbitrumSepolia,
     base,
     baseSepolia,
     foundry,
@@ -38,6 +40,8 @@ const chain =
         optimismSepolia,
         base,
         baseSepolia,
+        arbitrum,
+        arbitrumSepolia,
     ].find((c) => c.id == chainId) || foundry;
 
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
@@ -86,6 +90,8 @@ const [defaultOptimismRpcUrl] = optimism.rpcUrls.default.http;
 const [defaultOptimismSepoliaRpcUrl] = optimismSepolia.rpcUrls.default.http;
 const [defaultBaseRpcUrl] = base.rpcUrls.default.http;
 const [defaultBaseSepoliaRpcUrl] = baseSepolia.rpcUrls.default.http;
+const [defaultArbitrumRpcUrl] = arbitrum.rpcUrls.default.http;
+const [defaultArbitrumSepoliaRpcUrl] = arbitrumSepolia.rpcUrls.default.http;
 
 const wagmiConfig = createConfig({
     ssr: true,
@@ -133,6 +139,19 @@ const wagmiConfig = createConfig({
                   http(defaultBaseSepoliaRpcUrl),
               ])
             : http(defaultBaseSepoliaRpcUrl),
+        [arbitrum.id]: alchemyApiKey
+            ? fallback([
+                  http(`https://arb-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
+                  http(defaultArbitrumRpcUrl),
+              ])
+            : http(defaultArbitrumRpcUrl),
+
+        [arbitrumSepolia.id]: alchemyApiKey
+            ? fallback([
+                  http(`https://arb-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+                  http(defaultArbitrumSepoliaRpcUrl),
+              ])
+            : http(defaultArbitrumSepoliaRpcUrl),
     },
 });
 
