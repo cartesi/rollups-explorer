@@ -7,26 +7,128 @@ test.describe.configure({
     timeout: 120000,
 });
 
-test.afterAll(async ({ context }) => {
-    await context.close();
-});
+test.describe.serial("Ether Deposit form", () => {
+    test.afterEach(async ({ context }) => {
+        await context.close();
+    });
 
-test("should connect to MetaMask and enable 'Send Transaction' button", async ({
-    page,
-}) => {
-    await page.goto("/");
+    test("should render 'Ether Deposit' transaction form", async ({ page }) => {
+        await page.goto("/");
 
-    const sendTransactionButton = page.getByTestId("transaction-button");
-    await expect(sendTransactionButton).toBeDisabled();
+        const connectButton = page.getByText("Connect Wallet");
+        await connectButton.click();
+        const metamaskButton = page.getByText("Metamask");
+        await metamaskButton.click();
+        await metamask.acceptAccess();
+        const sendTransactionButton = page.getByTestId("transaction-button");
+        await sendTransactionButton.click();
 
-    const connectButton = page.getByText("Connect Wallet");
-    await connectButton.click();
+        const modal = page.getByRole("dialog");
+        await expect(modal).toBeVisible();
 
-    const metamaskButton = page.getByText("Metamask");
-    await metamaskButton.click();
+        await expect(page.getByText("Ether Deposit")).toBeHidden();
+        await expect(modal.getByTestId("ether-deposit-form")).toBeVisible();
 
-    await metamask.acceptAccess();
+        await expect(
+            modal.getByText("The application smart contract address"),
+        ).toBeVisible();
+        await expect(
+            modal.getByText("Amount of ether to deposit"),
+        ).toBeVisible();
+        await expect(
+            modal.getByText(
+                "Extra execution layer data handled by the application",
+            ),
+        ).toBeHidden();
+    });
 
-    await expect(sendTransactionButton).toBeEnabled();
-    await sendTransactionButton.click();
+    test("should display errors for 'Ether Deposit' transaction form", async ({
+        page,
+    }) => {
+        await page.goto("/");
+
+        const connectButton = page.getByText("Connect Wallet");
+        await connectButton.click();
+        const metamaskButton = page.getByText("Metamask");
+        await metamaskButton.click();
+        await metamask.acceptAccess({
+            switchNetwork: true,
+        });
+        const sendTransactionButton = page.getByTestId("transaction-button");
+        await sendTransactionButton.click();
+
+        const modal = page.getByRole("dialog");
+        await expect(modal).toBeVisible();
+        const form = modal.getByTestId("ether-deposit-form");
+        await expect(form).toBeVisible();
+
+        const applicationsAutocompleteInput = form.locator(
+            '[data-path="application"]',
+        );
+        await applicationsAutocompleteInput.focus();
+        await page.keyboard.type("invalid address");
+        await applicationsAutocompleteInput.blur();
+        await expect(form.getByText("Invalid application")).toBeVisible();
+
+        const amountInput = form.locator('[data-path="amount"]');
+        await amountInput.focus();
+        await page.keyboard.type("0.0");
+        await amountInput.blur();
+        await expect(form.getByText("Invalid amount")).toBeVisible();
+
+        const advancedButton = form.locator(
+            'button[data-variant="transparent"]',
+        );
+        await advancedButton.click();
+        const extraDataLocator = form.locator("textarea");
+        await extraDataLocator.focus();
+        await page.keyboard.type("invalid hex");
+        await extraDataLocator.blur();
+        await expect(form.getByText("Invalid hex string")).toBeVisible();
+    });
+
+    test("should validate successfully 'Ether Deposit' transaction form", async ({
+        page,
+    }) => {
+        await page.goto("/");
+
+        const connectButton = page.getByText("Connect Wallet");
+        await connectButton.click();
+        const metamaskButton = page.getByText("Metamask");
+        await metamaskButton.click();
+        await metamask.acceptAccess({
+            switchNetwork: true,
+        });
+        const sendTransactionButton = page.getByTestId("transaction-button");
+        await sendTransactionButton.click();
+
+        const modal = page.getByRole("dialog");
+        await expect(modal).toBeVisible();
+        const form = modal.getByTestId("ether-deposit-form");
+        await expect(form).toBeVisible();
+
+        const applicationsAutocompleteInput = form.locator(
+            '[data-path="application"]',
+        );
+        await applicationsAutocompleteInput.focus();
+        const firstAddressNode = page
+            .locator(".mantine-Autocomplete-option")
+            .first()
+            .locator("span");
+        await expect(firstAddressNode).toBeVisible();
+        const firstAddress = await firstAddressNode.textContent();
+
+        await page.keyboard.type(firstAddress ?? "");
+        await applicationsAutocompleteInput.blur();
+        await expect(form.getByText("Invalid application")).not.toBeVisible();
+
+        const amountInput = form.locator('[data-path="amount"]');
+        await amountInput.focus();
+        await page.keyboard.type("0.0000001");
+        await amountInput.blur();
+        await expect(form.getByText("Invalid amount")).not.toBeVisible();
+
+        const submitButton = form.getByText("Deposit");
+        expect(submitButton.getAttribute("disabled")).toBe(undefined);
+    });
 });
