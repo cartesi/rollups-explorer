@@ -8,8 +8,9 @@ import {
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
+import { sepolia } from "viem/chains";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../../utils/WithMantineTheme";
@@ -45,6 +46,7 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
 });
 vi.mock("wagmi");
 
+const useConfigMock = vi.mocked(useConfig, { partial: true });
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const useQueryMock = vi.mocked(useQuery, true);
 const useAccountMock = vi.mocked(useAccount, true);
@@ -69,6 +71,10 @@ describe("Input details view component", () => {
             status: "idle",
             isLoading: false,
         } as any);
+
+        useConfigMock.mockReturnValue({
+            chains: [sepolia],
+        });
     });
 
     afterEach(() => {

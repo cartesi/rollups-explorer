@@ -28,6 +28,7 @@ import {
 export type AddressProps = {
     value: AddressType;
     href?: string;
+    hrefTarget?: "_self" | "_blank" | "_top" | "_parent";
     icon?: boolean;
     iconSize?: number;
     shorten?: boolean;
@@ -52,6 +53,7 @@ const Address: FC<AddressProps> = ({
     icon,
     iconSize,
     shorten,
+    hrefTarget = "_self",
 }) => {
     value = getAddress(value);
     const name = resolveName(value);
@@ -78,7 +80,7 @@ const Address: FC<AddressProps> = ({
             )}
 
             {href ? (
-                <Anchor href={href} component={Link}>
+                <Anchor href={href} component={Link} target={hrefTarget}>
                     {label}
                 </Anchor>
             ) : (

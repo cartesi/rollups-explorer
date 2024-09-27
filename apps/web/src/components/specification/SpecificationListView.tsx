@@ -291,7 +291,7 @@ type FilterByMode = (value: {
     list: Specification[];
 }) => Specification[];
 
-const filterByMode: FilterByMode = cond([
+const filterByMode = cond<Parameters<FilterByMode>, ReturnType<FilterByMode>>([
     [({ filterBy }) => filterBy === "all", ({ list }) => list],
     [T, ({ filterBy, list }) => filter(propEq(filterBy, "mode"), list)],
 ]);

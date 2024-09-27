@@ -10,6 +10,7 @@ import { FC, useEffect } from "react";
 import type { Address } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { Voucher } from "../../graphql/rollups/types";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 
 const typeCastProof = (voucher: Partial<Voucher>) => ({
     context: voucher.proof?.context as Address,
@@ -50,8 +51,10 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
             BigInt(voucher.input?.index as number),
             BigInt(voucher.index as number),
         ],
+        chainId: parseInt(getConfiguredChainId()),
         address: appId,
     });
+
     const prepare = useSimulateCartesiDAppExecuteVoucher({
         args: [
             voucher.destination as Address,
@@ -59,7 +62,14 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
             typeCastProof(voucher),
         ],
         address: appId,
+        query: {
+            enabled:
+                hasVoucherProof &&
+                !wasExecuted.isFetching &&
+                wasExecuted.data === false,
+        },
     });
+
     const execute = useWriteCartesiDAppExecuteVoucher();
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,
@@ -72,7 +82,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
         isExecuted ||
         !hasVoucherProof ||
         !isConnected ||
-        prepare.isPending ||
+        prepare.isLoading ||
         prepare.isError;
 
     useEffect(() => {
@@ -125,10 +135,10 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                             execute.writeContract(prepare.data!.request)
                         }
                     >
-                        {prepare.isPending
-                            ? "Preparing voucher..."
-                            : isExecuted
+                        {isExecuted
                             ? "Executed"
+                            : prepare.isLoading
+                            ? "Preparing voucher..."
                             : "Execute"}
                     </Button>
                 </Tooltip>

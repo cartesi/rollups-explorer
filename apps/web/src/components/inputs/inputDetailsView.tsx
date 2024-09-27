@@ -1,5 +1,5 @@
 "use client";
-import { InputDetails } from "@cartesi/rollups-explorer-ui";
+import { ContentType, InputDetails } from "@cartesi/rollups-explorer-ui";
 import { Alert, Box, Group, Select, Stack, Text } from "@mantine/core";
 import { find, omit, pathOr } from "ramda";
 import { included, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
@@ -14,13 +14,17 @@ import {
     InputDetailsQueryVariables,
 } from "../../graphql/rollups/operations";
 import { Voucher } from "../../graphql/rollups/types";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { theme } from "../../providers/theme";
+import { useBlockExplorerData } from "../BlockExplorerLink";
+import AddressEl from "../address";
 import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
 import { findSpecificationFor } from "../specification/conditionals";
 import { Envelope, decodePayload } from "../specification/decoder";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import { useSystemSpecifications } from "../specification/hooks/useSystemSpecifications";
+import useVoucherDecoder from "../specification/hooks/useVoucherDecoder";
 import { Specification } from "../specification/types";
 import { stringifyContent } from "../specification/utils";
 import VoucherExecution from "./voucherExecution";
@@ -31,6 +35,7 @@ interface ApplicationInputDataProps {
 
 type InputTypes = "vouchers" | "reports" | "notices";
 
+const destinationOrString = pathOr("", ["edges", "0", "node", "destination"]);
 const payloadOrString = pathOr("", ["edges", 0, "node", "payload"]);
 
 const updateForNextPage = (
@@ -164,6 +169,8 @@ const buildSelectData = (
     return groups;
 };
 
+const chainId = Number.parseInt(getConfiguredChainId());
+
 /**
  * InputDetailsView should be lazy rendered.
  * to avoid multiple eager network calls.
@@ -220,6 +227,18 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         },
     ] = useDecodingOnInput(input, selectedSpec);
 
+    const voucherDestination = destinationOrString(vouchers) as Hex;
+    const voucherBlockExplorer = useBlockExplorerData(
+        "address",
+        voucherDestination,
+    );
+
+    const voucherDecoderRes = useVoucherDecoder({
+        payload: payloadOrString(vouchers) as Hex,
+        destination: voucherDestination,
+        chainId: chainId,
+    });
+
     const selectData = buildSelectData(
         userSpecifications,
         systemSpecifications,
@@ -231,6 +250,14 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
     const isSystemSpecAppliedManually =
         wasSpecManuallySelected && included(systemSpecifications, specApplied);
+
+    const [voucherContentType, setVoucherContentType] =
+        useState<ContentType>("raw");
+
+    const voucherContent =
+        voucherContentType === "raw" || voucherDecoderRes.data === null
+            ? payloadOrString(vouchers)
+            : voucherDecoderRes.data;
 
     return (
         <Box py="md">
@@ -381,8 +408,9 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showVouchers && (
                     <InputDetails.VoucherContent
-                        content={payloadOrString(vouchers)}
-                        contentType="raw"
+                        content={voucherContent}
+                        contentType={voucherContentType}
+                        onContentTypeChange={setVoucherContentType}
                         onConnect={() => showConnectionModal(appId)}
                         isLoading={result.fetching}
                         isConnected={hasConnection(appId)}
@@ -419,6 +447,22 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                                 });
                             },
                         }}
+                        middlePosition={
+                            isNotNilOrEmpty(voucherDestination) && (
+                                <Group
+                                    gap="xs"
+                                    data-testid="voucher-destination-block-explorer-link"
+                                >
+                                    <Text fw="bold">Destination Address:</Text>
+                                    <AddressEl
+                                        value={voucherDestination}
+                                        href={voucherBlockExplorer.url}
+                                        hrefTarget="_blank"
+                                        shorten
+                                    />
+                                </Group>
+                            )
+                        }
                     >
                         {showVoucherForExecution ? (
                             <VoucherExecution
