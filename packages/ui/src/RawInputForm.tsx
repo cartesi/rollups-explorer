@@ -10,6 +10,7 @@ import {
     Group,
     Loader,
     SegmentedControl,
+    Select,
     Stack,
     Textarea,
 } from "@mantine/core";
@@ -17,6 +18,7 @@ import { useForm } from "@mantine/form";
 import { FC, useCallback, useEffect, useState } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
+    Abi,
     BaseError,
     getAddress,
     Hex,
@@ -30,10 +32,17 @@ import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 import { TransactionFormSuccessData } from "./DepositFormTypes";
 
-type Format = "hex" | "utf";
+type Format = "hex" | "string" | "abi";
+
+export interface RawInputFormSpecification {
+    id: string;
+    name: string;
+    abi: Abi;
+}
 
 export interface RawInputFormProps {
     applications: string[];
+    specifications: RawInputFormSpecification[];
     isLoadingApplications: boolean;
     onSearchApplications: (applicationId: string) => void;
     onSuccess: (receipt: TransactionFormSuccessData) => void;
@@ -42,6 +51,7 @@ export interface RawInputFormProps {
 export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const {
         applications,
+        specifications,
         isLoadingApplications,
         onSearchApplications,
         onSuccess,
@@ -52,6 +62,8 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             application: "",
             rawInput: "0x",
             stringInput: "",
+            abiMethod: "existing",
+            specificationId: "",
         },
         validate: {
             application: (value) =>
@@ -63,9 +75,10 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                 ? getAddress(values.application)
                 : zeroAddress,
             rawInput: values.rawInput as Hex,
+            abiMethod: values.abiMethod,
         }),
     });
-    const { address, rawInput } = form.getTransformedValues();
+    const { address, rawInput, abiMethod } = form.getTransformedValues();
     const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
         query: {
@@ -81,6 +94,10 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
     const [format, setFormat] = useState<Format>("hex");
+    const specificationOptions = specifications.map((s) => ({
+        value: s.id,
+        label: s.name,
+    }));
 
     const onChangeFormat = useCallback((format: string | null) => {
         setFormat(format as Format);
@@ -136,7 +153,8 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                     onChange={onChangeFormat}
                     data={[
                         { label: "Hex", value: "hex" },
-                        { label: "String to Hex", value: "utf" },
+                        { label: "String to Hex", value: "string" },
+                        { label: "ABI to Hex", value: "abi" },
                     ]}
                 />
 
@@ -147,7 +165,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         withAsterisk
                         {...form.getInputProps("rawInput")}
                     />
-                ) : (
+                ) : format === "string" ? (
                     <>
                         <Textarea
                             label="String input"
@@ -172,7 +190,35 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                             {...form.getInputProps("rawInput")}
                         />
                     </>
-                )}
+                ) : format === "abi" ? (
+                    <Stack>
+                        <Select
+                            label="ABI method"
+                            description="Select how to attach an ABI"
+                            mb={16}
+                            allowDeselect={false}
+                            data={[
+                                {
+                                    value: "existing",
+                                    label: "ABI from an existing JSON_ABI specification",
+                                },
+                                { value: "new", label: "New ABI" },
+                            ]}
+                            {...form.getInputProps("abiMethod")}
+                        />
+
+                        {abiMethod === "existing" ? (
+                            <Autocomplete
+                                label="Specifications"
+                                description="Available JSON_ABI specifications"
+                                placeholder="Select specification..."
+                                data={specificationOptions}
+                                withAsterisk
+                                {...form.getInputProps("specificationId")}
+                            />
+                        ) : null}
+                    </Stack>
+                ) : null}
 
                 <Collapse
                     in={
