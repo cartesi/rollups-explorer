@@ -17,3 +17,4 @@ export { Summary } from "./Summary";
 export { SummaryCard } from "./SummaryCard";
 export { TransactionProgress } from "./TransactionProgress";
 export { default as useWatchQueryOnBlockChange } from "./hooks/useWatchQueryOnBlockChange";
+export { GenericInputForm } from "./GenericInputForm";

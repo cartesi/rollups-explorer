@@ -6,6 +6,7 @@ import {
     ERC721DepositForm,
     EtherDepositForm,
     RawInputForm,
+    GenericInputForm,
     TransactionFormSuccessData,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
@@ -160,7 +161,7 @@ const SendTransaction: FC<DepositProps> = ({
                     onSuccess={onSuccess}
                 />
             ) : depositType === "input" ? (
-                <RawInputForm
+                <GenericInputForm
                     applications={applications}
                     specifications={
                         specifications as RawInputFormSpecification[]
