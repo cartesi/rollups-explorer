@@ -13,26 +13,17 @@ import {
     Stack,
     Textarea,
 } from "@mantine/core";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
-import {
-    Abi,
-    AbiFunction,
-    BaseError,
-    getAddress,
-    Hex,
-    isAddress,
-    isHex,
-    stringToHex,
-    zeroAddress,
-} from "viem";
+import { Abi, BaseError, stringToHex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "../TransactionProgress";
 import useUndeployedApplication from "../hooks/useUndeployedApplication";
 import { TransactionFormSuccessData } from "../DepositFormTypes";
 import { AbiFields } from "./AbiFields";
 import { FormMode } from "./types";
-import { useForm, FormProvider } from "./context";
+import { FormProvider } from "./context";
+import { useGenericInputForm } from "./useGenericInputForm";
 
 export interface GenericInputFormSpecification {
     id: string;
@@ -56,43 +47,8 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
         onSearchApplications,
         onSuccess,
     } = props;
-    const form = useForm({
-        validateInputOnBlur: true,
-        initialValues: {
-            application: "",
-            rawInput: "0x",
-            stringInput: "",
-            abiMethod: "existing",
-            specificationId: "",
-            abiFunctionName: "",
-        },
-        validate: {
-            application: (value) =>
-                value !== "" && isAddress(value) ? null : "Invalid application",
-            rawInput: (value) => (isHex(value) ? null : "Invalid hex string"),
-        },
-        transformValues: (values) => {
-            const selectedSpecification = specifications.find(
-                (s) => s.id === values.specificationId,
-            );
-            return {
-                address: isAddress(values.application)
-                    ? getAddress(values.application)
-                    : zeroAddress,
-                rawInput: values.rawInput as Hex,
-                abiMethod: values.abiMethod,
-                specificationId: values.specificationId,
-                selectedSpecification,
-                abiFunction: (
-                    (selectedSpecification?.abi as AbiFunction[]) ?? []
-                ).find(
-                    (abiFunction) =>
-                        abiFunction.name === values.abiFunctionName,
-                ),
-            };
-        },
-    });
-    const { address, rawInput } = form.getTransformedValues();
+    const form = useGenericInputForm(specifications);
+    const { address, rawInput, mode } = form.getTransformedValues();
     const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
         query: {
@@ -107,12 +63,11 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
     const loading = execute.isPending || wait.isLoading;
     const canSubmit = form.isValid() && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
-    const [format, setFormat] = useState<FormMode>("hex");
 
-    const onChangeFormat = useCallback(
-        (format: string | null) => {
-            setFormat(format as FormMode);
+    const onChangeFormMode = useCallback(
+        (mode: string | null) => {
             form.reset();
+            form.setFieldValue("mode", mode as FormMode);
         },
         [form],
     );
@@ -164,8 +119,8 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                     )}
 
                     <SegmentedControl
-                        value={format}
-                        onChange={onChangeFormat}
+                        value={mode}
+                        onChange={onChangeFormMode}
                         data={[
                             { label: "Hex", value: "hex" },
                             { label: "String to Hex", value: "string" },
@@ -173,14 +128,14 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                         ]}
                     />
 
-                    {format === "hex" ? (
+                    {mode === "hex" ? (
                         <Textarea
-                            label="Raw input"
-                            description="Raw input for the application"
+                            label="Hex input"
+                            description="Hex input for the application"
                             withAsterisk
                             {...form.getInputProps("rawInput")}
                         />
-                    ) : format === "string" ? (
+                    ) : mode === "string" ? (
                         <>
                             <Textarea
                                 label="String input"
@@ -208,7 +163,7 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                                 {...form.getInputProps("rawInput")}
                             />
                         </>
-                    ) : format === "abi" ? (
+                    ) : mode === "abi" ? (
                         <AbiFields specifications={specifications} />
                     ) : null}
 

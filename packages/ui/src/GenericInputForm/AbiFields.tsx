@@ -81,6 +81,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                 description="Select how to attach an ABI"
                 mb={16}
                 allowDeselect={false}
+                withAsterisk
                 data={[
                     {
                         value: "existing",
@@ -97,6 +98,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     description="Available JSON_ABI specifications"
                     placeholder="Select specification"
                     data={specificationOptions}
+                    allowDeselect={false}
                     withAsterisk
                     {...form.getInputProps("specificationId")}
                 />
@@ -120,6 +122,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             rightSection={<Combobox.Chevron />}
                             rightSectionPointerEvents="none"
                             withAsterisk
+                            {...form.getInputProps("abiFunctionName")}
                             onClick={() => combobox.toggleDropdown()}
                         >
                             {abiFunction ? (
