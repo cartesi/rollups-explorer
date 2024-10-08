@@ -7,18 +7,23 @@ import {
     Autocomplete,
     Button,
     Collapse,
+    Combobox,
     Group,
+    InputBase,
+    Input,
     Loader,
     SegmentedControl,
     Select,
     Stack,
     Textarea,
+    useCombobox,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, Fragment, useCallback, useEffect, useState } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import {
     Abi,
+    AbiFunction,
     BaseError,
     getAddress,
     Hex,
@@ -64,21 +69,36 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
             stringInput: "",
             abiMethod: "existing",
             specificationId: "",
+            abiFunctionName: "",
         },
         validate: {
             application: (value) =>
                 value !== "" && isAddress(value) ? null : "Invalid application",
             rawInput: (value) => (isHex(value) ? null : "Invalid hex string"),
         },
-        transformValues: (values) => ({
-            address: isAddress(values.application)
-                ? getAddress(values.application)
-                : zeroAddress,
-            rawInput: values.rawInput as Hex,
-            abiMethod: values.abiMethod,
-        }),
+        transformValues: (values) => {
+            const selectedSpecification = specifications.find(
+                (s) => s.id === values.specificationId,
+            );
+            return {
+                address: isAddress(values.application)
+                    ? getAddress(values.application)
+                    : zeroAddress,
+                rawInput: values.rawInput as Hex,
+                abiMethod: values.abiMethod,
+                specificationId: values.specificationId,
+                selectedSpecification,
+                abiFunction: (
+                    (selectedSpecification?.abi as AbiFunction[]) ?? []
+                ).find(
+                    (abiFunction) =>
+                        abiFunction.name === values.abiFunctionName,
+                ),
+            };
+        },
     });
-    const { address, rawInput, abiMethod } = form.getTransformedValues();
+    const { address, rawInput, abiMethod, abiFunction, selectedSpecification } =
+        form.getTransformedValues();
     const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
         query: {
@@ -103,6 +123,16 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         setFormat(format as Format);
     }, []);
 
+    const combobox = useCombobox({
+        onDropdownClose: () => combobox.resetSelectedOption(),
+    });
+
+    const formatParams = useCallback((abiFunction: AbiFunction) => {
+        return abiFunction.inputs
+            .map((input) => `${input.type} ${input.name}`)
+            .join(", ");
+    }, []);
+
     useEffect(() => {
         if (wait.isSuccess) {
             onSuccess({ receipt: wait.data, type: "RAW" });
@@ -112,6 +142,10 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wait, onSearchApplications, onSuccess]);
+
+    useEffect(() => {
+        console.log("specifications::", specifications);
+    }, [specifications]);
 
     return (
         <form data-testid="raw-input-form">
@@ -208,7 +242,7 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                         />
 
                         {abiMethod === "existing" ? (
-                            <Autocomplete
+                            <Select
                                 label="Specifications"
                                 description="Available JSON_ABI specifications"
                                 placeholder="Select specification..."
@@ -217,6 +251,103 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
                                 {...form.getInputProps("specificationId")}
                             />
                         ) : null}
+
+                        {selectedSpecification && (
+                            <Combobox
+                                store={combobox}
+                                onOptionSubmit={(abiFunctionName) => {
+                                    combobox.closeDropdown();
+                                    form.setFieldValue(
+                                        "abiFunctionName",
+                                        abiFunctionName,
+                                    );
+                                }}
+                            >
+                                <Combobox.Target>
+                                    <InputBase
+                                        component="button"
+                                        type="button"
+                                        pointer
+                                        rightSection={<Combobox.Chevron />}
+                                        rightSectionPointerEvents="none"
+                                        onClick={() =>
+                                            combobox.toggleDropdown()
+                                        }
+                                    >
+                                        {abiFunction ? (
+                                            `${abiFunction.name}(${formatParams(
+                                                abiFunction,
+                                            )})`
+                                        ) : (
+                                            <Input.Placeholder>
+                                                Select function
+                                            </Input.Placeholder>
+                                        )}
+                                    </InputBase>
+                                </Combobox.Target>
+                                <Combobox.Dropdown>
+                                    <Combobox.Options>
+                                        {(
+                                            selectedSpecification.abi as AbiFunction[]
+                                        )
+                                            .filter(
+                                                (item) =>
+                                                    item.type === "function",
+                                            )
+                                            .map((abiFunction) => {
+                                                const params =
+                                                    abiFunction.inputs
+                                                        .map(
+                                                            (input) =>
+                                                                `${input.type} ${input.name}`,
+                                                        )
+                                                        .join(", ");
+
+                                                return (
+                                                    <Combobox.Option
+                                                        key={`${abiFunction.name}-${params}`}
+                                                        value={abiFunction.name}
+                                                    >
+                                                        {abiFunction.name}(
+                                                        {abiFunction.inputs.map(
+                                                            (input, index) => (
+                                                                <Fragment
+                                                                    key={`${input.type}-${input.name}`}
+                                                                >
+                                                                    <span>
+                                                                        <span
+                                                                            style={{
+                                                                                color: "var(--mantine-color-blue-text)",
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                input.type
+                                                                            }
+                                                                        </span>{" "}
+                                                                        <span>
+                                                                            {
+                                                                                input.name
+                                                                            }
+                                                                        </span>
+                                                                    </span>
+                                                                    {index <
+                                                                    abiFunction
+                                                                        .inputs
+                                                                        .length -
+                                                                        1
+                                                                        ? ", "
+                                                                        : ""}
+                                                                </Fragment>
+                                                            ),
+                                                        )}
+                                                        )
+                                                    </Combobox.Option>
+                                                );
+                                            })}
+                                    </Combobox.Options>
+                                </Combobox.Dropdown>
+                            </Combobox>
+                        )}
                     </Stack>
                 ) : null}
 
