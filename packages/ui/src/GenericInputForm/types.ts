@@ -11,6 +11,7 @@ export interface FormSpecification {
 export type FormAbiMethod = "new" | "existing";
 
 export interface FormValues {
+    mode: FormMode;
     application: string;
     rawInput: Hex;
     stringInput: string;
@@ -20,6 +21,7 @@ export interface FormValues {
 }
 
 export interface FormTransformedValues {
+    mode: FormMode;
     address: Address;
     rawInput: Hex;
     abiMethod: FormAbiMethod;
