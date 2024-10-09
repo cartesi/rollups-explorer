@@ -16,12 +16,13 @@ import { FC, Fragment, useCallback, useEffect } from "react";
 import { AbiValueParameter, FormAbiMethod, FormSpecification } from "./types";
 import { TbAlertCircle } from "react-icons/tb";
 import { encodeFunctionParams } from "./utils";
+import { useDebouncedCallback } from "@mantine/hooks";
 
-interface FunctionParamProps {
+interface FunctionParamLabelProps {
     input: AbiParameter;
 }
 
-export const FunctionParam: FC<FunctionParamProps> = ({ input }) => {
+export const FunctionParamLabel: FC<FunctionParamLabelProps> = ({ input }) => {
     return (
         <Box display="inline">
             <Text c="cyan" span fz="sm">
@@ -49,7 +50,7 @@ export const FunctionSignature: FC<FunctionSignatureProps> = ({
             (
             {abiFunction.inputs.map((input, index) => (
                 <Fragment key={`${input.type}-${input.name}`}>
-                    <FunctionParam input={input} />
+                    <FunctionParamLabel input={input} />
                     {index < abiFunction.inputs.length - 1 ? ", " : ""}
                 </Fragment>
             ))}
@@ -67,6 +68,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const { abiMethod, abiFunction, specificationId } =
         form.getTransformedValues();
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
+    const isFormValid = form.isValid();
     const selectedSpecification = specifications.find(
         (s) => s.id === specificationId,
     );
@@ -78,25 +80,10 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
 
-    const updateAbiFunctionParams = useCallback(
-        (params: AbiValueParameter[]) => {
-            const abiFunctionParamsValue =
-                abiFunctionParams.value as AbiValueParameter[];
-
-            abiFunctionParamsValue.forEach((_, index) => {
-                form.removeListItem("abiFunctionParams", index);
-            });
-
-            params.forEach((param) => {
-                form.insertListItem("abiFunctionParams", param);
-            });
-        },
-        [abiFunctionParams.value, form],
-    );
-
     const onChangeAbiFunctionName = useCallback(
         (abiFunctionName: string) => {
             combobox.closeDropdown();
+
             form.setFieldValue("abiFunctionName", abiFunctionName);
 
             const nextAbiFunction = (
@@ -111,23 +98,27 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     }),
                 );
 
-                updateAbiFunctionParams(emptyFunctionParams);
+                form.setFieldValue("abiFunctionParams", emptyFunctionParams);
             }
         },
-        [combobox, form, selectedSpecification, updateAbiFunctionParams],
+        [combobox, form, selectedSpecification],
     );
 
-    const isFormValid = form.isValid();
-    useEffect(() => {
-        // Check if form is valid
-        if (isFormValid) {
+    const encodeFunctionParamsDebounced = useDebouncedCallback(
+        (params: AbiValueParameter[]) => {
             // Encode the function params
-            const payload = encodeFunctionParams(abiFunctionParams.value);
+            const payload = encodeFunctionParams(params);
             // Set the encoded function params as value for hex field
             form.setFieldValue("rawInput", payload);
+        },
+        400,
+    );
+
+    useEffect(() => {
+        if (isFormValid) {
+            encodeFunctionParamsDebounced(abiFunctionParams.value);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' dependency is not added on purpose because it has an unstable reference
-    }, [abiFunctionParams.value, isFormValid]);
+    }, [abiFunctionParams.value, isFormValid, encodeFunctionParamsDebounced]);
 
     return (
         <Stack>
@@ -149,7 +140,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     form.setFieldValue("abiMethod", nextValue as FormAbiMethod);
                     form.setFieldValue("specificationId", "");
                     form.setFieldValue("abiFunctionName", "");
-                    updateAbiFunctionParams([]);
+                    form.setFieldValue("abiFunctionParams", []);
                 }}
             />
 
@@ -168,7 +159,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             nextValue as string,
                         );
                         form.setFieldValue("abiFunctionName", "");
-                        updateAbiFunctionParams([]);
+                        form.setFieldValue("abiFunctionParams", []);
                     }}
                 />
             ) : null}
@@ -238,7 +229,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                                     key={`${input.name}-${input.type}`}
                                     label={
                                         input.name && input.type ? (
-                                            <FunctionParam input={input} />
+                                            <FunctionParamLabel input={input} />
                                         ) : (
                                             input.name || input.type
                                         )
@@ -256,7 +247,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             variant="light"
                             color="blue"
                             icon={<TbAlertCircle />}
-                            data-testid={`specification-mode-info`}
+                            data-testid="empty-inputs-argments-alert"
                         >
                             No input arguments defined for{" "}
                             <Text span fz="sm" fw="bold">
