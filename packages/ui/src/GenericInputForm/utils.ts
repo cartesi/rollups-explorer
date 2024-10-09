@@ -27,8 +27,3 @@ export const encodeFunctionParams = (params: AbiValueParameter[]) => {
 
     return encodeAbiParameters(params, values);
 };
-
-export const generateErrorMessage = (param: AbiValueParameter) => {
-    const key = `${param.type}-${param.name}`;
-    return `[${key}] Invalid ${param.type} value`;
-};

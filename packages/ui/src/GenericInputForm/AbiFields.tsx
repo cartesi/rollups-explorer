@@ -12,7 +12,7 @@ import {
     useCombobox,
 } from "@mantine/core";
 import { AbiFunction, AbiParameter } from "viem";
-import { FC, Fragment, useCallback, useEffect, useState } from "react";
+import { FC, Fragment, useCallback, useEffect } from "react";
 import { AbiValueParameter, FormAbiMethod, FormSpecification } from "./types";
 import { TbAlertCircle } from "react-icons/tb";
 import { encodeFunctionParams } from "./utils";
@@ -67,9 +67,6 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const { abiMethod, abiFunction, specificationId } =
         form.getTransformedValues();
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
-    const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
-        {},
-    );
     const selectedSpecification = specifications.find(
         (s) => s.id === specificationId,
     );
@@ -81,11 +78,26 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
 
+    const updateAbiFunctionParams = useCallback(
+        (params: AbiValueParameter[]) => {
+            const abiFunctionParamsValue =
+                abiFunctionParams.value as AbiValueParameter[];
+
+            abiFunctionParamsValue.forEach((_, index) => {
+                form.removeListItem("abiFunctionParams", index);
+            });
+
+            params.forEach((param) => {
+                form.insertListItem("abiFunctionParams", param);
+            });
+        },
+        [abiFunctionParams.value, form],
+    );
+
     const onChangeAbiFunctionName = useCallback(
         (abiFunctionName: string) => {
             combobox.closeDropdown();
             form.setFieldValue("abiFunctionName", abiFunctionName);
-            setTouchedFields({});
 
             const nextAbiFunction = (
                 (selectedSpecification?.abi as AbiFunction[]) ?? []
@@ -98,16 +110,20 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                         value: "",
                     }),
                 );
-                form.setFieldValue("abiFunctionParams", emptyFunctionParams);
+
+                updateAbiFunctionParams(emptyFunctionParams);
             }
         },
-        [combobox, form, selectedSpecification],
+        [combobox, form, selectedSpecification, updateAbiFunctionParams],
     );
 
     const isFormValid = form.isValid();
     useEffect(() => {
+        // Check if form is valid
         if (isFormValid) {
+            // Encode the function params
             const payload = encodeFunctionParams(abiFunctionParams.value);
+            // Set the encoded function params as value for hex field
             form.setFieldValue("rawInput", payload);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' dependency is not added on purpose because it has an unstable reference
@@ -133,7 +149,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     form.setFieldValue("abiMethod", nextValue as FormAbiMethod);
                     form.setFieldValue("specificationId", "");
                     form.setFieldValue("abiFunctionName", "");
-                    form.setFieldValue("abiFunctionParams", []);
+                    updateAbiFunctionParams([]);
                 }}
             />
 
@@ -152,7 +168,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             nextValue as string,
                         );
                         form.setFieldValue("abiFunctionName", "");
-                        form.setFieldValue("abiFunctionParams", []);
+                        updateAbiFunctionParams([]);
                     }}
                 />
             ) : null}
@@ -217,77 +233,23 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                 <Stack>
                     {abiFunction.inputs.length > 0 ? (
                         <>
-                            {abiFunction.inputs.map((input) => {
-                                const abiFunctionParamsValue =
-                                    abiFunctionParams.value as AbiValueParameter[];
-                                const param = abiFunctionParamsValue.find(
-                                    (p) =>
-                                        p.type === input.type &&
-                                        p.name === input.name,
-                                ) as AbiValueParameter;
-                                const fieldKey = `[${param.type}-${param.name}]`;
-                                const error = abiFunctionParams.error?.find(
-                                    (error: string | null) =>
-                                        error?.includes(fieldKey),
-                                );
-                                const errorMessage = error
-                                    ? error.replace(fieldKey, "")
-                                    : null;
-
-                                return (
-                                    <TextInput
-                                        key={`${input.name}-${input.type}`}
-                                        value={param.value}
-                                        label={
-                                            input.name && input.type ? (
-                                                <FunctionParam input={input} />
-                                            ) : (
-                                                input.name || input.type
-                                            )
-                                        }
-                                        placeholder={`Enter ${input.type} value`}
-                                        withAsterisk
-                                        error={
-                                            touchedFields[fieldKey] &&
-                                            errorMessage
-                                                ? errorMessage
-                                                : null
-                                        }
-                                        onBlur={() => {
-                                            form.validateField(
-                                                "abiFunctionParams",
-                                            );
-
-                                            setTouchedFields(
-                                                (touchedFields) => ({
-                                                    ...touchedFields,
-                                                    [fieldKey]: true,
-                                                }),
-                                            );
-                                        }}
-                                        onChange={(event) => {
-                                            const nextValue =
-                                                event.target.value;
-                                            const nextAbiFunctionParams =
-                                                abiFunctionParamsValue.map(
-                                                    (p) =>
-                                                        p.type === input.type &&
-                                                        p.name === input.name
-                                                            ? {
-                                                                  ...p,
-                                                                  value: nextValue,
-                                                              }
-                                                            : p,
-                                                );
-
-                                            form.setFieldValue(
-                                                "abiFunctionParams",
-                                                nextAbiFunctionParams,
-                                            );
-                                        }}
-                                    />
-                                );
-                            })}
+                            {abiFunction.inputs.map((input, index) => (
+                                <TextInput
+                                    key={`${input.name}-${input.type}`}
+                                    label={
+                                        input.name && input.type ? (
+                                            <FunctionParam input={input} />
+                                        ) : (
+                                            input.name || input.type
+                                        )
+                                    }
+                                    placeholder={`Enter ${input.type} value`}
+                                    withAsterisk
+                                    {...form.getInputProps(
+                                        `abiFunctionParams.${index}.value`,
+                                    )}
+                                />
+                            ))}
                         </>
                     ) : (
                         <Alert
