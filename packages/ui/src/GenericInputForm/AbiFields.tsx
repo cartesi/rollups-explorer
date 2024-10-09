@@ -12,8 +12,8 @@ import {
     useCombobox,
 } from "@mantine/core";
 import { AbiFunction, AbiParameter } from "viem";
-import { FC, Fragment } from "react";
-import { FormSpecification } from "./types";
+import { FC, Fragment, useCallback, useEffect, useState } from "react";
+import { AbiValueParameter, FormSpecification } from "./types";
 import { TbAlertCircle } from "react-icons/tb";
 
 interface FunctionParamProps {
@@ -65,6 +65,8 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const form = useFormContext();
     const { abiMethod, abiFunction, selectedSpecification } =
         form.getTransformedValues();
+    const abiFunctionParams = form.getInputProps("abiFunctionParams");
+    const [dirtyFields, setDirtyFields] = useState<Record<string, boolean>>({});
     const specificationOptions = specifications.map((s) => ({
         value: s.id,
         label: s.name,
@@ -73,6 +75,34 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
+
+    const onChangeAbiFunctionName = useCallback(
+        (abiFunctionName: string) => {
+            combobox.closeDropdown();
+            form.setFieldValue("abiFunctionName", abiFunctionName);
+            setDirtyFields({});
+
+            const nextAbiFunction = (
+                (selectedSpecification?.abi as AbiFunction[]) ?? []
+            ).find((abiFunction) => abiFunction.name === abiFunctionName);
+
+            if (nextAbiFunction) {
+                const emptyFunctionParams = nextAbiFunction.inputs.map(
+                    (input) => ({
+                        ...input,
+                        value: "",
+                    }),
+                );
+                form.setFieldValue("abiFunctionParams", emptyFunctionParams);
+            }
+        },
+        [combobox, form, selectedSpecification],
+    );
+
+    useEffect(() => {
+        console.log("errors::", form.errors);
+        console.log("isValid::", form.isValid());
+    }, [form.errors, form.isValid]);
 
     return (
         <Stack>
@@ -107,10 +137,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
             {selectedSpecification && (
                 <Combobox
                     store={combobox}
-                    onOptionSubmit={(abiFunctionName) => {
-                        combobox.closeDropdown();
-                        form.setFieldValue("abiFunctionName", abiFunctionName);
-                    }}
+                    onOptionSubmit={onChangeAbiFunctionName}
                 >
                     <Combobox.Target>
                         <InputBase
@@ -134,6 +161,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             )}
                         </InputBase>
                     </Combobox.Target>
+
                     <Combobox.Dropdown>
                         <Combobox.Options>
                             {(selectedSpecification.abi as AbiFunction[])
@@ -166,20 +194,75 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                 <Stack>
                     {abiFunction.inputs.length > 0 ? (
                         <>
-                            {abiFunction.inputs.map((input) => (
-                                <TextInput
-                                    key={`${input.name}-${input.type}`}
-                                    label={
-                                        input.name && input.type ? (
-                                            <FunctionParam input={input} />
-                                        ) : (
-                                            input.name || input.type
-                                        )
-                                    }
-                                    placeholder="Enter value"
-                                    withAsterisk
-                                />
-                            ))}
+                            {abiFunction.inputs.map((input) => {
+                                const abiFunctionParamsValue =
+                                    abiFunctionParams.value as AbiValueParameter[];
+                                const param = abiFunctionParamsValue.find(
+                                    (p) =>
+                                        p.type === input.type &&
+                                        p.name === input.name,
+                                ) as AbiValueParameter;
+                                const fieldKey = `[${param.type}-${param.name}]`;
+                                const error = abiFunctionParams.error?.find(
+                                    (error: string | null) =>
+                                        error?.includes(fieldKey),
+                                );
+                                const errorMessage = error
+                                    ? error.replace(fieldKey, "")
+                                    : null;
+
+                                return (
+                                    <TextInput
+                                        key={`${input.name}-${input.type}`}
+                                        value={param.value}
+                                        label={
+                                            input.name && input.type ? (
+                                                <FunctionParam input={input} />
+                                            ) : (
+                                                input.name || input.type
+                                            )
+                                        }
+                                        placeholder="Enter value"
+                                        withAsterisk
+                                        error={
+                                            dirtyFields[fieldKey]
+                                                ? errorMessage
+                                                : null
+                                        }
+                                        onFocus={() => {
+                                            setDirtyFields((dirtyFields) => ({
+                                                ...dirtyFields,
+                                                [fieldKey]: true,
+                                            }));
+                                        }}
+                                        onBlur={() =>
+                                            form.validateField(
+                                                "abiFunctionParams",
+                                            )
+                                        }
+                                        onChange={(event) => {
+                                            const nextValue =
+                                                event.target.value;
+                                            const nextAbiFunctionParams =
+                                                abiFunctionParamsValue.map(
+                                                    (p) =>
+                                                        p.type === input.type &&
+                                                        p.name === input.name
+                                                            ? {
+                                                                  ...p,
+                                                                  value: nextValue,
+                                                              }
+                                                            : p,
+                                                );
+
+                                            form.setFieldValue(
+                                                "abiFunctionParams",
+                                                nextAbiFunctionParams,
+                                            );
+                                        }}
+                                    />
+                                );
+                            })}
                         </>
                     ) : (
                         <Alert
