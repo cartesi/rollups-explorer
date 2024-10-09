@@ -27,6 +27,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             const selectedSpecification = specifications.find(
                 (s) => s.id === values.specificationId,
             );
+
             return {
                 mode: values.mode,
                 address: isAddress(values.application)
@@ -35,7 +36,6 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                 rawInput: values.rawInput as Hex,
                 abiMethod: values.abiMethod,
                 specificationId: values.specificationId,
-                selectedSpecification,
                 abiFunction: (
                     (selectedSpecification?.abi as AbiFunction[]) ?? []
                 ).find(

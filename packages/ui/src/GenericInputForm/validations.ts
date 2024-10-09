@@ -1,9 +1,6 @@
 import { isAddress, isHex } from "viem";
-import {
-    AbiFunctionParameterError,
-    AbiValueParameter,
-    FormValues,
-} from "./types";
+import { AbiValueParameter, FormValues } from "./types";
+import { generateErrorMessage } from "./utils";
 
 export const validateApplication = (value: string) =>
     value !== "" && isAddress(value) ? null : "Invalid application";
@@ -32,7 +29,7 @@ export const validateAbiFunctionParams = (
 
     const errors = value
         .map((param) => {
-            const key = `${param.type}-${param.name}`;
+            const message = generateErrorMessage(param);
             let error: string | null = null;
 
             switch (param.type) {
@@ -46,34 +43,24 @@ export const validateAbiFunctionParams = (
                     try {
                         BigInt(param.value);
                     } catch (e) {
-                        error = `[${key}] Invalid uint value`;
+                        error = message;
                     }
-                    break;
-                case "string":
-                    error =
-                        param.value !== ""
-                            ? null
-                            : `[${key}] Invalid string value`;
                     break;
                 case "bool":
                     error =
                         param.value === "true" || param.value === "false"
                             ? null
-                            : `[${key}] Invalid boolean value`;
+                            : message;
                     break;
                 case "bytes":
-                    error = isHex(param.value)
-                        ? null
-                        : `[${key}] Invalid byte value`;
+                    error = isHex(param.value) ? null : message;
                     break;
                 case "address":
-                    error = isAddress(param.value)
-                        ? null
-                        : `[${key}] Invalid address value`;
+                    error = isAddress(param.value) ? null : message;
                     break;
+                case "string":
                 default:
-                    error =
-                        param.value !== "" ? null : `[${key}] Invalid value`;
+                    error = param.value !== "" ? null : message;
                     break;
             }
 

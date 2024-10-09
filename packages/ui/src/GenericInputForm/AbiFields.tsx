@@ -13,8 +13,9 @@ import {
 } from "@mantine/core";
 import { AbiFunction, AbiParameter } from "viem";
 import { FC, Fragment, useCallback, useEffect, useState } from "react";
-import { AbiValueParameter, FormSpecification } from "./types";
+import { AbiValueParameter, FormAbiMethod, FormSpecification } from "./types";
 import { TbAlertCircle } from "react-icons/tb";
+import { encodeFunctionParams } from "./utils";
 
 interface FunctionParamProps {
     input: AbiParameter;
@@ -63,15 +64,19 @@ export interface AbiFieldsProps {
 
 export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const form = useFormContext();
-    const { abiMethod, abiFunction, selectedSpecification } =
+    const { abiMethod, abiFunction, specificationId } =
         form.getTransformedValues();
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
-    const [dirtyFields, setDirtyFields] = useState<Record<string, boolean>>({});
+    const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+        {},
+    );
+    const selectedSpecification = specifications.find(
+        (s) => s.id === specificationId,
+    );
     const specificationOptions = specifications.map((s) => ({
         value: s.id,
         label: s.name,
     }));
-
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
@@ -80,7 +85,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         (abiFunctionName: string) => {
             combobox.closeDropdown();
             form.setFieldValue("abiFunctionName", abiFunctionName);
-            setDirtyFields({});
+            setTouchedFields({});
 
             const nextAbiFunction = (
                 (selectedSpecification?.abi as AbiFunction[]) ?? []
@@ -99,10 +104,14 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         [combobox, form, selectedSpecification],
     );
 
+    const isFormValid = form.isValid();
     useEffect(() => {
-        console.log("errors::", form.errors);
-        console.log("isValid::", form.isValid());
-    }, [form.errors, form.isValid]);
+        if (isFormValid) {
+            const payload = encodeFunctionParams(abiFunctionParams.value);
+            form.setFieldValue("rawInput", payload);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' dependency is not added on purpose because it has an unstable reference
+    }, [abiFunctionParams.value, isFormValid]);
 
     return (
         <Stack>
@@ -120,6 +129,12 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     { value: "new", label: "New ABI" },
                 ]}
                 {...form.getInputProps("abiMethod")}
+                onChange={(nextValue) => {
+                    form.setFieldValue("abiMethod", nextValue as FormAbiMethod);
+                    form.setFieldValue("specificationId", "");
+                    form.setFieldValue("abiFunctionName", "");
+                    form.setFieldValue("abiFunctionParams", []);
+                }}
             />
 
             {abiMethod === "existing" ? (
@@ -131,6 +146,14 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     allowDeselect={false}
                     withAsterisk
                     {...form.getInputProps("specificationId")}
+                    onChange={(nextValue) => {
+                        form.setFieldValue(
+                            "specificationId",
+                            nextValue as string,
+                        );
+                        form.setFieldValue("abiFunctionName", "");
+                        form.setFieldValue("abiFunctionParams", []);
+                    }}
                 />
             ) : null}
 
@@ -222,24 +245,26 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                                                 input.name || input.type
                                             )
                                         }
-                                        placeholder="Enter value"
+                                        placeholder={`Enter ${input.type} value`}
                                         withAsterisk
                                         error={
-                                            dirtyFields[fieldKey]
+                                            touchedFields[fieldKey] &&
+                                            errorMessage
                                                 ? errorMessage
                                                 : null
                                         }
-                                        onFocus={() => {
-                                            setDirtyFields((dirtyFields) => ({
-                                                ...dirtyFields,
-                                                [fieldKey]: true,
-                                            }));
-                                        }}
-                                        onBlur={() =>
+                                        onBlur={() => {
                                             form.validateField(
                                                 "abiFunctionParams",
-                                            )
-                                        }
+                                            );
+
+                                            setTouchedFields(
+                                                (touchedFields) => ({
+                                                    ...touchedFields,
+                                                    [fieldKey]: true,
+                                                }),
+                                            );
+                                        }}
                                         onChange={(event) => {
                                             const nextValue =
                                                 event.target.value;
