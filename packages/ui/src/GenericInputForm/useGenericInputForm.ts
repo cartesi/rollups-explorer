@@ -6,6 +6,7 @@ import {
     validateApplication,
     validateHexInput,
     validateSpecificationId,
+    validateAbiFunctionParams,
 } from "./validations";
 import { AbiFunction, getAddress, Hex, isAddress, zeroAddress } from "viem";
 import { FormSpecification } from "./types";
@@ -20,6 +21,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             abiMethod: validateAbiMethod,
             specificationId: validateSpecificationId,
             abiFunctionName: validateAbiFunctionName,
+            abiFunctionParams: validateAbiFunctionParams,
         },
         transformValues: (values) => {
             const selectedSpecification = specifications.find(

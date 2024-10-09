@@ -1,4 +1,4 @@
-import { Abi, AbiFunction, Address, Hex } from "viem";
+import { Abi, AbiFunction, Address, Hex, AbiParameter } from "viem";
 
 export type FormMode = "hex" | "string" | "abi";
 
@@ -10,6 +10,14 @@ export interface FormSpecification {
 
 export type FormAbiMethod = "new" | "existing";
 
+export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
+    value: string;
+};
+
+export type AbiFunctionParameterError = Pick<AbiParameter, "type" | "name"> & {
+    message: string | null;
+};
+
 export interface FormValues {
     mode: FormMode;
     application: string;
@@ -18,6 +26,7 @@ export interface FormValues {
     abiMethod: FormAbiMethod;
     specificationId: string;
     abiFunctionName: string;
+    abiFunctionParams: AbiValueParameter[];
 }
 
 export interface FormTransformedValues {

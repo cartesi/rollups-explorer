@@ -8,4 +8,5 @@ export const initialValues: FormValues = {
     abiMethod: "existing",
     specificationId: "",
     abiFunctionName: "",
+    abiFunctionParams: [],
 };
