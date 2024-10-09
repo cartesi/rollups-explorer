@@ -14,10 +14,6 @@ export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
     value: string;
 };
 
-export type AbiFunctionParameterError = Pick<AbiParameter, "type" | "name"> & {
-    message: string | null;
-};
-
 export interface FormValues {
     mode: FormMode;
     application: string;
@@ -36,5 +32,4 @@ export interface FormTransformedValues {
     abiMethod: FormAbiMethod;
     specificationId: string;
     abiFunction: AbiFunction | undefined;
-    selectedSpecification: FormSpecification | undefined;
 }
