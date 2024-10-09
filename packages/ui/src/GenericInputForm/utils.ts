@@ -3,13 +3,13 @@ import { AbiValueParameter } from "./types";
 
 export const encodeFunctionParams = (params: AbiValueParameter[]) => {
     const values = params.map((param) => {
-        const { type, value } = param;
-
-        switch (type) {
+        switch (param.type) {
             case "bool":
-                return value === "true";
+                // Assume that the value can either be 'true' or 'false'
+                // because it was already validated for those exact values
+                return param.value === "true";
             case "address":
-                return getAddress(value);
+                return getAddress(param.value);
             case "uint":
             case "uint8":
             case "uint16":
@@ -17,11 +17,10 @@ export const encodeFunctionParams = (params: AbiValueParameter[]) => {
             case "uint64":
             case "uint128":
             case "uint256":
-                return BigInt(value);
-            case "string":
-            case "bytes":
+                return BigInt(param.value);
+            // No encoding required for other types like 'string' or 'bytes'
             default:
-                return value;
+                return param.value;
         }
     });
 

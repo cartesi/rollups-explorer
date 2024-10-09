@@ -40,7 +40,7 @@ export const validateAbiFunctionParamValue = (
     const message = `Invalid ${param.type} value`;
     let error: string | null = null;
 
-    // Validate the field for some content
+    // Validate the field for non-empty content
     if (value === "") {
         return message;
     }
@@ -69,7 +69,7 @@ export const validateAbiFunctionParamValue = (
         case "address":
             error = isAddress(value) ? null : message;
             break;
-        // All other types like 'string' are handled in the non-empty check above
+        // All other types like 'string' are handled in the non-empty content check above
         default:
             break;
     }
