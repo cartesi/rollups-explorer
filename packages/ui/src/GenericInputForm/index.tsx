@@ -82,6 +82,11 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wait, onSearchApplications, onSuccess]);
 
+    useEffect(() => {
+        console.log("errors::", form.errors);
+        console.log("isValid::", form.isValid());
+    }, [form]);
+
     return (
         <FormProvider form={form}>
             <form data-testid="raw-input-form">

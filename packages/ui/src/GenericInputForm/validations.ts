@@ -1,5 +1,7 @@
-import { isAddress, isHex } from "viem";
+import { isAddress, isHex, parseAbi } from "viem";
 import { FormValues } from "./types";
+import { isBlank } from "ramda-adjunct";
+import { prepareSignatures } from "web/src/components/specification/utils";
 
 export const validateApplication = (value: string) =>
     value !== "" && isAddress(value) ? null : "Invalid application";
@@ -13,7 +15,9 @@ export const validateAbiMethod = (value: string, values: FormValues) =>
         : "Invalid abi method";
 
 export const validateSpecificationId = (value: string, values: FormValues) =>
-    values.mode !== "abi" || value !== "" ? null : "Invalid specification";
+    values.mode !== "abi" || values.abiMethod === "new" || value !== ""
+        ? null
+        : "Invalid specification";
 
 export const validateAbiFunctionName = (value: string, values: FormValues) =>
     values.mode !== "abi" || value !== "" ? null : "Invalid abi function";
@@ -75,4 +79,19 @@ export const validateAbiFunctionParamValue = (
     }
 
     return error;
+};
+
+export const validateHumanAbi = (value: string) => {
+    if (isBlank(value)) {
+        return "The ABI signature definition is required!";
+    }
+
+    const items = prepareSignatures(value);
+    try {
+        parseAbi(items);
+    } catch (error: any) {
+        return error.message;
+    }
+
+    return null;
 };

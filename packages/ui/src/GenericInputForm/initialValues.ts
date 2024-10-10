@@ -6,6 +6,8 @@ export const initialValues: FormValues = {
     rawInput: "0x",
     stringInput: "",
     abiMethod: "existing",
+    specificationMode: "json_abi",
+    humanAbi: "",
     specificationId: "",
     abiFunctionName: "",
     abiFunctionParams: [],
