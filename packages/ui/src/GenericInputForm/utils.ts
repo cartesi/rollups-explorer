@@ -1,4 +1,4 @@
-import { Abi, encodeAbiParameters, getAddress, parseAbi } from "viem";
+import { encodeAbiParameters, getAddress, parseAbi } from "viem";
 import { AbiValueParameter, FormSpecification } from "./types";
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isBlank, isObject } from "ramda-adjunct";
@@ -7,8 +7,6 @@ export const encodeFunctionParams = (params: AbiValueParameter[]) => {
     const values = params.map((param) => {
         switch (param.type) {
             case "bool":
-                // Assume that the value can either be 'true' or 'false'
-                // because it was already validated for those exact values
                 return param.value === "true";
             case "address":
                 return getAddress(param.value);
@@ -20,7 +18,6 @@ export const encodeFunctionParams = (params: AbiValueParameter[]) => {
             case "uint128":
             case "uint256":
                 return BigInt(param.value);
-            // No encoding required for other types like 'string' or 'bytes'
             default:
                 return param.value;
         }
