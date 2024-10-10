@@ -8,6 +8,8 @@ export interface FormSpecification {
     abi: Abi;
 }
 
+export type SpecificationMode = "json_abi" | "abi_params";
+
 export type FormAbiMethod = "new" | "existing";
 
 export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
@@ -20,6 +22,8 @@ export interface FormValues {
     rawInput: Hex;
     stringInput: string;
     abiMethod: FormAbiMethod;
+    specificationMode: SpecificationMode;
+    humanAbi: string;
     specificationId: string;
     abiFunctionName: string;
     abiFunctionParams: AbiValueParameter[];
@@ -30,6 +34,9 @@ export interface FormTransformedValues {
     address: Address;
     rawInput: Hex;
     abiMethod: FormAbiMethod;
+    specificationMode: SpecificationMode;
+    humanAbi: string;
     specificationId: string;
     abiFunction: AbiFunction | undefined;
+    selectedSpecification: FormSpecification | undefined;
 }

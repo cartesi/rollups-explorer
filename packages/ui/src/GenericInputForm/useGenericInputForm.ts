@@ -6,10 +6,12 @@ import {
     validateAbiMethod,
     validateApplication,
     validateHexInput,
+    validateHumanAbi,
     validateSpecificationId,
 } from "./validations";
 import { AbiFunction, getAddress, Hex, isAddress, zeroAddress } from "viem";
 import { FormSpecification } from "./types";
+import { generateFormSpecification } from "./utils";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
     return useForm({
@@ -19,6 +21,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             application: validateApplication,
             rawInput: validateHexInput,
             abiMethod: validateAbiMethod,
+            humanAbi: validateHumanAbi,
             specificationId: validateSpecificationId,
             abiFunctionName: validateAbiFunctionName,
             abiFunctionParams: {
@@ -26,9 +29,14 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             },
         },
         transformValues: (values) => {
-            const selectedSpecification = specifications.find(
-                (s) => s.id === values.specificationId,
-            );
+            const selectedSpecification =
+                values.abiMethod === "existing"
+                    ? specifications.find(
+                          (s) => s.id === values.specificationId,
+                      )
+                    : values.specificationMode === "json_abi"
+                    ? generateFormSpecification(values.humanAbi)
+                    : undefined;
 
             return {
                 mode: values.mode,
@@ -37,7 +45,10 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                     : zeroAddress,
                 rawInput: values.rawInput as Hex,
                 abiMethod: values.abiMethod,
+                specificationMode: values.specificationMode,
+                humanAbi: values.humanAbi,
                 specificationId: values.specificationId,
+                selectedSpecification,
                 abiFunction: (
                     (selectedSpecification?.abi as AbiFunction[]) ?? []
                 ).find(

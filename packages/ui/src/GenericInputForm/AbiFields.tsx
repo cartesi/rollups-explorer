@@ -3,20 +3,34 @@ import {
     Alert,
     Box,
     Combobox,
+    Flex,
+    Group,
     Input,
     InputBase,
+    SegmentedControl,
     Select,
     Stack,
     Text,
+    Textarea,
     TextInput,
+    Tooltip,
     useCombobox,
 } from "@mantine/core";
 import { AbiFunction, AbiParameter } from "viem";
 import { FC, Fragment, useCallback, useEffect } from "react";
-import { AbiValueParameter, FormAbiMethod, FormSpecification } from "./types";
-import { TbAlertCircle } from "react-icons/tb";
+import {
+    AbiValueParameter,
+    FormAbiMethod,
+    FormSpecification,
+    SpecificationMode,
+} from "./types";
+import { TbAlertCircle, TbHelp } from "react-icons/tb";
 import { encodeFunctionParams } from "./utils";
 import { useDebouncedCallback } from "@mantine/hooks";
+import LabelWithTooltip from "web/src/components/labelWithTooltip";
+import { AbiFunctionNameCombobox } from "./AbiFunctionNameCombobox";
+
+const placeholder = `function balanceOf(address owner) view returns (uint256) \nevent Transfer(address indexed from, address indexed to, uint256 amount)`;
 
 interface FunctionParamLabelProps {
     input: AbiParameter;
@@ -65,13 +79,10 @@ export interface AbiFieldsProps {
 
 export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
     const form = useFormContext();
-    const { abiMethod, abiFunction, specificationId } =
+    const { abiMethod, abiFunction, specificationMode, selectedSpecification } =
         form.getTransformedValues();
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
     const isFormValid = form.isValid();
-    const selectedSpecification = specifications.find(
-        (s) => s.id === specificationId,
-    );
     const specificationOptions = specifications.map((s) => ({
         value: s.id,
         label: s.name,
@@ -114,6 +125,8 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         400,
     );
 
+    const onChangeHumanAbiDebounced = useDebouncedCallback(() => {}, 400);
+
     useEffect(() => {
         if (isFormValid) {
             encodeFunctionParamsDebounced(abiFunctionParams.value);
@@ -144,7 +157,60 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                 }}
             />
 
-            {abiMethod === "existing" ? (
+            {abiMethod === "new" ? (
+                <Stack>
+                    <SegmentedControl
+                        aria-label="Specification Mode"
+                        data={[
+                            {
+                                label: "JSON ABI",
+                                value: "json_abi",
+                            },
+                            {
+                                label: "ABI Parameters",
+                                value: "abi_params",
+                            },
+                        ]}
+                        {...form.getInputProps("specificationMode")}
+                        onChange={(nextValue) => {
+                            form.setFieldValue(
+                                "specificationMode",
+                                nextValue as SpecificationMode,
+                            );
+                        }}
+                    />
+
+                    {specificationMode === "json_abi" ? (
+                        <Textarea
+                            data-testid="json-abi-textarea"
+                            resize="vertical"
+                            description="Define signatures in Human readable format"
+                            placeholder={placeholder}
+                            rows={5}
+                            label={
+                                <Group justify="flex-start" gap="3">
+                                    <Text size="sm">ABI</Text>
+                                    <Tooltip
+                                        multiline
+                                        label="Define the signature without wrapping it on quotes nor adding comma at the end to separate. Just hit enter and keep defining your signatures"
+                                        withArrow
+                                        w="300"
+                                    >
+                                        <Flex direction="column-reverse">
+                                            <TbHelp />
+                                        </Flex>
+                                    </Tooltip>
+                                </Group>
+                            }
+                            {...form.getInputProps("humanAbi")}
+                            onChange={(event) => {
+                                const nextValue = event.target.value;
+                                form.setFieldValue("humanAbi", nextValue);
+                            }}
+                        />
+                    ) : null}
+                </Stack>
+            ) : (
                 <Select
                     label="Specifications"
                     description="Available JSON_ABI specifications"
@@ -162,63 +228,9 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                         form.setFieldValue("abiFunctionParams", []);
                     }}
                 />
-            ) : null}
-
-            {selectedSpecification && (
-                <Combobox
-                    store={combobox}
-                    onOptionSubmit={onChangeAbiFunctionName}
-                >
-                    <Combobox.Target>
-                        <InputBase
-                            component="button"
-                            type="button"
-                            pointer
-                            label="ABI Function"
-                            description="Available ABI functions"
-                            rightSection={<Combobox.Chevron />}
-                            rightSectionPointerEvents="none"
-                            withAsterisk
-                            {...form.getInputProps("abiFunctionName")}
-                            onClick={() => combobox.toggleDropdown()}
-                        >
-                            {abiFunction ? (
-                                <FunctionSignature abiFunction={abiFunction} />
-                            ) : (
-                                <Input.Placeholder>
-                                    Select function
-                                </Input.Placeholder>
-                            )}
-                        </InputBase>
-                    </Combobox.Target>
-
-                    <Combobox.Dropdown>
-                        <Combobox.Options>
-                            {(selectedSpecification.abi as AbiFunction[])
-                                .filter((item) => item.type === "function")
-                                .map((abiFunction) => {
-                                    const params = abiFunction.inputs
-                                        .map(
-                                            (input) =>
-                                                `${input.type} ${input.name}`,
-                                        )
-                                        .join(", ");
-
-                                    return (
-                                        <Combobox.Option
-                                            key={`${abiFunction.name}-${params}`}
-                                            value={abiFunction.name}
-                                        >
-                                            <FunctionSignature
-                                                abiFunction={abiFunction}
-                                            />
-                                        </Combobox.Option>
-                                    );
-                                })}
-                        </Combobox.Options>
-                    </Combobox.Dropdown>
-                </Combobox>
             )}
+
+            <AbiFunctionNameCombobox />
 
             {abiFunction && (
                 <Stack>

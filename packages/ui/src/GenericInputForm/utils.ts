@@ -1,5 +1,7 @@
-import { encodeAbiParameters, getAddress } from "viem";
-import { AbiValueParameter } from "./types";
+import { Abi, encodeAbiParameters, getAddress, parseAbi } from "viem";
+import { AbiValueParameter, FormSpecification } from "./types";
+import { prepareSignatures } from "web/src/components/specification/utils";
+import { isBlank, isObject } from "ramda-adjunct";
 
 export const encodeFunctionParams = (params: AbiValueParameter[]) => {
     const values = params.map((param) => {
@@ -25,4 +27,24 @@ export const encodeFunctionParams = (params: AbiValueParameter[]) => {
     });
 
     return encodeAbiParameters(params, values);
+};
+
+export const generateFormSpecification = (humanAbi: string) => {
+    if (isBlank(humanAbi)) {
+        return undefined;
+    }
+
+    const readableList = prepareSignatures(humanAbi);
+    let generatedAbi;
+    try {
+        generatedAbi = parseAbi(readableList);
+    } catch (err) {}
+
+    return isObject(generatedAbi)
+        ? ({
+              id: new Date().getTime().toString(),
+              name: "Generated specification",
+              abi: generatedAbi,
+          } as FormSpecification)
+        : undefined;
 };
