@@ -81,7 +81,11 @@ export const validateAbiFunctionParamValue = (
     return error;
 };
 
-export const validateHumanAbi = (value: string) => {
+export const validateHumanAbi = (value: string, values: FormValues) => {
+    if (values.abiMethod === "existing") {
+        return null;
+    }
+
     if (isBlank(value)) {
         return "The ABI signature definition is required!";
     }
