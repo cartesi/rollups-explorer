@@ -1,7 +1,7 @@
 import { useFormContext } from "./context";
 import { Alert, Stack, Text, TextInput } from "@mantine/core";
 import { TbAlertCircle } from "react-icons/tb";
-import { FunctionParamLabel } from "./FunctionParamLabel";
+import { FunctionParamLabel } from "./FunctionSignature";
 
 export const AbiFunctionParams = () => {
     const form = useFormContext();
