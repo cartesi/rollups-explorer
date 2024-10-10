@@ -21,9 +21,11 @@ import { TransactionProgress } from "../TransactionProgress";
 import useUndeployedApplication from "../hooks/useUndeployedApplication";
 import { TransactionFormSuccessData } from "../DepositFormTypes";
 import { AbiFields } from "./AbiFields";
-import { FormMode } from "./types";
+import { AbiValueParameter, FormMode } from "./types";
 import { FormProvider } from "./context";
 import { useGenericInputForm } from "./useGenericInputForm";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { encodeFunctionParams } from "./utils";
 
 export interface GenericInputFormSpecification {
     id: string;
@@ -61,8 +63,10 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
         hash: execute.data,
     });
     const loading = execute.isPending || wait.isLoading;
-    const canSubmit = form.isValid() && prepare.error === null;
+    const isFormValid = form.isValid();
+    const canSubmit = isFormValid && prepare.error === null;
     const isUndeployedApp = useUndeployedApplication(address, applications);
+    const abiFunctionParams = form.getInputProps("abiFunctionParams");
 
     const onChangeFormMode = useCallback(
         (mode: string | null) => {
@@ -70,6 +74,16 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
             form.setFieldValue("mode", mode as FormMode);
         },
         [form],
+    );
+
+    const encodeFunctionParamsDebounced = useDebouncedCallback(
+        (params: AbiValueParameter[]) => {
+            // Encode the function params
+            const payload = encodeFunctionParams(params);
+            // Set the encoded function params as value for hex field
+            form.setFieldValue("rawInput", payload);
+        },
+        400,
     );
 
     useEffect(() => {
@@ -83,9 +97,10 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
     }, [wait, onSearchApplications, onSuccess]);
 
     useEffect(() => {
-        console.log("errors::", form.errors);
-        console.log("isValid::", form.isValid());
-    }, [form]);
+        if (isFormValid) {
+            encodeFunctionParamsDebounced(abiFunctionParams.value);
+        }
+    }, [abiFunctionParams.value, isFormValid, encodeFunctionParamsDebounced]);
 
     return (
         <FormProvider form={form}>

@@ -4,7 +4,7 @@ import { AbiFunction } from "viem";
 import { useCallback } from "react";
 import { FunctionSignature } from "./FunctionSignature";
 
-export const AbiFunctionNameCombobox = () => {
+export const AbiFunctionName = () => {
     const form = useFormContext();
     const { abiFunction, selectedSpecification } = form.getTransformedValues();
     const combobox = useCombobox({
