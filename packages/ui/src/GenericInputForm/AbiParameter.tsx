@@ -1,6 +1,6 @@
 import { useFormContext } from "./context";
-import { Button, TextInput, Transition, Paper } from "@mantine/core";
-import { useCallback, useEffect, useState } from "react";
+import { Button, TextInput } from "@mantine/core";
+import { useCallback } from "react";
 import { AbiFunction } from "viem";
 import { generateAbiParamFormSpecification } from "./utils";
 

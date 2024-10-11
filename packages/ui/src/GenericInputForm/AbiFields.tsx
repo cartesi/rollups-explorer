@@ -55,6 +55,10 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     form.setFieldValue("specificationId", "");
                     form.setFieldValue("abiFunctionName", "");
                     form.setFieldValue("abiFunctionParams", []);
+                    form.setFieldValue("humanAbi", "");
+                    form.setFieldValue("abiParam", "");
+                    form.setFieldValue("savedAbiParam", "");
+                    form.setFieldValue("specificationMode", "json_abi");
                 }}
             />
 
@@ -78,6 +82,13 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                                 "specificationMode",
                                 nextValue as SpecificationMode,
                             );
+
+                            form.setFieldValue("specificationId", "");
+                            form.setFieldValue("abiFunctionName", "");
+                            form.setFieldValue("abiFunctionParams", []);
+                            form.setFieldValue("humanAbi", "");
+                            form.setFieldValue("abiParam", "");
+                            form.setFieldValue("savedAbiParam", "");
                         }}
                     />
 

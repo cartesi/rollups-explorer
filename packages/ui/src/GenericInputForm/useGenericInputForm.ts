@@ -18,7 +18,7 @@ import {
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
     return useForm({
-        validateInputOnChange: true,
+        validateInputOnBlur: true,
         initialValues: {
             mode: "hex",
             application: "",
