@@ -24,6 +24,8 @@ export interface FormValues {
     abiMethod: FormAbiMethod;
     specificationMode: SpecificationMode;
     humanAbi: string;
+    abiParam: string;
+    savedAbiParam: string;
     specificationId: string;
     abiFunctionName: string;
     abiFunctionParams: AbiValueParameter[];
@@ -36,6 +38,8 @@ export interface FormTransformedValues {
     abiMethod: FormAbiMethod;
     specificationMode: SpecificationMode;
     humanAbi: string;
+    abiParam: string;
+    savedAbiParam: string;
     specificationId: string;
     abiFunction: AbiFunction | undefined;
     selectedSpecification: FormSpecification | undefined;
