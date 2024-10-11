@@ -6,7 +6,7 @@ import { FunctionSignature } from "./FunctionSignature";
 
 export const AbiFunctionName = () => {
     const form = useFormContext();
-    const { abiFunction, selectedSpecification, specificationMode } =
+    const { abiMethod, abiFunction, selectedSpecification, specificationMode } =
         form.getTransformedValues();
     const combobox = useCombobox({
         onDropdownClose: () => combobox.resetSelectedOption(),
@@ -41,7 +41,7 @@ export const AbiFunctionName = () => {
 
     return (
         <>
-            {specificationMode === "json_abi" &&
+            {(abiMethod === "existing" || specificationMode === "json_abi") &&
             selectedSpecification &&
             specificationFunctions.length > 0 ? (
                 <Combobox
