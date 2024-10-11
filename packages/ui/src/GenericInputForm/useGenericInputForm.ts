@@ -3,6 +3,7 @@ import {
     validateAbiFunctionName,
     validateAbiFunctionParamValue,
     validateAbiMethod,
+    validateAbiParam,
     validateApplication,
     validateHexInput,
     validateHumanAbi,
@@ -10,11 +11,14 @@ import {
 } from "./validations";
 import { AbiFunction, getAddress, Hex, isAddress, zeroAddress } from "viem";
 import { FormSpecification } from "./types";
-import { generateFormSpecification } from "./utils";
+import {
+    generateAbiParamFormSpecification,
+    generateHumanAbiFormSpecification,
+} from "./utils";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
     return useForm({
-        validateInputOnBlur: true,
+        validateInputOnChange: true,
         initialValues: {
             mode: "hex",
             application: "",
@@ -23,6 +27,8 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             abiMethod: "existing",
             specificationMode: "json_abi",
             humanAbi: "",
+            abiParam: "",
+            savedAbiParam: "",
             specificationId: "",
             abiFunctionName: "",
             abiFunctionParams: [],
@@ -32,6 +38,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             rawInput: validateHexInput,
             abiMethod: validateAbiMethod,
             humanAbi: validateHumanAbi,
+            abiParam: validateAbiParam,
             specificationId: validateSpecificationId,
             abiFunctionName: validateAbiFunctionName,
             abiFunctionParams: {
@@ -45,8 +52,8 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                           (s) => s.id === values.specificationId,
                       )
                     : values.specificationMode === "json_abi"
-                    ? generateFormSpecification(values.humanAbi)
-                    : undefined;
+                    ? generateHumanAbiFormSpecification(values.humanAbi)
+                    : generateAbiParamFormSpecification(values.savedAbiParam);
 
             return {
                 mode: values.mode,
@@ -57,6 +64,8 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                 abiMethod: values.abiMethod,
                 specificationMode: values.specificationMode,
                 humanAbi: values.humanAbi,
+                abiParam: values.abiParam,
+                savedAbiParam: values.savedAbiParam,
                 specificationId: values.specificationId,
                 selectedSpecification,
                 abiFunction: (

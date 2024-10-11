@@ -1,5 +1,6 @@
 import { useFormContext } from "./context";
 import {
+    Button,
     Flex,
     Group,
     SegmentedControl,
@@ -7,6 +8,7 @@ import {
     Stack,
     Text,
     Textarea,
+    TextInput,
     Tooltip,
     useCombobox,
 } from "@mantine/core";
@@ -15,6 +17,7 @@ import { FormAbiMethod, FormSpecification, SpecificationMode } from "./types";
 import { TbHelp } from "react-icons/tb";
 import { AbiFunctionName } from "./AbiFunctionName";
 import { AbiFunctionParams } from "./AbiFunctionParams";
+import { AbiParameter } from "./AbiParameter";
 
 export interface AbiFieldsProps {
     specifications: FormSpecification[];
@@ -106,7 +109,9 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                                 form.setFieldValue("humanAbi", nextValue);
                             }}
                         />
-                    ) : null}
+                    ) : (
+                        <AbiParameter />
+                    )}
                 </Stack>
             ) : (
                 <Select

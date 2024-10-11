@@ -1,4 +1,4 @@
-import { isAddress, isHex, parseAbi } from "viem";
+import { isAddress, isHex, parseAbi, parseAbiParameters } from "viem";
 import { FormValues } from "./types";
 import { isBlank } from "ramda-adjunct";
 import { prepareSignatures } from "web/src/components/specification/utils";
@@ -20,7 +20,11 @@ export const validateSpecificationId = (value: string, values: FormValues) =>
         : "Invalid specification";
 
 export const validateAbiFunctionName = (value: string, values: FormValues) =>
-    values.mode !== "abi" || value !== "" ? null : "Invalid abi function";
+    values.mode !== "abi" ||
+    values.specificationMode !== "json_abi" ||
+    value !== ""
+        ? null
+        : "Invalid abi function";
 
 export const validateAbiFunctionParamValue = (
     value: string,
@@ -82,12 +86,15 @@ export const validateAbiFunctionParamValue = (
 };
 
 export const validateHumanAbi = (value: string, values: FormValues) => {
-    if (values.abiMethod === "existing") {
+    if (
+        values.abiMethod === "existing" ||
+        values.specificationMode === "abi_params"
+    ) {
         return null;
     }
 
     if (isBlank(value)) {
-        return "The ABI signature definition is required!";
+        return "The ABI signature definition is required";
     }
 
     const items = prepareSignatures(value);
@@ -98,4 +105,24 @@ export const validateHumanAbi = (value: string, values: FormValues) => {
     }
 
     return null;
+};
+
+export const validateAbiParam = (value: string, values: FormValues) => {
+    if (
+        values.abiMethod === "existing" ||
+        values.specificationMode === "json_abi"
+    ) {
+        return null;
+    }
+
+    if (isBlank(value)) {
+        return "ABI parameter is required.";
+    }
+
+    try {
+        parseAbiParameters(value);
+        return null;
+    } catch (error: any) {
+        return error.message as string;
+    }
 };
