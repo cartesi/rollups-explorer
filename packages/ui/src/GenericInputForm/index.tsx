@@ -160,7 +160,6 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                             <Textarea
                                 label="String input"
                                 description="String input for the application"
-                                mb={16}
                                 {...form.getInputProps("stringInput")}
                                 onChange={(event) => {
                                     const nextValue = event.target.value;

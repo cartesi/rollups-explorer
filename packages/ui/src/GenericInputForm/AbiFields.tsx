@@ -1,6 +1,5 @@
 import { useFormContext } from "./context";
 import {
-    Button,
     Flex,
     Group,
     SegmentedControl,
@@ -8,9 +7,7 @@ import {
     Stack,
     Text,
     Textarea,
-    TextInput,
     Tooltip,
-    useCombobox,
 } from "@mantine/core";
 import { FC } from "react";
 import { FormAbiMethod, FormSpecification, SpecificationMode } from "./types";
@@ -30,16 +27,12 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         value: s.id,
         label: s.name,
     }));
-    const combobox = useCombobox({
-        onDropdownClose: () => combobox.resetSelectedOption(),
-    });
 
     return (
-        <Stack>
+        <>
             <Select
                 label="ABI method"
                 description="Select how to attach an ABI"
-                mb={16}
                 allowDeselect={false}
                 withAsterisk
                 data={[
@@ -63,7 +56,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
             />
 
             {abiMethod === "new" ? (
-                <Stack>
+                <>
                     <SegmentedControl
                         aria-label="Specification Mode"
                         data={[
@@ -118,12 +111,13 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             onChange={(event) => {
                                 const nextValue = event.target.value;
                                 form.setFieldValue("humanAbi", nextValue);
+                                form.validateField("humanAbi");
                             }}
                         />
                     ) : (
                         <AbiParameter />
                     )}
-                </Stack>
+                </>
             ) : (
                 <Select
                     label="Specifications"
@@ -146,6 +140,6 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
 
             <AbiFunctionName />
             <AbiFunctionParams />
-        </Stack>
+        </>
     );
 };
