@@ -47,6 +47,11 @@ export const AbiParameter = () => {
                 </Button>
             }
             {...form.getInputProps("abiParam")}
+            onChange={(event) => {
+                const nextValue = event.target.value;
+                form.setFieldValue("abiParam", nextValue);
+                form.validateField("abiParam");
+            }}
         />
     );
 };

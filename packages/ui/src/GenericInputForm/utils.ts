@@ -1,15 +1,10 @@
 import {
-    AbiFunction,
     encodeAbiParameters,
     getAddress,
     parseAbi,
     parseAbiParameters,
 } from "viem";
-import {
-    AbiValueParameter,
-    FormSpecification,
-    SpecificationMode,
-} from "./types";
+import { AbiValueParameter, FormSpecification } from "./types";
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 
