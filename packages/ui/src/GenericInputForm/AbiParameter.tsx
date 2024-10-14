@@ -46,6 +46,7 @@ export const AbiParameter = () => {
                     Save
                 </Button>
             }
+            data-testid="abi-parameter-input"
             {...form.getInputProps("abiParam")}
             onChange={(event) => {
                 const nextValue = event.target.value;

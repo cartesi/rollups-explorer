@@ -15,24 +15,12 @@ import {
     generateAbiParamFormSpecification,
     generateHumanAbiFormSpecification,
 } from "./utils";
+import { initialValues } from "./initialValues";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
     return useForm({
         validateInputOnBlur: true,
-        initialValues: {
-            mode: "hex",
-            application: "",
-            rawInput: "0x",
-            stringInput: "",
-            abiMethod: "existing",
-            specificationMode: "json_abi",
-            humanAbi: "",
-            abiParam: "",
-            savedAbiParam: "",
-            specificationId: "",
-            abiFunctionName: "",
-            abiFunctionParams: [],
-        },
+        initialValues,
         validate: {
             application: validateApplication,
             rawInput: validateHexInput,
