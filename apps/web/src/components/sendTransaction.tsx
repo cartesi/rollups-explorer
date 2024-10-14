@@ -6,8 +6,8 @@ import {
     ERC721DepositForm,
     EtherDepositForm,
     GenericInputForm,
-    TransactionFormSuccessData,
     GenericInputFormSpecification,
+    TransactionFormSuccessData,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
