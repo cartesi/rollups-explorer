@@ -1,4 +1,4 @@
-import { Abi, AbiFunction, Address, Hex, AbiParameter } from "viem";
+import { Abi, AbiFunction, AbiParameter, Address, Hex } from "viem";
 
 export type FormMode = "hex" | "string" | "abi";
 

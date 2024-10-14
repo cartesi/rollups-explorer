@@ -1,12 +1,5 @@
 import { useFormContext } from "./context";
-import {
-    Alert,
-    Combobox,
-    Input,
-    InputBase,
-    Text,
-    useCombobox,
-} from "@mantine/core";
+import { Alert, Combobox, Input, InputBase, useCombobox } from "@mantine/core";
 import { AbiFunction } from "viem";
 import { useCallback } from "react";
 import { FunctionSignature } from "./FunctionSignature";
