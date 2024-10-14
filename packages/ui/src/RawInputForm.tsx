@@ -9,8 +9,8 @@ import {
     Collapse,
     Combobox,
     Group,
-    InputBase,
     Input,
+    InputBase,
     Loader,
     SegmentedControl,
     Select,
@@ -142,10 +142,6 @@ export const RawInputForm: FC<RawInputFormProps> = (props) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wait, onSearchApplications, onSuccess]);
-
-    useEffect(() => {
-        console.log("specifications::", specifications);
-    }, [specifications]);
 
     return (
         <form data-testid="raw-input-form">
