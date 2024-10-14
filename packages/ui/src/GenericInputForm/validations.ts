@@ -12,7 +12,7 @@ export const validateHexInput = (value: string) =>
 export const validateAbiMethod = (value: string, values: FormValues) =>
     values.mode !== "abi" || value === "new" || value === "existing"
         ? null
-        : "Invalid abi method";
+        : "Invalid ABI method";
 
 export const validateSpecificationId = (value: string, values: FormValues) =>
     values.mode !== "abi" || values.abiMethod === "new" || value !== ""
@@ -24,7 +24,7 @@ export const validateAbiFunctionName = (value: string, values: FormValues) =>
     values.specificationMode !== "json_abi" ||
     value !== ""
         ? null
-        : "Invalid abi function";
+        : "Invalid ABI function";
 
 export const validateAbiFunctionParamValue = (
     value: string,

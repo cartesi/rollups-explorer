@@ -112,6 +112,7 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                         placeholder="0x"
                         data={applications}
                         withAsterisk
+                        data-testid="application-autocomplete"
                         rightSection={
                             (prepare.isLoading || isLoadingApplications) && (
                                 <Loader size="xs" />
@@ -153,6 +154,7 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                             label="Hex input"
                             description="Hex input for the application"
                             withAsterisk
+                            data-testid="hex-textarea"
                             {...form.getInputProps("rawInput")}
                         />
                     ) : mode === "string" ? (
@@ -209,6 +211,7 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                             disabled={!canSubmit}
                             leftSection={<TbCheck />}
                             loading={loading}
+                            data-testid="generic-input-submit-button"
                             onClick={() =>
                                 execute.writeContract(prepare.data!.request)
                             }

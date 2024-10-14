@@ -4,12 +4,11 @@ import {
     Group,
     SegmentedControl,
     Select,
-    Stack,
     Text,
     Textarea,
     Tooltip,
 } from "@mantine/core";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { FormAbiMethod, FormSpecification, SpecificationMode } from "./types";
 import { TbHelp } from "react-icons/tb";
 import { AbiFunctionName } from "./AbiFunctionName";
@@ -33,6 +32,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
             <Select
                 label="ABI method"
                 description="Select how to attach an ABI"
+                data-testid="abi-method-select"
                 allowDeselect={false}
                 withAsterisk
                 data={[
