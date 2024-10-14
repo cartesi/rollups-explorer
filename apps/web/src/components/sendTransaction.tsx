@@ -5,9 +5,9 @@ import {
     ERC20DepositForm,
     ERC721DepositForm,
     EtherDepositForm,
-    RawInputForm,
     GenericInputForm,
     TransactionFormSuccessData,
+    GenericInputFormSpecification,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -20,7 +20,6 @@ import getConfiguredChainId from "../lib/getConfiguredChain";
 import { BlockExplorerLink } from "./BlockExplorerLink";
 import { useSpecification } from "./specification/hooks/useSpecification";
 import { JSON_ABI } from "./specification/types";
-import { RawInputFormSpecification } from "@cartesi/rollups-explorer-ui/src/RawInputForm";
 
 export type DepositType =
     | "ether"
@@ -164,7 +163,7 @@ const SendTransaction: FC<DepositProps> = ({
                 <GenericInputForm
                     applications={applications}
                     specifications={
-                        specifications as RawInputFormSpecification[]
+                        specifications as GenericInputFormSpecification[]
                     }
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
