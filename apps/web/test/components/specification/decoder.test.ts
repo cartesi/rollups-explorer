@@ -229,7 +229,43 @@ Slice name: "from" (Is it the right one?)`,
                 expect(envelope.result).toEqual({
                     amount: 10000000000000000n,
                     sender: "0x0c70e9a737aa92055c8c1217bf887a65cb2292f4",
+                    execLayerData: "0x",
                 });
+            });
+
+            it("should decode ether-portal data with the exec-layer information", () => {
+                const envelope = decodePayload(
+                    systemSpecification.EtherPortalSpec,
+                    encodedDataSamples.etherPortalSampleWithExecLayer,
+                );
+
+                expect(envelope.result).toEqual({
+                    amount: 300n,
+                    execLayerData:
+                        "0x33303020657468206465706f736974656420746f20307833613134363931353532376264313532383032366235633134333335303938646666323730306361",
+                    sender: "0x3a146915527bd1528026b5c14335098dff2700ca",
+                });
+            });
+
+            it("should fail to decode ether-portal data with required but missing exec-layer information", () => {
+                const envelope = decodePayload(
+                    {
+                        ...systemSpecification.EtherPortalSpec,
+                        sliceInstructions:
+                            systemSpecification.EtherPortalSpec.sliceInstructions?.map(
+                                (instruction) =>
+                                    instruction.name === "execLayerData"
+                                        ? {
+                                              ...instruction,
+                                              optional: false,
+                                          }
+                                        : instruction,
+                            ),
+                    },
+                    encodedDataSamples.etherPortalSampleWithoutExecLayer,
+                );
+
+                expect(envelope.result).toEqual({});
             });
         });
 

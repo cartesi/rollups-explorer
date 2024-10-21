@@ -46,6 +46,8 @@ export interface SliceInstruction {
     name?: string;
     /** The type to decode e.g. uint. Leaving empty will default to the raw sliced return; useful for Address for example.*/
     type?: AbiType;
+    /** A flag to signal to the decoder not to throw an exception caused by slicing the defined byte range.*/
+    optional?: boolean;
 }
 
 type Commons = {

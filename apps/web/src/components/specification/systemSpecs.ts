@@ -85,6 +85,7 @@ const ERC20PortalSpec: Specification = {
         { from: 1, to: 21, name: "tokenAddress" },
         { from: 21, to: 41, name: "from" },
         { from: 41, to: 73, name: "amount", type: "uint" },
+        { from: 73, name: "execLayerData", optional: true },
     ],
     abiParams: [],
     conditionals: [
@@ -135,6 +136,7 @@ const EtherPortalSpec: Specification = {
     sliceInstructions: [
         { from: 0, to: 20, name: "sender" },
         { from: 20, to: 52, name: "amount", type: "uint256" },
+        { from: 52, name: "execLayerData", optional: true },
     ],
     abiParams: [],
     conditionals: [
