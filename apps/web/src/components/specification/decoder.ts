@@ -9,10 +9,12 @@ import {
     pathOr,
     pipe,
 } from "ramda";
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import {
     AbiDecodingDataSizeTooSmallError,
     AbiFunction,
     AbiFunctionSignatureNotFoundError,
+    AbiParameter,
     Hex,
     InvalidAbiParametersError,
     decodeAbiParameters,
@@ -150,6 +152,22 @@ const prepareResultFromPieces = (e: Envelope): Envelope => {
     return e;
 };
 
+type AbiParameterInfo = {
+    param: AbiParameter;
+    index: number;
+};
+
+/**
+ * Check the AbiParameter in the following precedence order [name, type]
+ * and returns the first available.
+ * Fallback to `arg-{index}` based on the parameter position passed to the abi function.
+ */
+const getAbiParamIdentifier = cond<[info: AbiParameterInfo], string>([
+    [(info) => isNotNilOrEmpty(info.param.name), pathOr("", ["param", "name"])],
+    [(info) => isNotNilOrEmpty(info.param.type), pathOr("", ["param", "type"])],
+    [T, (info) => `arg-${info.index}`],
+]);
+
 const prepareResultForJSONABI = (e: Envelope): Envelope => {
     if (e.spec.mode === "json_abi") {
         try {
@@ -168,7 +186,7 @@ const prepareResultForJSONABI = (e: Envelope): Envelope => {
 
                 // respecting order of arguments but including abi names
                 abiItem.inputs.forEach((param, index) => {
-                    const name = param.name ?? `param${0}`;
+                    const name = getAbiParamIdentifier({ param, index });
                     orderedNamedArgs.push([name, args[index]]);
                 });
             }

@@ -1,4 +1,5 @@
 import {
+    act,
     cleanup,
     fireEvent,
     getByDisplayValue,
@@ -10,7 +11,6 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import { act } from "react-dom/test-utils";
 import { describe, expect, it } from "vitest";
 import {
     InputContent,
@@ -265,5 +265,337 @@ describe("Rollups InputDetails", () => {
         expect(
             getByTestId(voucherPanel, "loading-overlay-vouchercontent"),
         ).toBeInTheDocument();
+    });
+
+    describe("positioning children", () => {
+        it("should the default option align the children at the bottom for InputContent", () => {
+            render(
+                <InputDetailsE>
+                    <InputContent content={queryContentAsHex} contentType="raw">
+                        <button>input button</button>
+                    </InputContent>
+                </InputDetailsE>,
+            );
+
+            const content = screen.getByText("input button")
+                .previousSibling as HTMLElement;
+            const nextSibling = screen.getByText("input button").nextSibling;
+
+            expect(content).toBeDefined();
+            expect(nextSibling).toStrictEqual(null);
+
+            expect(getByText(content, queryContentAsHex)).toBeInTheDocument();
+        });
+
+        it("should be able to position children element on top for InputContent", () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                        childrenPosition="top"
+                    >
+                        <button>input button</button>
+                    </InputContent>
+                </InputDetailsE>,
+            );
+
+            const el = screen.getByText("input button")
+                .nextSibling as HTMLElement;
+
+            expect(el).toBeDefined();
+
+            expect(getByText(el, "Raw")).toBeInTheDocument();
+            expect(getByText(el, "As Text")).toBeInTheDocument();
+            expect(getByText(el, "As JSON")).toBeInTheDocument();
+        });
+
+        it("should be able to position children element in the middle for InputContent", () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                        childrenPosition="middle"
+                    >
+                        <button>input button</button>
+                    </InputContent>
+                </InputDetailsE>,
+            );
+
+            const segment = screen.getByText("input button")
+                .previousSibling as HTMLElement;
+            const content = screen.getByText("input button")
+                .nextSibling as HTMLElement;
+
+            expect(segment).toBeDefined();
+            expect(content).toBeDefined();
+
+            expect(getByText(segment, "Raw")).toBeInTheDocument();
+            expect(getByText(segment, "As Text")).toBeInTheDocument();
+            expect(getByText(segment, "As JSON")).toBeInTheDocument();
+            expect(getByText(content, queryContentAsHex)).toBeInTheDocument();
+        });
+
+        it("should the default option align the children at the bottom for VoucherContent", async () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                    />
+                    <VoucherContent
+                        isConnected={true}
+                        content={jsonWithdraw0}
+                        contentType="raw"
+                    >
+                        <button>voucher button</button>
+                    </VoucherContent>
+                </InputDetailsE>,
+            );
+
+            const panelName = "panel-vouchers";
+
+            act(() => {
+                fireEvent.click(screen.getByText("Vouchers"));
+            });
+
+            await waitFor(() =>
+                expect(screen.getByTestId(panelName)).not.toHaveStyle(
+                    "display: none",
+                ),
+            );
+
+            const content = screen.getByText("voucher button")
+                .previousSibling as HTMLElement;
+            const nextSibling = screen.getByText("voucher button").nextSibling;
+
+            expect(content).toBeDefined();
+            expect(nextSibling).toStrictEqual(null);
+
+            expect(getByText(content, jsonWithdraw0)).toBeInTheDocument();
+        });
+
+        it("should be able to position children element at the middle for VoucherContent", async () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                    />
+                    <VoucherContent
+                        isConnected={true}
+                        content={jsonWithdraw0}
+                        contentType="raw"
+                        childrenPosition="middle"
+                    >
+                        <button>voucher button</button>
+                    </VoucherContent>
+                </InputDetailsE>,
+            );
+
+            const panelName = "panel-vouchers";
+
+            act(() => {
+                fireEvent.click(screen.getByText("Vouchers"));
+            });
+
+            await waitFor(() =>
+                expect(screen.getByTestId(panelName)).not.toHaveStyle(
+                    "display: none",
+                ),
+            );
+
+            const segment = screen.getByText("voucher button")
+                .previousSibling as HTMLElement;
+            const content = screen.getByText("voucher button")
+                .nextSibling as HTMLElement;
+
+            expect(content).toBeDefined();
+            expect(segment).toBeDefined();
+
+            expect(getByText(content, jsonWithdraw0)).toBeInTheDocument();
+
+            expect(getByText(segment, "Raw")).toBeInTheDocument();
+            expect(getByText(segment, "As Text")).toBeInTheDocument();
+            expect(getByText(segment, "As JSON")).toBeInTheDocument();
+        });
+
+        it("should be able to position children element in the top for VoucherContent", async () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                    />
+                    <VoucherContent
+                        isConnected={true}
+                        content={jsonWithdraw0}
+                        contentType="raw"
+                        childrenPosition="top"
+                    >
+                        <button>voucher button</button>
+                    </VoucherContent>
+                </InputDetailsE>,
+            );
+
+            const panelName = "panel-vouchers";
+
+            act(() => {
+                fireEvent.click(screen.getByText("Vouchers"));
+            });
+
+            await waitFor(() =>
+                expect(screen.getByTestId(panelName)).not.toHaveStyle(
+                    "display: none",
+                ),
+            );
+
+            const segment = screen.getByText("voucher button")
+                .nextSibling as HTMLElement;
+
+            expect(segment).toBeDefined();
+            expect(getByText(segment, "Raw")).toBeInTheDocument();
+            expect(getByText(segment, "As Text")).toBeInTheDocument();
+            expect(getByText(segment, "As JSON")).toBeInTheDocument();
+        });
+    });
+
+    describe("Positioning external components independently", () => {
+        it("should topPosition option render an react node above the segmentcontrol for PageableContent", async () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                    />
+                    <VoucherContent
+                        isConnected={true}
+                        content={jsonWithdraw0}
+                        contentType="json"
+                        topPosition={
+                            <div data-testid="top-positioned-element">
+                                Hello World
+                            </div>
+                        }
+                    />
+                </InputDetailsE>,
+            );
+
+            const panelName = "panel-vouchers";
+
+            act(() => {
+                fireEvent.click(screen.getByText("Vouchers"));
+            });
+
+            await waitFor(() =>
+                expect(screen.getByTestId(panelName)).not.toHaveStyle(
+                    "display: none",
+                ),
+            );
+
+            const el = screen.getByText("Hello World")
+                .nextSibling! as HTMLElement;
+
+            expect(el).toBeDefined();
+            expect(getByText(el, "Raw")).toBeInTheDocument();
+            expect(getByText(el, "As Text")).toBeInTheDocument();
+            expect(getByText(el, "As JSON")).toBeInTheDocument();
+        });
+
+        it("should middlePosition option render a react node between segment-control and content for PageableContent", async () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                    />
+                    <VoucherContent
+                        isConnected={true}
+                        content={jsonWithdraw0}
+                        contentType="raw"
+                        middlePosition={
+                            <div data-testid="middle-positioned-element">
+                                Hello World
+                            </div>
+                        }
+                    />
+                </InputDetailsE>,
+            );
+
+            const panelName = "panel-vouchers";
+
+            act(() => {
+                fireEvent.click(screen.getByText("Vouchers"));
+            });
+
+            await waitFor(() =>
+                expect(screen.getByTestId(panelName)).not.toHaveStyle(
+                    "display: none",
+                ),
+            );
+
+            const el = screen.getByText("Hello World");
+            const segmentControlEl = el.previousSibling! as HTMLElement;
+            const contentEl = el.nextSibling! as HTMLElement;
+
+            expect(segmentControlEl).toBeDefined();
+            expect(contentEl).toBeDefined();
+            expect(getByText(segmentControlEl, "Raw")).toBeInTheDocument();
+            expect(getByText(segmentControlEl, "As Text")).toBeInTheDocument();
+            expect(getByText(segmentControlEl, "As JSON")).toBeInTheDocument();
+            expect(getByText(contentEl, jsonWithdraw0)).toBeInTheDocument();
+        });
+
+        it("should topPosition option render an react node above the segmentcontrol for InputContent", () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                        topPosition={
+                            <div data-testid="top-positioned-element">
+                                Hello World
+                            </div>
+                        }
+                    />
+                </InputDetailsE>,
+            );
+
+            const el = screen.getByText("Hello World")
+                .nextSibling! as HTMLElement;
+
+            expect(el).toBeDefined();
+            expect(getByText(el, "Raw")).toBeInTheDocument();
+            expect(getByText(el, "As Text")).toBeInTheDocument();
+            expect(getByText(el, "As JSON")).toBeInTheDocument();
+        });
+
+        it("should middlePosition option render a react node between segment-control and content for InputContent", () => {
+            render(
+                <InputDetailsE>
+                    <InputContent
+                        content={queryContentAsHex}
+                        contentType="raw"
+                        middlePosition={
+                            <div data-testid="middle-positioned-element">
+                                Hello World
+                            </div>
+                        }
+                    />
+                </InputDetailsE>,
+            );
+
+            const el = screen.getByText("Hello World");
+            const segmentControlEl = el.previousSibling! as HTMLElement;
+            const contentEl = el.nextSibling! as HTMLElement;
+
+            expect(segmentControlEl).toBeDefined();
+            expect(contentEl).toBeDefined();
+            expect(getByText(segmentControlEl, "Raw")).toBeInTheDocument();
+            expect(getByText(segmentControlEl, "As Text")).toBeInTheDocument();
+            expect(getByText(segmentControlEl, "As JSON")).toBeInTheDocument();
+            expect(getByText(contentEl, queryContentAsHex)).toBeInTheDocument();
+        });
     });
 });
