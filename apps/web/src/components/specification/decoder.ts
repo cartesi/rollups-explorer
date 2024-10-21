@@ -21,6 +21,7 @@ import {
     decodeFunctionData,
     parseAbiParameters,
     slice,
+    SliceOffsetOutOfBoundsError,
 } from "viem";
 import SpecificationModeNotSupportedError from "./errors/SpecificationModeNotSupported";
 import { ABI_PARAMS, JSON_ABI, Specification, specModes } from "./types";
@@ -82,7 +83,10 @@ const addPiecesToEnvelope = (e: Envelope): Envelope => {
                     try {
                         part = slice(e.input, from, to);
                     } catch (err: any) {
-                        if (optional) {
+                        if (
+                            err instanceof SliceOffsetOutOfBoundsError &&
+                            optional
+                        ) {
                             part = "0x" as Hex;
                         } else {
                             throw err;
