@@ -70,8 +70,25 @@ const addPiecesToEnvelope = (e: Envelope): Envelope => {
         try {
             if (e.spec.sliceInstructions?.length) {
                 e.spec.sliceInstructions.forEach((instruction, index) => {
-                    const { from, to, name, type } = instruction;
-                    const part = slice(e.input, from, to);
+                    const {
+                        from,
+                        to,
+                        name,
+                        type,
+                        optional = false,
+                    } = instruction;
+                    let part;
+
+                    try {
+                        part = slice(e.input, from, to);
+                    } catch (err: any) {
+                        if (optional) {
+                            part = "0x" as Hex;
+                        } else {
+                            throw err;
+                        }
+                    }
+
                     const decodedPart =
                         !isNil(type) && !isEmpty(type)
                             ? head(decodeAbiParameters([{ type, name }], part))
