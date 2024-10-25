@@ -263,8 +263,14 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         <Box py="md">
             <InputDetails>
                 <InputDetails.InputContent
+                    rawContent={input.payload}
                     content={inputContent}
                     contentType="raw"
+                    additionalControls={
+                        inputContent !== input.payload && !error
+                            ? ["decoded"]
+                            : []
+                    }
                 >
                     <Stack gap="sm">
                         <Group>
@@ -324,6 +330,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showReports && (
                     <InputDetails.ReportContent
+                        rawContent={input.payload}
                         content={payloadOrString(reports)}
                         contentType="raw"
                         onConnect={() => showConnectionModal(appId)}
@@ -366,6 +373,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showNotices && (
                     <InputDetails.NoticeContent
+                        rawContent={input.payload}
                         content={payloadOrString(notices)}
                         contentType="raw"
                         onConnect={() => showConnectionModal(appId)}
@@ -408,8 +416,12 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showVouchers && (
                     <InputDetails.VoucherContent
+                        rawContent={input.payload}
                         content={voucherContent}
                         contentType={voucherContentType}
+                        additionalControls={
+                            voucherDecoderRes.data ? ["decoded"] : []
+                        }
                         onContentTypeChange={setVoucherContentType}
                         onConnect={() => showConnectionModal(appId)}
                         isLoading={result.fetching}

@@ -13,6 +13,7 @@ import {
 export interface InputContentType extends FC<ContentProps> {}
 
 const InputContent: InputContentType = ({
+    rawContent,
     content,
     contentType,
     onContentTypeChange,
@@ -20,6 +21,7 @@ const InputContent: InputContentType = ({
     childrenPosition,
     middlePosition,
     topPosition,
+    additionalControls,
 }) => {
     const [type, setContentType] = useState<ContentType>(contentType);
     const position = childrenPosition ?? "bottom";
@@ -32,6 +34,7 @@ const InputContent: InputContentType = ({
             <Group>
                 <ContentTypeControl
                     type={type}
+                    additionalControls={additionalControls}
                     onTypeChange={(contentType: ContentType) => {
                         setContentType(contentType);
                         isFunction(onContentTypeChange) &&
@@ -41,7 +44,11 @@ const InputContent: InputContentType = ({
             </Group>
             {position === "middle" && hasChildren && children}
             {isNotNilOrEmpty(middlePosition) && middlePosition}
-            <DisplayContent type={type} content={content} />
+            <DisplayContent
+                type={type}
+                content={content}
+                rawContent={rawContent}
+            />
             {position === "bottom" && hasChildren && children}
         </Stack>
     );

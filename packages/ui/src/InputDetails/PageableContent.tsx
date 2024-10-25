@@ -75,6 +75,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
         throw new Error("OnConnect callback not defined");
     },
     isLoading,
+    rawContent,
     content,
     contentType,
     paging,
@@ -84,6 +85,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     outputType,
     topPosition,
     middlePosition,
+    additionalControls,
 }) => {
     const theme = useMantineTheme();
     const [type, setContentType] = useState<ContentType>(contentType);
@@ -133,6 +135,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                             <Group gap={1} justify="space-between">
                                 <ContentTypeControl
                                     type={type}
+                                    additionalControls={additionalControls}
                                     onTypeChange={(contentType) => {
                                         setContentType(contentType);
                                         isFunction(onContentTypeChange) &&
@@ -173,7 +176,11 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                             </Group>
                             {position === "middle" && hasChildren && children}
                             {isNotNilOrEmpty(middlePosition) && middlePosition}
-                            <DisplayContent type={type} content={content} />
+                            <DisplayContent
+                                type={type}
+                                content={content}
+                                rawContent={rawContent}
+                            />
                         </>
                     ) : (
                         <Group justify="center" align="center">
