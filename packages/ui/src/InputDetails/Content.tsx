@@ -62,13 +62,10 @@ export const ContentTypeControl = ({
     );
 };
 
-interface DisableContentProps {
-    type?: ContentType;
-    content: string;
-}
-
-export const DisplayContent: FC<DisableContentProps> = (props) => {
-    const { content, type } = props;
+export const DisplayContent: FC<{ type?: ContentType; content: string }> = ({
+    content,
+    type,
+}) => {
     const value =
         type === "raw"
             ? content
