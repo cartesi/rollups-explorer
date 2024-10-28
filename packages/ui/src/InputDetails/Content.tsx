@@ -17,11 +17,11 @@ export interface ContentProps {
     /**default to be located at the bottom, after the textarea element.*/
     childrenPosition?: ContentChildrenPosition;
     /**
-     *  Add a React node independently above the segment control.
+     *  Add a react node independently above the segment control.
      */
     topPosition?: ReactNode;
     /**
-     * Add a React node independently between the content and the segment control.
+     * add a react node independently between the content and the segment control.
      */
     middlePosition?: ReactNode;
     additionalControls?: Omit<ContentType, RequiredContentType>[];
