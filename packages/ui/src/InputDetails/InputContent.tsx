@@ -13,7 +13,6 @@ import {
 export interface InputContentType extends FC<ContentProps> {}
 
 const InputContent: InputContentType = ({
-    rawContent,
     content,
     contentType,
     onContentTypeChange,
@@ -44,11 +43,7 @@ const InputContent: InputContentType = ({
             </Group>
             {position === "middle" && hasChildren && children}
             {isNotNilOrEmpty(middlePosition) && middlePosition}
-            <DisplayContent
-                type={type}
-                content={content}
-                rawContent={rawContent}
-            />
+            <DisplayContent type={type} content={content} />
             {position === "bottom" && hasChildren && children}
         </Stack>
     );

@@ -75,7 +75,6 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
         throw new Error("OnConnect callback not defined");
     },
     isLoading,
-    rawContent,
     content,
     contentType,
     paging,
@@ -176,11 +175,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                             </Group>
                             {position === "middle" && hasChildren && children}
                             {isNotNilOrEmpty(middlePosition) && middlePosition}
-                            <DisplayContent
-                                type={type}
-                                content={content}
-                                rawContent={rawContent}
-                            />
+                            <DisplayContent type={type} content={content} />
                         </>
                     ) : (
                         <Group justify="center" align="center">

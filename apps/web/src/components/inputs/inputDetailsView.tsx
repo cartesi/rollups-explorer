@@ -217,7 +217,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         showVouchers && vouchersForExecution.length > 0;
 
     const [
-        inputContent,
+        content,
         {
             specApplied,
             error,
@@ -253,24 +253,25 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
     const [voucherContentType, setVoucherContentType] =
         useState<ContentType>("raw");
+    const [inputContentType, setInputContentType] =
+        useState<ContentType>("raw");
 
     const voucherContent =
         voucherContentType === "raw" || voucherDecoderRes.data === null
             ? payloadOrString(vouchers)
             : voucherDecoderRes.data;
 
+    const inputContent =
+        inputContentType === "raw" || error ? input.payload : content;
+
     return (
         <Box py="md">
             <InputDetails>
                 <InputDetails.InputContent
-                    rawContent={input.payload}
                     content={inputContent}
-                    contentType="raw"
-                    additionalControls={
-                        inputContent !== input.payload && !error
-                            ? ["decoded"]
-                            : []
-                    }
+                    contentType={inputContentType}
+                    onContentTypeChange={setInputContentType}
+                    additionalControls={!error ? ["decoded"] : []}
                 >
                     <Stack gap="sm">
                         <Group>
@@ -330,7 +331,6 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showReports && (
                     <InputDetails.ReportContent
-                        rawContent={input.payload}
                         content={payloadOrString(reports)}
                         contentType="raw"
                         onConnect={() => showConnectionModal(appId)}
@@ -373,7 +373,6 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showNotices && (
                     <InputDetails.NoticeContent
-                        rawContent={input.payload}
                         content={payloadOrString(notices)}
                         contentType="raw"
                         onConnect={() => showConnectionModal(appId)}
@@ -416,7 +415,6 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
                 {showVouchers && (
                     <InputDetails.VoucherContent
-                        rawContent={input.payload}
                         content={voucherContent}
                         contentType={voucherContentType}
                         additionalControls={

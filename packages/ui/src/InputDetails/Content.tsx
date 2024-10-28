@@ -4,11 +4,12 @@ import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { hexToString, isHex } from "viem";
 
-export type ContentType = "raw" | "text" | "json" | "decoded";
+export type RequiredContentType = "raw" | "text" | "json";
+
+export type ContentType = RequiredContentType | "decoded";
 
 export type ContentChildrenPosition = "top" | "middle" | "bottom";
 export interface ContentProps {
-    rawContent: string;
     content: string;
     contentType: ContentType;
     onContentTypeChange?: (contentType: ContentType) => void;
@@ -16,18 +17,18 @@ export interface ContentProps {
     /**default to be located at the bottom, after the textarea element.*/
     childrenPosition?: ContentChildrenPosition;
     /**
-     *  Add a react node independently above the segment control.
+     *  Add a React node independently above the segment control.
      */
     topPosition?: ReactNode;
     /**
-     * add a react node independently between the content and the segment control.
+     * Add a React node independently between the content and the segment control.
      */
     middlePosition?: ReactNode;
-    additionalControls?: ContentType[];
+    additionalControls?: Omit<ContentType, RequiredContentType>[];
 }
 interface ContentTypeGroupedButtons {
     type: ContentType;
-    additionalControls?: ContentType[];
+    additionalControls?: ContentProps["additionalControls"];
     onTypeChange: (v: ContentType) => void;
 }
 
@@ -64,11 +65,10 @@ export const ContentTypeControl = ({
 interface DisableContentProps {
     type?: ContentType;
     content: string;
-    rawContent: string;
 }
 
 export const DisplayContent: FC<DisableContentProps> = (props) => {
-    const { content, type, rawContent } = props;
+    const { content, type } = props;
     const value =
         type === "raw"
             ? content
@@ -99,7 +99,7 @@ export const DisplayContent: FC<DisableContentProps> = (props) => {
                 <Textarea
                     key={`${type}-${value}`}
                     rows={10}
-                    value={type === "raw" ? rawContent : value}
+                    value={value}
                     readOnly
                     placeholder="No content defined"
                 />
