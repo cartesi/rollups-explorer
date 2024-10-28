@@ -83,27 +83,26 @@ export const DisplayContent: FC<DisableContentProps> = (props) => {
         }
     });
 
+    if (type === "raw" || type === "text")
+        return (
+            <Textarea
+                key={`${type}-${value}`}
+                rows={10}
+                value={value}
+                readOnly
+                placeholder="No content defined"
+            />
+        );
+
     return (
-        <>
-            {type === "json" ? (
-                <JsonInput
-                    key={`${type}-${value}`}
-                    autoFocus
-                    ref={ref}
-                    rows={10}
-                    defaultValue={value}
-                    placeholder="No content defined"
-                    formatOnBlur
-                />
-            ) : (
-                <Textarea
-                    key={`${type}-${value}`}
-                    rows={10}
-                    value={value}
-                    readOnly
-                    placeholder="No content defined"
-                />
-            )}
-        </>
+        <JsonInput
+            key={`${type}-${value}`}
+            autoFocus
+            ref={ref}
+            rows={10}
+            defaultValue={value}
+            placeholder="No content defined"
+            formatOnBlur
+        />
     );
 };
