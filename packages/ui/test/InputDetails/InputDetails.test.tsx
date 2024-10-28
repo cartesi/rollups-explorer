@@ -13,12 +13,14 @@ import {
 } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
+    ContentType,
     InputContent,
     InputDetails,
     NoticeContent,
     ReportContent,
     VoucherContent,
 } from "../../src/InputDetails/index";
+import { ContentTypeControl } from "../../src/InputDetails/Content";
 import withMantineTheme from "../utils/WithMantineTheme";
 import { jsonWithdraw0, queryContentAsHex, reportText } from "./mocks";
 
@@ -596,6 +598,39 @@ describe("Rollups InputDetails", () => {
             expect(getByText(segmentControlEl, "As Text")).toBeInTheDocument();
             expect(getByText(segmentControlEl, "As JSON")).toBeInTheDocument();
             expect(getByText(contentEl, queryContentAsHex)).toBeInTheDocument();
+        });
+    });
+
+    describe("ContentTypeControl component", () => {
+        const defaultProps = {
+            type: "hex" as ContentType,
+            additionalControls: [],
+            onTypeChange: () => undefined,
+        };
+
+        const ContentTypeControlComponent =
+            withMantineTheme(ContentTypeControl);
+
+        it("should render additional options when some are available", () => {
+            render(
+                <ContentTypeControlComponent
+                    {...defaultProps}
+                    additionalControls={["decoded"]}
+                />,
+            );
+            expect(screen.getByText("Decoded")).toBeInTheDocument();
+        });
+
+        it("should not render additional options when none are available", () => {
+            render(
+                <ContentTypeControlComponent
+                    {...defaultProps}
+                    additionalControls={[]}
+                />,
+            );
+            expect(() => screen.getByText("Decoded")).toThrow(
+                "Unable to find an element",
+            );
         });
     });
 });

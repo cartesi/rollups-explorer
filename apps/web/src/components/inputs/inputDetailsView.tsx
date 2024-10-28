@@ -21,7 +21,7 @@ import { useBlockExplorerData } from "../BlockExplorerLink";
 import AddressEl from "../address";
 import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
 import { findSpecificationFor } from "../specification/conditionals";
-import { Envelope, decodePayload } from "../specification/decoder";
+import { decodePayload, Envelope } from "../specification/decoder";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import { useSystemSpecifications } from "../specification/hooks/useSystemSpecifications";
 import useVoucherDecoder from "../specification/hooks/useVoucherDecoder";

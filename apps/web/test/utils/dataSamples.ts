@@ -1,4 +1,5 @@
 import { VoucherEdge } from "../../src/graphql/rollups/types";
+import { InputItemFragment } from "../../src/graphql/explorer/operations";
 
 export const chainId = "11155111";
 /**
@@ -167,4 +168,21 @@ export const inputSample = {
     chain: {
         id: chainId,
     },
+};
+
+export const inputSampleEtherDeposit: InputItemFragment = {
+    id: "11155111-0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e-132",
+    application: {
+        id: "11155111-0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e",
+        address: "0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e",
+    },
+    chain: { id: "11155111" },
+    index: 132,
+    payload:
+        "0xcc42e700ae461bdf5b560e781110a965a8d4393500000000000000000000000000000000000000000000000000000000000000004465706f7369746564202830292065746865722e",
+    msgSender: "0xffdbe43d4c855bf7e0f105c400a50857f53ab044",
+    timestamp: "1729726392",
+    transactionHash:
+        "0x426a89ff66e1bbbd22947ad43e2efe54c68b842d59dd041c28a0497ac7ba96b8",
+    erc20Deposit: null,
 };
