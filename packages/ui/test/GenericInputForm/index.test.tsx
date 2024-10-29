@@ -52,6 +52,7 @@ vi.mock("viem", async () => {
     return {
         ...(actual as any),
         getAddress: (address: string) => address,
+        encodeFunctionData: vi.fn(),
     };
 });
 
