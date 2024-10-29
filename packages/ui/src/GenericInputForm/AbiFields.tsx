@@ -140,6 +140,15 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
 
             <AbiFunctionName />
             <AbiFunctionParams />
+
+            <Textarea
+                label="Hex value"
+                description="Encoded hex value for the application"
+                readOnly
+                value={
+                    form.isValid() ? form.getInputProps("rawInput").value : "0x"
+                }
+            />
         </>
     );
 };
