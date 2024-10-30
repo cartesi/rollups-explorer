@@ -5,6 +5,7 @@ import {
     getByText,
     render,
     screen,
+    waitFor,
 } from "@testing-library/react";
 import { useQuery } from "urql";
 import { Address } from "viem";
@@ -19,6 +20,7 @@ import {
     inputDetailsSample,
     inputDetailsSampleForPaging,
     inputSample,
+    inputSampleEtherDeposit,
 } from "../../utils/dataSamples";
 import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
@@ -359,6 +361,21 @@ describe("Input details view component", () => {
             fireEvent.click(getByText(panel, "Previous content"));
 
             expect(reExecQuery).toHaveBeenCalledTimes(3);
+        });
+
+        it("should not display additional controls for input when decoded value doesn't exist", () => {
+            render(<View input={inputSample} />);
+            expect(() => screen.getByText("Decoded")).toThrow(
+                "Unable to find an element",
+            );
+        });
+
+        it("should display additional controls for input when decoded value exist", async () => {
+            render(<View input={inputSampleEtherDeposit} />);
+
+            await waitFor(() =>
+                expect(screen.getByText("Decoded")).toBeInTheDocument(),
+            );
         });
     });
 });

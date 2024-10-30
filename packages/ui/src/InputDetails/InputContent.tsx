@@ -20,6 +20,7 @@ const InputContent: InputContentType = ({
     childrenPosition,
     middlePosition,
     topPosition,
+    additionalControls,
 }) => {
     const [type, setContentType] = useState<ContentType>(contentType);
     const position = childrenPosition ?? "bottom";
@@ -32,6 +33,7 @@ const InputContent: InputContentType = ({
             <Group>
                 <ContentTypeControl
                     type={type}
+                    additionalControls={additionalControls}
                     onTypeChange={(contentType: ContentType) => {
                         setContentType(contentType);
                         isFunction(onContentTypeChange) &&

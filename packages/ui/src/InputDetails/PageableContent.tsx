@@ -84,6 +84,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
     outputType,
     topPosition,
     middlePosition,
+    additionalControls,
 }) => {
     const theme = useMantineTheme();
     const [type, setContentType] = useState<ContentType>(contentType);
@@ -133,6 +134,7 @@ export const PageableContent: FunctionComponent<PageableContentProps> = ({
                             <Group gap={1} justify="space-between">
                                 <ContentTypeControl
                                     type={type}
+                                    additionalControls={additionalControls}
                                     onTypeChange={(contentType) => {
                                         setContentType(contentType);
                                         isFunction(onContentTypeChange) &&

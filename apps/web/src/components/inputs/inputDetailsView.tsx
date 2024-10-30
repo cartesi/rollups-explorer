@@ -21,7 +21,7 @@ import { useBlockExplorerData } from "../BlockExplorerLink";
 import AddressEl from "../address";
 import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
 import { findSpecificationFor } from "../specification/conditionals";
-import { Envelope, decodePayload } from "../specification/decoder";
+import { decodePayload, Envelope } from "../specification/decoder";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import { useSystemSpecifications } from "../specification/hooks/useSystemSpecifications";
 import useVoucherDecoder from "../specification/hooks/useVoucherDecoder";
@@ -217,7 +217,7 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
         showVouchers && vouchersForExecution.length > 0;
 
     const [
-        inputContent,
+        content,
         {
             specApplied,
             error,
@@ -253,18 +253,25 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
 
     const [voucherContentType, setVoucherContentType] =
         useState<ContentType>("raw");
+    const [inputContentType, setInputContentType] =
+        useState<ContentType>("raw");
 
     const voucherContent =
         voucherContentType === "raw" || voucherDecoderRes.data === null
             ? payloadOrString(vouchers)
             : voucherDecoderRes.data;
 
+    const inputContent =
+        inputContentType === "raw" || error ? input.payload : content;
+
     return (
         <Box py="md">
             <InputDetails>
                 <InputDetails.InputContent
                     content={inputContent}
-                    contentType="raw"
+                    contentType={inputContentType}
+                    onContentTypeChange={setInputContentType}
+                    additionalControls={!error ? ["decoded"] : []}
                 >
                     <Stack gap="sm">
                         <Group>
@@ -410,6 +417,9 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                     <InputDetails.VoucherContent
                         content={voucherContent}
                         contentType={voucherContentType}
+                        additionalControls={
+                            voucherDecoderRes.data ? ["decoded"] : []
+                        }
                         onContentTypeChange={setVoucherContentType}
                         onConnect={() => showConnectionModal(appId)}
                         isLoading={result.fetching}

@@ -4,7 +4,9 @@ import { JsonInput, SegmentedControl, Textarea } from "@mantine/core";
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { hexToString, isHex } from "viem";
 
-export type ContentType = "raw" | "text" | "json";
+export type RequiredContentType = "raw" | "text" | "json";
+
+export type ContentType = RequiredContentType | "decoded";
 
 export type ContentChildrenPosition = "top" | "middle" | "bottom";
 export interface ContentProps {
@@ -22,29 +24,40 @@ export interface ContentProps {
      * add a react node independently between the content and the segment control.
      */
     middlePosition?: ReactNode;
+    additionalControls?: Omit<ContentType, RequiredContentType>[];
 }
 interface ContentTypeGroupedButtons {
     type: ContentType;
+    additionalControls?: ContentProps["additionalControls"];
     onTypeChange: (v: ContentType) => void;
 }
 
-type SegmentControlData = { label: string; value: ContentType };
+type SegmentControlData = {
+    label: string;
+    value: ContentType;
+    required: boolean;
+};
 
 const segmentControlData: SegmentControlData[] = [
-    { label: "Raw", value: "raw" },
-    { label: "As Text", value: "text" },
-    { label: "As JSON", value: "json" },
+    { label: "Raw", value: "raw", required: true },
+    { label: "As Text", value: "text", required: true },
+    { label: "As JSON", value: "json", required: true },
+    { label: "Decoded", value: "decoded", required: false },
 ];
 
 export const ContentTypeControl = ({
     type,
+    additionalControls = [],
     onTypeChange,
 }: ContentTypeGroupedButtons) => {
+    const data = segmentControlData.filter(
+        (item) => item.required || additionalControls.includes(item.value),
+    );
     return (
         <SegmentedControl
             value={type}
             onChange={(v: string) => onTypeChange(v as ContentType)}
-            data={segmentControlData}
+            data={data}
         />
     );
 };
