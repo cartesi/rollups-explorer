@@ -4,6 +4,8 @@ import { AbiFunction } from "viem";
 import { useCallback } from "react";
 import { FunctionSignature } from "./FunctionSignature";
 import { TbAlertCircle } from "react-icons/tb";
+import { generateInitialValues } from "./utils";
+import { AbiInputParam } from "./types";
 
 export const AbiFunctionName = () => {
     const form = useFormContext();
@@ -27,12 +29,10 @@ export const AbiFunctionName = () => {
             ).find((abiFunction) => abiFunction.name === abiFunctionName);
 
             if (nextAbiFunction) {
-                const emptyFunctionParams = nextAbiFunction.inputs.map(
-                    (input) => ({
-                        ...input,
-                        value: "",
-                    }),
-                );
+                const emptyFunctionParams: AbiInputParam[] = [];
+                (nextAbiFunction.inputs as AbiInputParam[]).forEach((input) => {
+                    generateInitialValues(input, emptyFunctionParams);
+                });
 
                 form.setFieldValue("abiFunctionParams", emptyFunctionParams);
             }

@@ -1,5 +1,5 @@
-import { AbiFunction, getAddress, parseAbi, parseAbiParameters } from "viem";
-import { AbiValueParameter, FormSpecification } from "./types";
+import { getAddress, parseAbi, parseAbiParameters } from "viem";
+import { AbiInputParam, AbiValueParameter, FormSpecification } from "./types";
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 
@@ -68,7 +68,24 @@ export const generateAbiParamFormSpecification = (abiParam: string) => {
         : undefined;
 };
 
-export const getFunctionSignature = (abiFunction: AbiFunction) => {
-    const params = abiFunction.inputs.map((input) => input.type);
-    return `${abiFunction.name}(${params.join(", ")})`;
+export const generateInitialValues = (
+    parentInput: AbiInputParam,
+    flatInputs: AbiInputParam[],
+) => {
+    parentInput.components.forEach((input: AbiInputParam) => {
+        if (input.type === "tuple") {
+            generateInitialValues(input, flatInputs);
+        } else {
+            const flatInput: AbiInputParam = {
+                ...input,
+                value: "",
+            };
+
+            if (parentInput.type === "tuple") {
+                flatInput.tupleName = parentInput.name;
+            }
+
+            flatInputs.push(flatInput);
+        }
+    });
 };

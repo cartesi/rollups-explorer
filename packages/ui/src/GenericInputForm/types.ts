@@ -16,6 +16,11 @@ export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
     value: string;
 };
 
+export type AbiInputParam = AbiValueParameter & {
+    tupleName?: string;
+    components: AbiInputParam[];
+};
+
 export interface FormValues {
     mode: FormMode;
     application: string;
