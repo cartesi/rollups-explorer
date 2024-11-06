@@ -1,6 +1,7 @@
 import { AbiFunction, AbiParameter } from "viem";
 import { FC, Fragment } from "react";
 import { Box, Text } from "@mantine/core";
+import { AbiInputParam } from "./types";
 
 interface FunctionParamLabelProps {
     input: AbiParameter;
@@ -16,6 +17,22 @@ export const FunctionParamLabel: FC<FunctionParamLabelProps> = ({ input }) => {
                 {input.name}
             </Text>
         </Box>
+    );
+};
+
+interface InputLabelProps {
+    input: AbiParameter | AbiInputParam;
+}
+
+export const InputLabel: FC<InputLabelProps> = ({ input }) => {
+    return (
+        <>
+            {input.name && input.type ? (
+                <FunctionParamLabel input={input} />
+            ) : (
+                input.name || input.type
+            )}
+        </>
     );
 };
 

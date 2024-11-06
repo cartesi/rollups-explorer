@@ -1,7 +1,7 @@
 import { useFormContext } from "./context";
 import { Alert, Stack, Text, TextInput } from "@mantine/core";
 import { TbAlertCircle } from "react-icons/tb";
-import { FunctionParamLabel } from "./FunctionSignature";
+import { FunctionParamLabel, InputLabel } from "./FunctionSignature";
 import { Fragment } from "react";
 import { TupleComponents } from "./TupleComponents";
 import { AbiInputParam } from "./types";
@@ -25,15 +25,7 @@ export const AbiFunctionParams = () => {
                                     ) : (
                                         <TextInput
                                             key={`${input.name}-${input.type}`}
-                                            label={
-                                                input.name && input.type ? (
-                                                    <FunctionParamLabel
-                                                        input={input}
-                                                    />
-                                                ) : (
-                                                    input.name || input.type
-                                                )
-                                            }
+                                            label={<InputLabel input={input} />}
                                             placeholder={`Enter ${input.type} value`}
                                             withAsterisk
                                             {...form.getInputProps(

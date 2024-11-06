@@ -1,5 +1,5 @@
 import React, { FC, Fragment } from "react";
-import { FunctionParamLabel } from "./FunctionSignature";
+import { InputLabel } from "./FunctionSignature";
 import { Fieldset, FieldsetProps, TextInput } from "@mantine/core";
 import { useFormContext } from "./context";
 import { AbiInputParam } from "./types";
@@ -21,16 +21,7 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
     );
 
     return (
-        <Fieldset
-            {...restProps}
-            legend={
-                input.name && input.type ? (
-                    <FunctionParamLabel input={input} />
-                ) : (
-                    input.name || input.type
-                )
-            }
-        >
+        <Fieldset {...restProps} legend={<InputLabel input={input} />}>
             {input.components.map((component, componentIndex) => {
                 const isFirstStandardInput =
                     componentIndex === firstStandardInputIndex;
@@ -50,13 +41,7 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                         ) : (
                             <TextInput
                                 key={`${component.name}-${component.type}`}
-                                label={
-                                    component.name && component.type ? (
-                                        <FunctionParamLabel input={component} />
-                                    ) : (
-                                        component.name || component.type
-                                    )
-                                }
+                                label={<InputLabel input={component} />}
                                 placeholder={`Enter ${component.type} value`}
                                 mt={isFirstStandardInput ? 0 : 16}
                                 withAsterisk
