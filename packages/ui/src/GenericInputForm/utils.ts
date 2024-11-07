@@ -1,27 +1,30 @@
-import { getAddress, parseAbi, parseAbiParameters } from "viem";
-import { AbiInputParam, AbiValueParameter, FormSpecification } from "./types";
+import { AbiParameter, getAddress, parseAbi, parseAbiParameters } from "viem";
+import {
+    AbiInputParam,
+    AbiValueParameter,
+    FormSpecification,
+    FinalValues,
+} from "./types";
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 
-export const encodeFunctionParams = (params: AbiValueParameter[]) => {
-    return params.map((param) => {
-        switch (param.type) {
-            case "bool":
-                return param.value === "true";
-            case "address":
-                return getAddress(param.value);
-            case "uint":
-            case "uint8":
-            case "uint16":
-            case "uint32":
-            case "uint64":
-            case "uint128":
-            case "uint256":
-                return BigInt(param.value);
-            default:
-                return param.value;
-        }
-    });
+export const encodeFunctionParam = (param: AbiValueParameter) => {
+    switch (param.type) {
+        case "bool":
+            return param.value === "true";
+        case "address":
+            return getAddress(param.value);
+        case "uint":
+        case "uint8":
+        case "uint16":
+        case "uint32":
+        case "uint64":
+        case "uint128":
+        case "uint256":
+            return BigInt(param.value);
+        default:
+            return param.value;
+    }
 };
 
 export const generateHumanAbiFormSpecification = (humanAbi: string) => {
@@ -86,6 +89,60 @@ export const generateInitialValues = (
             }
 
             flatInputs.push(flatInput);
+        }
+    });
+};
+
+export const generateFinalValues = (
+    inputs: AbiParameter[],
+    params: AbiValueParameter[],
+) => {
+    const finalArr: FinalValues = [];
+
+    inputs.forEach((input) => {
+        if (input.type === "tuple") {
+            const currArr: FinalValues = [];
+            finalArr.push(currArr);
+
+            generateInputValues(
+                input as AbiInputParam,
+                params,
+                finalArr,
+                currArr,
+            );
+        } else {
+            const param = params.find((p) => {
+                return p.name === input.name && p.type === input.type;
+            }) as AbiValueParameter;
+            const value = encodeFunctionParam(param);
+            finalArr.push(value);
+        }
+    });
+
+    return finalArr;
+};
+
+const generateInputValues = (
+    tupleInput: AbiInputParam,
+    params: AbiValueParameter[],
+    finalArr: FinalValues = [],
+    currentArr: FinalValues = [],
+) => {
+    tupleInput.components.forEach((input) => {
+        if (input.type === "tuple") {
+            const nextCurrentArr: FinalValues = [];
+            currentArr.push(nextCurrentArr);
+            generateInputValues(input, params, finalArr, nextCurrentArr);
+        } else {
+            const param = params.find((p) => {
+                return (
+                    p.tupleName === tupleInput.name &&
+                    p.name === input.name &&
+                    p.type === input.type
+                );
+            }) as AbiValueParameter;
+            const value = encodeFunctionParam(param);
+            currentArr.push(value);
         }
     });
 };

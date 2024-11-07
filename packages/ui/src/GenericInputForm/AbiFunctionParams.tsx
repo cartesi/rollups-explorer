@@ -1,7 +1,7 @@
 import { useFormContext } from "./context";
 import { Alert, Stack, Text, TextInput } from "@mantine/core";
 import { TbAlertCircle } from "react-icons/tb";
-import { FunctionParamLabel, InputLabel } from "./FunctionSignature";
+import { InputLabel } from "./FunctionSignature";
 import { Fragment } from "react";
 import { TupleComponents } from "./TupleComponents";
 import { AbiInputParam } from "./types";

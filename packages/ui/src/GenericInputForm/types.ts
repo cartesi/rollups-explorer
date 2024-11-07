@@ -14,6 +14,7 @@ export type FormAbiMethod = "new" | "existing";
 
 export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
     value: string;
+    tupleName?: string;
 };
 
 export type AbiInputParam = AbiValueParameter & {
@@ -49,3 +50,5 @@ export interface FormTransformedValues {
     abiFunction: AbiFunction | undefined;
     selectedSpecification: FormSpecification | undefined;
 }
+
+export type FinalValues = (string | bigint | boolean | FinalValues)[];

@@ -32,7 +32,7 @@ import { AbiValueParameter, FormMode, FormSpecification } from "./types";
 import { FormProvider } from "./context";
 import { useGenericInputForm } from "./useGenericInputForm";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { encodeFunctionParams } from "./utils";
+import { generateFinalValues } from "./utils";
 
 export interface GenericInputFormSpecification {
     id: string;
@@ -92,19 +92,30 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
 
     const encodeFunctionParamsDebounced = useDebouncedCallback(
         (params: AbiValueParameter[]) => {
-            // Encode the function params
-            const values = encodeFunctionParams(params);
+            const nextAbiFunction = (
+                selectedSpecification?.abi as AbiFunction[]
+            )?.[0];
 
-            if (specificationMode === "json_abi") {
-                const payload = encodeFunctionData({
-                    abi: (selectedSpecification as FormSpecification)?.abi,
-                    functionName: (abiFunction as AbiFunction)?.name,
-                    args: values,
-                });
-                form.setFieldValue("rawInput", payload);
-            } else if (specificationMode === "abi_params") {
-                const payload = encodeAbiParameters(params, values);
-                form.setFieldValue("rawInput", payload);
+            if (nextAbiFunction) {
+                const finalValues = generateFinalValues(
+                    nextAbiFunction.inputs.slice(),
+                    params,
+                );
+
+                if (specificationMode === "json_abi") {
+                    const payload = encodeFunctionData({
+                        abi: (selectedSpecification as FormSpecification)?.abi,
+                        functionName: (abiFunction as AbiFunction)?.name,
+                        args: finalValues,
+                    });
+                    form.setFieldValue("rawInput", payload);
+                } else if (specificationMode === "abi_params") {
+                    const payload = encodeAbiParameters(
+                        nextAbiFunction.inputs,
+                        finalValues,
+                    );
+                    form.setFieldValue("rawInput", payload);
+                }
             }
         },
         400,
