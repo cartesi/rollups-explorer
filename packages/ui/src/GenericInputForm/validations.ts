@@ -15,7 +15,9 @@ export const validateAbiMethod = (value: string, values: FormValues) =>
         : "Invalid ABI method";
 
 export const validateSpecificationId = (value: string, values: FormValues) =>
-    values.mode !== "abi" || values.abiMethod === "new" || value !== ""
+    values.mode !== "abi" ||
+    (values.abiMethod === "new" && values.specificationMode === "json_abi") ||
+    value !== ""
         ? null
         : "Invalid specification";
 

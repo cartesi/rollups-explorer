@@ -14,6 +14,10 @@ export const AbiParameter = () => {
         const selectedSpecification =
             generateAbiParamFormSpecification(abiParam);
 
+        if (selectedSpecification) {
+            form.setFieldValue("specificationId", selectedSpecification.id);
+        }
+
         const nextAbiFunction = (
             selectedSpecification?.abi as AbiFunction[]
         )[0];
