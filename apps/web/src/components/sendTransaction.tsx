@@ -37,7 +37,7 @@ interface DepositProps {
 const DEBOUNCE_TIME = 400 as const;
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "input",
+    initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
