@@ -47,6 +47,7 @@ export interface FormTransformedValues {
     abiParam: string;
     savedAbiParam: string;
     specificationId: string;
+    abiFunctionName: string;
     abiFunction: AbiFunction | undefined;
     selectedSpecification: FormSpecification | undefined;
 }

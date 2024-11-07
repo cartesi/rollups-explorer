@@ -75,22 +75,29 @@ export const generateInitialValues = (
     parentInput: AbiInputParam,
     flatInputs: AbiInputParam[],
 ) => {
-    parentInput.components.forEach((input: AbiInputParam) => {
-        if (input.type === "tuple") {
-            generateInitialValues(input, flatInputs);
-        } else {
-            const flatInput: AbiInputParam = {
-                ...input,
-                value: "",
-            };
+    if (parentInput.components) {
+        parentInput.components.forEach((input: AbiInputParam) => {
+            if (input.type === "tuple") {
+                generateInitialValues(input, flatInputs);
+            } else {
+                const flatInput: AbiInputParam = {
+                    ...input,
+                    value: "",
+                };
 
-            if (parentInput.type === "tuple") {
-                flatInput.tupleName = parentInput.name;
+                if (parentInput.type === "tuple") {
+                    flatInput.tupleName = parentInput.name;
+                }
+
+                flatInputs.push(flatInput);
             }
-
-            flatInputs.push(flatInput);
-        }
-    });
+        });
+    } else {
+        flatInputs.push({
+            ...parentInput,
+            value: "",
+        });
+    }
 };
 
 export const generateFinalValues = (
@@ -104,12 +111,7 @@ export const generateFinalValues = (
             const currArr: FinalValues = [];
             finalArr.push(currArr);
 
-            generateInputValues(
-                input as AbiInputParam,
-                params,
-                finalArr,
-                currArr,
-            );
+            getTupleValues(input as AbiInputParam, params, finalArr, currArr);
         } else {
             const param = params.find((p) => {
                 return p.name === input.name && p.type === input.type;
@@ -122,7 +124,7 @@ export const generateFinalValues = (
     return finalArr;
 };
 
-const generateInputValues = (
+const getTupleValues = (
     tupleInput: AbiInputParam,
     params: AbiValueParameter[],
     finalArr: FinalValues = [],
@@ -132,7 +134,7 @@ const generateInputValues = (
         if (input.type === "tuple") {
             const nextCurrentArr: FinalValues = [];
             currentArr.push(nextCurrentArr);
-            generateInputValues(input, params, finalArr, nextCurrentArr);
+            getTupleValues(input, params, finalArr, nextCurrentArr);
         } else {
             const param = params.find((p) => {
                 return (

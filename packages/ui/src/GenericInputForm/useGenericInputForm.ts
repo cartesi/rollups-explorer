@@ -55,6 +55,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                 abiParam: values.abiParam,
                 savedAbiParam: values.savedAbiParam,
                 specificationId: values.specificationId,
+                abiFunctionName: values.abiFunctionName,
                 selectedSpecification,
                 abiFunction: (
                     (selectedSpecification?.abi as AbiFunction[]) ?? []

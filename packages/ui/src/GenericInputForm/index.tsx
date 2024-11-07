@@ -64,6 +64,7 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
         abiFunction,
         selectedSpecification,
         specificationMode,
+        abiFunctionName,
     } = form.getTransformedValues();
     const prepare = useSimulateInputBoxAddInput({
         args: [address, rawInput],
@@ -92,9 +93,11 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
 
     const encodeFunctionParamsDebounced = useDebouncedCallback(
         (params: AbiValueParameter[]) => {
-            const nextAbiFunction = (
-                selectedSpecification?.abi as AbiFunction[]
-            )?.[0];
+            const abiFunctions =
+                (selectedSpecification?.abi as AbiFunction[]) ?? [];
+            const nextAbiFunction = abiFunctions.find(
+                (f) => f.name === abiFunctionName,
+            );
 
             if (nextAbiFunction) {
                 const finalValues = generateFinalValues(
