@@ -2,7 +2,11 @@ import { useFormContext } from "./context";
 import { Button, TextInput } from "@mantine/core";
 import { useCallback } from "react";
 import { AbiFunction } from "viem";
-import { generateAbiParamFormSpecification } from "./utils";
+import {
+    generateAbiParamFormSpecification,
+    generateInitialValues,
+} from "./utils";
+import { AbiInputParam } from "./types";
 
 export const AbiParameter = () => {
     const form = useFormContext();
@@ -23,10 +27,10 @@ export const AbiParameter = () => {
         )[0];
 
         if (nextAbiFunction) {
-            const emptyFunctionParams = nextAbiFunction.inputs.map((input) => ({
-                ...input,
-                value: "",
-            }));
+            const emptyFunctionParams: AbiInputParam[] = [];
+            (nextAbiFunction.inputs as AbiInputParam[]).forEach((input) => {
+                generateInitialValues(input, emptyFunctionParams);
+            });
 
             form.setFieldValue("abiFunctionParams", emptyFunctionParams);
         }
