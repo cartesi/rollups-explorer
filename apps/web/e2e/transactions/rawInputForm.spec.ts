@@ -21,9 +21,7 @@ test.describe.serial("Raw Input deposit form", () => {
         await connectButton.click();
         const metamaskButton = page.getByText("Metamask");
         await metamaskButton.click();
-        await metamask.acceptAccess({
-            switchNetwork: true,
-        });
+        await metamask.acceptAccess();
         const sendTransactionButton = page.getByTestId("transaction-button");
         await sendTransactionButton.click();
 
