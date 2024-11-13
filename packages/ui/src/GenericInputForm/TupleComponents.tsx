@@ -37,7 +37,15 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                         key={`${input.name}-${input.type}-${component.name}-${component.type}`}
                     >
                         {component.type === "tuple" ? (
-                            <TupleComponents input={component} mt={16} />
+                            <TupleComponents
+                                input={component}
+                                mt={componentIndex > 0 ? 16 : 0}
+                                mb={
+                                    input.components[componentIndex + 1]
+                                        ? 16
+                                        : 0
+                                }
+                            />
                         ) : (
                             <TextInput
                                 key={`${component.name}-${component.type}`}
