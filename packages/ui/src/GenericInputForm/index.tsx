@@ -85,8 +85,10 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
 
     const onChangeFormMode = useCallback(
         (mode: string | null) => {
+            const application = form.getInputProps("application");
             form.reset();
             form.setFieldValue("mode", mode as FormMode);
+            form.setFieldValue("application", application.value);
         },
         [form],
     );
