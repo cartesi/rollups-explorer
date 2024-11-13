@@ -7,6 +7,7 @@ import {
     generateInitialValues,
 } from "./utils";
 import { AbiInputParam } from "./types";
+import { isArray } from "ramda-adjunct";
 
 export const AbiParameter = () => {
     const form = useFormContext();
@@ -31,6 +32,18 @@ export const AbiParameter = () => {
             (nextAbiFunction.inputs as AbiInputParam[]).forEach((input) => {
                 generateInitialValues(input, emptyFunctionParams);
             });
+
+            const prevAbiFunctionParams =
+                form.getInputProps("abiFunctionParams");
+
+            if (isArray(prevAbiFunctionParams.value)) {
+                prevAbiFunctionParams.value.forEach((_, index) => {
+                    form.setFieldError(
+                        `abiFunctionParams.${index}.value`,
+                        null,
+                    );
+                });
+            }
 
             form.setFieldValue("abiFunctionParams", emptyFunctionParams);
         }
