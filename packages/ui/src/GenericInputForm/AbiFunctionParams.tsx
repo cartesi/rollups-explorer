@@ -5,6 +5,7 @@ import { InputLabel } from "./FunctionSignature";
 import { Fragment } from "react";
 import { TupleComponents } from "./TupleComponents";
 import { AbiInputParam } from "./types";
+import { getInputIndexOffset } from "./utils";
 
 export const AbiFunctionParams = () => {
     const form = useFormContext();
@@ -16,25 +17,38 @@ export const AbiFunctionParams = () => {
                 <Stack>
                     {abiFunction.inputs.length > 0 ? (
                         <>
-                            {abiFunction.inputs.map((input, index) => (
-                                <Fragment key={`${input.name}-${input.type}`}>
-                                    {input.type === "tuple" ? (
-                                        <TupleComponents
-                                            input={input as AbiInputParam}
-                                        />
-                                    ) : (
-                                        <TextInput
-                                            key={`${input.name}-${input.type}`}
-                                            label={<InputLabel input={input} />}
-                                            placeholder={`Enter ${input.type} value`}
-                                            withAsterisk
-                                            {...form.getInputProps(
-                                                `abiFunctionParams.${index}.value`,
-                                            )}
-                                        />
-                                    )}
-                                </Fragment>
-                            ))}
+                            {abiFunction.inputs.map((input, index) => {
+                                const prevInputs = abiFunction.inputs.slice(
+                                    0,
+                                    index,
+                                ) as AbiInputParam[];
+                                const indexOffset =
+                                    getInputIndexOffset(prevInputs);
+
+                                return (
+                                    <Fragment
+                                        key={`${input.name}-${input.type}`}
+                                    >
+                                        {input.type === "tuple" ? (
+                                            <TupleComponents
+                                                input={input as AbiInputParam}
+                                            />
+                                        ) : (
+                                            <TextInput
+                                                key={`${input.name}-${input.type}`}
+                                                label={
+                                                    <InputLabel input={input} />
+                                                }
+                                                placeholder={`Enter ${input.type} value`}
+                                                withAsterisk
+                                                {...form.getInputProps(
+                                                    `abiFunctionParams.${indexOffset}.value`,
+                                                )}
+                                            />
+                                        )}
+                                    </Fragment>
+                                );
+                            })}
                         </>
                     ) : (
                         <Alert

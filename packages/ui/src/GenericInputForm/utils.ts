@@ -148,3 +148,30 @@ const getTupleValues = (
         }
     });
 };
+
+const getTupleInputs = (
+    tupleInput: AbiInputParam,
+    finalArr: AbiParameter[],
+) => {
+    tupleInput.components.forEach((input) => {
+        if (input.type === "tuple") {
+            getTupleInputs(input, finalArr);
+        } else {
+            finalArr.push(input);
+        }
+    });
+};
+
+export const getInputIndexOffset = (inputs: AbiInputParam[]) => {
+    const nestedInputs: AbiParameter[] = [];
+
+    inputs.forEach((input) => {
+        if (input.type === "tuple") {
+            getTupleInputs(input, nestedInputs);
+        } else {
+            nestedInputs.push(input);
+        }
+    });
+
+    return nestedInputs.length;
+};
