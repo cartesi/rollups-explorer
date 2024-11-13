@@ -30,6 +30,7 @@
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.2.0",
+        "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0-rc.10",
         "@cartesi/tsconfig": "*",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.3",
         "@types/react": "^18",
@@ -39,6 +40,7 @@
         "eslint-config-cartesi": "*",
         "react": "^18",
         "tsup": "^7",
+        "tsx": "^4.19.2",
         "typescript": "^5"
     },
     "publishConfig": {
