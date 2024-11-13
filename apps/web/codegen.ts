@@ -3,11 +3,14 @@ import type { Types } from "@graphql-codegen/plugin-helpers";
 import { join, sep } from "path";
 
 const basePath = join("src", "graphql");
+const rollupsBasePath = join("graphql", "rollups");
 // FIXUP: to be replaced with new deployed API.
 const explorerSchema = "https://api.cartesiscan.io/graphql";
 const explorerAPIQueries = join(".", "graphql", "queries.graphql");
-const rollupsSchema = join(".", "graphql", "rollups", "schema.graphql");
-const rollupsDocuments = join(".", "graphql", "rollups", "queries.graphql");
+const rollupsSchema = join(".", rollupsBasePath, "schema.graphql");
+const rollupsDocuments = join(".", rollupsBasePath, "queries.graphql");
+const rollupsV2Schema = join(".", rollupsBasePath, "v2", "schema.graphql");
+const rollupsV2Documents = join(".", rollupsBasePath, "v2", "queries.graphql");
 
 console.info(`Codegen will use schema URL: ${explorerSchema}`);
 
@@ -18,6 +21,11 @@ interface CommonConfig extends Pick<Types.Config, "schema" | "documents"> {
 type Generates = Partial<Pick<Types.Config, "generates">>;
 
 const setup: CommonConfig[] = [
+    {
+        dirname: "rollups/v2",
+        schema: rollupsV2Schema,
+        documents: rollupsV2Documents,
+    },
     {
         dirname: "rollups",
         schema: rollupsSchema,
