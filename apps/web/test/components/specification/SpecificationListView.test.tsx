@@ -210,7 +210,7 @@ describe("Specification Listing View", () => {
                 expect(
                     getByText(
                         elem,
-                        "You have 6 specifications, but none of them are the type",
+                        "You have 11 specifications, but none of them are the type",
                     ),
                 ).toBeInTheDocument();
                 expect(getByText(elem, "JSON ABI")).toBeInTheDocument();
