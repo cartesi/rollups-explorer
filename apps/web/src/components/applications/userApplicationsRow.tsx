@@ -34,6 +34,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
         removeConnection,
     } = useConnectionConfig();
     const appId = application.id as AddressType;
+    const version = application.rollupVersion;
     const connection = getConnection(appId);
     return (
         <Table.Tr key={application.id}>
@@ -103,7 +104,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                         <Group gap="xs">
                             <Tooltip label="Summary">
                                 <Link
-                                    href={`/applications/${appId}`}
+                                    href={`/applications/${appId}/${version}`}
                                     data-testid="applications-summary-link"
                                 >
                                     <ActionIcon variant="default">
@@ -113,7 +114,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                             </Tooltip>
                             <Tooltip label="Inputs">
                                 <Link
-                                    href={`/applications/${appId}/inputs`}
+                                    href={`/applications/${appId}/${version}/inputs`}
                                     data-testid="applications-link"
                                 >
                                     <ActionIcon variant="default">

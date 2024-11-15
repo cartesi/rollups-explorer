@@ -104,14 +104,14 @@ const LatestEntries: FC = () => {
             appId: edge.node.application.id,
             appAddress: edge.node.application.address as AddressType,
             timestamp: Number(edge.node.timestamp),
-            href: `/applications/${edge.node.application.address}/inputs`,
+            href: `/applications/${edge.node.application.address}/${edge.node.application.rollupVersion}/inputs`,
         })) ?? [];
     const applications =
         applicationsData?.applicationsConnection.edges.map((edge) => ({
             appId: edge.node.id,
             appAddress: edge.node.address as AddressType,
             timestamp: Number(edge.node.timestamp),
-            href: `/applications/${edge.node.address}`,
+            href: `/applications/${edge.node.address}/${edge.node.rollupVersion}`,
         })) ?? [];
 
     return (
