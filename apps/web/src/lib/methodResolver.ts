@@ -6,30 +6,58 @@ import {
     erc20PortalAddress,
     erc721PortalAddress,
     etherPortalAddress,
+    v2Erc1155BatchPortalAddress,
+    v2Erc1155SinglePortalAddress,
+    v2Erc20PortalAddress,
+    v2Erc721PortalAddress,
+    v2EtherPortalAddress,
 } from "@cartesi/rollups-wagmi";
-import { getAddress } from "viem";
+import { Address, getAddress } from "viem";
 import { InputItemFragment } from "../graphql/explorer/operations";
 
 export type MethodResolver = (
     input: InputItemFragment,
 ) => string | undefined | false;
 
+const etherPortalAddresses: Address[] = [
+    etherPortalAddress,
+    v2EtherPortalAddress,
+];
+const erc20PortalAddresses: Address[] = [
+    erc20PortalAddress,
+    v2Erc20PortalAddress,
+];
+const erc721PortalAddresses: Address[] = [
+    erc721PortalAddress,
+    v2Erc721PortalAddress,
+];
+const erc1155BatchPortalAddresses: Address[] = [
+    erc1155BatchPortalAddress,
+    v2Erc1155BatchPortalAddress,
+];
+const erc1155SinglePortalAddresses: Address[] = [
+    erc1155SinglePortalAddress,
+    v2Erc1155SinglePortalAddress,
+];
+
 const etherDepositResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === etherPortalAddress && "depositEther";
+    etherPortalAddresses.includes(getAddress(input.msgSender)) &&
+    "depositEther";
 
 const erc20PortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc20PortalAddress && "depositERC20Tokens";
+    erc20PortalAddresses.includes(getAddress(input.msgSender)) &&
+    "depositERC20Tokens";
 
 const erc721PortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc721PortalAddress &&
+    erc721PortalAddresses.includes(getAddress(input.msgSender)) &&
     "depositERC721Tokens";
 
 const erc1155SinglePortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc1155SinglePortalAddress &&
+    erc1155SinglePortalAddresses.includes(getAddress(input.msgSender)) &&
     "depositERC1155SingleTokens";
 
 const erc1155BatchPortalResolver: MethodResolver = (input) =>
-    getAddress(input.msgSender) === erc1155BatchPortalAddress &&
+    erc1155BatchPortalAddresses.includes(getAddress(input.msgSender)) &&
     "depositERC1155BatchTokens";
 
 const dAppAddressRelayResolver: MethodResolver = (input) =>
