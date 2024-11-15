@@ -116,7 +116,7 @@ const InputRow: FC<InputRowProps> = ({
                         <Address
                             value={to}
                             icon
-                            href={`/applications/${to}/inputs`}
+                            href={`/applications/${to}/${input.application.rollupVersion}/inputs`}
                             shorten
                         />
                     </Box>

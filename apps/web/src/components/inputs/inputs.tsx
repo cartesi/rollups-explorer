@@ -4,22 +4,24 @@ import { Stack } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useMemo, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
-import { InputOrderByInput } from "../../graphql/explorer/types";
+import { InputOrderByInput, RollupVersion } from "../../graphql/explorer/types";
+import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
 import Search from "../search";
-import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
-    applicationId?: string;
+    appVersion?: RollupVersion;
+    appAddress?: string;
 };
 
 const Inputs: FC<InputsProps> = ({
     orderBy = InputOrderByInput.TimestampDesc,
-    applicationId,
+    appAddress,
+    appVersion,
 }) => {
     const chainId = getConfiguredChainId();
     const [{ query: urlQuery }] = useUrlSearchParams();
@@ -37,8 +39,9 @@ const Inputs: FC<InputsProps> = ({
             after,
             where: checkQuery(
                 queryDebounced.toLowerCase(),
-                applicationId?.toLowerCase(),
+                appAddress?.toLowerCase(),
                 chainId,
+                appVersion,
             ),
         },
     });

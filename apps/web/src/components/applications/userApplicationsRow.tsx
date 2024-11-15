@@ -7,6 +7,7 @@ import {
     Text,
     Tooltip,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
@@ -17,10 +18,9 @@ import {
     TbStack2,
 } from "react-icons/tb";
 import { Address as AddressType } from "viem";
+import { Application } from "../../graphql/explorer/types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
-import { useDisclosure } from "@mantine/hooks";
-import { Application } from "../../graphql/explorer/types";
 import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
 
 export interface UserApplicationsRowProps {
@@ -38,6 +38,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
         removeConnection,
     } = useConnectionConfig();
     const appId = application.address as AddressType;
+    const version = application.rollupVersion;
     const connection = getConnection(appId);
     const [opened, { open, close }] = useDisclosure(false);
 
@@ -119,7 +120,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                             <Group gap="xs">
                                 <Tooltip label="Summary">
                                     <Link
-                                        href={`/applications/${appId}`}
+                                        href={`/applications/${appId}/${version}`}
                                         data-testid="applications-summary-link"
                                     >
                                         <ActionIcon variant="default">
@@ -129,7 +130,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                                 </Tooltip>
                                 <Tooltip label="Inputs">
                                     <Link
-                                        href={`/applications/${appId}/inputs`}
+                                        href={`/applications/${appId}/${version}/inputs`}
                                         data-testid="applications-link"
                                     >
                                         <ActionIcon variant="default">
