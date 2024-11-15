@@ -46,6 +46,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
     const { hasConnection, removeConnection, showConnectionModal } =
         useConnectionConfig();
     const appId = application.address as AddressType;
+    const version = application.rollupVersion;
 
     return (
         <Box
@@ -59,7 +60,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
             <Group gap="xs">
                 <Tooltip label="Summary">
                     <Link
-                        href={`/applications/${appId}`}
+                        href={`/applications/${appId}/${version}`}
                         data-testid="applications-summary-link"
                     >
                         <ActionIcon variant="default">
@@ -69,7 +70,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                 </Tooltip>
                 <Tooltip label="Inputs">
                     <Link
-                        href={`/applications/${appId}/inputs`}
+                        href={`/applications/${appId}/${version}/inputs`}
                         data-testid="applications-link"
                     >
                         <ActionIcon variant="default">
