@@ -28,6 +28,7 @@ export const usePaginationParams = (): UsePaginationReturn => {
     const page = isNaN(pg) ? 1 : pg;
     const updateParams = useCallback(
         (page: number, limit: number): void => {
+            console.log(`calling updateParams!`);
             const urlSearchParams = new URLSearchParams({
                 query: query.toString(),
                 pg: page.toString(),

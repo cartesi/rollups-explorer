@@ -4,17 +4,17 @@ import { notFound } from "next/navigation";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import { Address as AddressType } from "viem";
-import Address from "../../../../components/address";
-import Breadcrumbs from "../../../../components/breadcrumbs";
-import Inputs from "../../../../components/inputs/inputs";
-import PageTitle from "../../../../components/layout/pageTitle";
+import Address from "../../../../../components/address";
+import Breadcrumbs from "../../../../../components/breadcrumbs";
+import Inputs from "../../../../../components/inputs/inputs";
+import PageTitle from "../../../../../components/layout/pageTitle";
 import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
-} from "../../../../graphql/explorer/operations";
-import getConfiguredChainId from "../../../../lib/getConfiguredChain";
-import { getUrqlServerClient } from "../../../../lib/urql";
+} from "../../../../../graphql/explorer/operations";
+import getConfiguredChainId from "../../../../../lib/getConfiguredChain";
+import { getUrqlServerClient } from "../../../../../lib/urql";
 
 export async function generateMetadata({
     params,
@@ -37,14 +37,16 @@ async function getApplication(appId: string) {
 }
 
 export type ApplicationInputsPageProps = {
-    params: { address: string };
+    params: { address: string; version: string };
 };
 
 const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
     params,
 }) => {
     const chainId = getConfiguredChainId();
-    const appId = `${chainId}-${params.address?.toLowerCase()}`;
+    const appId = `${chainId}-${params.address?.toLowerCase()}-${
+        params.version
+    }`;
     const application = await getApplication(appId);
 
     if (!application) {
@@ -67,13 +69,16 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async ({
             >
                 <Address
                     value={params.address as AddressType}
-                    href={`/applications/${params.address}`}
+                    href={`/applications/${params.address}/${params.version}`}
                 />
                 <Text>Inputs</Text>
             </Breadcrumbs>
 
             <PageTitle title="Inputs" Icon={TbInbox} />
-            <Inputs applicationId={params.address} />
+            <Inputs
+                appAddress={application.address}
+                appVersion={application.rollupVersion}
+            />
         </Stack>
     );
 };
