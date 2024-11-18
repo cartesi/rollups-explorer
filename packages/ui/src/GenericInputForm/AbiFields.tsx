@@ -8,12 +8,13 @@ import {
     Textarea,
     Tooltip,
 } from "@mantine/core";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { FormAbiMethod, FormSpecification, SpecificationMode } from "./types";
 import { TbHelp } from "react-icons/tb";
 import { AbiFunctionName } from "./AbiFunctionName";
 import { AbiFunctionParams } from "./AbiFunctionParams";
 import { AbiParameter } from "./AbiParameter";
+import { resetAbiFunctionParams } from "./utils";
 
 export interface AbiFieldsProps {
     specifications: FormSpecification[];
@@ -47,11 +48,11 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     form.setFieldValue("abiMethod", nextValue as FormAbiMethod);
                     form.setFieldValue("specificationId", "");
                     form.setFieldValue("abiFunctionName", "");
-                    form.setFieldValue("abiFunctionParams", []);
                     form.setFieldValue("humanAbi", "");
                     form.setFieldValue("abiParam", "");
                     form.setFieldValue("savedAbiParam", "");
                     form.setFieldValue("specificationMode", "json_abi");
+                    resetAbiFunctionParams(form, []);
                 }}
             />
 
@@ -78,10 +79,10 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
 
                             form.setFieldValue("specificationId", "");
                             form.setFieldValue("abiFunctionName", "");
-                            form.setFieldValue("abiFunctionParams", []);
                             form.setFieldValue("humanAbi", "");
                             form.setFieldValue("abiParam", "");
                             form.setFieldValue("savedAbiParam", "");
+                            resetAbiFunctionParams(form, []);
                         }}
                     />
 
@@ -112,6 +113,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                                 const nextValue = event.target.value;
                                 form.setFieldValue("humanAbi", nextValue);
                                 form.validateField("humanAbi");
+                                form.setFieldValue("abiFunctionName", "");
                             }}
                         />
                     ) : (
@@ -133,7 +135,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                             nextValue as string,
                         );
                         form.setFieldValue("abiFunctionName", "");
-                        form.setFieldValue("abiFunctionParams", []);
+                        resetAbiFunctionParams(form, []);
                     }}
                 />
             )}

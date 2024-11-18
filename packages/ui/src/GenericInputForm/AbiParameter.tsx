@@ -4,10 +4,9 @@ import { useCallback } from "react";
 import { AbiFunction } from "viem";
 import {
     generateAbiParamFormSpecification,
-    generateInitialValues,
+    resetAbiFunctionParams,
 } from "./utils";
 import { AbiInputParam } from "./types";
-import { isArray } from "ramda-adjunct";
 
 export const AbiParameter = () => {
     const form = useFormContext();
@@ -28,24 +27,10 @@ export const AbiParameter = () => {
         )[0];
 
         if (nextAbiFunction) {
-            const emptyFunctionParams: AbiInputParam[] = [];
-            (nextAbiFunction.inputs as AbiInputParam[]).forEach((input) => {
-                generateInitialValues(input, emptyFunctionParams);
-            });
-
-            const prevAbiFunctionParams =
-                form.getInputProps("abiFunctionParams");
-
-            if (isArray(prevAbiFunctionParams.value)) {
-                prevAbiFunctionParams.value.forEach((_, index) => {
-                    form.setFieldError(
-                        `abiFunctionParams.${index}.value`,
-                        null,
-                    );
-                });
-            }
-
-            form.setFieldValue("abiFunctionParams", emptyFunctionParams);
+            resetAbiFunctionParams(
+                form,
+                nextAbiFunction.inputs as AbiInputParam[],
+            );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' is not added on purpose because it has unstable reference
     }, [abiParam]);

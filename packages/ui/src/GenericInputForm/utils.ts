@@ -4,9 +4,12 @@ import {
     AbiValueParameter,
     FormSpecification,
     FinalValues,
+    FormValues,
+    FormTransformedValues,
 } from "./types";
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
+import { UseFormReturnType } from "@mantine/form";
 
 export const encodeFunctionParam = (param: AbiValueParameter) => {
     switch (param.type) {
@@ -174,4 +177,27 @@ export const getInputIndexOffset = (inputs: AbiInputParam[]) => {
     });
 
     return nestedInputs.length;
+};
+
+export const resetAbiFunctionParams = (
+    form: UseFormReturnType<
+        FormValues,
+        (values: FormValues) => FormTransformedValues
+    >,
+    inputs: AbiInputParam[],
+) => {
+    const emptyFunctionParams: AbiInputParam[] = [];
+    (inputs as AbiInputParam[]).forEach((input) => {
+        generateInitialValues(input, emptyFunctionParams);
+    });
+
+    const prevAbiFunctionParams = form.getInputProps("abiFunctionParams");
+
+    if (isArray(prevAbiFunctionParams.value)) {
+        prevAbiFunctionParams.value.forEach((_, index) => {
+            form.setFieldError(`abiFunctionParams.${index}.value`, null);
+        });
+    }
+
+    form.setFieldValue("abiFunctionParams", emptyFunctionParams);
 };
