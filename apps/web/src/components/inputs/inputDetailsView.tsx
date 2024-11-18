@@ -3,17 +3,24 @@ import { ContentType, InputDetails } from "@cartesi/rollups-explorer-ui";
 import { Alert, Box, Group, Select, Stack, Text } from "@mantine/core";
 import { find, omit, pathOr } from "ramda";
 import { included, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { TbExclamationCircle } from "react-icons/tb";
-import { useQuery } from "urql";
+import { UseQueryResponse, useQuery } from "urql";
 import { Address, Hex } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
+import { RollupVersion } from "../../graphql/explorer/types";
 import {
     InputDetailsDocument,
     InputDetailsQuery,
     InputDetailsQueryVariables,
 } from "../../graphql/rollups/operations";
 import { Voucher } from "../../graphql/rollups/types";
+import {
+    InputDetailsDocument as V2InputDetailsDocument,
+    InputDetailsQuery as V2InputDetailsQuery,
+    InputDetailsQueryVariables as V2InputDetailsQueryVariables,
+} from "../../graphql/rollups/v2/operations";
+import { Voucher as VoucherV2 } from "../../graphql/rollups/v2/types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { theme } from "../../providers/theme";
@@ -21,17 +28,23 @@ import { useBlockExplorerData } from "../BlockExplorerLink";
 import AddressEl from "../address";
 import { NewSpecificationButton } from "../specification/components/NewSpecificationButton";
 import { findSpecificationFor } from "../specification/conditionals";
-import { decodePayload, Envelope } from "../specification/decoder";
+import { Envelope, decodePayload } from "../specification/decoder";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import { useSystemSpecifications } from "../specification/hooks/useSystemSpecifications";
 import useVoucherDecoder from "../specification/hooks/useVoucherDecoder";
 import { Specification } from "../specification/types";
 import { stringifyContent } from "../specification/utils";
 import VoucherExecution from "./voucherExecution";
+import VoucherExecutionV2 from "./voucherExecutionV2";
 
 interface ApplicationInputDataProps {
     input: InputItemFragment;
 }
+
+type OptionalInputDetailsVariables = Omit<
+    InputDetailsQueryVariables & V2InputDetailsQueryVariables,
+    "inputIdx" | "inputId"
+>;
 
 type InputTypes = "vouchers" | "reports" | "notices";
 
@@ -40,7 +53,7 @@ const payloadOrString = pathOr("", ["edges", 0, "node", "payload"]);
 
 const updateForNextPage = (
     name: InputTypes,
-    obj: InputDetailsQueryVariables,
+    obj: OptionalInputDetailsVariables,
 ) => {
     switch (name) {
         case "vouchers":
@@ -56,7 +69,7 @@ const updateForNextPage = (
 
 const updateForPrevPage = (
     name: InputTypes,
-    obj: InputDetailsQueryVariables,
+    obj: OptionalInputDetailsVariables,
 ) => {
     switch (name) {
         case "vouchers":
@@ -171,6 +184,31 @@ const buildSelectData = (
 
 const chainId = Number.parseInt(getConfiguredChainId());
 
+const getInputDetailsQueryFactoryByVersion = {
+    [RollupVersion.V1]:
+        (inputIdx: string) => (optionals: OptionalInputDetailsVariables) => {
+            return useQuery<InputDetailsQuery, InputDetailsQueryVariables>({
+                query: InputDetailsDocument,
+                pause: true,
+                variables: {
+                    inputIdx: parseInt(inputIdx),
+                    ...optionals,
+                },
+            });
+        },
+    [RollupVersion.V2]:
+        (inputId: string) => (optionals: OptionalInputDetailsVariables) => {
+            return useQuery<V2InputDetailsQuery, V2InputDetailsQueryVariables>({
+                query: V2InputDetailsDocument,
+                pause: true,
+                variables: {
+                    inputId,
+                    ...optionals,
+                },
+            });
+        },
+} as const;
+
 /**
  * InputDetailsView should be lazy rendered.
  * to avoid multiple eager network calls.
@@ -179,24 +217,34 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
     const appId = input.application.address as Address;
-    const inputIdx = input.index;
+    const appVersion = input.application.rollupVersion;
+    const requiredValue = input.index.toString();
+
+    const inputDetailsQuery = useMemo(() => {
+        const factory = getInputDetailsQueryFactoryByVersion[appVersion];
+
+        if (!factory) {
+            const text = isNilOrEmpty(appVersion)
+                ? `Missing appVersion (${appVersion})`
+                : `appVersion: ${appVersion} not supported.`;
+            console.warn(`${text}. GraphQL queries will be skipped.`);
+
+            return () => [{}, () => {}] as UseQueryResponse;
+        }
+
+        return factory(requiredValue);
+    }, [appVersion, requiredValue]);
+
     const connection = getConnection(appId);
     const [selectedSpec, setSelectedSpec] = useState<string>("");
-    const [variables, updateQueryVars] = useState<InputDetailsQueryVariables>({
-        firstNotices: 1,
-        firstReports: 1,
-        firstVouchers: 1,
-        inputIdx,
-    });
+    const [variables, updateQueryVars] =
+        useState<OptionalInputDetailsVariables>({
+            firstNotices: 1,
+            firstReports: 1,
+            firstVouchers: 1,
+        });
 
-    const [result, execQuery] = useQuery<
-        InputDetailsQuery,
-        InputDetailsQueryVariables
-    >({
-        query: InputDetailsDocument,
-        pause: true,
-        variables,
-    });
+    const [result, execQuery] = inputDetailsQuery(variables);
 
     const reports = result.data?.input.reports;
     const notices = result.data?.input.notices;
@@ -211,8 +259,8 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const showVouchers =
         !connection ||
         (connection && vouchers && payloadOrString(vouchers) !== "");
-    const vouchersForExecution = (vouchers?.edges?.map((e) => e.node) ??
-        []) as Partial<Voucher>[];
+    const vouchersForExecution = (vouchers?.edges?.map((e: any) => e.node) ??
+        []) as Partial<Voucher>[] | VoucherV2[];
     const showVoucherForExecution =
         showVouchers && vouchersForExecution.length > 0;
 
@@ -475,10 +523,21 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
                         }
                     >
                         {showVoucherForExecution ? (
-                            <VoucherExecution
-                                appId={appId}
-                                voucher={vouchersForExecution[0]}
-                            />
+                            appVersion === RollupVersion.V1 ? (
+                                <VoucherExecution
+                                    appId={appId}
+                                    voucher={
+                                        vouchersForExecution[0] as Partial<Voucher>
+                                    }
+                                />
+                            ) : appVersion === RollupVersion.V2 ? (
+                                <VoucherExecutionV2
+                                    input={input}
+                                    voucher={
+                                        vouchersForExecution[0] as VoucherV2
+                                    }
+                                />
+                            ) : null
                         ) : null}
                     </InputDetails.VoucherContent>
                 )}
