@@ -115,8 +115,8 @@ export const augmentInputsWithIds = (
 };
 
 export const generateFinalValues = (
-    inputs: AbiParameter[],
-    params: AbiValueParameter[],
+    inputs: AbiInputParam[],
+    params: AbiInputParam[],
 ) => {
     const finalArr: FinalValues = [];
 
@@ -125,10 +125,10 @@ export const generateFinalValues = (
             const currArr: FinalValues = [];
             finalArr.push(currArr);
 
-            getTupleValues(input as AbiInputParam, params, finalArr, currArr);
+            getTupleValues(input, params, finalArr, currArr);
         } else {
             const param = params.find((p) => {
-                return p.name === input.name && p.type === input.type;
+                return p.id === input.id;
             }) as AbiValueParameter;
             const value = encodeFunctionParam(param);
             finalArr.push(value);
@@ -140,7 +140,7 @@ export const generateFinalValues = (
 
 const getTupleValues = (
     tupleInput: AbiInputParam,
-    params: AbiValueParameter[],
+    params: AbiInputParam[],
     finalArr: FinalValues = [],
     currentArr: FinalValues = [],
 ) => {
@@ -151,11 +151,7 @@ const getTupleValues = (
             getTupleValues(input, params, finalArr, nextCurrentArr);
         } else {
             const param = params.find((p) => {
-                return (
-                    p.tupleName === tupleInput.name &&
-                    p.name === input.name &&
-                    p.type === input.type
-                );
+                return p.id === input.id;
             }) as AbiValueParameter;
             const value = encodeFunctionParam(param);
             currentArr.push(value);

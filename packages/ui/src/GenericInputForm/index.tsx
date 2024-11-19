@@ -28,7 +28,12 @@ import { TransactionProgress } from "../TransactionProgress";
 import useUndeployedApplication from "../hooks/useUndeployedApplication";
 import { TransactionFormSuccessData } from "../DepositFormTypes";
 import { AbiFields } from "./AbiFields";
-import { AbiValueParameter, FormMode, FormSpecification } from "./types";
+import {
+    AbiInputParam,
+    FormMode,
+    FormSpecification,
+    GenericFormAbiFunction,
+} from "./types";
 import { FormProvider } from "./context";
 import { useGenericInputForm } from "./useGenericInputForm";
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -94,16 +99,16 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
     );
 
     const encodeFunctionParamsDebounced = useDebouncedCallback(
-        (params: AbiValueParameter[]) => {
+        (params: AbiInputParam[]) => {
             const abiFunctions =
-                (selectedSpecification?.abi as AbiFunction[]) ?? [];
+                (selectedSpecification?.abi as GenericFormAbiFunction[]) ?? [];
             const nextAbiFunction = abiFunctions.find(
                 (f) => f.name === abiFunctionName,
             );
 
             if (nextAbiFunction) {
                 const finalValues = generateFinalValues(
-                    nextAbiFunction.inputs.slice(),
+                    [...nextAbiFunction.inputs],
                     params,
                 );
 
