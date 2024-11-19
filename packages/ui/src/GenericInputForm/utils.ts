@@ -10,6 +10,7 @@ import {
 import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 import { UseFormReturnType } from "@mantine/form";
+import { v4 as uuidv4 } from "uuid";
 
 export const encodeFunctionParam = (param: AbiValueParameter) => {
     switch (param.type) {
@@ -43,7 +44,7 @@ export const generateHumanAbiFormSpecification = (humanAbi: string) => {
 
     return isObject(generatedAbi)
         ? ({
-              id: new Date().getTime().toString(),
+              id: uuidv4(),
               name: "Generated specification",
               abi: generatedAbi,
           } as FormSpecification)
@@ -59,7 +60,7 @@ export const generateAbiParamFormSpecification = (abiParam: string) => {
 
     return isArray(abiParameters)
         ? ({
-              id: new Date().getTime().toString(),
+              id: uuidv4(),
               name: "Generated specification",
               abi: [
                   {
@@ -88,10 +89,6 @@ export const generateInitialValues = (
                     value: "",
                 };
 
-                if (parentInput.type === "tuple") {
-                    flatInput.tupleName = parentInput.name;
-                }
-
                 flatInputs.push(flatInput);
             }
         });
@@ -101,6 +98,20 @@ export const generateInitialValues = (
             value: "",
         });
     }
+};
+
+export const augmentInputsWithIds = (
+    parentInput: AbiInputParam,
+): AbiInputParam[] => {
+    return parentInput.components.map((input: AbiInputParam) => {
+        const nextInput = { ...input, id: uuidv4() };
+
+        if (nextInput.type === "tuple") {
+            nextInput.components = augmentInputsWithIds(input);
+        }
+
+        return nextInput;
+    });
 };
 
 export const generateFinalValues = (
@@ -163,20 +174,6 @@ const getTupleInputs = (
             finalArr.push(input);
         }
     });
-};
-
-export const getInputIndexOffset = (inputs: AbiInputParam[]) => {
-    const nestedInputs: AbiParameter[] = [];
-
-    inputs.forEach((input) => {
-        if (input.type === "tuple") {
-            getTupleInputs(input, nestedInputs);
-        } else {
-            nestedInputs.push(input);
-        }
-    });
-
-    return nestedInputs.length;
 };
 
 export const resetAbiFunctionParams = (

@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { FunctionSignature } from "./FunctionSignature";
 import { TbAlertCircle } from "react-icons/tb";
 import { resetAbiFunctionParams } from "./utils";
-import { AbiInputParam } from "./types";
+import { AbiInputParam, GenericFormAbiFunction } from "./types";
 
 export const AbiFunctionName = () => {
     const form = useFormContext();
@@ -15,13 +15,12 @@ export const AbiFunctionName = () => {
         onDropdownClose: () => combobox.resetSelectedOption(),
     });
     const specificationFunctions = (
-        (selectedSpecification?.abi as AbiFunction[]) ?? []
+        (selectedSpecification?.abi as GenericFormAbiFunction[]) ?? []
     ).filter((item) => item.type === "function");
 
     const onChangeAbiFunctionName = useCallback(
         (abiFunctionName: string) => {
             combobox.closeDropdown();
-
             form.setFieldValue("abiFunctionName", abiFunctionName);
 
             const nextAbiFunction = (

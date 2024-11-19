@@ -9,10 +9,9 @@ interface TupleComponentsProps extends FieldsetProps {
 }
 
 export const TupleComponents: FC<TupleComponentsProps> = (props) => {
-    const form = useFormContext();
     const { input, ...restProps } = props;
-    const { value: abiFunctionParams } =
-        form.getInputProps("abiFunctionParams");
+    const form = useFormContext();
+    const abiFunctionParams = form.getInputProps("abiFunctionParams");
     const firstStandardInput = input.components.find((c) => c.type !== "tuple");
     const firstStandardInputIndex = input.components.findIndex(
         (c) =>
@@ -25,17 +24,12 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
             {input.components.map((component, componentIndex) => {
                 const isFirstStandardInput =
                     componentIndex === firstStandardInputIndex;
-                const targetIndex = abiFunctionParams.findIndex(
-                    (p: AbiInputParam) =>
-                        p.tupleName === input.name &&
-                        p.type === component.type &&
-                        p.name === component.name,
+                const inputIndex = abiFunctionParams.value.findIndex(
+                    (p: AbiInputParam) => p.id === component.id,
                 );
 
                 return (
-                    <Fragment
-                        key={`${input.name}-${input.type}-${component.name}-${component.type}`}
-                    >
+                    <Fragment key={component.id}>
                         {component.type === "tuple" ? (
                             <TupleComponents
                                 input={component}
@@ -48,13 +42,12 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                             />
                         ) : (
                             <TextInput
-                                key={`${component.name}-${component.type}`}
                                 label={<InputLabel input={component} />}
                                 placeholder={`Enter ${component.type} value`}
                                 mt={isFirstStandardInput ? 0 : 16}
                                 withAsterisk
                                 {...form.getInputProps(
-                                    `abiFunctionParams.${targetIndex}.value`,
+                                    `abiFunctionParams.${inputIndex}.value`,
                                 )}
                             />
                         )}

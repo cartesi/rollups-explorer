@@ -5,11 +5,11 @@ import { InputLabel } from "./FunctionSignature";
 import { Fragment } from "react";
 import { TupleComponents } from "./TupleComponents";
 import { AbiInputParam } from "./types";
-import { getInputIndexOffset } from "./utils";
 
 export const AbiFunctionParams = () => {
     const form = useFormContext();
     const { abiFunction } = form.getTransformedValues();
+    const abiFunctionParams = form.getInputProps("abiFunctionParams");
 
     return (
         <>
@@ -17,32 +17,27 @@ export const AbiFunctionParams = () => {
                 <Stack>
                     {abiFunction.inputs.length > 0 ? (
                         <>
-                            {abiFunction.inputs.map((input, index) => {
-                                const prevInputs = abiFunction.inputs.slice(
-                                    0,
-                                    index,
-                                ) as AbiInputParam[];
-                                const indexOffset =
-                                    getInputIndexOffset(prevInputs);
+                            {abiFunction.inputs.map((input) => {
+                                const inputIndex =
+                                    abiFunctionParams.value.findIndex(
+                                        (p: AbiInputParam) => p.id === input.id,
+                                    );
 
                                 return (
-                                    <Fragment
-                                        key={`${input.name}-${input.type}`}
-                                    >
+                                    <Fragment key={input.id}>
                                         {input.type === "tuple" ? (
                                             <TupleComponents
                                                 input={input as AbiInputParam}
                                             />
                                         ) : (
                                             <TextInput
-                                                key={`${input.name}-${input.type}`}
                                                 label={
                                                     <InputLabel input={input} />
                                                 }
                                                 placeholder={`Enter ${input.type} value`}
                                                 withAsterisk
                                                 {...form.getInputProps(
-                                                    `abiFunctionParams.${indexOffset}.value`,
+                                                    `abiFunctionParams.${inputIndex}.value`,
                                                 )}
                                             />
                                         )}

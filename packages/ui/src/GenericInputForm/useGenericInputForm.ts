@@ -10,14 +10,23 @@ import {
     validateSpecificationId,
 } from "./validations";
 import { AbiFunction, getAddress, Hex, isAddress, zeroAddress } from "viem";
-import { FormSpecification } from "./types";
+import { FormSpecification, GenericFormAbiFunction } from "./types";
 import {
+    augmentInputsWithIds,
     generateAbiParamFormSpecification,
     generateHumanAbiFormSpecification,
 } from "./utils";
 import { initialValues } from "./initialValues";
+import { v4 as uuidv4 } from "uuid";
+import { useRef } from "react";
+import { equals, omit } from "ramda";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
+    const lastSelectedSpecification = useRef<FormSpecification | undefined>();
+    const lastSelectedSpecificationWithIds = useRef<
+        FormSpecification | undefined
+    >();
+
     return useForm({
         validateInputOnBlur: true,
         initialValues,
@@ -34,7 +43,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
             },
         },
         transformValues: (values) => {
-            const selectedSpecification =
+            let selectedSpecification =
                 values.abiMethod === "existing"
                     ? specifications.find(
                           (s) => s.id === values.specificationId,
@@ -42,6 +51,61 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                     : values.specificationMode === "json_abi"
                     ? generateHumanAbiFormSpecification(values.humanAbi)
                     : generateAbiParamFormSpecification(values.savedAbiParam);
+
+            if (
+                selectedSpecification &&
+                !equals(
+                    omit(["id"], selectedSpecification),
+                    omit(
+                        ["id"],
+                        (lastSelectedSpecification.current ??
+                            {}) as FormSpecification,
+                    ),
+                )
+            ) {
+                lastSelectedSpecification.current = {
+                    ...selectedSpecification,
+                };
+
+                const selectedSpecificationWithIds = {
+                    ...selectedSpecification,
+                    abi: selectedSpecification.abi.map((abiFunction) => {
+                        const nextAbiFunction = {
+                            ...abiFunction,
+                        } as GenericFormAbiFunction;
+
+                        nextAbiFunction.inputs = nextAbiFunction.inputs.map(
+                            (input) => {
+                                const nextInput = { ...input, id: uuidv4() };
+
+                                if (nextInput.type === "tuple") {
+                                    nextInput.components =
+                                        augmentInputsWithIds(nextInput);
+                                }
+
+                                return nextInput;
+                            },
+                        );
+
+                        return nextAbiFunction;
+                    }),
+                };
+
+                selectedSpecification = { ...selectedSpecificationWithIds };
+                lastSelectedSpecificationWithIds.current = {
+                    ...selectedSpecificationWithIds,
+                };
+            } else if (lastSelectedSpecificationWithIds.current) {
+                selectedSpecification = {
+                    ...lastSelectedSpecificationWithIds.current,
+                };
+            }
+
+            const abiFunction = (
+                (selectedSpecification?.abi as AbiFunction[]) ?? []
+            ).find(
+                (abiFunction) => abiFunction.name === values.abiFunctionName,
+            ) as GenericFormAbiFunction;
 
             return {
                 mode: values.mode,
@@ -57,12 +121,7 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                 specificationId: values.specificationId,
                 abiFunctionName: values.abiFunctionName,
                 selectedSpecification,
-                abiFunction: (
-                    (selectedSpecification?.abi as AbiFunction[]) ?? []
-                ).find(
-                    (abiFunction) =>
-                        abiFunction.name === values.abiFunctionName,
-                ),
+                abiFunction,
             };
         },
     });

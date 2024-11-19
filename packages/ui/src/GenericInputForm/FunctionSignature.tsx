@@ -1,7 +1,7 @@
-import { AbiFunction, AbiParameter } from "viem";
+import { AbiParameter } from "viem";
 import { FC, Fragment } from "react";
 import { Box, Text } from "@mantine/core";
-import { AbiInputParam } from "./types";
+import { AbiInputParam, GenericFormAbiFunction } from "./types";
 
 interface FunctionParamLabelProps {
     input: AbiParameter;
@@ -37,7 +37,7 @@ export const InputLabel: FC<InputLabelProps> = ({ input }) => {
 };
 
 interface FunctionSignatureProps {
-    abiFunction: AbiFunction;
+    abiFunction: GenericFormAbiFunction;
 }
 
 export const FunctionSignature: FC<FunctionSignatureProps> = ({
@@ -50,7 +50,7 @@ export const FunctionSignature: FC<FunctionSignatureProps> = ({
             </Text>
             (
             {abiFunction.inputs.map((input, index) => (
-                <Fragment key={`${input.type}-${input.name}`}>
+                <Fragment key={input.id}>
                     <FunctionParamLabel input={input} />
                     {index < abiFunction.inputs.length - 1 ? ", " : ""}
                 </Fragment>

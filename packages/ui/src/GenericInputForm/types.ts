@@ -19,7 +19,12 @@ export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
 
 export type AbiInputParam = AbiValueParameter & {
     tupleName?: string;
+    id?: string;
     components: AbiInputParam[];
+};
+
+export type GenericFormAbiFunction = Omit<AbiFunction, "inputs"> & {
+    inputs: AbiInputParam[];
 };
 
 export interface FormValues {
@@ -48,7 +53,7 @@ export interface FormTransformedValues {
     savedAbiParam: string;
     specificationId: string;
     abiFunctionName: string;
-    abiFunction: AbiFunction | undefined;
+    abiFunction: GenericFormAbiFunction | undefined;
     selectedSpecification: FormSpecification | undefined;
 }
 
