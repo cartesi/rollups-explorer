@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import prettyMilliseconds from "pretty-ms";
 import { describe, it } from "vitest";
 import LatestInputsTable from "../../../src/components/applications/latestInputsTable";
+import { RollupVersion } from "../../../src/graphql/explorer/types";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
-import prettyMilliseconds from "pretty-ms";
 
 const Component = withMantineTheme(LatestInputsTable);
 
@@ -11,7 +12,12 @@ const defaultProps = {
         {
             id: "0xdb84080e7d2b4654a7e384de851a6cf7281643de-1",
             application: {
-                id: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+                id: "11155111-0xdb84080e7d2b4654a7e384de851a6cf7281643de-v1",
+                address: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+                rollupVersion: RollupVersion.V1,
+            },
+            chain: {
+                id: "11155111",
             },
             index: 1,
             payload: "0x68656c6c6f2032",
