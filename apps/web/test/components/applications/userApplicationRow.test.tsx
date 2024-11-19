@@ -12,9 +12,20 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import UserApplicationsRow, {
     UserApplicationsRowProps,
 } from "../../../src/components/applications/userApplicationsRow";
+import { RollupVersion } from "../../../src/graphql/explorer/types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+
 vi.mock("../../../src/providers/connectionConfig/hooks");
+
+vi.mock("viem", async () => {
+    const actual = await vi.importActual("viem");
+    return {
+        ...(actual as any),
+        getAddress: (address: string) => address,
+    };
+});
+
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 
 const TableComponent: FC<UserApplicationsRowProps> = (props) => (
@@ -29,10 +40,9 @@ const Component = withMantineTheme(TableComponent);
 
 const defaultProps: UserApplicationsRowProps = {
     application: {
-        id: "11155111-0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
+        id: "11155111-0x028367fe226cd9e5699f4288d512fe3a4a4a0012-v1",
         owner: "0x74d093f6911ac080897c3145441103dabb869307",
         timestamp: 1700593992,
-        address: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
         chain: {
             id: "11155111",
         },
@@ -44,6 +54,8 @@ const defaultProps: UserApplicationsRowProps = {
                 id: "11155111",
             },
         },
+        address: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
+        rollupVersion: RollupVersion.V1,
     },
     keepDataColVisible: false,
     timeType: "age",
@@ -128,7 +140,7 @@ describe("UserApplicationRow component", () => {
 
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(
-            `/applications/${defaultProps.application.address}`,
+            `/applications/${defaultProps.application.address}/${defaultProps.application.rollupVersion}`,
         );
     });
 
@@ -138,7 +150,7 @@ describe("UserApplicationRow component", () => {
 
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(
-            `/applications/${defaultProps.application.address}/inputs`,
+            `/applications/${defaultProps.application.address}/${defaultProps.application.rollupVersion}/inputs`,
         );
     });
 

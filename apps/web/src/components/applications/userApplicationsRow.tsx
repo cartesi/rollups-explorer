@@ -25,8 +25,8 @@ import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
 
 export interface UserApplicationsRowProps {
     application: Omit<Application, "inputs">;
-    keepDataColVisible: boolean;
     timeType: "timestamp" | "age";
+    keepDataColVisible: boolean;
 }
 
 const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
