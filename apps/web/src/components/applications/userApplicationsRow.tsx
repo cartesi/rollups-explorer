@@ -17,12 +17,14 @@ import {
     TbStack2,
 } from "react-icons/tb";
 import { Address as AddressType } from "viem";
+import { Application } from "../../graphql/explorer/types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
-import { ApplicationRowProps } from "./applicationRow";
 
-export interface UserApplicationsRowProps extends ApplicationRowProps {
+export interface UserApplicationsRowProps {
+    application: Omit<Application, "inputs">;
     timeType: "timestamp" | "age";
+    keepDataColVisible: boolean;
 }
 
 const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
@@ -33,7 +35,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
         showConnectionModal,
         removeConnection,
     } = useConnectionConfig();
-    const appId = application.id as AddressType;
+    const appId = application.address as AddressType;
     const version = application.rollupVersion;
     const connection = getConnection(appId);
     return (
