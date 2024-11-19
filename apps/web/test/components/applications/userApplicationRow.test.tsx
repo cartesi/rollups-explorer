@@ -3,13 +3,23 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { ApplicationRowProps } from "../../../src/components/applications/applicationRow";
 import UserApplicationsRow, {
     UserApplicationsRowProps,
 } from "../../../src/components/applications/userApplicationsRow";
+import { RollupVersion } from "../../../src/graphql/explorer/types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+
 vi.mock("../../../src/providers/connectionConfig/hooks");
+
+vi.mock("viem", async () => {
+    const actual = await vi.importActual("viem");
+    return {
+        ...(actual as any),
+        getAddress: (address: string) => address,
+    };
+});
+
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 
 const TableComponent: FC<UserApplicationsRowProps> = (props) => (
@@ -24,13 +34,22 @@ const Component = withMantineTheme(TableComponent);
 
 const defaultProps: UserApplicationsRowProps = {
     application: {
-        id: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
+        id: "11155111-0x028367fe226cd9e5699f4288d512fe3a4a4a0012-v1",
         owner: "0x74d093f6911ac080897c3145441103dabb869307",
         timestamp: 1700593992,
+        chain: {
+            id: "11155111",
+        },
         factory: {
             id: "0x7122cd1221c20892234186facfe8615e6743ab02",
             applications: [],
+            address: "0x7122cd1221c20892234186facfe8615e6743ab02",
+            chain: {
+                id: "11155111",
+            },
         },
+        address: "0x028367fe226cd9e5699f4288d512fe3a4a4a0012",
+        rollupVersion: RollupVersion.V1,
     },
     keepDataColVisible: false,
     timeType: "age",
@@ -51,6 +70,7 @@ describe("UserApplicationRow component", () => {
             hideConnectionModal: vi.fn(),
             showConnectionModal: vi.fn(),
             listConnections: vi.fn(),
+            fetching: false,
         });
     });
 
@@ -62,7 +82,7 @@ describe("UserApplicationRow component", () => {
     it("should display shortened application id", () => {
         render(<Component {...defaultProps} />);
         const { application } = defaultProps;
-        const appId = application.id;
+        const appId = application.address;
         const shortenedId = `${appId.slice(0, 8)}...${appId.slice(-6)}`;
 
         expect(screen.getByText(shortenedId)).toBeInTheDocument();
@@ -114,7 +134,7 @@ describe("UserApplicationRow component", () => {
 
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(
-            `/applications/${defaultProps.application.id}`,
+            `/applications/${defaultProps.application.address}/${defaultProps.application.rollupVersion}`,
         );
     });
 
@@ -124,7 +144,7 @@ describe("UserApplicationRow component", () => {
 
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(
-            `/applications/${defaultProps.application.id}/inputs`,
+            `/applications/${defaultProps.application.address}/${defaultProps.application.rollupVersion}/inputs`,
         );
     });
 
@@ -133,7 +153,7 @@ describe("UserApplicationRow component", () => {
         expect(screen.getByTestId("add-connection")).toBeInTheDocument();
     });
 
-    it("should invoke showConnectionModal with application id, when add-connection button is clicked", () => {
+    it("should invoke showConnectionModal with application address, when add-connection button is clicked", () => {
         const showConnectionModalMock = vi.fn();
         useConnectionConfigMock.mockReturnValue({
             ...useConnectionConfigMock(),
@@ -147,7 +167,7 @@ describe("UserApplicationRow component", () => {
         fireEvent.click(addConnectionButton);
 
         expect(showConnectionModalMock).toHaveBeenCalledWith(
-            defaultProps.application.id,
+            defaultProps.application.address,
         );
     });
 
@@ -175,7 +195,7 @@ describe("UserApplicationRow component", () => {
         fireEvent.click(addConnectionButton);
 
         expect(removeConnectionMock).toHaveBeenCalledWith(
-            defaultProps.application.id,
+            defaultProps.application.address,
         );
     });
 });
