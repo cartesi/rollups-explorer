@@ -1,6 +1,6 @@
 import { useFormContext } from "./context";
 import { Button, TextInput } from "@mantine/core";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { AbiFunction } from "viem";
 import {
     generateAbiParamFormSpecification,
@@ -10,11 +10,12 @@ import { AbiInputParam } from "./types";
 
 export const AbiParameter = () => {
     const form = useFormContext();
-    const { abiParam, savedAbiParam } = form.getTransformedValues();
+    const { abiParam, savedAbiParam, specificationId, selectedSpecification } =
+        form.getTransformedValues();
+    const lastSpecificationId = useRef(specificationId);
 
     const addABIParam = useCallback(() => {
         form.setFieldValue("savedAbiParam", abiParam);
-
         const selectedSpecification =
             generateAbiParamFormSpecification(abiParam);
 
@@ -34,6 +35,23 @@ export const AbiParameter = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' is not added on purpose because it has unstable reference
     }, [abiParam]);
+
+    useEffect(() => {
+        if (specificationId !== lastSpecificationId.current) {
+            lastSpecificationId.current = specificationId;
+
+            const nextAbiFunction = (
+                selectedSpecification?.abi as AbiFunction[]
+            )[0];
+
+            if (nextAbiFunction) {
+                resetAbiFunctionParams(
+                    form,
+                    nextAbiFunction.inputs as AbiInputParam[],
+                );
+            }
+        }
+    }, [form, selectedSpecification?.abi, specificationId]);
 
     return (
         <TextInput

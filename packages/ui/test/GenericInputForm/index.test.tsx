@@ -66,10 +66,6 @@ vi.mock("@mantine/form", async () => {
 
 describe("GenericInputForm", () => {
     // beforeAll(() => {
-    //     vi.spyOn(initialValues, "initialValues", "get").mockReturnValue({
-    //         ...initialValues.initialValues,
-    //     });
-    // });
     afterAll(() => {
         vi.clearAllMocks();
     });
