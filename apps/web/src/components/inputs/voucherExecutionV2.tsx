@@ -117,6 +117,7 @@ const VoucherExecutionV2: FC<Props> = ({ input, voucher }) => {
         <div>
             <Tooltip label={tooltipText} disabled={!isTooltipEnabled}>
                 <Button
+                    id={`execute-voucher-${voucher.index}-from-input-${input.id}`}
                     disabled={isExecuteDisabled}
                     loading={executing}
                     onClick={() => execute.writeContract(prepare.data!.request)}
