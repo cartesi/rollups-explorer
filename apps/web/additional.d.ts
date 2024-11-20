@@ -8,6 +8,11 @@ declare namespace NodeJS {
          * Public available rollups-explorer-api graphql endpoint.
          */
         NEXT_PUBLIC_EXPLORER_API_URL: string;
+
+        /**
+         * A short-lived public preview rollups-explorer-api graphql endpoint (for development purposes)
+         */
+        NEXT_PUBLIC_PREVIEW_EXPLORER_API_URL: string;
         /**
          * Alchemy API key to have an extra rpc-node to work in conjunction with public nodes.
          */

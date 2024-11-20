@@ -5,7 +5,9 @@ import { join, sep } from "path";
 const basePath = join("src", "graphql");
 const rollupsBasePath = join("graphql", "rollups");
 // FIXUP: to be replaced with new deployed API.
-const explorerSchema = "https://api.cartesiscan.io/graphql";
+const explorerSchema =
+    process.env.NEXT_PUBLIC_PREVIEW_EXPLORER_API_URL ??
+    "https://api.cartesiscan.io/graphql";
 const explorerAPIQueries = join(".", "graphql", "queries.graphql");
 const rollupsSchema = join(".", rollupsBasePath, "schema.graphql");
 const rollupsDocuments = join(".", rollupsBasePath, "queries.graphql");
