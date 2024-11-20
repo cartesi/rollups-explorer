@@ -3,6 +3,7 @@ import { ContractConfig, defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import type { Abi } from "abitype";
 import { erc20Abi, erc721Abi } from "viem";
+import OutputsContract from "../../node_modules/@cartesi/rollups-v2/export/artifacts/contracts/common/Outputs.sol/Outputs.json";
 import CartesiApplicationContract from "../../node_modules/@cartesi/rollups-v2/export/artifacts/contracts/dapp/Application.sol/Application.json";
 import CartesiDAppContract from "../../node_modules/@cartesi/rollups/export/artifacts/contracts/dapp/CartesiDApp.sol/CartesiDApp.json";
 import { erc1155Abi } from "./abi/ERC1155";
@@ -25,8 +26,6 @@ const generateV2ContractsConfig = (): ContractConfig[] => {
         name: `V2${contract.name}`,
     }));
 };
-
-generateV2ContractsConfig();
 
 export default defineConfig({
     out: "src/index.tsx",
@@ -51,6 +50,10 @@ export default defineConfig({
         {
             name: "V2CartesiApplication",
             abi: CartesiApplicationContract.abi as Abi,
+        },
+        {
+            name: "V2OutputFactory",
+            abi: OutputsContract.abi as Abi,
         },
 
         ...generateV2ContractsConfig(),
