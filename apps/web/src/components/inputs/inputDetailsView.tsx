@@ -284,7 +284,8 @@ const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const voucherDecoderRes = useVoucherDecoder({
         payload: payloadOrString(vouchers) as Hex,
         destination: voucherDestination,
-        chainId: chainId,
+        chainId,
+        appVersion,
     });
 
     const selectData = buildSelectData(
