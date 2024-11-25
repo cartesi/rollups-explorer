@@ -4,6 +4,7 @@ import {
     Checkbox,
     Collapse,
     Fieldset,
+    Flex,
     Group,
     NumberInput,
     Select,
@@ -13,8 +14,9 @@ import {
     Text,
     TextInput,
     Title,
-    VisuallyHidden,
+    Tooltip,
     useMantineTheme,
+    VisuallyHidden,
 } from "@mantine/core";
 import { createFormActions, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -22,6 +24,7 @@ import { AbiType } from "abitype";
 import { any, clone, gt, gte, isEmpty, isNil, lt, reject } from "ramda";
 import {
     isBlank,
+    isBoolean,
     isFunction,
     isNilOrEmpty,
     isNotNilOrEmpty,
@@ -30,6 +33,7 @@ import { FC, ReactNode, useEffect, useRef } from "react";
 import {
     TbArrowsDiagonal,
     TbArrowsDiagonalMinimize2,
+    TbInfoCircle,
     TbTrash,
 } from "react-icons/tb";
 import { SliceInstruction } from "../../types";
@@ -48,6 +52,9 @@ const InstructionsReview: FC<Props> = ({ slices, onSliceChange }) => {
             <Table.Td>{slice.from}</Table.Td>
             <Table.Td>{slice.to ?? "end of bytes"}</Table.Td>
             <Table.Td>{`${isEmpty(slice.type) ? "Hex" : slice.type}`}</Table.Td>
+            <Table.Td>{`${
+                isBoolean(slice.optional) && slice.optional ? "Yes" : "No"
+            }`}</Table.Td>
             <Table.Td>
                 <Button
                     size="compact-sm"
@@ -100,6 +107,9 @@ const InstructionsReview: FC<Props> = ({ slices, onSliceChange }) => {
                                     Type
                                 </Table.Th>
                                 <Table.Th style={{ whiteSpace: "nowrap" }}>
+                                    Optional
+                                </Table.Th>
+                                <Table.Th style={{ whiteSpace: "nowrap" }}>
                                     Action
                                 </Table.Th>
                             </Table.Tr>
@@ -126,6 +136,7 @@ interface FormValues {
         from: string;
         to: string;
         type: string;
+        optional?: boolean;
     };
 }
 
@@ -191,6 +202,7 @@ const initialValues: FormValues = {
         from: "",
         to: "",
         type: "",
+        optional: false,
     },
 };
 
@@ -295,6 +307,40 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                             description="Optional: Empty means return slice value as-is (i.e. Hex.)"
                             {...form.getInputProps("sliceInput.type")}
                         />
+                        <Group
+                            justify="space-between"
+                            align="normal"
+                            wrap="nowrap"
+                        >
+                            <Stack gap={0}>
+                                <Flex>
+                                    <Text component="span" size="sm" mr={4}>
+                                        Optional
+                                    </Text>
+                                    <Tooltip
+                                        label="An optional boolean flag used to control the decoding behavior for the byte slice. When turned on, the decoder won't throw an exception caused by slicing the byte range, if that range is out of bounds (not found). Instead a fallback value of nil ('0x') will by used for that byte slice."
+                                        multiline
+                                        w={300}
+                                    >
+                                        <Text>
+                                            <TbInfoCircle />
+                                        </Text>
+                                    </Tooltip>
+                                </Flex>
+                                <Text size="xs" c="dimmed" component="span">
+                                    Signal to the decoder not to throw an
+                                    exception caused by slicing the byte range.
+                                </Text>
+                            </Stack>
+                            <Switch
+                                data-testid="byte-slice-optional-switch"
+                                {...form.getInputProps("sliceInput.optional")}
+                                checked={
+                                    form.getInputProps("sliceInput.optional")
+                                        .value
+                                }
+                            />
+                        </Group>
                     </Stack>
                     <Group justify="flex-end" mt="md">
                         <Button
@@ -310,12 +356,14 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                                     !isEmpty(sliceInput.to)
                                         ? parseInt(sliceInput?.to)
                                         : undefined;
+                                const optional = sliceInput.optional;
 
                                 const slice: SliceInstruction = {
                                     from,
                                     to,
                                     name,
                                     type,
+                                    optional,
                                 };
 
                                 const newSlices = [...(slices ?? []), slice];
