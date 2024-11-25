@@ -318,7 +318,7 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
                                         Optional
                                     </Text>
                                     <Tooltip
-                                        label="An optional boolean flag used to control the decoding behavior for the byte slice. When turned on, the decoder won't throw an exception caused by slicing the byte range, if that range is out of bounds (not found). Instead a fallback value of nil ('0x') will by used for that byte slice."
+                                        label="An optional boolean flag used to control the decoding behavior for the byte slice. When turned on, the decoder won't throw an exception caused by slicing the byte range, if that range is out of bounds (not found). Instead a fallback value of nil ('0x') will be used for that byte slice."
                                         multiline
                                         w={300}
                                     >
