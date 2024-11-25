@@ -7,10 +7,12 @@ import {
     FormValues,
     FormTransformedValues,
 } from "./types";
-import { prepareSignatures } from "web/src/components/specification/utils";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 import { UseFormReturnType } from "@mantine/form";
 import { v4 as uuidv4 } from "uuid";
+
+export const prepareSignatures = (multiline: string) =>
+    multiline.split("\n").map((signature) => signature?.trim());
 
 export const encodeFunctionParam = (param: AbiValueParameter) => {
     switch (param.type) {

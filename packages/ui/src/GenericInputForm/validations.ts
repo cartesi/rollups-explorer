@@ -1,7 +1,7 @@
 import { isAddress, isHex, parseAbi, parseAbiParameters } from "viem";
 import { FormValues } from "./types";
 import { isBlank } from "ramda-adjunct";
-import { prepareSignatures } from "web/src/components/specification/utils";
+import { prepareSignatures } from "./utils";
 
 export const validateApplication = (value: string) =>
     value !== "" && isAddress(value) ? null : "Invalid application";
