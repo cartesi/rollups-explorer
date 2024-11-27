@@ -1,16 +1,65 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, describe, it } from "vitest";
+import {
+    etherPortalAbi,
+    etherPortalAddress,
+    v2EtherPortalAbi,
+    v2EtherPortalAddress,
+} from "@cartesi/rollups-wagmi";
+import {
+    fireEvent,
+    getByText,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import { omit } from "ramda";
+import { beforeEach, describe, it } from "vitest";
+import {
+    useSimulateContract,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from "wagmi";
 import { EtherDepositForm } from "../src/EtherDepositForm";
+import { Application } from "../src/commons/interfaces";
 import withMantineTheme from "./utils/WithMantineTheme";
-import { getAddress } from "viem";
 
 const Component = withMantineTheme(EtherDepositForm);
 
-const applications = [
-    "0x60a7048c3136293071605a4eaffef49923e981cc",
-    "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
-    "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
+const applications: Application[] = [
+    {
+        address: "0x60a7048c3136293071605a4eaffef49923e981cc",
+        id: "11155111-0x60a7048c3136293071605a4eaffef49923e981cc-v1",
+        rollupVersion: "v1",
+    },
+    {
+        address: "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
+        id: "11155111-0x70ac08179605af2d9e75782b8decdd3c22aa4d0c-v1",
+        rollupVersion: "v1",
+    },
+    {
+        address: "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
+        id: "11155111-0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3-v1",
+        rollupVersion: "v1",
+    },
 ];
+
+const selectApp = (app: Application) => {
+    const appInput = screen.getByTestId("application-input");
+
+    return fireEvent.change(appInput, {
+        target: {
+            value: app.address.toLowerCase(),
+        },
+    });
+};
+
+const setRequiredValueToOpenForm = async (app: Application) => {
+    selectApp(app);
+    await waitFor(() => expect(screen.getByText("Advanced")).toBeVisible());
+
+    fireEvent.click(screen.getByText("Advanced"));
+
+    await waitFor(() => expect(screen.getByText("Extra data")).toBeVisible());
+};
 
 const defaultProps = {
     applications,
@@ -19,25 +68,14 @@ const defaultProps = {
     onSuccess: () => undefined,
 };
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        useSimulateEtherPortalDepositEther: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-            reset: vi.fn(),
-        }),
-        useWriteEtherPortalDepositEther: () => ({
-            wait: vi.fn(),
-            reset: vi.fn(),
-        }),
-    };
-});
-
 vi.mock("wagmi", async () => {
+    const actual = await vi.importActual("wagmi");
+
     return {
-        useWaitForTransactionReceipt: () => ({}),
+        ...actual,
+        useSimulateContract: vi.fn(),
+        useWriteContract: vi.fn(),
+        useWaitForTransactionReceipt: vi.fn(),
         useAccount: () => ({
             chain: {
                 nativeCurrency: {
@@ -64,30 +102,225 @@ vi.mock("@mantine/form", async () => {
     };
 });
 
+const useSimulateContractMock = vi.mocked(useSimulateContract, {
+    partial: true,
+});
+
+const useWriteContractMock = vi.mocked(useWriteContract, { partial: true });
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    { partial: true },
+);
+
+/**
+ * Object to support testing callback calls like onSuccces, onSearchApplication etc.
+ * That wait object is to avoid infinite loop by making a computed prop change when deposit reset is called.
+ */
+const depositWaitStatus = {
+    _status: "success",
+    get props(): {
+        status?: "success";
+        isSuccess?: true;
+    } {
+        return this._status === "success"
+            ? { status: "success", isSuccess: true }
+            : {};
+    },
+    reset() {
+        this._status = "idle";
+    },
+};
+
 describe("Rollups EtherDepositForm", () => {
-    afterAll(() => {
-        vi.restoreAllMocks();
+    beforeEach(() => {
+        useSimulateContractMock.mockReturnValue({
+            data: undefined,
+            status: "success",
+            isLoading: false,
+            isFetching: false,
+            isSuccess: true,
+        });
+
+        useWriteContractMock.mockReturnValue({
+            data: undefined,
+            status: "idle",
+            writeContract: vi.fn(),
+            reset: vi.fn(),
+        });
+
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isSuccess: false,
+        });
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("should display only the application field initially", () => {
+        render(<Component {...defaultProps} />);
+
+        expect(screen.getByText("Application")).toBeInTheDocument();
+        expect(
+            screen.getByText("The application smart contract address"),
+        ).toBeInTheDocument();
+    });
+
+    it("should display the other fields and deposit button after an application is chosen", () => {
+        render(
+            <Component {...defaultProps} applications={[applications[0]]} />,
+        );
+
+        expect(screen.getByText("Application")).toBeInTheDocument();
+        expect(screen.getByText("Amount")).toBeInTheDocument();
+        expect(screen.getByText("Advanced")).toBeInTheDocument();
+        expect(screen.getByText("Deposit")).toBeInTheDocument();
+    });
+
+    it("should display warning message for undeployed app application", async () => {
+        render(<Component {...defaultProps} applications={[]} />);
+
+        const appInput = screen.getByTestId("application-input");
+
+        fireEvent.change(appInput, {
+            target: {
+                value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+            },
+        });
+
+        await waitFor(() =>
+            expect(
+                screen.getByText(
+                    "This is a deposit to an undeployed application.",
+                ),
+            ).toBeVisible(),
+        );
+    });
+
+    it("should ask user to choose rollup version when application is considered undeployed", async () => {
+        render(<Component {...defaultProps} applications={[]} />);
+
+        const appInput = screen.getByTestId("application-input");
+
+        fireEvent.change(appInput, {
+            target: {
+                value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+            },
+        });
+
+        await waitFor(() =>
+            expect(
+                screen.getByText(
+                    "This is a deposit to an undeployed application.",
+                ),
+            ).toBeVisible(),
+        );
+
+        expect(screen.getByText("Cartesi Rollups version")).toBeVisible();
+        expect(
+            screen.getByText(
+                "Set the rollup version to call the correct contracts.",
+            ),
+        ).toBeVisible();
+
+        const segmentControlOptions = screen.getByRole("radiogroup");
+
+        expect(getByText(segmentControlOptions, "Rollup v1")).toBeVisible();
+        expect(getByText(segmentControlOptions, "Rollup v2")).toBeVisible();
+    });
+
+    it("should display the rest of the form after user manually choose the Rollup version", async () => {
+        render(<Component {...defaultProps} applications={[]} />);
+
+        const appInput = screen.getByTestId("application-input");
+
+        fireEvent.change(appInput, {
+            target: {
+                value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+            },
+        });
+
+        await waitFor(() =>
+            expect(screen.getByText("Cartesi Rollups version")).toBeVisible(),
+        );
+
+        const segmentControlOptions = screen.getByRole("radiogroup");
+
+        expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
+
+        fireEvent.click(getByText(segmentControlOptions, "Rollup v1"));
+
+        await waitFor(() =>
+            expect(screen.getByTestId("eth-amount-input")).toBeVisible(),
+        );
+
+        expect(screen.getByText("Advanced")).toBeVisible();
+        expect(screen.getByText("Deposit")).toBeVisible();
+    });
+
+    it("should setup correct contract configs when rollup version is chosen for undeployed application", async () => {
+        render(<Component {...defaultProps} applications={[]} />);
+
+        const appInput = screen.getByTestId("application-input");
+
+        fireEvent.change(appInput, {
+            target: {
+                value: "0x60a7048c3136293071605a4eaffef49923e981fe",
+            },
+        });
+
+        await waitFor(() =>
+            expect(screen.getByText("Cartesi Rollups version")).toBeVisible(),
+        );
+
+        const segmentControlOptions = screen.getByRole("radiogroup");
+        fireEvent.click(getByText(segmentControlOptions, "Rollup v1"));
+
+        const paramsForV1 = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+        expect(paramsForV1).toHaveProperty("abi", etherPortalAbi);
+        expect(paramsForV1).toHaveProperty("address", etherPortalAddress);
+
+        fireEvent.click(getByText(segmentControlOptions, "Rollup v2"));
+
+        const paramsForV2 = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+        expect(paramsForV2).toHaveProperty("abi", v2EtherPortalAbi);
+        expect(paramsForV2).toHaveProperty("address", v2EtherPortalAddress);
     });
 
     describe("Extra data textarea", () => {
-        it("should display correct label", () => {
-            render(<Component {...defaultProps} />);
+        it("should display correct label and description", async () => {
+            render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
 
-            expect(screen.getByText("Extra data")).toBeInTheDocument();
-        });
+            await setRequiredValueToOpenForm(applications[0]);
 
-        it("should display correct description", () => {
-            render(<Component {...defaultProps} />);
+            expect(screen.getByText("Extra data")).toBeVisible();
 
             expect(
                 screen.getByText(
                     "Extra execution layer data handled by the application",
                 ),
-            ).toBeInTheDocument();
+            ).toBeVisible();
         });
 
-        it("should display error when value is not hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
+        it("should display error when value is not hex", async () => {
+            const { container } = render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
+
+            await setRequiredValueToOpenForm(applications[0]);
+
             const textarea = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
@@ -104,8 +337,16 @@ describe("Rollups EtherDepositForm", () => {
             expect(screen.getByText("Invalid hex string")).toBeInTheDocument();
         });
 
-        it("should not display error when value is hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
+        it("should not display error when value is hex", async () => {
+            const { container } = render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
+
+            await setRequiredValueToOpenForm(applications[0]);
+
             const textarea = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
@@ -125,91 +366,98 @@ describe("Rollups EtherDepositForm", () => {
         });
 
         it("should correctly format extra data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            const { container } = render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
 
-            const { container } = render(<Component {...defaultProps} />);
+            await setRequiredValueToOpenForm(applications[0]);
+
             const execLayerDataInput = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
 
             const hexValue = "0x123123";
+
             fireEvent.change(execLayerDataInput, {
                 target: {
                     value: hexValue,
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", hexValue],
-                query: {
-                    enabled: false,
-                },
-                value: undefined,
-            });
+            const simulateParams =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(simulateParams).toHaveProperty("args", [
+                "0x60a7048c3136293071605a4eaffef49923e981cc",
+                hexValue,
+            ]);
+
+            expect(simulateParams).toHaveProperty("query", { enabled: false });
+            expect(simulateParams).toHaveProperty("value", undefined);
         });
     });
 
     describe("Send button", () => {
-        it("should be disabled when extra data is not hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
+        it("should be disabled when extra data is not hex", async () => {
+            render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
+
+            await setRequiredValueToOpenForm(applications[0]);
+
+            const textarea = screen.getByTestId("eth-extra-data-input");
+            const submitButton = screen.getByText("Deposit").closest("button");
 
             fireEvent.change(textarea, {
                 target: {
                     value: "",
                 },
             });
+
             fireEvent.blur(textarea);
 
-            expect(submitButton.hasAttribute("disabled")).toBe(true);
+            expect(submitButton?.hasAttribute("disabled")).toBe(true);
         });
 
         it("should invoke write function when send button is clicked", async () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockReturnValue({
-                    ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                    data: {
-                        request: {},
-                    },
-                    loading: false,
-                    error: null,
-                });
-            rollupsWagmi.useWriteEtherPortalDepositEther = vi
-                .fn()
-                .mockReturnValue({
-                    ...rollupsWagmi.useWriteEtherPortalDepositEther,
-                    writeContract: mockedWrite,
-                    reset: vi.fn(),
-                });
 
-            const { container } = render(<Component {...defaultProps} />);
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
+            useSimulateContractMock.mockReturnValue({
+                data: {
+                    request: {},
+                },
+                isLoading: false,
+                error: null,
+            });
 
-            const inputs = container.querySelectorAll("input");
-            const applicationInput = inputs[0] as HTMLInputElement;
-            const amountInput = inputs[1] as HTMLInputElement;
-            applicationInput.setAttribute("value", selectedApplication);
+            useWriteContractMock.mockReturnValue({
+                reset: vi.fn(),
+                writeContract: mockedWrite,
+            });
 
-            fireEvent.change(applicationInput, {
+            render(
+                <Component
+                    {...defaultProps}
+                    applications={[selectedApplication]}
+                />,
+            );
+
+            await setRequiredValueToOpenForm(selectedApplication);
+
+            const appInput = screen.getByTestId("application-input");
+            const amountInput = screen.getByTestId("eth-amount-input");
+            const submitButton = screen.getByText("Deposit");
+
+            fireEvent.change(appInput, {
                 target: {
-                    value: selectedApplication,
+                    value: selectedApplication.address.toLowerCase(),
                 },
             });
 
@@ -220,319 +468,193 @@ describe("Rollups EtherDepositForm", () => {
             });
 
             fireEvent.blur(amountInput);
+
             expect(submitButton.hasAttribute("disabled")).toBe(false);
 
             fireEvent.click(submitButton);
+
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should invoke onSearchApplications function after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
-                status: "success",
-                isSuccess: true,
+        it('should enable "useSimulateContract" only when the form is valid', async () => {
+            const selectedApp = applications[0];
+
+            render(
+                <Component {...defaultProps} applications={[selectedApp]} />,
+            );
+
+            await setRequiredValueToOpenForm(selectedApp);
+
+            const appInput = screen.getByTestId("application-input");
+            const amountInput = screen.getByTestId("eth-amount-input");
+            const textarea = screen.getByTestId("eth-extra-data-input");
+
+            let params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(params).toHaveProperty("query", { enabled: false });
+
+            fireEvent.change(appInput, {
+                target: {
+                    value: selectedApp.address.toLowerCase(),
+                },
             });
 
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "",
+                },
+            });
+
+            params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(params).toHaveProperty("query", { enabled: false });
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0.1",
+                },
+            });
+
+            params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(params).toHaveProperty("query", { enabled: true });
+
+            fireEvent.change(textarea, {
+                target: { value: "invalid-hex-value" },
+            });
+
+            params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(params).toHaveProperty("query", { enabled: false });
+
+            fireEvent.change(textarea, { target: { value: "0x" } });
+
+            params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(params).toHaveProperty("query", { enabled: true });
+            expect(params).toHaveProperty("args", [
+                selectedApp.address.toLowerCase(),
+                "0x",
+            ]);
+            expect(params).toHaveProperty("value", 100000000000000000n);
+        });
+
+        it("should invoke onSearchApplications and OnSuccess function after successful deposit", async () => {
+            const app = applications[0];
             const onSearchApplicationsMock = vi.fn();
+            const onSuccessMock = vi.fn();
+
+            useWriteContractMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {
+                    depositWaitStatus.reset();
+                },
+            });
+
+            useWaitForTransactionReceiptMock.mockImplementation((params) => {
+                return params?.hash === "0x0001"
+                    ? {
+                          ...depositWaitStatus.props,
+                          fetchStatus: "idle",
+                          data: { transactionHash: "0x01" },
+                      }
+                    : {
+                          fetchStatus: "idle",
+                      };
+            });
+
             render(
                 <Component
                     {...defaultProps}
                     onSearchApplications={onSearchApplicationsMock}
+                    onSuccess={onSuccessMock}
+                    applications={[app]}
                 />,
             );
 
+            await setRequiredValueToOpenForm(app);
+
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
-        });
-
-        it('should enable "useSimulateEtherPortalDepositEther" only when the form is valid', async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
+            expect(onSuccessMock).toHaveBeenCalledWith({
+                receipt: { transactionHash: "0x01" },
+                type: "ETHER",
             });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const applicationsInput = container.querySelector(
-                "input",
-            ) as HTMLInputElement;
-            const amountInput = container.querySelectorAll(
-                "input",
-            )[1] as HTMLInputElement;
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
-
-            const [application] = applications;
-
-            fireEvent.change(applicationsInput, {
-                target: {
-                    value: "",
-                },
-            });
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.1",
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "0x",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", "0x"],
-                query: {
-                    enabled: false,
-                },
-                value: 100000000000000000n,
-            });
-
-            fireEvent.change(applicationsInput, {
-                target: {
-                    value: application,
-                },
-            });
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "",
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "0x",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                query: {
-                    enabled: false,
-                },
-                value: undefined,
-            });
-
-            fireEvent.change(applicationsInput, {
-                target: {
-                    value: application,
-                },
-            });
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.1",
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x"],
-                query: {
-                    enabled: false,
-                },
-                value: 100000000000000000n,
-            });
-
-            fireEvent.change(applicationsInput, {
-                target: {
-                    value: application,
-                },
-            });
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.1",
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "0x123",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x123"],
-                query: {
-                    enabled: true,
-                },
-                value: 100000000000000000n,
-            });
-        });
-
-        it("should invoke onSuccess callback after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
-                isSuccess: true,
-            });
-
-            const onSuccessMock = vi.fn();
-            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
-
-            expect(onSuccessMock).toHaveBeenCalled();
         });
     });
 
     describe("ApplicationAutocomplete", () => {
-        it("should display correct label for applications input", () => {
-            render(<Component {...defaultProps} />);
-
-            expect(screen.getByText("Application")).toBeInTheDocument();
-        });
-
-        it("should display correct description for applications input", () => {
-            render(<Component {...defaultProps} />);
-
-            expect(
-                screen.getByText("The application smart contract address"),
-            ).toBeInTheDocument();
-        });
-
         it("should display correct placeholder", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input");
+            render(<Component {...defaultProps} />);
+            const input = screen.getByTestId("application-input");
 
-            expect(input?.getAttribute("placeholder")).toBe("0x");
-        });
-
-        it("should display alert for unemployed application", async () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
-
-            fireEvent.change(input, {
-                target: {
-                    value: "0x60a7048c3136293071605a4eaffef49923e981fe",
-                },
-            });
-
-            await waitFor(
-                () =>
-                    expect(
-                        screen.getByText(
-                            "This is a deposit to an undeployed application.",
-                        ),
-                    ).toBeInTheDocument(),
-                {
-                    timeout: 1100,
-                },
-            );
+            expect(input.getAttribute("placeholder")).toBe("0x");
         });
 
         it("should display error when application is invalid", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
+            render(<Component {...defaultProps} />);
+            const input = screen.getByTestId("application-input");
 
             fireEvent.change(input, {
                 target: {
-                    value: "0x60a7048c3136293071605a4eaffef49923e981ccffffffff",
+                    value: "0x60a7048c",
                 },
             });
 
             fireEvent.blur(input);
 
             expect(input.getAttribute("aria-invalid")).toBe("true");
-            expect(screen.getByText("Invalid application")).toBeInTheDocument();
-        });
-
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
-
-            const [application] = applications;
-            fireEvent.change(input, {
-                target: {
-                    value: application,
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                query: {
-                    enabled: false,
-                },
-                value: undefined,
-            });
+            expect(
+                screen.getByText("Invalid application address"),
+            ).toBeInTheDocument();
         });
     });
 
     describe("Alerts", () => {
-        it("should display alert for successful transaction", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
-                status: "success",
-                isSuccess: true,
-            });
-
-            render(<Component {...defaultProps} />);
-            expect(
-                screen.getByText("Ether deposited successfully!"),
-            ).toBeInTheDocument();
-        });
-
-        it("should display alert for failed transaction", async () => {
-            const wagmi = await import("wagmi");
+        it("should display feedback for failed transaction", async () => {
             const message = "User declined the transaction";
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: undefined,
                 error: {
                     message,
+                    shortMessage: "",
+                    code: 10,
+                    details: message,
+                    name: "UnknownRpcError",
+                    version: "10",
+                    walk() {
+                        return new Error(message);
+                    },
                 },
                 status: "error",
             });
 
-            render(<Component {...defaultProps} />);
+            render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
+
+            await setRequiredValueToOpenForm(applications[0]);
+
             expect(screen.getByText(message)).toBeInTheDocument();
         });
     });
 
     describe("Amount input", () => {
         it("should correctly process small decimal numbers", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                data: {
-                    request: {},
-                },
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            const { container } = render(
+                <Component
+                    {...defaultProps}
+                    applications={[applications[0]]}
+                />,
+            );
+            await setRequiredValueToOpenForm(applications[0]);
 
-            const { container } = render(<Component {...defaultProps} />);
-            const amountInput = container.querySelector(
-                '[type="number"]',
-            ) as HTMLInputElement;
+            const appInput = screen.getByTestId("application-input");
+            const amountInput = screen.getByTestId("eth-amount-input");
 
             fireEvent.change(amountInput, {
                 target: {
@@ -540,42 +662,15 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", "0x"],
+            const params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(omit(["abi", "address", "functionName"], params)).toEqual({
+                args: [applications[0].address.toLowerCase(), "0x"],
                 value: 100000000000n,
                 query: {
-                    enabled: false,
+                    enabled: true,
                 },
             });
-        });
-    });
-
-    describe("Form", () => {
-        it("should reset form after successful submission", async () => {
-            const mantineForm = await import("@mantine/form");
-            const [application] = applications;
-            const resetMock = vi.fn();
-            vi.spyOn(mantineForm, "useForm").mockReturnValue({
-                getTransformedValues: () => ({
-                    address: getAddress(application),
-                    rawInput: "0x",
-                }),
-                isValid: () => true,
-                getInputProps: () => {},
-                errors: {},
-                setFieldValue: () => "",
-                reset: resetMock,
-            } as any);
-
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
-                isSuccess: true,
-            });
-
-            render(<Component {...defaultProps} />);
-            expect(resetMock).toHaveBeenCalled();
         });
     });
 });
