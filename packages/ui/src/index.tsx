@@ -19,4 +19,5 @@ export {
 export { Summary } from "./Summary";
 export { SummaryCard } from "./SummaryCard";
 export { TransactionProgress } from "./TransactionProgress";
+export { type RollupVersion } from "./commons/interfaces";
 export { default as useWatchQueryOnBlockChange } from "./hooks/useWatchQueryOnBlockChange";
