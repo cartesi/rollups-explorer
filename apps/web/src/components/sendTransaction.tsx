@@ -5,7 +5,8 @@ import {
     ERC20DepositForm,
     ERC721DepositForm,
     EtherDepositForm,
-    RawInputForm,
+    GenericInputForm,
+    GenericInputFormSpecification,
     TransactionFormSuccessData,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
@@ -17,6 +18,8 @@ import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
 import getConfiguredChainId from "../lib/getConfiguredChain";
 import { BlockExplorerLink } from "./BlockExplorerLink";
+import { useSpecification } from "./specification/hooks/useSpecification";
+import { JSON_ABI } from "./specification/types";
 
 export type DepositType =
     | "ether"
@@ -63,6 +66,9 @@ const SendTransaction: FC<DepositProps> = ({
         address: debouncedMultiTokenId,
         chainId,
     });
+    const { listSpecifications } = useSpecification();
+    const specifications =
+        listSpecifications()?.filter((s) => s.mode === JSON_ABI) ?? [];
 
     const onSuccess = useCallback(
         ({ receipt, type }: TransactionFormSuccessData) => {
@@ -120,7 +126,7 @@ const SendTransaction: FC<DepositProps> = ({
                     },
                     {
                         group: "Other",
-                        items: [{ value: "input", label: "Raw Input" }],
+                        items: [{ value: "input", label: "Generic Input" }],
                     },
                 ]}
                 value={depositType}
@@ -154,8 +160,11 @@ const SendTransaction: FC<DepositProps> = ({
                     onSuccess={onSuccess}
                 />
             ) : depositType === "input" ? (
-                <RawInputForm
+                <GenericInputForm
                     applications={applications}
+                    specifications={
+                        specifications as GenericInputFormSpecification[]
+                    }
                     isLoadingApplications={fetching}
                     onSearchApplications={setApplicationId}
                     onSuccess={onSuccess}
