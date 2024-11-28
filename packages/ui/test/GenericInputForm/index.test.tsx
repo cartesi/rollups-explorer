@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { AbiFunction, getAddress, stringToHex } from "viem";
 import { afterAll, describe, it } from "vitest";
 import { GenericInputForm } from "../../src/GenericInputForm";
 import withMantineTheme from "../utils/WithMantineTheme";
-import { AbiFunction, getAddress, stringToHex } from "viem";
 import { abiParam, formSpecification, functionSignature } from "./mocks";
 
 const Component = withMantineTheme(GenericInputForm);
