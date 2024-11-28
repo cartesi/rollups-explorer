@@ -44,7 +44,7 @@ type ApplicationSearchableParams = {
 };
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "ether",
+    initialDepositType = "erc20",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -180,9 +180,9 @@ const SendTransaction: FC<DepositProps> = ({
             ) : depositType === "erc20" ? (
                 <ERC20DepositForm
                     tokens={tokens}
-                    applications={applicationAddressList}
+                    applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setTokenId}
                     onSuccess={onSuccess}
                 />
