@@ -94,14 +94,6 @@ vi.mock("viem", async () => {
     };
 });
 
-vi.mock("@mantine/form", async () => {
-    const actual = await vi.importActual("@mantine/form");
-    return {
-        ...(actual as any),
-        useForm: (actual as any).useForm,
-    };
-});
-
 const useSimulateContractMock = vi.mocked(useSimulateContract, {
     partial: true,
 });
