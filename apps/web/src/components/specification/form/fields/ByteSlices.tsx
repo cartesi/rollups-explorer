@@ -78,11 +78,12 @@ const InstructionsReview: FC<Props> = ({ slices, onSliceChange }) => {
                     <Title order={4}>Review your definition</Title>
                 </Accordion.Control>
 
-                <Accordion.Panel>
+                <Accordion.Panel style={{ overflow: "auto" }}>
                     <Table
                         horizontalSpacing="xl"
                         highlightOnHover
                         data-testid="batch-review-table"
+                        styles={{ table: { width: "max-content" } }}
                     >
                         <Table.Thead>
                             <Table.Tr>
