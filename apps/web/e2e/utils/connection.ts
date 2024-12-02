@@ -1,7 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import { Address } from "viem";
 
-export const graphqlEndpoint = "https://drawingcanvas-nonode-2.fly.dev/graphql";
+export const graphqlEndpoint = "https://drawingcanvas.fly.dev/graphql";
 
 export const createConnection = async (
     page: Page,
