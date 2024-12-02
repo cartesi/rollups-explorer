@@ -17,7 +17,7 @@ You can add, remove and upgrade packages from within your monorepo using your pa
 
 `yarn workspace <workspace> add <package>`
 
-> Refer to Turborepo [package-installation](https://turbo.build/repo/docs/handbook/package-installation) session for more information.
+> Refer to Turborepo [package-installation](https://turbo.build/repo/docs/handbook/package-installation) for more information.
 
 ## Apps and Packages
 
