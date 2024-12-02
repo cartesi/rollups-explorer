@@ -6,11 +6,12 @@ import {
     GridCol,
     SegmentedControl,
     Stack,
+    useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { propOr } from "ramda";
 import { isFunction, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { TbLayoutColumns, TbLayoutList } from "react-icons/tb";
 import { DecodingPreview } from "./components/DecodingPreview";
 import { SpecificationForm } from "./form/SpecificationForm";
@@ -21,8 +22,8 @@ import {
     useSpecForm,
 } from "./form/context";
 import {
-    specABIValidation,
     specAbiParamValidation,
+    specABIValidation,
     specConditionalsValidation,
     specEncodedDataValidation,
     specModeValidation,
@@ -30,6 +31,7 @@ import {
     specSliceInstructionsValidation,
 } from "./form/validations";
 import { JSON_ABI, Specification } from "./types";
+import { useMediaQuery } from "@mantine/hooks";
 
 type Layout = "split_screen" | "stack_screen";
 const getInitialValues = (spec?: Specification): SpecFormValues => {
@@ -65,6 +67,7 @@ export const SpecificationFormView: FC<ViewProps> = ({
     onSuccess,
 }) => {
     const [layout, setLayout] = useState<Layout>("split_screen");
+    const lastSelectedLayout = useRef<Layout>(layout);
     const colSpan = layout === "split_screen" ? 6 : 12;
     const form = useSpecForm({
         initialValues: getInitialValues(specification),
@@ -79,6 +82,8 @@ export const SpecificationFormView: FC<ViewProps> = ({
         },
     });
     const { formMode } = form.getTransformedValues();
+    const theme = useMantineTheme();
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
 
     const onFinished = useCallback(
         (spec: Specification) => {
@@ -108,37 +113,46 @@ export const SpecificationFormView: FC<ViewProps> = ({
         });
     }, []);
 
+    useEffect(() => {
+        setLayout(isSmallDevice ? "stack_screen" : lastSelectedLayout.current);
+    }, [isSmallDevice]);
+
     return (
         <Stack>
-            <Flex justify="flex-start">
-                <SegmentedControl
-                    data-testid="specification-creation-view-switch"
-                    value={layout}
-                    onChange={(value) => {
-                        setLayout(value as Layout);
-                    }}
-                    data={[
-                        {
-                            value: "split_screen",
-                            label: (
-                                <Center style={{ gap: 10 }}>
-                                    <TbLayoutColumns size={18} />
-                                    <span>Split View</span>
-                                </Center>
-                            ),
-                        },
-                        {
-                            value: "stack_screen",
-                            label: (
-                                <Center style={{ gap: 10 }}>
-                                    <TbLayoutList size={18} />
-                                    <span>List View</span>
-                                </Center>
-                            ),
-                        },
-                    ]}
-                />
-            </Flex>
+            {!isSmallDevice && (
+                <Flex justify="flex-start">
+                    <SegmentedControl
+                        data-testid="specification-creation-view-switch"
+                        value={layout}
+                        onChange={(value) => {
+                            const nextValue = value as Layout;
+                            setLayout(nextValue);
+                            lastSelectedLayout.current = nextValue;
+                        }}
+                        data={[
+                            {
+                                value: "split_screen",
+                                label: (
+                                    <Center style={{ gap: 10 }}>
+                                        <TbLayoutColumns size={18} />
+                                        <span>Split View</span>
+                                    </Center>
+                                ),
+                            },
+                            {
+                                value: "stack_screen",
+                                label: (
+                                    <Center style={{ gap: 10 }}>
+                                        <TbLayoutList size={18} />
+                                        <span>List View</span>
+                                    </Center>
+                                ),
+                            },
+                        ]}
+                    />
+                </Flex>
+            )}
+
             <SpecFormProvider form={form}>
                 <Grid>
                     <GridCol span={colSpan}>

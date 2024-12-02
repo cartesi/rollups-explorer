@@ -19,6 +19,20 @@ import withMantineTheme from "../../utils/WithMantineTheme";
 import { encodedDataSamples } from "./encodedData.stubs";
 import { JotaiTestProvider } from "./jotaiHelpers";
 import { erc1155JSONABISpecStub } from "./specification.stubs";
+import * as mantineHooks from "@mantine/hooks";
+
+vi.mock("@mantine/hooks", async () => {
+    const actual = await vi.importActual<typeof mantineHooks>("@mantine/hooks");
+
+    return {
+        ...actual,
+        useMediaQuery: vi.fn(),
+    };
+});
+
+const useMediaQueryMock = vi.mocked(mantineHooks.useMediaQuery, {
+    partial: true,
+});
 
 const View = withMantineTheme(SpecificationFormView);
 type Props = Parameters<typeof View>[0];
@@ -829,6 +843,26 @@ describe("Specification Form View", () => {
                 amount: "420",
                 success: true,
             });
+        });
+    });
+
+    describe("Layout", () => {
+        it("should hide view switch on small devices", async () => {
+            useMediaQueryMock.mockReturnValue(true);
+            await act(async () => render(<StatefulView />));
+
+            expect(() =>
+                screen.getByTestId("specification-creation-view-switch"),
+            ).toThrow("Unable to find an element");
+        });
+
+        it("should show view switch on large devices", async () => {
+            useMediaQueryMock.mockReturnValue(false);
+            await act(async () => render(<StatefulView />));
+
+            expect(
+                screen.getByTestId("specification-creation-view-switch"),
+            ).toBeInTheDocument();
         });
     });
 });
