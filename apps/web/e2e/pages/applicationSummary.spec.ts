@@ -1,8 +1,18 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "../fixtures/test";
 import { goToApplicationSummaryPage } from "../utils/navigation";
 import { createConnection, graphqlEndpoint } from "../utils/connection";
+import { allOperations } from "../../src/graphql/rollups/operations";
+import { checkStatusSuccessResponse } from "../utils/checkStatus.data";
 
-test.beforeEach(goToApplicationSummaryPage);
+test.beforeEach(async ({ page, interceptGQL }) => {
+    await goToApplicationSummaryPage({ page });
+    await interceptGQL(
+        page,
+        allOperations.Query.checkStatus,
+        checkStatusSuccessResponse,
+    );
+});
 
 test("should have correct page title", async ({ page }) => {
     const [address] = page.url().split("/").reverse();
@@ -50,7 +60,9 @@ test("should display summary skeleton cards", async ({ page }) => {
     await expect(page.getByText("Add connection")).toBeVisible();
 });
 
-test("should be able to add a connection", async ({ page }) => {
+test("should be able to add a connection from application summary page", async ({
+    page,
+}) => {
     const [address] = page.url().split("/").reverse();
     await createConnection(
         page,
