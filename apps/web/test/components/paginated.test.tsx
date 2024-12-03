@@ -28,7 +28,7 @@ const Component = withMantineTheme(Paginated);
 const defaultProps = {
     totalCount: 10,
     fetching: false,
-    onChange: () => undefined,
+    onChange: vi.fn(),
 };
 
 describe("Paginated component", () => {
@@ -42,7 +42,7 @@ describe("Paginated component", () => {
         );
         usePaginationParamsMock.mockReturnValue([
             { limit: 10, page: 1 },
-            () => undefined,
+            vi.fn(),
         ]);
         useScrollIntoViewMock.mockReturnValue({
             scrollIntoView: vi.fn(),
