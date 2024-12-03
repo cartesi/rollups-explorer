@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ERC721DepositForm } from "../src/ERC721DepositForm";
 import { withMantineTheme } from "./utils/WithMantineTheme";
 import {
@@ -431,6 +431,34 @@ describe("ERC721DepositForm", () => {
                     enabled: false,
                 },
             });
+        });
+    });
+
+    describe("Form", () => {
+        // TODO: Update test so that we don't need an inline import for "@mantine/form"
+        it.skip("should reset form after successful submission", async () => {
+            const mantineForm = await import("@mantine/form");
+            const [application] = defaultProps.applications;
+            const resetMock = vi.fn();
+            vi.spyOn(mantineForm, "useForm").mockReturnValue({
+                getTransformedValues: () => ({
+                    address: getAddress(application),
+                    rawInput: "0x",
+                }),
+                isValid: () => true,
+                getInputProps: () => {},
+                errors: {},
+                setFieldValue: () => "",
+                reset: resetMock,
+            } as any);
+
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                error: null,
+                isSuccess: true,
+            } as any);
+
+            render(<Component {...defaultProps} />);
+            expect(resetMock).toHaveBeenCalled();
         });
     });
 });

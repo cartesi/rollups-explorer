@@ -546,4 +546,34 @@ describe("Rollups EtherDepositForm", () => {
             });
         });
     });
+
+    describe("Form", () => {
+        // TODO: Update test so that we don't need an inline import for "@mantine/form"
+        it.skip("should reset form after successful submission", async () => {
+            const mantineForm = await import("@mantine/form");
+            const [application] = applications;
+            const resetMock = vi.fn();
+            vi.spyOn(mantineForm, "useForm").mockReturnValue({
+                getTransformedValues: () => ({
+                    address: getAddress(application),
+                    rawInput: "0x",
+                }),
+                isValid: () => true,
+                getInputProps: () => {},
+                errors: {},
+                setFieldValue: () => "",
+                reset: resetMock,
+            } as any);
+
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
+                error: null,
+                isSuccess: true,
+            });
+
+            render(<Component {...defaultProps} />);
+            expect(resetMock).toHaveBeenCalled();
+        });
+    });
 });
