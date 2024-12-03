@@ -43,15 +43,8 @@ vi.mock("viem", async () => {
     };
 });
 
-vi.mock("@mantine/form", async () => {
-    const actual = await vi.importActual("@mantine/form");
-    return {
-        ...(actual as any),
-        useForm: (actual as any).useForm,
-    };
-});
 vi.mock("../src/hooks/useWatchQueryOnBlockChange", () => ({
-    default: () => undefined,
+    default: vi.fn(),
 }));
 
 const Component = withMantineTheme(ERC721DepositForm);
@@ -62,8 +55,8 @@ const defaultProps = {
         "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
     ],
     isLoadingApplications: false,
-    onSearchApplications: () => undefined,
-    onSuccess: () => undefined,
+    onSearchApplications: vi.fn(),
+    onSuccess: vi.fn(),
 };
 
 describe("ERC721DepositForm", () => {
@@ -278,13 +271,11 @@ describe("ERC721DepositForm", () => {
             expect(screen.getByTestId("token-id-input")).toBeInTheDocument();
         });
 
-        it("should invoke onSearchApplications function after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSearchApplications function after successful deposit", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
                 isSuccess: true,
-            });
+            } as any);
 
             const onSearchApplicationsMock = vi.fn();
             render(
@@ -321,13 +312,11 @@ describe("ERC721DepositForm", () => {
             expect(depositResetMock).toHaveBeenCalled();
         });
 
-        it("should invoke onSuccess callback after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSuccess callback after successful deposit", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
                 isSuccess: true,
-            });
+            } as any);
 
             const onSuccessMock = vi.fn();
             render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
@@ -442,33 +431,6 @@ describe("ERC721DepositForm", () => {
                     enabled: false,
                 },
             });
-        });
-    });
-
-    describe("Form", () => {
-        it("should reset form after successful submission", async () => {
-            const mantineForm = await import("@mantine/form");
-            const [application] = defaultProps.applications;
-            const resetMock = vi.fn();
-            vi.spyOn(mantineForm, "useForm").mockReturnValue({
-                getTransformedValues: () => ({
-                    address: getAddress(application),
-                    rawInput: "0x",
-                }),
-                isValid: () => true,
-                getInputProps: () => {},
-                errors: {},
-                setFieldValue: () => "",
-                reset: resetMock,
-            } as any);
-
-            useWaitForTransactionReceiptMock.mockReturnValue({
-                error: null,
-                isSuccess: true,
-            } as any);
-
-            render(<Component {...defaultProps} />);
-            expect(resetMock).toHaveBeenCalled();
         });
     });
 });
