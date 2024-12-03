@@ -24,8 +24,8 @@ const defaultProps = {
     applications,
     specifications,
     isLoadingApplications: false,
-    onSearchApplications: () => undefined,
-    onSuccess: () => undefined,
+    onSearchApplications: vi.fn(),
+    onSuccess: vi.fn(),
 };
 
 vi.mock("../../src/GenericInputForm/initialValues");

@@ -85,7 +85,7 @@ vi.mock("viem", async () => {
 });
 
 vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
-    default: () => undefined,
+    default: vi.fn(),
 }));
 
 const defaultProps: ERC1155DepositFormProps = {
