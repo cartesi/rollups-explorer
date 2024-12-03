@@ -473,6 +473,7 @@ describe("Specification Form View", () => {
                             name: "tokenAddress",
                             to: 20,
                             type: "",
+                            optional: false,
                         },
                     ],
                     sliceTarget: "tokenAddress",
@@ -481,6 +482,90 @@ describe("Specification Form View", () => {
                     ],
                 }),
             });
+        });
+
+        it("should correctly set the default value for the optional byte-slice flag", async () => {
+            await act(async () => render(<StatefulView />));
+
+            act(() => {
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
+                fireEvent.click(screen.getByTestId("add-byte-slice-switch"));
+
+                fireEvent.change(screen.getByTestId("slice-name-input"), {
+                    target: { value: "tokenAddress" },
+                });
+
+                fireEvent.change(screen.getByTestId("slice-from-input"), {
+                    target: { value: "0" },
+                });
+
+                fireEvent.change(screen.getByTestId("slice-to-input"), {
+                    target: { value: "20" },
+                });
+
+                fireEvent.click(screen.getByTestId("slice-add-button"));
+            });
+
+            fireEvent.click(screen.getByText("Review your definition"));
+
+            await waitFor(() =>
+                expect(screen.getByTestId("0-tokenAddress")).toBeVisible(),
+            );
+
+            const reviewTable = screen.getByTestId(
+                "batch-review-table",
+            ) as HTMLDivElement;
+
+            expect(getByText(reviewTable, "Optional")).toBeInTheDocument();
+            expect(getByText(reviewTable, "No")).toBeInTheDocument();
+
+            fireEvent.click(screen.getByText("Remove slice-tokenAddress"));
+        });
+
+        it("should correctly configure the optional boolean flag for a byte slice", async () => {
+            await act(async () => render(<StatefulView />));
+
+            act(() => {
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
+                fireEvent.click(screen.getByTestId("add-byte-slice-switch"));
+
+                fireEvent.change(screen.getByTestId("slice-name-input"), {
+                    target: { value: "tokenAddress" },
+                });
+
+                fireEvent.change(screen.getByTestId("slice-from-input"), {
+                    target: { value: "0" },
+                });
+
+                fireEvent.change(screen.getByTestId("slice-to-input"), {
+                    target: { value: "20" },
+                });
+
+                fireEvent.click(
+                    screen.getByTestId("byte-slice-optional-switch"),
+                );
+
+                fireEvent.click(screen.getByTestId("slice-add-button"));
+            });
+
+            fireEvent.click(screen.getByText("Review your definition"));
+
+            await waitFor(() =>
+                expect(screen.getByTestId("0-tokenAddress")).toBeVisible(),
+            );
+
+            const reviewTable = screen.getByTestId(
+                "batch-review-table",
+            ) as HTMLDivElement;
+
+            expect(getByText(reviewTable, "Optional")).toBeInTheDocument();
+            expect(getByText(reviewTable, "Yes")).toBeInTheDocument();
         });
     });
 
