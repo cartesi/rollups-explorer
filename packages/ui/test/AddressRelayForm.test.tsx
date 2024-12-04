@@ -3,12 +3,14 @@ import {
     useWriteDAppAddressRelayRelayDAppAddress,
 } from "@cartesi/rollups-wagmi";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { FC } from "react";
 import * as viem from "viem";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { AddressRelayForm } from "../src";
 import { AddressRelayFormProps } from "../src/AddressRelayForm";
 import withMantineTheme from "./utils/WithMantineTheme";
+import { applications } from "./utils/stubs";
 
 vi.mock("@cartesi/rollups-wagmi");
 vi.mock("wagmi");
@@ -19,12 +21,6 @@ vi.mock("viem", async () => {
         getAddress: (address: string) => address,
     };
 });
-
-const applications = [
-    "0x60a7048c3136293071605a4eaffef49923e981cc",
-    "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
-    "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
-];
 
 const useSimulateRelayDAppAddressMock = vi.mocked(
     useSimulateDAppAddressRelayRelayDAppAddress,
@@ -84,6 +80,60 @@ describe("AddressRelayForm", () => {
         expect(screen.getByText("The application address to relay."));
     });
 
+    it("should call the onSearchApplication callback passing the rollup v1 on bootstrap", () => {
+        const onSearchApps = vi.fn();
+        render(
+            <Component {...defaultProps} onSearchApplications={onSearchApps} />,
+        );
+
+        expect(onSearchApps).toHaveBeenLastCalledWith("", "v1");
+    });
+
+    it("should call application search callback always passing version 1 when filling the application input", () => {
+        const onSearchApps = vi.fn();
+        render(
+            <Component {...defaultProps} onSearchApplications={onSearchApps} />,
+        );
+
+        expect(onSearchApps).toHaveBeenCalledTimes(1);
+
+        fireEvent.change(screen.getByTestId("application"), {
+            target: { value: applications[0].address },
+        });
+
+        expect(onSearchApps).toHaveBeenCalledTimes(2);
+
+        expect(onSearchApps).toHaveBeenCalledWith(
+            applications[0].address,
+            "v1",
+        );
+    });
+
+    it("should call on-search-application callback without passing the rollup version on unmount event", () => {
+        const onSearchApps = vi.fn();
+        const Wrapper: FC<{ show: boolean }> = ({ show }) => {
+            return (
+                <>
+                    {show && (
+                        <Component
+                            {...defaultProps}
+                            onSearchApplications={onSearchApps}
+                        />
+                    )}
+                </>
+            );
+        };
+        const { rerender } = render(<Wrapper show={true} />);
+
+        expect(onSearchApps).toHaveBeenCalledOnce();
+        expect(onSearchApps).toHaveBeenCalledWith("", "v1");
+
+        rerender(<Wrapper show={false} />);
+
+        expect(onSearchApps).toHaveBeenCalledTimes(2);
+        expect(onSearchApps).toHaveBeenCalledWith("");
+    });
+
     it("should display error when application is not an address", () => {
         render(<Component {...defaultProps} />);
 
@@ -120,7 +170,7 @@ describe("AddressRelayForm", () => {
         render(<Component {...defaultProps} />);
 
         fireEvent.change(screen.getByTestId("application"), {
-            target: { value: applications[0] },
+            target: { value: applications[0].address },
         });
 
         fireEvent.click(screen.getByText("Send"));
@@ -240,7 +290,7 @@ describe("AddressRelayForm", () => {
 
         render(<Component {...defaultProps} />);
         fireEvent.change(screen.getByTestId("application"), {
-            target: { value: applications[0] },
+            target: { value: applications[0].address },
         });
 
         const btn = screen.getByText("Send").closest("button");

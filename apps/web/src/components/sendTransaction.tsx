@@ -44,7 +44,7 @@ type ApplicationSearchableParams = {
 };
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc721",
+    initialDepositType = "relay",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -225,9 +225,9 @@ const SendTransaction: FC<DepositProps> = ({
                 />
             ) : depositType === "relay" ? (
                 <AddressRelayForm
-                    applications={applicationAddressList}
+                    applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : null}
