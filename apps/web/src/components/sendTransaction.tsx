@@ -44,7 +44,7 @@ type ApplicationSearchableParams = {
 };
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc20",
+    initialDepositType = "erc721",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -188,9 +188,9 @@ const SendTransaction: FC<DepositProps> = ({
                 />
             ) : depositType === "erc721" ? (
                 <ERC721DepositForm
-                    applications={applicationAddressList}
+                    applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : depositType === "input" ? (
