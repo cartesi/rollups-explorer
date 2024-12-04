@@ -25,6 +25,8 @@ RUN yarn install
 # Build the project
 COPY --from=builder /app/out/full/ .
 ARG ENVIRONMENT=localhost
+# TODO: Remove temporary variable
+ARG PREVIEW_API_URL
 COPY --from=builder /app/out/full/apps/web/.env.${ENVIRONMENT} ./apps/web/.env
 RUN yarn build --filter=web
 
