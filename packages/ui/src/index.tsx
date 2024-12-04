@@ -2,7 +2,7 @@ export { AddressRelayForm } from "./AddressRelayForm";
 export { type TransactionFormSuccessData } from "./DepositFormTypes";
 export { ERC1155DepositForm } from "./ERC1155DepositForm";
 export { ERC20DepositForm } from "./ERC20/ERC20DepositForm";
-export { ERC721DepositForm } from "./ERC721DepositForm";
+export { ERC721DepositForm } from "./ERC721/ERC721DepositForm";
 export { EtherDepositForm } from "./EtherDepositForm";
 export {
     GenericInputForm,
