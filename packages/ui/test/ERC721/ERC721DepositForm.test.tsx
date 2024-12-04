@@ -1,6 +1,10 @@
 import {
-    useSimulateErc20Approve,
-    useWriteErc20Approve,
+    erc721PortalAbi,
+    erc721PortalAddress,
+    useSimulateErc721Approve,
+    useWriteErc721Approve,
+    v2Erc721PortalAbi,
+    v2Erc721PortalAddress,
 } from "@cartesi/rollups-wagmi";
 import {
     fireEvent,
@@ -9,7 +13,7 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import { omit } from "ramda";
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import { act } from "react";
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
 import {
@@ -18,20 +22,19 @@ import {
     useWaitForTransactionReceipt,
     useWriteContract,
 } from "wagmi";
-import { ERC20DepositForm } from "../src";
-import { Application } from "../src/commons/interfaces";
-import withMantineTheme from "./utils/WithMantineTheme";
-import { factoryWaitStatus } from "./utils/helpers";
-import { applications, tokens } from "./utils/stubs";
+import { ERC721DepositForm } from "../../src";
+import { Application } from "../../src/commons/interfaces";
+import useTokensOfOwnerByIndex from "../../src/hooks/useTokensOfOwnerByIndex";
+import withMantineTheme from "../utils/WithMantineTheme";
+import { factoryWaitStatus } from "../utils/helpers";
+import { applications, erc721Contracts } from "../utils/stubs";
 
-const Component = withMantineTheme(ERC20DepositForm);
+const Component = withMantineTheme(ERC721DepositForm);
 
 const defaultProps = {
     applications: applications,
-    tokens,
     isLoadingApplications: false,
     onSearchApplications: () => undefined,
-    onSearchTokens: () => undefined,
     onSuccess: () => undefined,
 };
 
@@ -49,7 +52,7 @@ vi.mock("wagmi", async () => {
     };
 });
 
-vi.mock("../src/hooks/useWatchQueryOnBlockChange", () => ({
+vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
     default: vi.fn(),
 }));
 
@@ -61,22 +64,26 @@ vi.mock("viem", async () => {
     };
 });
 
+vi.mock("../../src/hooks/useTokensOfOwnerByIndex", () => ({
+    default: vi.fn(),
+}));
+
 vi.mock("@cartesi/rollups-wagmi", async () => {
     const actual = await vi.importActual("@cartesi/rollups-wagmi");
     return {
         ...actual,
-        useSimulateErc20Approve: vi.fn(),
-        useWriteErc20Approve: vi.fn(),
+        useSimulateErc721Approve: vi.fn(),
+        useWriteErc721Approve: vi.fn(),
     };
 });
 
 const useSimulateContractMock = vi.mocked(useSimulateContract, {
     partial: true,
 });
-const useSimulateErc20ApproveMock = vi.mocked(useSimulateErc20Approve, {
+const useSimulateErc721ApproveMock = vi.mocked(useSimulateErc721Approve, {
     partial: true,
 });
-const useWriteErc20ApproveMock = vi.mocked(useWriteErc20Approve, {
+const useWriteErc721ApproveMock = vi.mocked(useWriteErc721Approve, {
     partial: true,
 });
 const useReadContractsMock = vi.mocked(useReadContracts, { partial: true });
@@ -86,12 +93,16 @@ const useWaitForTransactionReceiptMock = vi.mocked(
     { partial: true },
 );
 
+const useTokensOfOwnerByIndexMock = vi.mocked(useTokensOfOwnerByIndex, {
+    partial: true,
+});
+
 const fillFormValues = async (
     app: Application,
-    erc20Address: string,
-    amount: string,
+    address: string,
+    tokenId?: string,
 ) => {
-    const appInput = screen.getByTestId("application-input");
+    const appInput = screen.getByTestId("application");
 
     fireEvent.change(appInput, {
         target: {
@@ -99,22 +110,22 @@ const fillFormValues = async (
         },
     });
 
-    await waitFor(() => expect(screen.getByText("ERC-20")).toBeVisible());
+    await waitFor(() => expect(screen.getByText("ERC-721")).toBeVisible());
 
-    fireEvent.change(screen.getByTestId("erc20address-input"), {
-        target: { value: erc20Address },
+    fireEvent.change(screen.getByTestId("erc721Address"), {
+        target: { value: address },
     });
 
-    await waitFor(() => expect(screen.getByText("Amount")).toBeVisible());
-
-    fireEvent.change(screen.getByTestId("amount-input"), {
-        target: { value: amount },
-    });
+    if (isNotNilOrEmpty(tokenId)) {
+        fireEvent.change(screen.getByTestId("token-id-input"), {
+            target: { value: tokenId },
+        });
+    }
 };
 
 const cast = (obj: any, func: any) => obj as ReturnType<typeof func>;
 
-describe("ERC20 Portal Deposit", () => {
+describe("ERC721 Portal Deposit Form", () => {
     const defaultReturnForWriteFn = {
         data: undefined,
         status: "idle",
@@ -132,12 +143,18 @@ describe("ERC20 Portal Deposit", () => {
     };
 
     beforeEach(() => {
-        useSimulateErc20ApproveMock.mockReturnValue({
-            ...cast(defaultReturnForSimulateFn, useSimulateErc20ApproveMock),
+        // Default returns as the erc-721 address does not implement enumerable interface
+        useTokensOfOwnerByIndexMock.mockReturnValue({
+            fetching: false,
+            tokenIds: [],
         });
 
-        useWriteErc20ApproveMock.mockReturnValue({
-            ...cast(defaultReturnForWriteFn, useWriteErc20ApproveMock),
+        useSimulateErc721ApproveMock.mockReturnValue({
+            ...cast(defaultReturnForSimulateFn, useSimulateErc721ApproveMock),
+        });
+
+        useWriteErc721ApproveMock.mockReturnValue({
+            ...cast(defaultReturnForWriteFn, useWriteErc721ApproveMock),
         });
 
         useSimulateContractMock.mockReturnValue({
@@ -158,24 +175,14 @@ describe("ERC20 Portal Deposit", () => {
             isLoading: false,
             isSuccess: true,
             data: [
-                // decimals
-                {
-                    result: undefined,
-                    error: undefined,
-                },
                 //symbol
                 {
-                    result: undefined,
-                    error: undefined,
-                },
-                // allowance
-                {
-                    result: undefined,
+                    result: "MTK",
                     error: undefined,
                 },
                 // balance
                 {
-                    result: undefined,
+                    result: 1,
                     error: undefined,
                 },
             ],
@@ -194,15 +201,19 @@ describe("ERC20 Portal Deposit", () => {
             screen.getByText("The application smart contract address"),
         ).toBeVisible();
 
-        expect(screen.queryByText("ERC-20")).not.toBeInTheDocument();
+        expect(screen.queryByText("ERC-721")).not.toBeInTheDocument();
+        expect(screen.queryByText("Token ID")).not.toBeInTheDocument();
+        expect(screen.queryByText("Approve")).not.toBeInTheDocument();
+        expect(screen.queryByText("Advanced")).not.toBeInTheDocument();
+        expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
     });
 
-    it("should display all fields after fill application and erc-20 addresses", async () => {
+    it("should display all fields after fill application and erc-721 address", async () => {
         render(
             <Component {...defaultProps} applications={[applications[0]]} />,
         );
 
-        await fillFormValues(applications[0], tokens[0], "100");
+        await fillFormValues(applications[0], erc721Contracts[0]);
 
         fireEvent.click(screen.getByText("Advanced"));
 
@@ -210,14 +221,22 @@ describe("ERC20 Portal Deposit", () => {
             expect(screen.getByText("Extra data")).toBeVisible(),
         );
 
-        expect(screen.getByText("ERC-20")).toBeVisible();
+        expect(screen.getByText("ERC-721")).toBeVisible();
         expect(
-            screen.getByText("The ERC-20 smart contract address"),
+            screen.getByText("The ERC-721 smart contract address"),
         ).toBeVisible();
-        expect(screen.getByText("Amount")).toBeVisible();
-        expect(screen.getByText("Amount of tokens to deposit")).toBeVisible();
-        expect(screen.getByText("Balance:")).toBeVisible();
-        expect(screen.getByText("Allowance:")).toBeVisible();
+
+        expect(screen.getByText("Token ID")).toBeVisible();
+        expect(screen.getByText("Token ID to deposit")).toBeVisible();
+        expect(screen.getByText("Balance: 1 MTK")).toBeVisible();
+        expect(screen.getByText("Base data")).toBeVisible();
+
+        expect(
+            screen.getByText(
+                "Base execution layer data handled by the application",
+            ),
+        ).toBeVisible();
+
         expect(
             screen.getByText(
                 "Extra execution layer data handled by the application",
@@ -228,18 +247,18 @@ describe("ERC20 Portal Deposit", () => {
         expect(screen.getByText("Deposit")).toBeVisible();
     });
 
-    it("should display required field messages for the Application and ERC-20 addresses", async () => {
+    it("should display required field messages for the Application and ERC-721 addresses", () => {
         render(
             <Component {...defaultProps} applications={[applications[0]]} />,
         );
 
-        const input = screen.getByTestId("application-input");
+        const input = screen.getByTestId("application");
 
         fireEvent.change(input, {
             target: { value: " " },
         });
 
-        expect(screen.getByText("Invalid Application address")).toBeVisible();
+        expect(screen.getByText("Invalid application address")).toBeVisible();
 
         fireEvent.change(input, { target: { value: "" } });
 
@@ -247,35 +266,39 @@ describe("ERC20 Portal Deposit", () => {
             screen.getByText("Application address is required!"),
         ).toBeVisible();
 
-        const erc20Input = screen.getByTestId("erc20address-input");
+        const ercInput = screen.getByTestId("erc721Address");
 
-        fireEvent.change(erc20Input, {
+        fireEvent.change(ercInput, {
             target: { value: " " },
         });
 
-        expect(screen.getByText("Invalid ERC20 address")).toBeVisible();
+        expect(screen.getByText("Invalid ERC-721 address")).toBeVisible();
 
-        fireEvent.change(erc20Input, { target: { value: "" } });
+        fireEvent.change(ercInput, { target: { value: "" } });
 
-        expect(screen.getByText("ERC20 address is required!")).toBeVisible();
+        expect(screen.getByText("ERC-721 address is required!")).toBeVisible();
     });
 
-    it("should display invalid amount message for amount field", async () => {
+    it("should display invalid value message for token-id text input", async () => {
         render(
             <Component {...defaultProps} applications={[applications[0]]} />,
         );
 
-        await fillFormValues(applications[0], tokens[0], "-1");
+        await fillFormValues(applications[0], erc721Contracts[0]);
 
-        expect(screen.getByText("Invalid amount")).toBeVisible();
+        fireEvent.change(screen.getByTestId("token-id-input"), {
+            target: { value: " " },
+        });
+
+        expect(screen.getByText("Invalid token ID")).toBeVisible();
     });
 
-    it("should display invalid hex for extra-data field", async () => {
+    it("should display invalid hex for extra-data and base-data fields", async () => {
         render(
             <Component {...defaultProps} applications={[applications[0]]} />,
         );
 
-        await fillFormValues(applications[0], tokens[0], "10");
+        await fillFormValues(applications[0], erc721Contracts[0]);
 
         fireEvent.click(screen.getByText("Advanced"));
 
@@ -283,11 +306,65 @@ describe("ERC20 Portal Deposit", () => {
             expect(screen.getByText("Extra data")).toBeVisible(),
         );
 
-        fireEvent.change(screen.getByTestId("extra-data-input"), {
+        const extraData = screen.getByTestId("extra-data-input");
+        const baseData = screen.getByTestId("base-data-input");
+
+        fireEvent.change(extraData, {
             target: { value: "not-a-hex-string" },
         });
 
-        expect(screen.getByText("Invalid hex string")).toBeVisible();
+        fireEvent.change(baseData, {
+            target: { value: "not-a-hex-string-either" },
+        });
+
+        expect(
+            screen.getByText("Base data must be a valid hex string!"),
+        ).toBeVisible();
+        expect(
+            screen.getByText("Extra data must be a valid hex string!"),
+        ).toBeVisible();
+    });
+
+    it("should display a select with owned tokens as options when erc-721 contract implements enumerables interface", async () => {
+        const tokenIds = [1n, 2n, 10n, 15n];
+        useTokensOfOwnerByIndexMock.mockReturnValue({
+            fetching: false,
+            tokenIds,
+        });
+
+        useReadContractsMock.mockReturnValue({
+            isLoading: false,
+            isSuccess: true,
+            data: [
+                //symbol
+                {
+                    result: "MTK",
+                    error: undefined,
+                },
+                // balance
+                {
+                    result: tokenIds.length,
+                    error: undefined,
+                },
+            ],
+        });
+
+        render(
+            <Component {...defaultProps} applications={[applications[0]]} />,
+        );
+
+        expect(screen.queryByText("15")).not.toBeVisible();
+
+        await fillFormValues(applications[0], erc721Contracts[0]);
+
+        expect(screen.getByText("Balance: 4 MTK")).toBeVisible();
+
+        fireEvent.click(screen.getByTestId("token-id-select"));
+
+        expect(screen.getByText("1")).toBeVisible();
+        expect(screen.getByText("2")).toBeVisible();
+        expect(screen.getByText("10")).toBeVisible();
+        expect(screen.getByText("15")).toBeVisible();
     });
 
     describe("Warnings", () => {
@@ -295,7 +372,7 @@ describe("ERC20 Portal Deposit", () => {
             render(<Component {...defaultProps} applications={[]} />);
 
             await act(() =>
-                fireEvent.change(screen.getByTestId("application-input"), {
+                fireEvent.change(screen.getByTestId("application"), {
                     target: {
                         value: "0x60a7048c3136293071605a4eaffef49923e981fe",
                     },
@@ -310,26 +387,6 @@ describe("ERC20 Portal Deposit", () => {
                 ).toBeVisible(),
             );
         });
-
-        it("should display warning for an ERC-20 address not yet indexed", async () => {
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[applications[0]]}
-                    tokens={[]}
-                />,
-            );
-
-            await fillFormValues(applications[0], tokens[0], "10");
-
-            await waitFor(() =>
-                expect(
-                    screen.getByText(
-                        "This is the first deposit of that token.",
-                    ),
-                ).toBeVisible(),
-            );
-        });
     });
 
     describe("When the application is undeployed", () => {
@@ -337,7 +394,7 @@ describe("ERC20 Portal Deposit", () => {
             render(<Component {...defaultProps} applications={[]} />);
 
             await act(() =>
-                fireEvent.change(screen.getByTestId("application-input"), {
+                fireEvent.change(screen.getByTestId("application"), {
                     target: { value: applications[0].address },
                 }),
             );
@@ -350,20 +407,15 @@ describe("ERC20 Portal Deposit", () => {
                 ).toBeVisible(),
             );
 
-            await waitFor(() =>
-                expect(
-                    screen.getByText("Cartesi Rollups version"),
-                ).toBeVisible(),
-            );
-
+            expect(screen.getByText("Cartesi Rollups version")).toBeVisible();
             expect(
                 screen.getByText(
                     "Set the rollup version to call the correct contracts.",
                 ),
             ).toBeVisible();
 
-            expect(screen.queryByText("ERC-20")).not.toBeInTheDocument();
-            expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+            expect(screen.queryByText("ERC-721")).not.toBeInTheDocument();
+            expect(screen.queryByText("Token Id")).not.toBeInTheDocument();
             expect(screen.queryByText("Advanced")).not.toBeInTheDocument();
             expect(screen.queryByText("Approve")).not.toBeInTheDocument();
             expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
@@ -372,8 +424,37 @@ describe("ERC20 Portal Deposit", () => {
         it("should display the rest of the fields after choosing the Rollup version", async () => {
             render(<Component {...defaultProps} applications={[]} />);
 
+            fireEvent.change(screen.getByTestId("application"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "This is a deposit to an undeployed application.",
+                    ),
+                ).toBeVisible(),
+            );
+
+            const options = screen.getByRole("radiogroup");
+
+            fireEvent.click(getByText(options, "Rollup v1"));
+
+            await waitFor(() =>
+                expect(screen.getByText("ERC-721")).toBeVisible(),
+            );
+
+            expect(screen.getByText("Token ID")).toBeVisible();
+            expect(screen.getByText("Advanced")).toBeVisible();
+            expect(screen.getByText("Approve")).toBeVisible();
+            expect(screen.getByText("Deposit")).toBeVisible();
+        });
+
+        it("should setup correct contract configs when rollup version is chosen", async () => {
+            render(<Component {...defaultProps} applications={[]} />);
+
             await act(() =>
-                fireEvent.change(screen.getByTestId("application-input"), {
+                fireEvent.change(screen.getByTestId("application"), {
                     target: { value: applications[0].address },
                 }),
             );
@@ -390,73 +471,48 @@ describe("ERC20 Portal Deposit", () => {
 
             fireEvent.click(getByText(options, "Rollup v1"));
 
-            await waitFor(() =>
-                expect(screen.getByText("ERC-20")).toBeVisible(),
-            );
+            const paramsForV1 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
 
-            expect(screen.getByText("Amount")).toBeVisible();
-            expect(screen.getByText("Advanced")).toBeVisible();
-            expect(screen.getByText("Approve")).toBeVisible();
-            expect(screen.getByText("Deposit")).toBeVisible();
+            expect(paramsForV1).toHaveProperty("abi", erc721PortalAbi);
+            expect(paramsForV1).toHaveProperty("address", erc721PortalAddress);
+
+            fireEvent.click(getByText(options, "Rollup v2"));
+
+            const paramsForV2 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(paramsForV2).toHaveProperty("abi", v2Erc721PortalAbi);
+            expect(paramsForV2).toHaveProperty(
+                "address",
+                v2Erc721PortalAddress,
+            );
         });
     });
 
     describe("Approve", () => {
-        it("should be able to click the approve when the amount is covered by the allowance", async () => {
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 0n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
-            });
-
+        it("should be able to click the approve when the token-id is set", async () => {
             const writeContract = vi.fn();
 
-            useSimulateErc20ApproveMock.mockReturnValue({
+            useSimulateErc721ApproveMock.mockReturnValue({
                 ...cast(
                     defaultReturnForSimulateFn,
-                    useSimulateErc20ApproveMock,
+                    useSimulateErc721ApproveMock,
                 ),
                 data: {
                     request: {},
                 },
             });
 
-            useWriteErc20ApproveMock.mockReturnValue({
+            useWriteErc721ApproveMock.mockReturnValue({
                 writeContract,
             });
 
             const app = applications[0];
-            const token = tokens[0];
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            const adress = erc721Contracts[0];
+            render(<Component {...defaultProps} applications={[app]} />);
 
-            await fillFormValues(app, token, "10");
+            await fillFormValues(app, adress, "10");
 
             const approveBtn = screen.getByText("Approve");
 
@@ -467,105 +523,31 @@ describe("ERC20 Portal Deposit", () => {
             expect(writeContract).toHaveBeenCalledTimes(1);
         });
 
-        it("should be disabled when the amount is smaller than the allowance", async () => {
+        it("should be disabled when the user balance is zero", async () => {
             useReadContractsMock.mockReturnValue({
                 isLoading: false,
                 isSuccess: true,
                 data: [
-                    // decimals
                     {
-                        result: 18,
+                        result: "MTK",
                         error: undefined,
                     },
-                    //symbol
                     {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
+                        result: 0,
                         error: undefined,
                     },
                 ],
             });
 
             const app = applications[0];
-            const token = tokens[0];
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            const token = erc721Contracts[0];
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "10");
 
             expect(
                 screen.getByText("Approve").closest("button"),
-            ).not.toBeDisabled();
-
-            await fillFormValues(app, token, "2");
-
-            expect(
-                screen.getByText("Approve").closest("button"),
             ).toBeDisabled();
-        });
-
-        it("should disable approve call when amount is '0'", async () => {
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
-            });
-
-            const app = applications[0];
-            const token = tokens[0];
-
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
-
-            await fillFormValues(app, token, "0");
-
-            expect(useSimulateErc20ApproveMock).toHaveBeenLastCalledWith({
-                address: "0x059c7507b973d1512768c06f32a813bc93d83eb2",
-                args: ["0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB", 0n],
-                query: {
-                    enabled: false,
-                },
-            });
         });
     });
 
@@ -575,27 +557,33 @@ describe("ERC20 Portal Deposit", () => {
                 isLoading: false,
                 isSuccess: true,
                 data: [
-                    // decimals
                     {
-                        result: 18,
+                        result: "MTK",
                         error: undefined,
                     },
-                    //symbol
                     {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
+                        result: 1,
                         error: undefined,
                     },
                 ],
+            });
+
+            useWriteErc721ApproveMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {},
+            });
+
+            useWaitForTransactionReceiptMock.mockImplementation((params) => {
+                return params?.hash === "0x0001"
+                    ? {
+                          status: "success",
+                          fetchStatus: "idle",
+                          data: { transactionHash: "0x01" },
+                      }
+                    : {
+                          fetchStatus: "idle",
+                      };
             });
 
             useSimulateContractMock.mockReturnValue({
@@ -608,20 +596,14 @@ describe("ERC20 Portal Deposit", () => {
 
         it("should not be able to click the deposit when the form is invalid", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
             const writeContract = vi.fn();
 
             useWriteContractMock.mockReturnValue({
                 writeContract: writeContract,
             });
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "2");
 
@@ -631,11 +613,14 @@ describe("ERC20 Portal Deposit", () => {
 
             await fillFormValues(app, token, " ");
 
-            expect(screen.getByText("Invalid amount")).toBeVisible();
+            expect(screen.getByText("Invalid token ID")).toBeVisible();
+
             expect(
                 screen.getByText("Deposit").closest("button"),
             ).toBeDisabled();
+
             fireEvent.click(screen.getByText("Deposit"));
+
             expect(writeContract).not.toHaveBeenCalled();
 
             await fillFormValues(app, token, "2");
@@ -645,31 +630,42 @@ describe("ERC20 Portal Deposit", () => {
 
             await fillFormValues(app, " ", "2");
 
-            expect(screen.getByText("Invalid ERC20 address")).toBeVisible();
+            expect(screen.getByText("Invalid ERC-721 address")).toBeVisible();
 
             expect(
                 screen.getByText("Deposit").closest("button"),
             ).toBeDisabled();
+
             fireEvent.click(screen.getByText("Deposit"));
+
             expect(writeContract).not.toHaveBeenCalled();
         });
 
-        it("should not be able to click the deposit when amount is above the allowance", async () => {
+        it("should not be able to click the deposit when balance is zero", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
             const writeContract = vi.fn();
+
+            useReadContractsMock.mockReturnValue({
+                isLoading: false,
+                isSuccess: true,
+                data: [
+                    {
+                        result: "MTK",
+                        error: undefined,
+                    },
+                    {
+                        result: 0,
+                        error: undefined,
+                    },
+                ],
+            });
 
             useWriteContractMock.mockReturnValue({
                 writeContract: writeContract,
             });
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "10");
 
@@ -678,22 +674,16 @@ describe("ERC20 Portal Deposit", () => {
             expect(writeContract).not.toHaveBeenCalled();
         });
 
-        it("should be able to click the deposit button after fill everything and amount below allowance", async () => {
+        it("should be able to click the deposit button after filled form and approved token", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
             const writeContract = vi.fn();
 
             useWriteContractMock.mockReturnValue({
                 writeContract: writeContract,
             });
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "2");
 
@@ -707,73 +697,15 @@ describe("ERC20 Portal Deposit", () => {
 
             expect(writeContract).toHaveBeenCalledTimes(1);
         });
-
-        it("should disable deposit call when amount is '0'", async () => {
-            const app = applications[0];
-            const token = tokens[0];
-
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
-
-            await fillFormValues(app, token, "0");
-
-            const params = useSimulateContractMock.mock.lastCall?.[0] ?? {};
-
-            expect(omit(["abi", "address", "functionName"], params)).toEqual({
-                args: [
-                    "0x059c7507b973d1512768c06f32a813bc93d83eb2",
-                    "0x60a7048c3136293071605a4eaffef49923e981cc",
-                    0n,
-                    "0x",
-                ],
-                query: {
-                    enabled: false,
-                },
-            });
-        });
     });
 
     describe("Transaction feedbacks", () => {
-        beforeEach(() => {
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 0n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
-            });
-        });
-
-        it("should ask the user to check the wallet when approving allowances", async () => {
+        it("should ask the user to check the wallet when approving", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
 
-            useWriteErc20ApproveMock.mockReturnValue({
-                ...cast(defaultReturnForWriteFn, useWriteErc20ApproveMock),
+            useWriteErc721ApproveMock.mockReturnValue({
+                ...cast(defaultReturnForWriteFn, useWriteErc721ApproveMock),
                 status: "pending",
                 isPending: true,
             });
@@ -784,32 +716,27 @@ describe("ERC20 Portal Deposit", () => {
                 data: undefined,
             });
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "2");
 
             expect(
                 screen.getByText("Approve").closest("button"),
-            ).toBeDisabled(),
-                expect(
-                    screen.getByText("Deposit").closest("button"),
-                ).toBeDisabled();
+            ).toBeDisabled();
+
+            expect(
+                screen.getByText("Deposit").closest("button"),
+            ).toBeDisabled();
 
             expect(screen.getByText("Check wallet...")).toBeVisible();
         });
 
         it("should show a message while awaiting approval confirmation", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
 
-            useWriteErc20ApproveMock.mockReturnValue({
-                ...cast(defaultReturnForWriteFn, useWriteErc20ApproveMock),
+            useWriteErc721ApproveMock.mockReturnValue({
+                ...cast(defaultReturnForWriteFn, useWriteErc721ApproveMock),
                 status: "idle",
                 isPending: false,
                 data: "0x001",
@@ -831,13 +758,7 @@ describe("ERC20 Portal Deposit", () => {
                 },
             );
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "2");
 
@@ -850,54 +771,34 @@ describe("ERC20 Portal Deposit", () => {
 
         it("should ask the user to check the wallet after start the deposit transaction", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
 
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
+            useWriteErc721ApproveMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {},
             });
 
             useWriteContractMock.mockReturnValue({
                 ...cast(defaultReturnForWriteFn, useWriteContractMock),
                 status: "pending",
                 isPending: true,
+                isIdle: false,
             });
 
-            useWaitForTransactionReceiptMock.mockReturnValue({
-                fetchStatus: "idle",
-                isLoading: false,
-                data: undefined,
+            useWaitForTransactionReceiptMock.mockImplementation((params) => {
+                return params?.hash === "0x0001"
+                    ? {
+                          status: "success",
+                          fetchStatus: "idle",
+                          data: { transactionHash: "0x01" },
+                      }
+                    : {
+                          fetchStatus: "idle",
+                      };
             });
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "2");
 
@@ -909,38 +810,19 @@ describe("ERC20 Portal Deposit", () => {
                 screen.getByText("Deposit").closest("button"),
             ).toBeDisabled();
 
-            expect(screen.getByText("Check wallet...")).toBeVisible();
+            await waitFor(() =>
+                expect(screen.getByText("Check wallet...")).toBeVisible(),
+            );
         });
 
         it("should show a message while awaiting deposit confirmation", async () => {
             const app = applications[0];
-            const token = tokens[0];
+            const token = erc721Contracts[0];
 
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
+            useWriteErc721ApproveMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {},
             });
 
             useWriteContractMock.mockReturnValue({
@@ -958,6 +840,12 @@ describe("ERC20 Portal Deposit", () => {
                               isLoading: true,
                               data: undefined,
                           }
+                        : parameters?.hash === "0x0001"
+                        ? {
+                              status: "success",
+                              fetchStatus: "idle",
+                              data: { transactionHash: "0x01" },
+                          }
                         : {
                               data: undefined,
                               status: "pending",
@@ -966,13 +854,7 @@ describe("ERC20 Portal Deposit", () => {
                 },
             );
 
-            render(
-                <Component
-                    {...defaultProps}
-                    applications={[app]}
-                    tokens={[token]}
-                />,
-            );
+            render(<Component {...defaultProps} applications={[app]} />);
 
             await fillFormValues(app, token, "1");
 
@@ -985,41 +867,12 @@ describe("ERC20 Portal Deposit", () => {
     });
 
     describe("When deposit successed", () => {
-        beforeEach(() => {
-            useReadContractsMock.mockReturnValue({
-                isLoading: false,
-                isSuccess: true,
-                data: [
-                    // decimals
-                    {
-                        result: 18,
-                        error: undefined,
-                    },
-                    //symbol
-                    {
-                        result: "SIM20",
-                        error: undefined,
-                    },
-                    // allowance
-                    {
-                        result: 3000000000000000000n,
-                        error: undefined,
-                    },
-                    // balance
-                    {
-                        result: 1000000000000000000000n,
-                        error: undefined,
-                    },
-                ],
-            });
-        });
-
         it("should reset the form to initial state after the deposit is successful", async () => {
             const app = applications[0];
-            const token = tokens[0];
-            const onTokenSearchMock = vi.fn();
+            const token = erc721Contracts[0];
             const onSearchApplicationsMock = vi.fn();
             const onSuccessMock = vi.fn();
+
             const depositWaitStatus = factoryWaitStatus();
 
             useWriteContractMock.mockReturnValue({
@@ -1045,39 +898,34 @@ describe("ERC20 Portal Deposit", () => {
             const { rerender } = render(
                 <Component
                     {...defaultProps}
-                    tokens={[token]}
                     applications={[app]}
                     onSearchApplications={onSearchApplicationsMock}
                     onSuccess={onSuccessMock}
-                    onSearchTokens={onTokenSearchMock}
                 />,
             );
 
             await fillFormValues(app, token, "2");
 
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
-            expect(onTokenSearchMock).toHaveBeenCalledWith("");
             expect(onSuccessMock).toHaveBeenCalledWith({
                 receipt: { transactionHash: "0x01" },
-                type: "ERC-20",
+                type: "ERC-721",
             });
 
             rerender(
                 <Component
                     {...defaultProps}
                     applications={applications}
-                    tokens={tokens}
                     onSearchApplications={onSearchApplicationsMock}
-                    onSearchTokens={onTokenSearchMock}
                     onSuccess={onSuccessMock}
                 />,
             );
 
             await waitFor(() =>
-                expect(screen.queryByText("ERC-20")).not.toBeInTheDocument(),
+                expect(screen.queryByText("ERC-721")).not.toBeInTheDocument(),
             );
 
-            expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+            expect(screen.queryByText("Token ID")).not.toBeInTheDocument();
             expect(screen.queryByText("Advanced")).not.toBeInTheDocument();
             expect(screen.queryByText("Approve")).not.toBeInTheDocument();
             expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
