@@ -605,7 +605,7 @@ describe("Rollups InputDetails", () => {
         const defaultProps = {
             type: "hex" as ContentType,
             additionalControls: [],
-            onTypeChange: () => undefined,
+            onTypeChange: vi.fn(),
         };
 
         const ContentTypeControlComponent =

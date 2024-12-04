@@ -14,7 +14,7 @@ const Component = withMantineTheme(PageNotFound);
 describe("PageNotFound component", () => {
     beforeEach(() => {
         useRouterMock.mockReturnValue({
-            back: () => undefined,
+            back: vi.fn(),
         } as unknown as AppRouterInstance);
     });
 

@@ -15,19 +15,14 @@ import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
 import { Voucher } from "../../../src/graphql/rollups/types";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { notifications } from "@mantine/notifications";
+
+vi.mock("@mantine/notifications");
+const notificationsShowMock = vi.mocked(notifications.show, {
+    partial: true,
+});
 
 vi.mock("@cartesi/rollups-wagmi");
-vi.mock("@mantine/notifications", async () => {
-    const actual = await vi.importActual("@mantine/notifications");
-    return {
-        ...(actual as any),
-        notifications: {
-            show: () => undefined,
-        },
-    };
-});
-vi.mock("wagmi");
-
 const useReadCartesiDAppWasVoucherExecutedMock = vi.mocked(
     useReadCartesiDAppWasVoucherExecuted,
     true,
@@ -40,6 +35,8 @@ const useSimulateCartesiDAppExecuteVoucherMock = vi.mocked(
     useSimulateCartesiDAppExecuteVoucher,
     true,
 );
+
+vi.mock("wagmi");
 const useAccountMock = vi.mocked(useAccount, true);
 const useWaitForTransactionReceiptMock = vi.mocked(
     useWaitForTransactionReceipt,
@@ -84,6 +81,7 @@ const defaultProps = {
 
 describe("VoucherExecution component", () => {
     beforeEach(() => {
+        notificationsShowMock.mockImplementation(vi.fn());
         useReadCartesiDAppWasVoucherExecutedMock.mockReturnValue({
             data: false,
             isLoading: false,
@@ -97,7 +95,7 @@ describe("VoucherExecution component", () => {
         useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "idle",
             isLoading: false,
-            writeContract: () => undefined,
+            writeContract: vi.fn(),
         } as any);
         useWaitForTransactionReceiptMock.mockReturnValue({
             status: "idle",
@@ -260,13 +258,9 @@ describe("VoucherExecution component", () => {
         expect(button.getAttribute("data-loading")).toBe("true");
     });
 
-    it("should not display a notification until transaction is successful", async () => {
-        const mantineNotifications = await import("@mantine/notifications");
+    it("should not display a notification until transaction is successful", () => {
         const showMock = vi.fn();
-        mantineNotifications.notifications = {
-            ...mantineNotifications.notifications,
-            show: showMock,
-        } as any;
+        notificationsShowMock.mockImplementation(showMock);
 
         useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "success",
@@ -282,13 +276,9 @@ describe("VoucherExecution component", () => {
         expect(showMock).toHaveBeenCalledTimes(0);
     });
 
-    it("should display a notification after voucher has been successfully executed and transaction for it is successful", async () => {
-        const mantineNotifications = await import("@mantine/notifications");
+    it("should display a notification after voucher has been successfully executed and transaction for it is successful", () => {
         const showMock = vi.fn();
-        mantineNotifications.notifications = {
-            ...mantineNotifications.notifications,
-            show: showMock,
-        } as any;
+        notificationsShowMock.mockImplementation(showMock);
 
         useWriteCartesiDAppExecuteVoucherMock.mockReturnValue({
             status: "success",
@@ -334,13 +324,9 @@ describe("VoucherExecution component", () => {
         expect(button.hasAttribute("disabled")).toBe(true);
     });
 
-    it("should display prepare error", async () => {
-        const mantineNotifications = await import("@mantine/notifications");
+    it("should display prepare error", () => {
         const showMock = vi.fn();
-        mantineNotifications.notifications = {
-            ...mantineNotifications.notifications,
-            show: showMock,
-        } as any;
+        notificationsShowMock.mockImplementation(showMock);
 
         const prepareData = {
             data: false,
@@ -366,13 +352,9 @@ describe("VoucherExecution component", () => {
         );
     });
 
-    it("should not display prepare error when proof is pending", async () => {
-        const mantineNotifications = await import("@mantine/notifications");
+    it("should not display prepare error when proof is pending", () => {
         const showMock = vi.fn();
-        mantineNotifications.notifications = {
-            ...mantineNotifications.notifications,
-            show: showMock,
-        } as any;
+        notificationsShowMock.mockImplementation(showMock);
 
         const prepareData = {
             data: false,

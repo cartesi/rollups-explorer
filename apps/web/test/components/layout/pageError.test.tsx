@@ -5,7 +5,7 @@ import PageError from "../../../src/components/layout/pageError";
 
 const Component = withMantineTheme(PageError);
 const props = {
-    reset: () => undefined,
+    reset: vi.fn(),
 };
 
 describe("PageError component", () => {
