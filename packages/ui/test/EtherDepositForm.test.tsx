@@ -3,11 +3,6 @@ import { afterAll, describe, it } from "vitest";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 import { getAddress } from "viem";
-import {
-    useSimulateEtherPortalDepositEther,
-    useWriteEtherPortalDepositEther,
-} from "@cartesi/rollups-wagmi";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 
 const Component = withMantineTheme(EtherDepositForm);
 
@@ -20,26 +15,38 @@ const applications = [
 const defaultProps = {
     applications,
     isLoadingApplications: false,
-    onSearchApplications: vi.fn(),
-    onSuccess: vi.fn(),
+    onSearchApplications: () => undefined,
+    onSuccess: () => undefined,
 };
 
-vi.mock("@cartesi/rollups-wagmi");
-const useSimulateEtherPortalDepositEtherMock = vi.mocked(
-    useSimulateEtherPortalDepositEther,
-    { partial: true },
-);
-const useWriteEtherPortalDepositEtherMock = vi.mocked(
-    useWriteEtherPortalDepositEther,
-    { partial: true },
-);
+vi.mock("@cartesi/rollups-wagmi", async () => {
+    return {
+        useSimulateEtherPortalDepositEther: () => ({
+            data: {
+                request: {},
+            },
+            config: {},
+            reset: vi.fn(),
+        }),
+        useWriteEtherPortalDepositEther: () => ({
+            wait: vi.fn(),
+            reset: vi.fn(),
+        }),
+    };
+});
 
-vi.mock("wagmi");
-const useWaitForTransactionReceiptMock = vi.mocked(
-    useWaitForTransactionReceipt,
-    { partial: true },
-);
-const useAccountMock = vi.mocked(useAccount, { partial: true });
+vi.mock("wagmi", async () => {
+    return {
+        useWaitForTransactionReceipt: () => ({}),
+        useAccount: () => ({
+            chain: {
+                nativeCurrency: {
+                    decimals: 18,
+                },
+            },
+        }),
+    };
+});
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -49,36 +56,15 @@ vi.mock("viem", async () => {
     };
 });
 
-const useSimulateEtherPortalDepositEtherData = {
-    data: {
-        request: {},
-    },
-    config: {},
-    reset: vi.fn(),
-} as any;
-
-const useWriteEtherPortalDepositEtherData = {
-    wait: vi.fn(),
-    reset: vi.fn(),
-};
+vi.mock("@mantine/form", async () => {
+    const actual = await vi.importActual("@mantine/form");
+    return {
+        ...(actual as any),
+        useForm: (actual as any).useForm,
+    };
+});
 
 describe("Rollups EtherDepositForm", () => {
-    beforeEach(() => {
-        useSimulateEtherPortalDepositEtherMock.mockReturnValue(
-            useSimulateEtherPortalDepositEtherData,
-        );
-        useWriteEtherPortalDepositEtherMock.mockReturnValue(
-            useWriteEtherPortalDepositEtherData,
-        );
-        useWaitForTransactionReceiptMock.mockReturnValue({});
-        useAccountMock.mockReturnValue({
-            chain: {
-                nativeCurrency: {
-                    decimals: 18,
-                } as any,
-            },
-        } as any);
-    });
     afterAll(() => {
         vi.restoreAllMocks();
     });
@@ -138,15 +124,16 @@ describe("Rollups EtherDepositForm", () => {
             );
         });
 
-        it("should correctly format extra data", () => {
+        it("should correctly format extra data", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...useSimulateEtherPortalDepositEtherData,
+                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
                 loading: false,
                 error: null,
             });
-            useSimulateEtherPortalDepositEtherMock.mockImplementation(
-                mockedHook,
-            );
+            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const execLayerDataInput = container.querySelector(
@@ -189,22 +176,27 @@ describe("Rollups EtherDepositForm", () => {
             expect(submitButton.hasAttribute("disabled")).toBe(true);
         });
 
-        it("should invoke write function when send button is clicked", () => {
+        it("should invoke write function when send button is clicked", async () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
-            useSimulateEtherPortalDepositEtherMock.mockReturnValue({
-                ...useSimulateEtherPortalDepositEtherData,
-                data: {
-                    request: {},
-                },
-                loading: false,
-                error: null,
-            });
-            useWriteEtherPortalDepositEtherMock.mockReturnValue({
-                ...useWriteEtherPortalDepositEtherData,
-                writeContract: mockedWrite,
-                reset: vi.fn(),
-            });
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
+                .fn()
+                .mockReturnValue({
+                    ...rollupsWagmi.useSimulateEtherPortalDepositEther,
+                    data: {
+                        request: {},
+                    },
+                    loading: false,
+                    error: null,
+                });
+            rollupsWagmi.useWriteEtherPortalDepositEther = vi
+                .fn()
+                .mockReturnValue({
+                    ...rollupsWagmi.useWriteEtherPortalDepositEther,
+                    writeContract: mockedWrite,
+                    reset: vi.fn(),
+                });
 
             const { container } = render(<Component {...defaultProps} />);
             const buttons = container.querySelectorAll("button");
@@ -234,8 +226,10 @@ describe("Rollups EtherDepositForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should invoke onSearchApplications function after successful deposit", () => {
-            useWaitForTransactionReceiptMock.mockReturnValue({
+        it("should invoke onSearchApplications function after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
                 status: "success",
                 isSuccess: true,
@@ -252,15 +246,16 @@ describe("Rollups EtherDepositForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it('should enable "useSimulateEtherPortalDepositEther" only when the form is valid', () => {
+        it('should enable "useSimulateEtherPortalDepositEther" only when the form is valid', async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...useSimulateEtherPortalDepositEtherData,
+                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
                 loading: false,
                 error: null,
             });
-            useSimulateEtherPortalDepositEtherMock.mockImplementation(
-                mockedHook,
-            );
+            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const applicationsInput = container.querySelector(
@@ -380,8 +375,10 @@ describe("Rollups EtherDepositForm", () => {
             });
         });
 
-        it("should invoke onSuccess callback after successful deposit", () => {
-            useWaitForTransactionReceiptMock.mockReturnValue({
+        it("should invoke onSuccess callback after successful deposit", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
                 isSuccess: true,
             });
@@ -454,15 +451,16 @@ describe("Rollups EtherDepositForm", () => {
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
 
-        it("should correctly format address", () => {
+        it("should correctly format address", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...useSimulateEtherPortalDepositEtherData,
+                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
                 loading: false,
                 error: null,
             });
-            useSimulateEtherPortalDepositEtherMock.mockImplementation(
-                mockedHook,
-            );
+            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -485,8 +483,10 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Alerts", () => {
-        it("should display alert for successful transaction", () => {
-            useWaitForTransactionReceiptMock.mockReturnValue({
+        it("should display alert for successful transaction", async () => {
+            const wagmi = await import("wagmi");
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: null,
                 status: "success",
                 isSuccess: true,
@@ -498,14 +498,16 @@ describe("Rollups EtherDepositForm", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display alert for failed transaction", () => {
+        it("should display alert for failed transaction", async () => {
+            const wagmi = await import("wagmi");
             const message = "User declined the transaction";
-            useWaitForTransactionReceiptMock.mockReturnValue({
+            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
+                ...wagmi.useWaitForTransactionReceipt,
                 error: {
                     message,
                 },
                 status: "error",
-            } as any);
+            });
 
             render(<Component {...defaultProps} />);
             expect(screen.getByText(message)).toBeInTheDocument();
@@ -513,18 +515,19 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Amount input", () => {
-        it("should correctly process small decimal numbers", () => {
+        it("should correctly process small decimal numbers", async () => {
+            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
             const mockedHook = vi.fn().mockReturnValue({
-                ...useSimulateEtherPortalDepositEther,
+                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
                 data: {
                     request: {},
                 },
                 loading: false,
                 error: null,
             });
-            useSimulateEtherPortalDepositEtherMock.mockImplementation(
-                mockedHook,
-            );
+            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
+                .fn()
+                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const amountInput = container.querySelector(
@@ -548,8 +551,7 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Form", () => {
-        // TODO: Update test so that we don't need an inline import for "@mantine/form"
-        it.skip("should reset form after successful submission", async () => {
+        it("should reset form after successful submission", async () => {
             const mantineForm = await import("@mantine/form");
             const [application] = applications;
             const resetMock = vi.fn();
