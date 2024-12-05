@@ -1,4 +1,4 @@
-import { TokenMetadataResult } from "../../src/ERC1155DepositForm/useGetTokenMetadata";
+import { TokenMetadataResult } from "../../src/ERC1155DepositForm/hooks/useGetTokenMetadata";
 
 export const applicationIds = [
     "0x4ca2f6935200b9a782a78f408f640f17b29809d8",
