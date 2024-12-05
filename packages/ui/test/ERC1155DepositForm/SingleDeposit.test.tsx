@@ -1,12 +1,14 @@
 import {
+    erc1155SinglePortalAbi,
+    erc1155SinglePortalAddress,
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
     useReadErc1155SupportsInterface,
     useReadErc1155Uri,
     useSimulateErc1155SetApprovalForAll,
-    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
     useWriteErc1155SetApprovalForAll,
-    useWriteErc1155SinglePortalDepositSingleErc1155Token,
+    v2Erc1155SinglePortalAbi,
+    v2Erc1155SinglePortalAddress,
 } from "@cartesi/rollups-wagmi";
 import {
     cleanup,
@@ -16,13 +18,22 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import * as viem from "viem";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import {
+    useAccount,
+    useSimulateContract,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from "wagmi";
 import { ERC1155DepositForm } from "../../src";
+import { useGetTokenMetadata } from "../../src/ERC1155DepositForm/hooks/useGetTokenMetadata";
 import { ERC1155DepositFormProps } from "../../src/ERC1155DepositForm/types";
-import { useGetTokenMetadata } from "../../src/ERC1155DepositForm/useGetTokenMetadata";
+import { Application } from "../../src/commons/interfaces";
 import withMantineTheme from "../utils/WithMantineTheme";
+import { factoryWaitStatus } from "../utils/helpers";
+import { applications } from "../utils/stubs";
 import {
     accountAddress,
     applicationIds,
@@ -51,27 +62,26 @@ const useSimulateSetApprovalForAllMock = vi.mocked(
     useSimulateErc1155SetApprovalForAll,
     { partial: true },
 );
-const useSimulatePortalDepositSingleMock = vi.mocked(
-    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
-    { partial: true },
-);
+
 const useWriteSetApprovalForAllMock = vi.mocked(
     useWriteErc1155SetApprovalForAll,
-    { partial: true },
-);
-const useWritePortalDepositSingleMock = vi.mocked(
-    useWriteErc1155SinglePortalDepositSingleErc1155Token,
     { partial: true },
 );
 
 vi.mock("wagmi");
 const useAccountMock = vi.mocked(useAccount, { partial: true });
+const useSimulateContractMock = vi.mocked(useSimulateContract, {
+    partial: true,
+});
+const useWriteContractMock = vi.mocked(useWriteContract, {
+    partial: true,
+});
 const useWaitForTransactionReceiptMock = vi.mocked(
     useWaitForTransactionReceipt,
     { partial: true },
 );
 
-vi.mock("../../src/ERC1155DepositForm/useGetTokenMetadata");
+vi.mock("../../src/ERC1155DepositForm/hooks/useGetTokenMetadata");
 const useGetTokenMetadataMock = vi.mocked(useGetTokenMetadata, {
     partial: true,
 });
@@ -90,7 +100,7 @@ vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
 
 const defaultProps: ERC1155DepositFormProps = {
     mode: "single",
-    applications: applicationIds,
+    applications: applications,
     tokens: erc1155ContractIds,
     isLoadingApplications: false,
     onSearchApplications: vi.fn(),
@@ -100,7 +110,41 @@ const defaultProps: ERC1155DepositFormProps = {
 
 const Component = withMantineTheme(ERC1155DepositForm);
 
+const fillFormValues = async (
+    app: Application,
+    address: string,
+    tokenId?: string,
+    amount?: string,
+) => {
+    const appInput = screen.getByTestId("application");
+
+    fireEvent.change(appInput, {
+        target: {
+            value: app.address.toLowerCase(),
+        },
+    });
+
+    await waitFor(() => expect(screen.getByText("ERC-1155")).toBeVisible());
+
+    fireEvent.change(screen.getByTestId("erc1155Address"), {
+        target: { value: address },
+    });
+
+    if (isNotNilOrEmpty(tokenId)) {
+        fireEvent.change(screen.getByTestId("token-id-input"), {
+            target: { value: tokenId },
+        });
+    }
+
+    if (isNotNilOrEmpty(amount)) {
+        fireEvent.change(screen.getByTestId("amount-input"), {
+            target: { value: amount },
+        });
+    }
+};
+
 describe("ERC-1155 Single Deposit", () => {
+    const foundApp = applications[0];
     beforeEach(() => {
         useReadSupportsInterfaceMock.mockReturnValue({
             isLoading: false,
@@ -137,17 +181,20 @@ describe("ERC-1155 Single Deposit", () => {
             reset: () => {},
         });
 
-        useSimulatePortalDepositSingleMock.mockReturnValue({
+        useSimulateContractMock.mockReturnValue({
+            data: undefined,
+            status: "success",
             isLoading: false,
-            fetchStatus: "idle",
-            data: { request: {} },
+            isFetching: false,
+            isSuccess: true,
             error: null,
         });
 
-        useWritePortalDepositSingleMock.mockReturnValue({
-            isIdle: true,
+        useWriteContractMock.mockReturnValue({
+            data: undefined,
             status: "idle",
-            reset: () => {},
+            writeContract: vi.fn(),
+            reset: vi.fn(),
         });
 
         useAccountMock.mockReturnValue({
@@ -174,26 +221,16 @@ describe("ERC-1155 Single Deposit", () => {
         expect(
             screen.getByText("The application smart contract address"),
         ).toBeInTheDocument();
-        expect(screen.getByText("ERC-1155")).toBeInTheDocument();
+        expect(screen.queryByText("ERC-1155")).not.toBeInTheDocument();
         expect(
-            screen.getByText("The ERC-1155 smart contract address"),
-        ).toBeInTheDocument();
+            screen.queryByText("The ERC-1155 smart contract address"),
+        ).not.toBeInTheDocument();
     });
 
     it("should display fields for token id and amount after filling app address and contract address", async () => {
-        render(<Component {...defaultProps} />);
+        render(<Component {...defaultProps} applications={[foundApp]} />);
 
-        fireEvent.change(screen.getByTestId("application"), {
-            target: {
-                value: applicationIds[0],
-            },
-        });
-
-        fireEvent.change(screen.getByTestId("erc1155Address"), {
-            target: {
-                value: applicationIds[0],
-            },
-        });
+        await fillFormValues(foundApp, erc1155ContractIds[0]);
 
         fireEvent.click(screen.getByText("Advanced"));
 
@@ -209,7 +246,9 @@ describe("ERC-1155 Single Deposit", () => {
     });
 
     it("should display Base and Execution layer data fields after clicking the advanced button", async () => {
-        render(<Component {...defaultProps} />);
+        render(<Component {...defaultProps} applications={[foundApp]} />);
+
+        await fillFormValues(foundApp, erc1155ContractIds[0]);
 
         fireEvent.click(screen.getByText("Advanced"));
 
@@ -226,6 +265,133 @@ describe("ERC-1155 Single Deposit", () => {
                 "Additional data to be interpreted by the execution layer",
             ),
         );
+    });
+
+    describe("Warnings", () => {
+        it("should display warning for undeployed Application address", async () => {
+            render(<Component {...defaultProps} applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: { value: "0x60a7048c3136293071605a4eaffef49923e981fe" },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "This is a deposit to an undeployed application.",
+                    ),
+                ).toBeVisible(),
+            );
+        });
+    });
+
+    describe("When the application is undeployed", () => {
+        it("should display rollup-version options to be chosen", async () => {
+            render(<Component {...defaultProps} applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "This is a deposit to an undeployed application.",
+                    ),
+                ).toBeVisible(),
+            );
+
+            expect(screen.getByText("Cartesi Rollups version")).toBeVisible();
+            expect(
+                screen.getByText(
+                    "Set the rollup version to call the correct contracts.",
+                ),
+            ).toBeVisible();
+
+            expect(screen.queryByText("ERC-1155")).not.toBeInTheDocument();
+            expect(screen.queryByText("Token id")).not.toBeInTheDocument();
+            expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+            expect(screen.queryByText("Advanced")).not.toBeInTheDocument();
+            expect(screen.queryByText("Approve")).not.toBeInTheDocument();
+            expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
+        });
+
+        it("should display the rest of the fields after choosing the Rollup version", async () => {
+            render(<Component {...defaultProps} applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "This is a deposit to an undeployed application.",
+                    ),
+                ).toBeVisible(),
+            );
+
+            const options = screen.getByRole("radiogroup");
+
+            fireEvent.click(getByText(options, "Rollup v1"));
+
+            await waitFor(() =>
+                expect(screen.getByText("ERC-1155")).toBeVisible(),
+            );
+
+            fireEvent.change(screen.getByTestId("erc1155Address"), {
+                target: { value: erc1155ContractIds[0] },
+            });
+
+            await waitFor(() =>
+                expect(screen.getByText("Token id")).toBeVisible(),
+            );
+
+            expect(screen.getByText("Amount")).toBeVisible();
+            expect(screen.getByText("Advanced")).toBeVisible();
+            expect(screen.getByText("Approved")).toBeVisible();
+            expect(screen.getByText("Deposit")).toBeVisible();
+        });
+
+        it("should setup correct contract configs when rollup version is chosen", async () => {
+            render(<Component {...defaultProps} applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "This is a deposit to an undeployed application.",
+                    ),
+                ).toBeVisible(),
+            );
+
+            const options = screen.getByRole("radiogroup");
+
+            fireEvent.click(getByText(options, "Rollup v1"));
+
+            const paramsForV1 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(paramsForV1).toHaveProperty("abi", erc1155SinglePortalAbi);
+            expect(paramsForV1).toHaveProperty(
+                "address",
+                erc1155SinglePortalAddress,
+            );
+
+            fireEvent.click(getByText(options, "Rollup v2"));
+
+            const paramsForV2 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(paramsForV2).toHaveProperty("abi", v2Erc1155SinglePortalAbi);
+            expect(paramsForV2).toHaveProperty(
+                "address",
+                v2Erc1155SinglePortalAddress,
+            );
+        });
     });
 
     describe("Validations", () => {
@@ -262,12 +428,13 @@ describe("ERC-1155 Single Deposit", () => {
 
         describe("ERC-1155 field", () => {
             it("should display field required message", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 const input = screen.getByTestId("erc1155Address");
-                fireEvent.change(input, {
-                    target: { value: applicationIds[0] },
-                });
 
                 fireEvent.change(input, { target: { value: "" } });
 
@@ -277,7 +444,11 @@ describe("ERC-1155 Single Deposit", () => {
             });
 
             it("should display invalid address message", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 const input = screen.getByTestId("erc1155Address");
 
@@ -297,17 +468,14 @@ describe("ERC-1155 Single Deposit", () => {
                     data: false,
                 });
 
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
                 const erc721Address =
                     "0x7a3cc9c0408887a030a0354330c36a9cd681aa7e";
 
-                const input = screen.getByTestId("erc1155Address");
-                fireEvent.change(input, {
-                    target: {
-                        value: erc721Address,
-                    },
-                });
+                await fillFormValues(foundApp, erc721Address);
 
                 expect(
                     await screen.findByText(
@@ -323,17 +491,14 @@ describe("ERC-1155 Single Deposit", () => {
                     data: undefined,
                 });
 
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
                 const erc20Address =
                     "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8";
 
-                const input = screen.getByTestId("erc1155Address");
-                fireEvent.change(input, {
-                    target: {
-                        value: erc20Address,
-                    },
-                });
+                await fillFormValues(foundApp, erc20Address);
 
                 expect(
                     await screen.findByText(
@@ -345,19 +510,11 @@ describe("ERC-1155 Single Deposit", () => {
 
         describe("Token id field", () => {
             it("should display field require message", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
-                fireEvent.change(screen.getByTestId("application"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
-
-                fireEvent.change(screen.getByTestId("erc1155Address"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "0" },
@@ -373,19 +530,11 @@ describe("ERC-1155 Single Deposit", () => {
             });
 
             it("should display integer is required message", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
-                fireEvent.change(screen.getByTestId("application"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
-
-                fireEvent.change(screen.getByTestId("erc1155Address"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "0.01" },
@@ -401,19 +550,11 @@ describe("ERC-1155 Single Deposit", () => {
 
         describe("Amount field", () => {
             it("should display error message for invalid value", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
-                fireEvent.change(screen.getByTestId("application"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
-
-                fireEvent.change(screen.getByTestId("erc1155Address"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "0" },
@@ -434,19 +575,11 @@ describe("ERC-1155 Single Deposit", () => {
                     data: 100n,
                 });
 
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
 
-                fireEvent.change(screen.getByTestId("application"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
-
-                fireEvent.change(screen.getByTestId("erc1155Address"), {
-                    target: {
-                        value: applicationIds[0],
-                    },
-                });
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.change(screen.getByTestId("token-id-input"), {
                     target: { value: "0" },
@@ -466,7 +599,11 @@ describe("ERC-1155 Single Deposit", () => {
 
         describe("Data layer fields", () => {
             it("should display error message for invalid hex value for Base layer data", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.click(screen.getByText("Advanced"));
 
@@ -479,7 +616,11 @@ describe("ERC-1155 Single Deposit", () => {
             });
 
             it("should display error message for invalid hex value for Execution layer data", async () => {
-                render(<Component {...defaultProps} />);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(foundApp, erc1155ContractIds[0]);
 
                 fireEvent.click(screen.getByText("Advanced"));
 
@@ -498,19 +639,9 @@ describe("ERC-1155 Single Deposit", () => {
 
     describe("Metadata View", () => {
         it("should display token metadata on request success", async () => {
-            render(<Component {...defaultProps} />);
+            render(<Component {...defaultProps} applications={[foundApp]} />);
 
-            fireEvent.change(screen.getByTestId("application"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("erc1155Address"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
+            await fillFormValues(foundApp, erc1155ContractIds[0]);
 
             fireEvent.change(screen.getByTestId("token-id-input"), {
                 target: { value: "0" },
@@ -542,19 +673,9 @@ describe("ERC-1155 Single Deposit", () => {
                 error: new Error("Invalid URL"),
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component {...defaultProps} applications={[foundApp]} />);
 
-            fireEvent.change(screen.getByTestId("application"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("erc1155Address"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
+            await fillFormValues(foundApp, erc1155ContractIds[0]);
 
             fireEvent.change(screen.getByTestId("token-id-input"), {
                 target: { value: "0" },
@@ -564,11 +685,13 @@ describe("ERC-1155 Single Deposit", () => {
                 screen.queryByTestId("metadata-view"),
             ).not.toBeInTheDocument();
 
-            expect(
-                await screen.findByText(
-                    "Something is wrong with the URI returned by the contract.",
-                ),
-            ).toBeVisible();
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "Something is wrong with the URI returned by the contract.",
+                    ),
+                ).toBeVisible(),
+            );
 
             expect(screen.getByText("URI is not defined.")).toBeVisible();
         });
@@ -580,33 +703,21 @@ describe("ERC-1155 Single Deposit", () => {
                 state: "not_http",
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component {...defaultProps} applications={[foundApp]} />);
 
-            fireEvent.change(screen.getByTestId("application"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("erc1155Address"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("token-id-input"), {
-                target: { value: "0" },
-            });
+            await fillFormValues(foundApp, erc1155ContractIds[0], "0");
 
             expect(
                 screen.queryByTestId("metadata-view"),
             ).not.toBeInTheDocument();
 
-            expect(
-                await screen.findByText(
-                    "The URI is valid, but it is not an HTTP protocol.",
-                ),
-            ).toBeVisible();
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "The URI is valid, but it is not an HTTP protocol.",
+                    ),
+                ).toBeVisible(),
+            );
 
             expect(
                 screen.getByText(
@@ -624,31 +735,19 @@ describe("ERC-1155 Single Deposit", () => {
                 url: tokenMetadataResultStub.url,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component {...defaultProps} applications={[foundApp]} />);
 
-            fireEvent.change(screen.getByTestId("application"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("erc1155Address"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("token-id-input"), {
-                target: { value: "0" },
-            });
+            await fillFormValues(foundApp, erc1155ContractIds[0], "0");
 
             expect(
                 screen.queryByTestId("metadata-view"),
             ).not.toBeInTheDocument();
 
-            expect(
-                await screen.findByText("We could not fetch the metadata."),
-            ).toBeVisible();
+            await waitFor(() =>
+                expect(
+                    screen.getByText("We could not fetch the metadata."),
+                ).toBeVisible(),
+            );
 
             expect(
                 screen.getByText(tokenMetadataResultStub.url!),
@@ -657,39 +756,24 @@ describe("ERC-1155 Single Deposit", () => {
     });
 
     describe("Actions", () => {
-        type Screen = typeof screen;
-        const fillForm = (screen: Screen) => {
-            fireEvent.change(screen.getByTestId("application"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("erc1155Address"), {
-                target: {
-                    value: applicationIds[0],
-                },
-            });
-
-            fireEvent.change(screen.getByTestId("token-id-input"), {
-                target: { value: "0" },
-            });
-
-            fireEvent.change(screen.getByTestId("amount-input"), {
-                target: { value: "500" },
-            });
-        };
-
         describe("Approve states", () => {
-            it("should display approved when portal is set as an approved operator", () => {
+            it("should display approved when portal is set as an approved operator", async () => {
                 const writeContract = vi.fn();
 
                 useWriteSetApprovalForAllMock.mockReturnValue({
                     writeContract: writeContract,
                 });
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Approved").closest("button");
                 fireEvent.click(btn!);
@@ -698,7 +782,7 @@ describe("ERC-1155 Single Deposit", () => {
                 expect(writeContract).toHaveBeenCalledTimes(0);
             });
 
-            it("should be able to click the approve when portal is not authorized", () => {
+            it("should be able to click the approve when portal is not authorized", async () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: false,
@@ -709,8 +793,16 @@ describe("ERC-1155 Single Deposit", () => {
                     writeContract: writeContract,
                 });
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Approve");
 
@@ -719,7 +811,7 @@ describe("ERC-1155 Single Deposit", () => {
                 expect(writeContract).toHaveBeenCalledTimes(1);
             });
 
-            it("should display a feedback while waiting approve transaction confirmation", () => {
+            it("should display a feedback while waiting approve transaction confirmation", async () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: false,
@@ -747,8 +839,16 @@ describe("ERC-1155 Single Deposit", () => {
                     },
                 );
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Approve").closest("button");
                 expect(btn?.getAttribute("data-loading")).toEqual("true");
@@ -757,7 +857,7 @@ describe("ERC-1155 Single Deposit", () => {
                 ).toBeVisible();
             });
 
-            it("should display a feedback once the approve transaction is confirmed", () => {
+            it("should display a feedback once the approve transaction is confirmed", async () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: true,
@@ -782,8 +882,16 @@ describe("ERC-1155 Single Deposit", () => {
                     },
                 );
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Approved").closest("button");
                 expect(btn).toBeDisabled();
@@ -801,7 +909,7 @@ describe("ERC-1155 Single Deposit", () => {
                 ).not.toBeInTheDocument();
             });
 
-            it("should display error message when transaction fails", () => {
+            it("should display error message when transaction fails", async () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: false,
@@ -834,8 +942,16 @@ describe("ERC-1155 Single Deposit", () => {
                     },
                 );
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Approve").closest("button");
                 expect(btn).not.toBeDisabled();
@@ -852,10 +968,23 @@ describe("ERC-1155 Single Deposit", () => {
         });
 
         describe("Deposit states", () => {
-            it("should keep deposit button disabled when portal is not an approved operator", () => {
+            beforeEach(() => {
+                useSimulateContractMock.mockReturnValue({
+                    status: "success",
+                    isLoading: false,
+                    isFetching: false,
+                    isSuccess: true,
+                    error: null,
+                    data: {
+                        request: {},
+                    },
+                });
+            });
+
+            it("should keep deposit button disabled when portal is not an approved operator", async () => {
                 const writeContract = vi.fn();
 
-                useWritePortalDepositSingleMock.mockReturnValue({
+                useWriteContractMock.mockReturnValue({
                     writeContract: writeContract,
                 });
 
@@ -864,8 +993,16 @@ describe("ERC-1155 Single Deposit", () => {
                     data: false,
                 });
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Deposit").closest("button");
                 fireEvent.click(btn!);
@@ -874,21 +1011,31 @@ describe("ERC-1155 Single Deposit", () => {
                 expect(writeContract).toHaveBeenCalledTimes(0);
             });
 
-            it("should be able to click the deposit button when authorized and form is valid", () => {
+            it("should be able to click the deposit button when authorized and form is valid", async () => {
                 useReadIsApprovedForAllMock.mockReturnValue({
                     isLoading: false,
                     data: true,
                 });
+
                 const writeContract = vi.fn();
 
-                useWritePortalDepositSingleMock.mockReturnValue({
+                useWriteContractMock.mockReturnValue({
                     writeContract: writeContract,
+                    status: "success",
+                    isPending: false,
                     data: "0x0002",
-                    status: "idle",
                 });
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Deposit");
 
@@ -897,10 +1044,10 @@ describe("ERC-1155 Single Deposit", () => {
                 expect(writeContract).toHaveBeenCalledTimes(1);
             });
 
-            it("should display a feedback while waiting deposit confirmation", () => {
-                useWritePortalDepositSingleMock.mockReturnValue({
+            it("should display a feedback while waiting deposit confirmation", async () => {
+                useWriteContractMock.mockReturnValue({
                     isIdle: false,
-                    status: "pending",
+                    status: "success",
                     data: "0x0001",
                 });
 
@@ -920,8 +1067,16 @@ describe("ERC-1155 Single Deposit", () => {
                     },
                 );
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Deposit").closest("button");
                 expect(btn?.getAttribute("data-loading")).toEqual("true");
@@ -930,24 +1085,12 @@ describe("ERC-1155 Single Deposit", () => {
                 ).toBeVisible();
             });
 
-            it("should cleanup and call onSuccess once the deposit is confirmed", () => {
+            it("should cleanup and call onSuccess once the deposit is confirmed", async () => {
                 const depositReset = vi.fn();
                 const approveReset = vi.fn();
+
                 // Avoiding infinite loop by making a computed prop change when deposit reset is called.
-                const depositWaitStatus = {
-                    _status: "success",
-                    get props(): {
-                        status?: "success";
-                        isSuccess?: true;
-                    } {
-                        return this._status === "success"
-                            ? { status: "success", isSuccess: true }
-                            : {};
-                    },
-                    reset() {
-                        this._status = "idle";
-                    },
-                };
+                const depositWaitStatus = factoryWaitStatus();
 
                 useWriteSetApprovalForAllMock.mockReturnValue({
                     isIdle: true,
@@ -955,7 +1098,7 @@ describe("ERC-1155 Single Deposit", () => {
                     reset: approveReset,
                 });
 
-                useWritePortalDepositSingleMock.mockReturnValue({
+                useWriteContractMock.mockReturnValue({
                     status: "success",
                     data: "0x0001",
                     reset: () => {
@@ -979,22 +1122,67 @@ describe("ERC-1155 Single Deposit", () => {
                 );
 
                 const onSuccess = vi.fn();
+                const onSearchTokens = vi.fn();
+                const onSearchApplication = vi.fn();
 
-                render(<Component {...defaultProps} onSuccess={onSuccess} />);
-                fillForm(screen);
+                const { rerender } = render(
+                    <Component
+                        {...defaultProps}
+                        onSuccess={onSuccess}
+                        applications={[foundApp]}
+                        onSearchApplications={onSearchApplication}
+                        onSearchTokens={onSearchTokens}
+                    />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Deposit").closest("button");
 
                 expect(btn).toBeDisabled();
-                expect(onSuccess).toHaveBeenCalledTimes(1);
+                expect(onSuccess).toHaveBeenCalledWith({
+                    receipt: { transactionHash: "0x01" },
+                    type: "ERC-1155",
+                });
+                expect(onSearchApplication).toHaveBeenCalledWith("");
+                expect(onSearchTokens).toHaveBeenCalledWith("");
                 expect(depositReset).toHaveBeenCalledTimes(1);
                 expect(approveReset).toHaveBeenCalledTimes(1);
+
+                rerender(
+                    <Component
+                        {...defaultProps}
+                        onSuccess={onSuccess}
+                        applications={applications}
+                        onSearchApplications={onSearchApplication}
+                        onSearchTokens={onSearchTokens}
+                    />,
+                );
+
+                await waitFor(() =>
+                    expect(
+                        screen.queryByText("ERC-1155"),
+                    ).not.toBeInTheDocument(),
+                );
+
+                expect(screen.queryByText("Token id")).not.toBeInTheDocument();
+                expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+                expect(screen.queryByText("Advanced")).not.toBeInTheDocument();
+                expect(screen.queryByText("Approve")).not.toBeInTheDocument();
+                expect(screen.queryByText("Deposit")).not.toBeInTheDocument();
             });
 
-            it("should display error message when transaction fails", () => {
-                useWritePortalDepositSingleMock.mockReturnValue({
-                    isError: true,
-                    status: "error",
+            it("should display error message when transaction fails", async () => {
+                useWriteContractMock.mockReturnValue({
+                    isIdle: false,
+                    isPending: false,
+                    isSuccess: true,
+                    status: "success",
                     data: "0x0001",
                 });
 
@@ -1020,8 +1208,16 @@ describe("ERC-1155 Single Deposit", () => {
                     },
                 );
 
-                render(<Component {...defaultProps} />);
-                fillForm(screen);
+                render(
+                    <Component {...defaultProps} applications={[foundApp]} />,
+                );
+
+                await fillFormValues(
+                    foundApp,
+                    erc1155ContractIds[0],
+                    "0",
+                    "500",
+                );
 
                 const btn = screen.getByText("Deposit").closest("button");
                 expect(btn).not.toBeDisabled();
