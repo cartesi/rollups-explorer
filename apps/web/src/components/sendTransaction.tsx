@@ -44,7 +44,7 @@ type ApplicationSearchableParams = {
 };
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "relay",
+    initialDepositType = "erc1155Batch",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
@@ -207,9 +207,9 @@ const SendTransaction: FC<DepositProps> = ({
                 <ERC1155DepositForm
                     mode="single"
                     tokens={multiTokens}
-                    applications={applicationAddressList}
+                    applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setMultiTokenId}
                     onSuccess={onSuccess}
                 />
@@ -217,9 +217,9 @@ const SendTransaction: FC<DepositProps> = ({
                 <ERC1155DepositForm
                     mode="batch"
                     tokens={multiTokens}
-                    applications={applicationAddressList}
+                    applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setMultiTokenId}
                     onSuccess={onSuccess}
                 />

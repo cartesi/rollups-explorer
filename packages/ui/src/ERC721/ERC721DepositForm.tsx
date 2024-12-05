@@ -200,11 +200,6 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
     const isApproveDisabled =
         approveDisabled || !needApproval || !isDepositDisabled;
 
-    // console.clear();
-    // console.log(
-    //     `isNotIdle: ${!deposit.isIdle} - isNotDepositDisabled: ${!isDepositDisabled} - isLoading: ${depositLoading}`,
-    // );
-
     useEffect(() => {
         return () => {
             onSearchApplications("");
