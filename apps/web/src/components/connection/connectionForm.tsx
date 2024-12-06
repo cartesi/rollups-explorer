@@ -145,6 +145,8 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
         chainId,
     });
 
+    const applicationAddressList = applications.map((a) => a.address);
+
     const showLoader = !isEmpty(debouncedAddress) && fetching;
 
     const { validURL } = React.useMemo(
@@ -219,7 +221,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
                     description="The application smart contract address."
                     rightSection={showLoader ? <Loader size="sm" /> : ""}
                     placeholder="0x"
-                    data={applications}
+                    data={applicationAddressList}
                     data-testid="connection-address"
                     {...form.getInputProps("address")}
                 />

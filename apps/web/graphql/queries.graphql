@@ -1,8 +1,13 @@
+fragment ApplicationRequiredFields on Application {
+  id
+  address
+  rollupVersion
+}
+
 fragment InputItem on Input {
     id
     application {
-        id
-        address
+        ...ApplicationRequiredFields
     }
     chain {
         id
@@ -88,8 +93,7 @@ query statsApplicationsOwner($ownerAddress: String, $chainId: String) {
 
 query applications($limit: Int, $where: ApplicationWhereInput) {
     applications(where: $where, limit: $limit) {
-        id
-        address
+        ...ApplicationRequiredFields
     }
 }
 
@@ -110,10 +114,9 @@ query multiTokens($limit: Int, $where: MultiTokenWhereInput) {
 }
 
 fragment ApplicationItem on Application {
-    id
+    ...ApplicationRequiredFields
     owner
-    timestamp
-		address
+    timestamp	
     factory {
         id
       	address

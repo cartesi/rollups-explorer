@@ -116,7 +116,7 @@ const InputRow: FC<InputRowProps> = ({
                         <Address
                             value={to}
                             icon
-                            href={`/applications/${to}/inputs`}
+                            href={`/applications/${to}/${input.application.rollupVersion}/inputs`}
                             shorten
                         />
                     </Box>
@@ -130,6 +130,7 @@ const InputRow: FC<InputRowProps> = ({
                         <ConnectionInputStatusBadge
                             graphqlUrl={(getConnection(to) as Connection).url}
                             index={input.index}
+                            application={input.application}
                         />
                     ) : (
                         <Tooltip label="Click to add a connection and inspect the input status.">

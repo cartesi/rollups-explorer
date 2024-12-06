@@ -1,6 +1,6 @@
 # Rollups Explorer
 
-[![Coverage Status](https://coveralls.io/repos/github/cartesi/rollups-explorer/badge.svg?branch=feature/97-upload-test-coverage-to-coveralls)](https://coveralls.io/github/cartesi/rollups-explorer?branch=feature/97-upload-test-coverage-to-coveralls)
+[![Coverage Status](https://coveralls.io/repos/github/cartesi/rollups-explorer/badge.svg?branch=main)](https://coveralls.io/github/cartesi/rollups-explorer?branch=main)
 
 This is a monorepo managed by [turborepo](https://turbo.build/repo) using [Yarn v1](https://classic.yarnpkg.com/) as the package manager. It holds two web apps and a few packages. A nextJS app called [web](./apps//web/) that is the rollups-explorer UI. The second is a Storybook app called [workshop](./apps/workshop/) to support showcase and quick development of components. The backend for the rollups-explorer can be found [here](https://github.com/cartesi/rollups-explorer-api)
 

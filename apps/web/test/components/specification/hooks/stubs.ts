@@ -12,6 +12,17 @@ const destination2: Hex = "0xec6adef5e1006bb305bb1975333e8fc4071295bf";
 const payload2: Hex =
     "0xa9059cbb000000000000000000000000d91c0c2fc065a2e094129066d2683ef16e6f60320000000000000000000000000000000000000000000000d8d726b7177a800000";
 
+const withdrawV2EtherDestination: Hex =
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+
+const payloadWithdrawEtherV2: Hex =
+    "0x237a816f000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb922660000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000";
+
+const voucherOutputV2Destination: Hex =
+    "0x9A676e781A523b5d0C0e43731313A708CB607508";
+const payloadVoucherOutputV2: Hex =
+    "0x237a816f0000000000000000000000009a676e781a523b5d0c0e43731313a708cb60750800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000004440c10f190000000000000000000000009965507d1a55bcc2695c58ba16fb37d819b0a4dc000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
 const validABIByDestination: Record<Hex, ABI> = {
     [destination2]: [
         {
@@ -578,13 +589,257 @@ const validABIByDestination: Record<Hex, ABI> = {
             inputs: [],
         },
     ],
+    [voucherOutputV2Destination]: [
+        {
+            type: "function",
+            selector: "0xa22cb465",
+            sig: "setApprovalForAll(address,bool)",
+            name: "setApprovalForAll",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "bool",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0xe985e9c5",
+            sig: "isApprovedForAll(address,address)",
+            name: "isApprovedForAll",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "address",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0xf242432a",
+            sig: "safeTransferFrom(address,address,uint256,uint256,bytes)",
+            name: "safeTransferFrom",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "uint256",
+                    name: "",
+                },
+                {
+                    type: "uint256",
+                    name: "",
+                },
+                {
+                    type: "bytes",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0xf2fde38b",
+            sig: "transferOwnership(address)",
+            name: "transferOwnership",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x4e1273f4",
+            sig: "balanceOfBatch(address[],uint256[])",
+            name: "balanceOfBatch",
+            payable: false,
+            inputs: [
+                {
+                    type: "address[]",
+                    name: "",
+                },
+                {
+                    type: "uint256[]",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x715018a6",
+            sig: "renounceOwnership()",
+            name: "renounceOwnership",
+            payable: false,
+            inputs: [],
+        },
+        {
+            type: "function",
+            selector: "0x8da5cb5b",
+            sig: "owner()",
+            name: "owner",
+
+            payable: false,
+            inputs: [],
+        },
+        {
+            type: "function",
+            selector: "0x0e89341c",
+            sig: "uri(uint256)",
+            name: "uri",
+            payable: false,
+            inputs: [
+                {
+                    type: "uint256",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x1f7fdffa",
+            sig: "mintBatch(address,uint256[],uint256[],bytes)",
+            name: "mintBatch",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "uint256[]",
+                    name: "",
+                },
+                {
+                    type: "uint256[]",
+                    name: "",
+                },
+                {
+                    type: "bytes",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x2eb2c2d6",
+            sig: "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)",
+            name: "safeBatchTransferFrom",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "uint256[]",
+                    name: "",
+                },
+                {
+                    type: "uint256[]",
+                    name: "",
+                },
+                {
+                    type: "bytes",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x40c10f19",
+            sig: "mint(address,uint256)",
+            name: "mint",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "uint256",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x00fdd58e",
+            sig: "balanceOf(address,uint256)",
+            name: "balanceOf",
+            payable: false,
+            inputs: [
+                {
+                    type: "address",
+                    name: "",
+                },
+                {
+                    type: "uint256",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x01ffc9a7",
+            sig: "supportsInterface(bytes4)",
+            name: "supportsInterface",
+            payable: false,
+            inputs: [
+                {
+                    type: "bytes4",
+                    name: "",
+                },
+            ],
+        },
+        {
+            type: "function",
+            selector: "0x02fe5305",
+            sig: "setURI(string)",
+            name: "setURI",
+            payable: false,
+            inputs: [
+                {
+                    type: "string",
+                    name: "",
+                },
+            ],
+        },
+    ],
 };
 
 export const voucherDecoderStubs = {
     chainId,
     destination,
     destination2,
+    withdrawV2EtherDestination,
+    voucherOutputV2Destination,
     payload2,
     payload,
+    payloadWithdrawEtherV2,
+    payloadVoucherOutputV2,
+
     validABIByDestination,
 };

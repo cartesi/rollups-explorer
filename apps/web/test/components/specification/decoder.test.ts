@@ -267,6 +267,84 @@ Slice name: "from" (Is it the right one?)`,
 
                 expect(envelope.result).toEqual({});
             });
+
+            describe("Decoding portal data ( Rollups v2 )", () => {
+                it("should decode ether-portal data", () => {
+                    const envelope = decodePayload(
+                        systemSpecification.V2EtherPortalSpec,
+                        encodedDataSamples.v2EtherPortalSample,
+                    );
+
+                    expect(envelope.result).toEqual({
+                        amount: 111000000000000000n,
+                        sender: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
+                        execLayerData:
+                            "0x7b22616374696f6e223a226d61696e3a616363227d",
+                    });
+                });
+
+                it("should decode erc-721-portal data", () => {
+                    const envelope = decodePayload(
+                        systemSpecification.V2ERC721PortalSpec,
+                        encodedDataSamples.v2Erc721PortalSample,
+                    );
+
+                    expect(envelope.result).toEqual({
+                        tokenAddress:
+                            "0x7a3cc9c0408887a030a0354330c36a9cd681aa7e",
+                        tokenIndex: 1n,
+                        from: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
+                    });
+                });
+
+                it("should decode erc-20-portal data", () => {
+                    const envelope = decodePayload(
+                        systemSpecification.V2ERC20PortalSpec,
+                        encodedDataSamples.v2Erc20PortalSample,
+                    );
+
+                    expect(envelope.result).toEqual({
+                        amount: 111000000000000000n,
+                        execLayerData:
+                            "0x7b22616374696f6e223a226372656174653a616363227d",
+                        from: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
+                        tokenAddress:
+                            "0x813ae0539daf858599a1b2a7083380542a7b1bb5",
+                    });
+                });
+
+                it("should decode erc-1155_single-portal data", () => {
+                    const envelope = decodePayload(
+                        systemSpecification.V2ERC1155SinglePortalSpec,
+                        encodedDataSamples.v2Erc1155SinglePortalSample,
+                    );
+
+                    expect(envelope.result).toEqual({
+                        amount: 100n,
+                        from: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
+                        tokenAddress:
+                            "0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e",
+                        tokenId: 0n,
+                    });
+                });
+
+                it("should decode erc-1155_batch-portal data", () => {
+                    const envelope = decodePayload(
+                        systemSpecification.V2ERC1155BatchPortalSpec,
+                        encodedDataSamples.v2Erc1155BatchPortalSample,
+                    );
+
+                    expect(envelope.result).toEqual({
+                        amounts: [100n, 200n],
+                        baseLayer: "0x636f64653a3139",
+                        execLayer: "0x616374696f6e3a33",
+                        from: "0xa074683b5be015f053b5dceb064c41fc9d11b6e5",
+                        tokenAddress:
+                            "0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e",
+                        tokenIds: [1n, 2n],
+                    });
+                });
+            });
         });
 
         describe("Struct definition example cases", () => {

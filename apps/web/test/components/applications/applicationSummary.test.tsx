@@ -2,7 +2,10 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import ApplicationSummary from "../../../src/components/applications/applicationSummary";
 import { useInputsConnectionQuery } from "../../../src/graphql/explorer/hooks/queries";
-import { InputOrderByInput } from "../../../src/graphql/explorer/types";
+import {
+    InputOrderByInput,
+    RollupVersion,
+} from "../../../src/graphql/explorer/types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { inputsConnectionMock } from "./mocks";
@@ -16,7 +19,8 @@ const useInputsConnectionQueryMock = vi.mocked(useInputsConnectionQuery, true);
 const Component = withMantineTheme(ApplicationSummary);
 
 const defaultProps = {
-    applicationId: "0x07044f5d4ae00666bbb946cf1cbcff8e2d29c878",
+    appAddress: "0x07044f5d4ae00666bbb946cf1cbcff8e2d29c878",
+    appVersion: RollupVersion.V1,
 };
 
 const connectionConfig = {
@@ -46,7 +50,7 @@ describe("ApplicationSummary component", () => {
         cleanup();
     });
 
-    it("should filter applications based on application id", () => {
+    it("should filter applications based on application address", () => {
         const implementationMock = vi.fn(
             () =>
                 [
@@ -65,10 +69,11 @@ describe("ApplicationSummary component", () => {
                 limit: 6,
                 where: {
                     application: {
-                        address_eq: defaultProps.applicationId.toLowerCase(),
+                        address_eq: defaultProps.appAddress.toLowerCase(),
                         chain: {
                             id_eq: "11155111",
                         },
+                        rollupVersion_eq: RollupVersion.V1,
                     },
                 },
             },
@@ -120,7 +125,7 @@ describe("ApplicationSummary component", () => {
         fireEvent.click(button);
 
         expect(showConnectionModalMock).toHaveBeenCalledWith(
-            defaultProps.applicationId,
+            defaultProps.appAddress,
         );
     });
 
@@ -136,7 +141,7 @@ describe("ApplicationSummary component", () => {
 
         const anchor = buttonLabel.closest("a") as HTMLAnchorElement;
         expect(anchor.getAttribute("href")).toBe(
-            `/applications/${defaultProps.applicationId}/inputs`,
+            `/applications/${defaultProps.appAddress}/${defaultProps.appVersion}/inputs`,
         );
     });
 
