@@ -44,15 +44,13 @@ type ApplicationSearchableParams = {
 };
 
 const SendTransaction: FC<DepositProps> = ({
-    initialDepositType = "erc1155Batch",
+    initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
     const [applicationSearchableParams, setApplicationSearchableParams] =
         useState<ApplicationSearchableParams>({ address: "" });
 
-    // TODO: Replace this by the above one in every form.
-    const [applicationId, setApplicationId] = useState<string>("");
     const [multiTokenId, setMultiTokenId] = useState<string>("");
     const [tokenId, setTokenId] = useState<string>("");
 
@@ -108,12 +106,10 @@ const SendTransaction: FC<DepositProps> = ({
             });
 
             setMultiTokenId("");
-            setApplicationId("");
+            setApplicationSearchableParams({ address: "" });
         },
         [],
     );
-
-    const applicationAddressList = applications.map((a) => a.address);
 
     const updateApplicationSearchParams = useCallback(
         (address: string, rollupVersion?: RollupVersionUI) =>
@@ -123,13 +119,6 @@ const SendTransaction: FC<DepositProps> = ({
             }),
         [],
     );
-
-    // TODO: Fixup and remove after upgrading last form
-    const setOldApplicationCB = useCallback((address: string) => {
-        setApplicationSearchableParams({
-            address,
-        });
-    }, []);
 
     return (
         <>
@@ -166,7 +155,7 @@ const SendTransaction: FC<DepositProps> = ({
                 value={depositType}
                 onChange={(nextValue) => {
                     setDepositType(nextValue as DepositType);
-                    setApplicationId("");
+                    setApplicationSearchableParams({ address: "" });
                 }}
             />
 
@@ -195,12 +184,12 @@ const SendTransaction: FC<DepositProps> = ({
                 />
             ) : depositType === "input" ? (
                 <GenericInputForm
-                    applications={applicationAddressList}
+                    applications={applications}
                     specifications={
                         specifications as GenericInputFormSpecification[]
                     }
                     isLoadingApplications={fetching}
-                    onSearchApplications={setOldApplicationCB}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : depositType === "erc1155" ? (
