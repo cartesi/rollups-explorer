@@ -28,13 +28,14 @@ test("should open application inputs page", async ({ page }) => {
 
     const firstLink = applicationSummaryLinks.first();
     const href = (await firstLink.getAttribute("href")) as string;
-    const [hrefPart] = href
+    const appVersioned = href
         .split(/applications|inputs|\//)
-        .filter((p) => p !== "");
+        .filter((p) => p !== "")
+        .join("/");
 
     await firstLink.click();
 
-    await page.waitForURL(`/applications/${hrefPart}/inputs`);
+    await page.waitForURL(`/applications/${appVersioned}/inputs`);
 });
 
 test("should open input details", async ({ page }) => {
