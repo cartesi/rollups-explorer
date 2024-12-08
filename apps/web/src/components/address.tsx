@@ -17,14 +17,7 @@ import { jsNumberForAddress } from "react-jazzicon";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { Address as AddressType, getAddress } from "viem";
 
-import {
-    dAppAddressRelayAddress,
-    erc1155BatchPortalAddress,
-    erc1155SinglePortalAddress,
-    erc20PortalAddress,
-    erc721PortalAddress,
-    etherPortalAddress,
-} from "@cartesi/rollups-wagmi";
+import RollupContractResolver from "../lib/rollupContractResolver";
 
 export interface AddressProps extends GroupProps {
     value: AddressType;
@@ -35,19 +28,6 @@ export interface AddressProps extends GroupProps {
     shorten?: boolean;
     canCopy?: boolean;
 }
-
-const cartesi: Record<AddressType, string> = {
-    [dAppAddressRelayAddress]: "DAppAddressRelay",
-    [erc20PortalAddress]: "ERC20Portal",
-    [erc1155BatchPortalAddress]: "ERC1155BatchPortal",
-    [erc1155SinglePortalAddress]: "ERC1155SinglePortal",
-    [erc721PortalAddress]: "ERC721Portal",
-    [etherPortalAddress]: "EtherPortal",
-};
-
-const resolveName = (value: AddressType) => {
-    return cartesi[value];
-};
 
 const Address: FC<AddressProps> = ({
     href,
@@ -60,7 +40,7 @@ const Address: FC<AddressProps> = ({
     ...restProps
 }) => {
     value = getAddress(value);
-    const name = resolveName(value);
+    const name = RollupContractResolver.resolveName(value);
     const text = shorten ? `${value.slice(0, 8)}...${value.slice(-6)}` : value;
 
     const label = name ? (
