@@ -4,7 +4,7 @@ import { goToApplicationInputsPage } from "../utils/navigation";
 test.beforeEach(goToApplicationInputsPage);
 
 test("should have correct page title", async ({ page }) => {
-    const [, address] = page.url().split("/").reverse();
+    const [_page, _version, address] = page.url().split("/").reverse();
     await expect(page).toHaveTitle(`Application ${address} | CartesiScan`);
 });
 
