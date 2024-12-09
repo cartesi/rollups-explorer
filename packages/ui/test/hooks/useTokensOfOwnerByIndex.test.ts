@@ -26,7 +26,7 @@ vi.mock("@mantine/form", async () => {
 });
 
 vi.mock("../../src/hooks/useWatchQueryOnBlockChange", () => ({
-    default: () => undefined,
+    default: vi.fn(),
 }));
 
 const applications = [

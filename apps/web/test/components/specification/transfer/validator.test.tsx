@@ -396,7 +396,7 @@ describe("Specification transfer validator", () => {
                                     abi:
                                         specification.mode === "json_abi"
                                             ? (specification.abi ?? []).map(
-                                                  () => undefined,
+                                                  vi.fn(),
                                               )
                                             : null,
                                 }) as any,
