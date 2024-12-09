@@ -68,6 +68,8 @@ test("should search for specific input", async ({ page }) => {
     await page.keyboard.press("Enter");
     await page.waitForTimeout(2000);
 
+    await expect(page.getByText("inputs-table-spinner")).not.toBeVisible();
+
     fromAddress = page
         .getByTestId("application-from-address")
         .getByRole("paragraph");
