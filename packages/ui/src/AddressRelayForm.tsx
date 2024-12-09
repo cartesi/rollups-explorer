@@ -2,29 +2,26 @@ import {
     useSimulateDAppAddressRelayRelayDAppAddress,
     useWriteDAppAddressRelayRelayDAppAddress,
 } from "@cartesi/rollups-wagmi";
-import {
-    Alert,
-    Autocomplete,
-    Button,
-    Collapse,
-    Group,
-    Loader,
-    Stack,
-} from "@mantine/core";
+import { Alert, Button, Collapse, Group, Loader, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC, useEffect } from "react";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import { BaseError, getAddress, isAddress, zeroAddress } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
+import ApplicationAutocomplete from "./ApplicationAutocomplete";
 import { TransactionFormSuccessData } from "./DepositFormTypes";
 import { TransactionProgress } from "./TransactionProgress";
 import { transactionState } from "./TransactionState";
+import { Application, RollupVersion } from "./commons/interfaces";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 
 export interface AddressRelayFormProps {
-    applications: string[];
+    applications: Application[];
     isLoadingApplications: boolean;
-    onSearchApplications: (applicationId: string) => void;
+    onSearchApplications: (
+        appAddress: string,
+        rollupVersion?: RollupVersion,
+    ) => void;
     onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
@@ -72,7 +69,13 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
         true,
     );
     const canSubmit = form.isValid();
-    const isUndeployedApp = useUndeployedApplication(address, applications);
+    const addressList = applications.map((a) => a.address);
+    const isUndeployedApp = useUndeployedApplication(address, addressList);
+
+    useEffect(() => {
+        onSearchApplications("", "v1");
+        return () => onSearchApplications("");
+    }, []);
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -85,12 +88,12 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
     return (
         <form data-testid="address-relay-form">
             <Stack>
-                <Autocomplete
+                <ApplicationAutocomplete
                     label="Application"
                     data-testid="application"
                     description="The application address to relay."
                     placeholder="0x"
-                    data={applications}
+                    applications={applications}
                     withAsterisk
                     rightSection={
                         (prepare.isLoading || isLoadingApplications) && (
@@ -104,7 +107,11 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
                     }
                     onChange={(nextValue) => {
                         form.setFieldValue("application", nextValue);
-                        onSearchApplications(nextValue);
+                        onSearchApplications(nextValue, "v1");
+                    }}
+                    onApplicationSelected={(app) => {
+                        form.setFieldValue("application", app.address);
+                        onSearchApplications(app.address, "v1");
                     }}
                 />
 

@@ -4,8 +4,7 @@ import { Stack } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
-import { InputOrderByInput } from "../../graphql/explorer/types";
-import { useQueryParams } from "../../hooks/useQueryParams";
+import { InputOrderByInput, RollupVersion } from "../../graphql/explorer/types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
@@ -14,16 +13,18 @@ import Search from "../search";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
-    applicationId?: string;
+    appVersion?: RollupVersion;
+    appAddress?: string;
 };
 
 const Inputs: FC<InputsProps> = ({
     orderBy = InputOrderByInput.TimestampDesc,
-    applicationId,
+    appAddress,
+    appVersion,
 }) => {
     const chainId = getConfiguredChainId();
-    const { query: urlQuery } = useQueryParams();
-    const [query, setQuery] = useState(urlQuery);
+    // const { query: urlQuery } = useQueryParams();
+    const [query, setQuery] = useState("");
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
@@ -37,8 +38,9 @@ const Inputs: FC<InputsProps> = ({
             after,
             where: checkQuery(
                 queryDebounced.toLowerCase(),
-                applicationId?.toLowerCase(),
+                appAddress?.toLowerCase(),
                 chainId,
+                appVersion,
             ),
         },
     });
