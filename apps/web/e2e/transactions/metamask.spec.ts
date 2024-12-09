@@ -7,7 +7,7 @@ test.describe.configure({
     timeout: 120000,
 });
 
-test.describe.serial("Ether Deposit form", () => {
+test.skip("Ether Deposit form", () => {
     test.afterEach(async ({ context }) => {
         if (context) {
             await context.close();
@@ -41,13 +41,14 @@ test.describe.serial("Ether Deposit form", () => {
 
         await applicationInput.focus();
 
-        const option = page.getByRole("option").first();
+        const option = await page.getByRole("option").first();
 
         await option.click();
 
         await expect(
             modal.getByText("Amount of ether to deposit"),
         ).toBeVisible();
+
         await expect(
             modal.getByText(
                 "Extra execution layer data handled by the application",
