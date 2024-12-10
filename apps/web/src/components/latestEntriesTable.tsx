@@ -1,8 +1,8 @@
 "use client";
 import { Button, Loader, Table, Text } from "@mantine/core";
-import type { Address as AddressType } from "abitype/dist/types/abi";
 import prettyMilliseconds from "pretty-ms";
 import { FC, useCallback, useState } from "react";
+import type { Address as AddressType } from "viem";
 import Address from "./address";
 
 export interface Entry {

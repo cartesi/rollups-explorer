@@ -8,11 +8,11 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import type { Address as AddressType } from "abitype/dist/types/abi";
 import Link from "next/link";
 import type { FC } from "react";
 import { IconType } from "react-icons";
 import { TbApps, TbInbox } from "react-icons/tb";
+import type { Address as AddressType } from "viem";
 import {
     useApplicationsConnectionQuery,
     useInputsQuery,

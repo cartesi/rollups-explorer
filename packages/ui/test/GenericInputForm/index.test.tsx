@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { AbiFunction, getAddress, stringToHex } from "viem";
 import { afterAll, describe, it } from "vitest";
 import { GenericInputForm } from "../../src/GenericInputForm";
 import withMantineTheme from "../utils/WithMantineTheme";
-import { AbiFunction, getAddress, stringToHex } from "viem";
 import { abiParam, formSpecification, functionSignature } from "./mocks";
 
 const Component = withMantineTheme(GenericInputForm);
@@ -819,7 +819,7 @@ describe("GenericInputForm", () => {
             });
             expect(
                 screen.getByText(
-                    "Unknown signature. Details: invalid-value Version: abitype@1.0.0",
+                    "Unknown signature. Details: invalid-value Version: abitype@1.0.7",
                 ),
             ).toBeInTheDocument();
 
@@ -1022,7 +1022,7 @@ describe("GenericInputForm", () => {
             });
             expect(
                 screen.getByText(
-                    "Invalid ABI parameter. Details: invalid-value Version: abitype@1.0.0",
+                    "Invalid ABI parameter. Details: invalid-value Version: abitype@1.0.7",
                 ),
             ).toBeInTheDocument();
             fireEvent.change(abiParameterInput, {
