@@ -15,7 +15,7 @@ export const DecodingPreview = () => {
     const content = envelope?.result ? stringifyContent(envelope.result) : null;
 
     return (
-        <Card shadow="sm" withBorder>
+        <Card shadow="sm" withBorder pos="sticky" top="4.75rem">
             <Title order={3}>Preview</Title>
             <Stack gap="lg">
                 <Textarea
