@@ -1,3 +1,4 @@
+import * as mantineHooks from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
     cleanup,
@@ -19,7 +20,6 @@ import withMantineTheme from "../../utils/WithMantineTheme";
 import { encodedDataSamples } from "./encodedData.stubs";
 import { JotaiTestProvider } from "./jotaiHelpers";
 import { erc1155JSONABISpecStub } from "./specification.stubs";
-import * as mantineHooks from "@mantine/hooks";
 
 vi.mock("@mantine/hooks", async () => {
     const actual = await vi.importActual<typeof mantineHooks>("@mantine/hooks");
@@ -687,7 +687,7 @@ describe("Specification Form View", () => {
 
                     expect(
                         screen.getByText(
-                            `Unknown type. Type "bla" is not a valid ABI type. Version: abitype@1.0.0`,
+                            `Unknown type. Type "bla" is not a valid ABI type. Version: abitype@1.0.7`,
                         ),
                     ).toBeInTheDocument();
                 });
@@ -712,7 +712,7 @@ describe("Specification Form View", () => {
 
                     expect(
                         screen.getByText(
-                            `Invalid ABI parameter. "address" is a protected Solidity keyword. More info: https://docs.soliditylang.org/en/latest/cheatsheet.html Details: uint address Version: abitype@1.0.0`,
+                            `Invalid ABI parameter. "address" is a protected Solidity keyword. More info: https://docs.soliditylang.org/en/latest/cheatsheet.html Details: uint address Version: abitype@1.0.7`,
                         ),
                     ).toBeInTheDocument();
                 });

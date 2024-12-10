@@ -1,7 +1,6 @@
 "use client";
 
 import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
-import { Address as AddressType } from "abitype/dist/types/abi";
 import Link from "next/link";
 import { FC } from "react";
 import {
@@ -10,6 +9,7 @@ import {
     TbPlugConnectedX,
     TbStack2,
 } from "react-icons/tb";
+import { Address as AddressType } from "viem";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
