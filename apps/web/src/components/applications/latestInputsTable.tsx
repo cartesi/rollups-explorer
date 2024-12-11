@@ -1,12 +1,12 @@
 "use client";
 import { Badge, Box, Button, Group, Loader, Table, Text } from "@mantine/core";
-import type { Address as AddressType } from "abitype/dist/types/abi";
 import prettyMilliseconds from "pretty-ms";
 import { FC, useCallback, useState } from "react";
-import Address from "../address";
-import { InputItemFragment } from "../../graphql/explorer/operations";
 import { TbArrowRight } from "react-icons/tb";
+import type { Address as AddressType } from "viem";
+import { InputItemFragment } from "../../graphql/explorer/operations";
 import { methodResolver } from "../../lib/methodResolver";
+import Address from "../address";
 
 export interface Entry {
     appId: AddressType;
