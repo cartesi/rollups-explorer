@@ -8,12 +8,6 @@ import { InputItemFragment } from "../../graphql/explorer/operations";
 import RollupContractResolver from "../../lib/rollupContractResolver";
 import Address from "../address";
 
-export interface Entry {
-    appId: AddressType;
-    timestamp: number;
-    href: string;
-}
-
 export interface LatestInputsTableProps {
     inputs: InputItemFragment[];
     fetching: boolean;
