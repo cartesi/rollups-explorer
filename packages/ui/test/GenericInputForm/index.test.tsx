@@ -1,17 +1,35 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { AbiFunction, getAddress, stringToHex } from "viem";
-import { afterAll, describe, it } from "vitest";
-import { GenericInputForm } from "../../src/GenericInputForm";
+import {
+    inputBoxAbi,
+    inputBoxAddress,
+    v2InputBoxAbi,
+    v2InputBoxAddress,
+} from "@cartesi/rollups-wagmi";
+import {
+    fireEvent,
+    getByText,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import {
+    AbiFunction,
+    WaitForTransactionReceiptErrorType,
+    stringToHex,
+} from "viem";
+import { afterEach, beforeEach, describe, it } from "vitest";
+import {
+    useSimulateContract,
+    useWaitForTransactionReceipt,
+    useWriteContract,
+} from "wagmi";
+import {
+    GenericInputForm,
+    GenericInputFormProps,
+} from "../../src/GenericInputForm";
 import withMantineTheme from "../utils/WithMantineTheme";
+import { factoryWaitStatus } from "../utils/helpers";
+import { applications } from "../utils/stubs";
 import { abiParam, formSpecification, functionSignature } from "./mocks";
-
-const Component = withMantineTheme(GenericInputForm);
-
-const applications = [
-    "0x60a7048c3136293071605a4eaffef49923e981cc",
-    "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
-    "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
-];
 
 const specifications = [formSpecification];
 
@@ -23,28 +41,29 @@ const defaultProps = {
     onSuccess: () => undefined,
 };
 
+const ComponentE = withMantineTheme(GenericInputForm);
+const Component = (overwrites: Partial<GenericInputFormProps> = {}) => (
+    <ComponentE
+        {...defaultProps}
+        applications={[applications[0]]}
+        {...overwrites}
+    />
+);
+
 vi.mock("../../src/GenericInputForm/initialValues");
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        useSimulateInputBoxAddInput: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteInputBoxAddInput: () => ({
-            wait: vi.fn(),
-            reset: vi.fn(),
-            execute: vi.fn(),
-        }),
-    };
+vi.mock("wagmi");
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    { partial: true },
+);
+
+const useSimulateContractMock = vi.mocked(useSimulateContract, {
+    partial: true,
 });
 
-vi.mock("wagmi", async () => {
-    return {
-        useWaitForTransactionReceipt: () => ({}),
-    };
+const useWriteContractMock = vi.mocked(useWriteContract, {
+    partial: true,
 });
 
 vi.mock("viem", async () => {
@@ -56,29 +75,73 @@ vi.mock("viem", async () => {
     };
 });
 
-vi.mock("@mantine/form", async () => {
-    const actual = await vi.importActual("@mantine/form");
-    return {
-        ...(actual as any),
-        useForm: (actual as any).useForm,
-    };
-});
-
 describe("GenericInputForm", () => {
-    // beforeAll(() => {
-    afterAll(() => {
+    beforeEach(() => {
+        useSimulateContractMock.mockReturnValue({
+            data: undefined,
+            status: "success",
+            isLoading: false,
+            isFetching: false,
+            isSuccess: true,
+            error: null,
+        });
+
+        useWriteContractMock.mockReturnValue({
+            data: undefined,
+            status: "idle",
+            writeContract: vi.fn(),
+            reset: vi.fn(),
+        });
+
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            status: "pending",
+            fetchStatus: "idle",
+        });
+    });
+
+    afterEach(() => {
         vi.clearAllMocks();
+    });
+
+    it("should display initial fields without application selected", () => {
+        render(<Component {...defaultProps} />);
+
+        expect(screen.getByText("Application")).toBeInTheDocument();
+        expect(
+            screen.getByText("The application smart contract address"),
+        ).toBeInTheDocument();
+
+        expect(screen.queryByText("Hex input")).not.toBeInTheDocument();
+    });
+
+    it("should display the rest of the form after choosing an application", async () => {
+        const { rerender } = render(<Component {...defaultProps} />);
+
+        fireEvent.change(screen.getByTestId("application-autocomplete"), {
+            target: { value: applications[0].address },
+        });
+
+        rerender(<Component />);
+
+        await waitFor(() =>
+            expect(screen.getByText("Hex input")).toBeVisible(),
+        );
+
+        expect(screen.getByText("Hex")).toBeVisible();
+        expect(screen.getByText("String to Hex")).toBeVisible();
+        expect(screen.getByText("ABI to Hex")).toBeVisible();
+        expect(screen.getByText("Send")).toBeVisible();
     });
 
     describe("Hex textarea", () => {
         it("should display correct label for raw input", () => {
-            render(<Component {...defaultProps} />);
+            render(<Component />);
 
             expect(screen.getByText("Hex input")).toBeInTheDocument();
         });
 
         it("should display correct description for raw input", () => {
-            render(<Component {...defaultProps} />);
+            render(<Component />);
 
             expect(
                 screen.getByText("Hex input for the application"),
@@ -86,7 +149,7 @@ describe("GenericInputForm", () => {
         });
 
         it("should display error when value is not hex", async () => {
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const textarea = screen.getByTestId(
                 "hex-textarea",
             ) as HTMLTextAreaElement;
@@ -104,7 +167,7 @@ describe("GenericInputForm", () => {
         });
 
         it("should not display error when value is hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
+            const { container } = render(<Component />);
             const textarea = container.querySelector(
                 "textarea",
             ) as HTMLTextAreaElement;
@@ -124,20 +187,9 @@ describe("GenericInputForm", () => {
         });
 
         it("should correctly format hex data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            render(<Component />);
 
-            const { container } = render(<Component {...defaultProps} />);
-            const execLayerDataInput = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
+            const execLayerDataInput = screen.getByTestId("hex-textarea");
 
             const hexValue = "0x123123";
             fireEvent.change(execLayerDataInput, {
@@ -146,17 +198,19 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", hexValue],
-                query: {
-                    enabled: false,
-                },
-                value: undefined,
-            });
+            const simulateParams =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(simulateParams).toHaveProperty("args", [
+                "0x0000000000000000000000000000000000000000",
+                hexValue,
+            ]);
+
+            expect(simulateParams).toHaveProperty("query", { enabled: false });
         });
 
         it("should display format tabs", () => {
-            render(<Component {...defaultProps} />);
+            render(<Component />);
 
             expect(screen.getByText("Hex")).toBeInTheDocument();
             expect(screen.getByText("String to Hex")).toBeInTheDocument();
@@ -164,7 +218,7 @@ describe("GenericInputForm", () => {
         });
 
         it('should display string and hex textareas when "String to Hex" format is selected', () => {
-            render(<Component {...defaultProps} />);
+            render(<Component />);
 
             const button = screen.getByText("String to Hex");
             fireEvent.click(button);
@@ -180,7 +234,7 @@ describe("GenericInputForm", () => {
         });
 
         it("should correctly encode string to hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
+            const { container } = render(<Component />);
             const button = screen.getByText("String to Hex");
             fireEvent.click(button);
 
@@ -200,196 +254,102 @@ describe("GenericInputForm", () => {
     });
 
     describe("Send button", () => {
-        it("should be disabled when raw input is not hex", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
-            const button = container.querySelector(
-                "button",
-            ) as HTMLButtonElement;
+        beforeEach(() => {
+            useSimulateContractMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                isFetching: false,
+                isSuccess: true,
+                error: null,
+                data: {
+                    request: {},
+                },
+            });
+        });
 
+        it("should be disabled when raw input is not hex", () => {
+            render(<Component />);
+            const textarea = screen.getByTestId("hex-textarea");
+            const button = screen.getByText("Send").closest("button");
             fireEvent.change(textarea, {
                 target: {
                     value: "",
                 },
             });
 
-            expect(button.hasAttribute("disabled")).toBe(true);
+            expect(button).toBeDisabled();
         });
 
         it("should invoke write function when send button is clicked", async () => {
-            const selectedApplication = applications[1];
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+
+            useSimulateContractMock.mockReturnValue({
+                status: "success",
+                isSuccess: true,
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
             });
 
-            const { container } = render(<Component {...defaultProps} />);
-            const button = container.querySelector(
-                "button",
-            ) as HTMLButtonElement;
+            render(<Component />);
 
-            const input = container.querySelector("input") as HTMLInputElement;
-            input.setAttribute("value", selectedApplication);
+            const buttonLabel = screen.getByText("Send");
+            const input = screen.getByTestId("application-autocomplete");
+            const textarea = screen.getByTestId("hex-textarea");
 
-            fireEvent.change(input, {
+            fireEvent.change(input, { target: { value: selectedApplication } });
+            fireEvent.change(textarea, {
                 target: {
-                    value: selectedApplication,
+                    value: "0x3020",
                 },
             });
 
-            fireEvent.click(button);
-            expect(button.hasAttribute("disabled")).toBe(false);
-            expect(mockedWrite).toHaveBeenCalled();
+            fireEvent.blur(input);
+            fireEvent.blur(textarea);
+
+            fireEvent.click(buttonLabel);
+
+            expect(buttonLabel.closest("button")).not.toBeDisabled(),
+                expect(mockedWrite).toHaveBeenCalled();
         });
 
         it("should invoke onSearchApplications function after successful submission", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+            const inputWaitStatus = factoryWaitStatus();
+
+            useWriteContractMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {
+                    inputWaitStatus.reset();
+                },
+            });
+
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
+                status: "success",
                 isSuccess: true,
             });
 
             const onSearchApplicationsMock = vi.fn();
+
             render(
-                <Component
-                    {...defaultProps}
-                    onSearchApplications={onSearchApplicationsMock}
-                />,
+                <Component onSearchApplications={onSearchApplicationsMock} />,
             );
 
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
-
-        it('should enable "useSimulateInputBoxAddInput" only when the form is valid', async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
-
-            const [application] = applications;
-            fireEvent.change(input, {
-                target: {
-                    value: application,
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), ""],
-                query: {
-                    enabled: false,
-                },
-            });
-
-            fireEvent.change(input, {
-                target: {
-                    value: "",
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "0x",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: ["0x0000000000000000000000000000000000000000", "0x"],
-                query: {
-                    enabled: false,
-                },
-            });
-
-            fireEvent.change(input, {
-                target: {
-                    value: application,
-                },
-            });
-
-            fireEvent.change(textarea, {
-                target: {
-                    value: "0x",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                query: {
-                    enabled: true,
-                },
-            });
-        });
-
-        it("should invoke onSuccess callback after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
-                isSuccess: true,
-            });
-
-            const onSuccessMock = vi.fn();
-            render(<Component {...defaultProps} onSuccess={onSuccessMock} />);
-
-            expect(onSuccessMock).toHaveBeenCalled();
-        });
     });
 
-    describe("ApplicationAutocomplete", () => {
-        it("should display correct label for applications input", () => {
-            render(<Component {...defaultProps} />);
-
-            expect(screen.getByText("Application")).toBeInTheDocument();
-        });
-
-        it("should display correct description for applications input", () => {
-            render(<Component {...defaultProps} />);
-
-            expect(
-                screen.getByText("The application smart contract address"),
-            ).toBeInTheDocument();
-        });
-
-        it("should display correct placeholder", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input");
-
-            expect(input?.getAttribute("placeholder")).toBe("0x");
-        });
-
+    describe("warnings", () => {
         it("should display alert for unemployed application", async () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
+            render(<Component applications={[]} />);
+            const input = screen.getByTestId("application-autocomplete");
 
             fireEvent.change(input, {
                 target: {
@@ -397,20 +357,106 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            await waitFor(
-                () =>
-                    expect(
-                        screen.getByText("This is an undeployed application."),
-                    ).toBeInTheDocument(),
-                {
-                    timeout: 1100,
-                },
+            await waitFor(() =>
+                expect(
+                    screen.getByText("This is an undeployed application."),
+                ).toBeVisible(),
             );
         });
+    });
 
+    describe("When the application is undeployed", () => {
+        it("should display rollup-version options to be chosen", async () => {
+            render(<Component applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application-autocomplete"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText("This is an undeployed application."),
+                ).toBeVisible(),
+            );
+
+            expect(screen.getByText("Cartesi Rollups version")).toBeVisible();
+            expect(
+                screen.getByText(
+                    "Set the rollup version to call the correct contracts.",
+                ),
+            ).toBeVisible();
+
+            expect(screen.queryByText("Hex input")).not.toBeInTheDocument();
+            expect(screen.queryByText("Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("String to Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("ABI to Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("Send")).not.toBeInTheDocument();
+        });
+
+        it("should display the rest of the fields after choosing the Rollup version", async () => {
+            render(<Component applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application-autocomplete"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText("This is an undeployed application."),
+                ).toBeVisible(),
+            );
+
+            const options = screen.getByRole("radiogroup");
+
+            fireEvent.click(getByText(options, "Rollup v1"));
+
+            await waitFor(() =>
+                expect(screen.getByText("Hex input")).toBeVisible(),
+            );
+
+            expect(screen.getByText("Hex")).toBeVisible();
+            expect(screen.getByText("String to Hex")).toBeVisible();
+            expect(screen.getByText("ABI to Hex")).toBeVisible();
+            expect(screen.getByText("Send")).toBeVisible();
+        });
+
+        it("should setup correct contract configs when rollup version is chosen", async () => {
+            render(<Component applications={[]} />);
+
+            fireEvent.change(screen.getByTestId("application-autocomplete"), {
+                target: { value: applications[0].address },
+            });
+
+            await waitFor(() =>
+                expect(
+                    screen.getByText("This is an undeployed application."),
+                ).toBeVisible(),
+            );
+
+            const options = screen.getByRole("radiogroup");
+
+            fireEvent.click(getByText(options, "Rollup v1"));
+
+            const paramsForV1 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(paramsForV1).toHaveProperty("abi", inputBoxAbi);
+            expect(paramsForV1).toHaveProperty("address", inputBoxAddress);
+
+            fireEvent.click(getByText(options, "Rollup v2"));
+
+            const paramsForV2 =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(paramsForV2).toHaveProperty("abi", v2InputBoxAbi);
+            expect(paramsForV2).toHaveProperty("address", v2InputBoxAddress);
+        });
+    });
+
+    describe("ApplicationAutocomplete", () => {
         it("should display error when application is invalid", () => {
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
+            render(<Component {...defaultProps} />);
+            const input = screen.getByTestId("application-autocomplete");
 
             fireEvent.change(input, {
                 target: {
@@ -425,89 +471,98 @@ describe("GenericInputForm", () => {
         });
 
         it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            render(<Component />);
+            const input = screen.getByTestId("application-autocomplete");
 
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
+            const application = applications[0];
 
-            const [application] = applications;
             fireEvent.change(input, {
                 target: {
-                    value: application,
+                    value: application.address,
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                args: [getAddress(application), "0x"],
-                value: undefined,
-                query: {
-                    enabled: true,
-                },
-            });
+            const simulateParams =
+                useSimulateContractMock.mock.lastCall?.[0] ?? {};
+
+            expect(simulateParams).toHaveProperty("args", [
+                application.address,
+                "0x",
+            ]);
+            expect(simulateParams).toHaveProperty("query", { enabled: true });
         });
     });
 
     describe("Alerts", () => {
         it("should display alert for successful transaction", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 status: "success",
                 isSuccess: true,
+                error: null,
+                data: { transactionHash: "0x002" },
             });
 
-            render(<Component {...defaultProps} />);
-            expect(
-                screen.getByText("Raw input sent successfully!"),
-            ).toBeInTheDocument();
+            const onSuccess = vi.fn();
+
+            render(<Component onSuccess={onSuccess} />);
+
+            expect(onSuccess).toHaveBeenCalledWith({
+                type: "RAW",
+                receipt: { transactionHash: "0x002" },
+            });
         });
 
         it("should display alert for failed transaction", async () => {
-            const wagmi = await import("wagmi");
             const message = "User declined the transaction";
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: {
-                    message,
-                },
-                status: "error",
+
+            useWriteContractMock.mockReturnValue({
+                isError: true,
+                isPending: false,
                 isSuccess: false,
             });
 
-            render(<Component {...defaultProps} />);
-            expect(screen.getByText(message)).toBeInTheDocument();
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                status: "error",
+                isError: true,
+                isLoading: false,
+                error: {
+                    shortMessage: message,
+                } as WaitForTransactionReceiptErrorType,
+                isSuccess: false,
+            });
+
+            render(<Component />);
+
+            await waitFor(() =>
+                expect(screen.getByText(message)).toBeVisible(),
+            );
         });
     });
 
     describe("ABI encoding", () => {
-        it("should send ABI encoded data from existing JSON_ABI specification", async () => {
-            const selectedApplication = applications[0] as string;
-            const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+        beforeEach(() => {
+            useSimulateContractMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                isSuccess: true,
+                error: null,
                 data: {
                     request: {},
                 },
-                error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+        });
+
+        it("should send ABI encoded data from existing JSON_ABI specification", async () => {
+            const selectedApplication = applications[0].address;
+            const mockedWrite = vi.fn();
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -570,30 +625,23 @@ describe("GenericInputForm", () => {
                 "generic-input-submit-button",
             );
 
-            expect(submitButton.hasAttribute("disabled")).toBe(false);
+            expect(submitButton).not.toBeDisabled();
+
             fireEvent.click(submitButton);
             expect(mockedWrite).toHaveBeenCalled();
         });
 
         it("should validate form when attempting to submit invalid ABI encoded data from existing JSON_ABI specification", async () => {
-            const selectedApplication = applications[0] as string;
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                data: {
-                    request: {},
-                },
-                error: null,
-            });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -649,6 +697,7 @@ describe("GenericInputForm", () => {
                     value: "invalid-value",
                 },
             });
+
             fireEvent.blur(intInput);
             expect(
                 screen.getByText("Invalid uint256 value"),
@@ -688,24 +737,16 @@ describe("GenericInputForm", () => {
         });
 
         it("should send ABI encoded data from new JSON_ABI specification", async () => {
-            const selectedApplication = applications[0] as string;
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                data: {
-                    request: {},
-                },
-                error: null,
-            });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -773,24 +814,16 @@ describe("GenericInputForm", () => {
         });
 
         it("should validate form when attempting to submit invalid ABI encoded data from new JSON_ABI specification", async () => {
-            const selectedApplication = applications[0] as string;
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                data: {
-                    request: {},
-                },
-                error: null,
-            });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -890,24 +923,16 @@ describe("GenericInputForm", () => {
         });
 
         it("should send ABI encoded data from new ABI params specification", async () => {
-            const selectedApplication = applications[0] as string;
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                data: {
-                    request: {},
-                },
-                error: null,
-            });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -972,24 +997,15 @@ describe("GenericInputForm", () => {
         });
 
         it("should validate form when attempting to submit invalid ABI encoded data from new ABI params specification", async () => {
-            const selectedApplication = applications[0] as string;
+            const selectedApplication = applications[0].address;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                data: {
-                    request: {},
-                },
-                error: null,
-            });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteContractMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
-                reset: vi.fn(),
+                status: "idle",
+                isIdle: true,
             });
 
-            render(<Component {...defaultProps} />);
+            render(<Component />);
             const button = screen.getByText("ABI to Hex");
             fireEvent.click(button);
 
@@ -1082,36 +1098,85 @@ describe("GenericInputForm", () => {
     });
 
     describe("Form", () => {
-        it("should reset form after successful submission", async () => {
-            const mantineContext = await import(
-                "../../src/GenericInputForm/context"
-            );
-            const [application] = applications;
-            const resetMock = vi.fn();
+        it("should cleanup and go to initial state after transaction is confirmed", async () => {
+            const inputAddedReset = vi.fn();
+            // Avoiding infinite loop by making a computed prop change when deposit reset is called.
+            const inputAddedWaitStatus = factoryWaitStatus();
 
-            vi.spyOn(mantineContext, "useForm").mockReturnValue({
-                getTransformedValues: () => ({
-                    address: getAddress(application),
-                    rawInput: "0x",
-                }),
-                getInputProps: () => ({
-                    value: "",
-                }),
-                isValid: () => true,
-                errors: {},
-                setFieldValue: () => "",
-                reset: resetMock,
-            } as any);
-
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
-                error: null,
+            useSimulateContractMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                isFetching: false,
                 isSuccess: true,
+                error: null,
+                data: {
+                    request: {},
+                },
             });
 
-            render(<Component {...defaultProps} />);
-            expect(resetMock).toHaveBeenCalled();
+            useWriteContractMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {
+                    inputAddedReset();
+                    inputAddedWaitStatus.reset();
+                },
+            });
+
+            useWaitForTransactionReceiptMock.mockImplementation((params) => {
+                return params?.hash === "0x0001"
+                    ? {
+                          ...inputAddedWaitStatus.props,
+                          fetchStatus: "idle",
+                          data: { transactionHash: "0x02" },
+                      }
+                    : {
+                          fetchStatus: "idle",
+                      };
+            });
+
+            const onSuccess = vi.fn();
+            const onSearchApplication = vi.fn();
+
+            const { rerender } = render(
+                <Component
+                    onSuccess={onSuccess}
+                    onSearchApplications={onSearchApplication}
+                />,
+            );
+
+            fireEvent.change(screen.getByTestId("application-autocomplete"), {
+                target: { value: applications[0].address },
+            });
+
+            fireEvent.change(screen.getByTestId("hex-textarea"), {
+                target: { value: "0x3020" },
+            });
+
+            expect(onSuccess).toHaveBeenCalledWith({
+                receipt: { transactionHash: "0x02" },
+                type: "RAW",
+            });
+            expect(onSearchApplication).toHaveBeenCalledWith("");
+
+            expect(inputAddedReset).toHaveBeenCalledTimes(1);
+
+            rerender(
+                <Component
+                    applications={applications}
+                    onSuccess={onSuccess}
+                    onSearchApplications={onSearchApplication}
+                />,
+            );
+
+            await waitFor(() =>
+                expect(screen.queryByText("Hex input")).not.toBeInTheDocument(),
+            );
+
+            expect(screen.queryByText("Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("String to Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("ABI to Hex")).not.toBeInTheDocument();
+            expect(screen.queryByText("Send")).not.toBeInTheDocument();
         });
     });
 });

@@ -19,10 +19,17 @@ import {
     InputDetailsQueryVariables,
 } from "../../src/graphql/rollups/operations";
 import {
+    InputDetailsDocument as InputDetailsDocumentV2,
+    InputDetailsQuery as InputDetailsQueryV2,
+    InputDetailsQueryVariables as InputDetailsQueryVariablesV2,
+} from "../../src/graphql/rollups/v2/operations";
+import {
     applicationsSample,
     checkStatusSample,
     inputDetailsSample,
     inputDetailsSampleForPaging,
+    inputDetailsSampleForPagingV2,
+    inputDetailsSampleV2,
 } from "./dataSamples";
 
 type Applications = typeof applicationsSample;
@@ -30,6 +37,10 @@ type CheckStatusData = typeof checkStatusSample;
 type InputDetailsData =
     | typeof inputDetailsSample
     | typeof inputDetailsSampleForPaging;
+
+type InputDetailsDataV2 =
+    | typeof inputDetailsSampleV2
+    | typeof inputDetailsSampleForPagingV2;
 
 type MockResult<T> =
     | {
@@ -49,6 +60,7 @@ interface BuilderArgs {
     apps?: MockResult<Applications>;
     checkStatus?: MockResult<CheckStatusData>;
     inputDetails?: MockResult<InputDetailsData>;
+    inputDetailsV2?: MockResult<InputDetailsDataV2>;
     execQuery?: Mock<any>;
 }
 
@@ -66,12 +78,23 @@ type InputDetailsResult = UseQueryState<
     InputDetailsQueryVariables
 >;
 
+type InputDetailsResultV2 = UseQueryState<
+    InputDetailsQueryV2,
+    InputDetailsQueryVariablesV2
+>;
+
 /**
  * Helper to generate different returns for useQuery hooks.
  * Based on query property value.
  */
 export const queryMockImplBuilder =
-    ({ apps, checkStatus, inputDetails, execQuery }: BuilderArgs = {}) =>
+    ({
+        apps,
+        checkStatus,
+        inputDetails,
+        execQuery,
+        inputDetailsV2,
+    }: BuilderArgs = {}) =>
     (args: UseQueryArgs<any, any>): UseQueryResponse => {
         const reExec = execQuery ?? vi.fn();
 
@@ -111,6 +134,17 @@ export const queryMockImplBuilder =
                 fetching: inputDetails?.fetching ?? false,
                 data: inputDetails?.data ?? undefined,
                 error: inputDetails?.error,
+                stale: false,
+            };
+
+            return [result, reExec];
+        }
+
+        if (args.query === InputDetailsDocumentV2) {
+            const result: InputDetailsResultV2 = {
+                fetching: inputDetailsV2?.fetching ?? false,
+                data: inputDetailsV2?.data ?? undefined,
+                error: inputDetailsV2?.error,
                 stale: false,
             };
 

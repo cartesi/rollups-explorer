@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
-import { test } from "../fixtures/test";
-import { goToApplicationSummaryPage } from "../utils/navigation";
-import { createConnection, graphqlEndpoint } from "../utils/connection";
 import { allOperations } from "../../src/graphql/rollups/operations";
+import { test } from "../fixtures/test";
 import { checkStatusSuccessResponse } from "../utils/checkStatus.data";
+import { createConnection, graphqlEndpoint } from "../utils/connection";
+import { goToApplicationSummaryPage } from "../utils/navigation";
 
 test.beforeEach(async ({ page, interceptGQL }) => {
     await goToApplicationSummaryPage({ page });
@@ -15,7 +15,7 @@ test.beforeEach(async ({ page, interceptGQL }) => {
 });
 
 test("should have correct page title", async ({ page }) => {
-    const [address] = page.url().split("/").reverse();
+    const [_version, address] = page.url().split("/").reverse();
     await expect(page).toHaveTitle(`Application ${address} | CartesiScan`);
 });
 
@@ -50,9 +50,9 @@ test("should toggle date column", async ({ page }) => {
 });
 
 test("should navigate to application inputs page", async ({ page }) => {
-    const [address] = page.url().split("/").reverse();
+    const [version, address] = page.url().split("/").reverse();
     await page.getByText("View inputs").click();
-    await page.waitForURL(`/applications/${address}/inputs`);
+    await page.waitForURL(`/applications/${address}/${version}/inputs`);
 });
 
 test("should display summary skeleton cards", async ({ page }) => {
@@ -63,7 +63,7 @@ test("should display summary skeleton cards", async ({ page }) => {
 test("should be able to add a connection from application summary page", async ({
     page,
 }) => {
-    const [address] = page.url().split("/").reverse();
+    const [_version, address] = page.url().split("/").reverse();
     await createConnection(
         page,
         address as `0x${string}`,

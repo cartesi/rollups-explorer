@@ -1,7 +1,7 @@
-import { describe, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import useUndeployedApplication from "../../src/hooks/useUndeployedApplication";
 import { zeroAddress } from "viem";
+import { describe, it } from "vitest";
+import useUndeployedApplication from "../../src/hooks/useUndeployedApplication";
 
 const applications = ["0x60a7048c3136293071605a4eaffef49923e981cc"];
 const delay = 1000;
