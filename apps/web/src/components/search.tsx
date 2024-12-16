@@ -1,26 +1,36 @@
 import { Box, Loader, TextInput } from "@mantine/core";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { useQueryParams } from "../hooks/useQueryParams";
+import { useUrlSearchParams } from "../hooks/useUrlSearchParams";
+
 export type SearchProps = {
     isLoading: boolean;
     onChange: (query: string) => void;
 };
 
 const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
-    const { query, updateQueryParams } = useQueryParams();
-    const [keyword, setKeyword] = useState<string>(query);
+    const [{ limit, page, query }, updateParams] = useUrlSearchParams();
+    const [search, setSearch] = useState<string>(query);
+    const lastSearch = useRef(search);
 
     useEffect(() => {
-        updateQueryParams(keyword);
-        onChange(keyword);
-    }, [query, onChange, keyword, updateQueryParams]);
+        if (lastSearch.current !== query) {
+            setSearch(query);
+            onChange(query);
+            lastSearch.current = query;
+        }
+    }, [query, onChange]);
 
     const onSearch = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            setKeyword(event.target.value);
+            const nextSearch = event.target.value;
+            lastSearch.current = nextSearch;
+
+            setSearch(nextSearch);
+            updateParams(page, limit, nextSearch);
+            onChange(nextSearch);
         },
-        [],
+        [limit, page, onChange, updateParams],
     );
 
     return (
@@ -29,14 +39,14 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
                 placeholder="Search by Address / Txn Hash / Index"
                 leftSection={<CiSearch />}
                 rightSection={
-                    keyword &&
+                    search &&
                     isLoading && (
                         <Loader size={"xs"} aria-label="loader-input" />
                     )
                 }
                 size="md"
                 data-testid="search-input"
-                value={keyword}
+                value={search}
                 onChange={onSearch}
             />
         </Box>

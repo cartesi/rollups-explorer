@@ -9,7 +9,7 @@ import {
 import { useScrollIntoView } from "@mantine/hooks";
 import { withMantineTheme } from "../utils/WithMantineTheme";
 import Paginated from "../../src/components/paginated";
-import { usePaginationParams } from "../../src/hooks/usePaginationParams";
+import { useUrlSearchParams } from "../../src/hooks/useUrlSearchParams";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 vi.mock("next/navigation");
@@ -17,8 +17,8 @@ const usePathnameMock = vi.mocked(usePathname, true);
 const useRouterMock = vi.mocked(useRouter, true);
 const useSearchParamsMock = vi.mocked(useSearchParams, true);
 
-vi.mock("../../src/hooks/usePaginationParams");
-const usePaginationParamsMock = vi.mocked(usePaginationParams, true);
+vi.mock("../../src/hooks/useUrlSearchParams");
+const useUrlSearchParamsMock = vi.mocked(useUrlSearchParams, true);
 
 vi.mock("@mantine/hooks");
 const useScrollIntoViewMock = vi.mocked(useScrollIntoView, true);
@@ -40,8 +40,8 @@ describe("Paginated component", () => {
         useSearchParamsMock.mockReturnValue(
             new URLSearchParams() as unknown as ReadonlyURLSearchParams,
         );
-        usePaginationParamsMock.mockReturnValue([
-            { limit: 10, page: 1 },
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 1, query: "" },
             vi.fn(),
         ]);
         useScrollIntoViewMock.mockReturnValue({
@@ -78,11 +78,11 @@ describe("Paginated component", () => {
 
     it("should invoke updateParams function when top pagination prev page button is clicked", async () => {
         const mockedUpdateParams = vi.fn();
-        usePaginationParamsMock.mockReturnValue([
-            { limit: 10, page: 2 },
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 2, query: "" },
             mockedUpdateParams,
         ]);
-        const { container, rerender } = render(
+        const { container } = render(
             <Component {...defaultProps} totalCount={20}>
                 Children
             </Component>,
@@ -95,20 +95,20 @@ describe("Paginated component", () => {
         ) as HTMLButtonElement;
 
         fireEvent.click(prevPageButton);
-        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10);
+        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "");
     });
 
     it("should invoke updateParams function when bottom pagination button is clicked", async () => {
         const mockedUpdateParams = vi.fn();
-        usePaginationParamsMock.mockReturnValue([
-            { limit: 10, page: 2 },
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 2, query: "" },
             mockedUpdateParams,
         ]);
         const mockedScrollIntoView = vi.fn();
         useScrollIntoViewMock.mockReturnValue({
             scrollIntoView: mockedScrollIntoView,
         } as any);
-        const { container, rerender } = render(
+        const { container } = render(
             <Component {...defaultProps} totalCount={20}>
                 Children
             </Component>,
@@ -124,7 +124,7 @@ describe("Paginated component", () => {
         ) as HTMLButtonElement;
 
         fireEvent.click(prevPageButton);
-        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10);
+        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "");
         expect(mockedScrollIntoView).toHaveBeenCalled();
     });
 });

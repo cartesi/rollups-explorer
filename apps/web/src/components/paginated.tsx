@@ -11,7 +11,7 @@ import {
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
-import { limitBounds, usePaginationParams } from "../hooks/usePaginationParams";
+import { limitBounds, useUrlSearchParams } from "../hooks/useUrlSearchParams";
 
 export const perPageList = Array.from({ length: 3 }).map((_, index) => {
     const key = ((index + 1) * 10).toString() as keyof typeof limitBounds;
@@ -27,7 +27,7 @@ export interface PaginatedProps extends Omit<StackProps, "onChange"> {
 
 const Paginated: FC<PaginatedProps> = (props) => {
     const { children, totalCount, fetching, onChange, ...restProps } = props;
-    const [{ limit, page }, updateParams] = usePaginationParams();
+    const [{ limit, page, query }, updateParams] = useUrlSearchParams();
     const totalPages = Math.ceil(
         totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
     );
@@ -43,36 +43,36 @@ const Paginated: FC<PaginatedProps> = (props) => {
 
     const onChangeTopPagination = useCallback(
         (pageN: number) => {
-            updateParams(pageN, limit);
+            updateParams(pageN, limit, query);
         },
-        [limit, updateParams],
+        [limit, query, updateParams],
     );
 
     const onChangeBottomPagination = useCallback(
         (pageN: number) => {
-            updateParams(pageN, limit);
+            updateParams(pageN, limit, query);
             scrollIntoView({ alignment: "center" });
         },
-        [limit, scrollIntoView, updateParams],
+        [limit, query, scrollIntoView, updateParams],
     );
 
     const onChangeLimit = useCallback(
         (val: string | null) => {
             const entry = val ?? limit;
             const nextLimit = pathOr(limit, [entry], limitBounds);
-            updateParams(page, nextLimit);
+            updateParams(page, nextLimit, query);
         },
-        [limit, page, updateParams],
+        [limit, page, query, updateParams],
     );
 
     useEffect(() => {
         if (!fetching && page > totalPages) {
-            updateParams(totalPages, limit);
+            updateParams(totalPages, limit, query);
         }
-    }, [limit, page, fetching, totalPages, updateParams]);
+    }, [limit, page, fetching, totalPages, updateParams, query]);
 
     useEffect(() => {
-        setActivePage((activePage) =>
+        setActivePage((activePage: number) =>
             activePage !== page ? page : activePage,
         );
     }, [page]);
