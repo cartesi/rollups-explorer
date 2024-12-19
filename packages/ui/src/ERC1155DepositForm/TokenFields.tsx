@@ -38,7 +38,7 @@ import {
     State,
     TokenMetadataResult,
     useGetTokenMetadata,
-} from "./useGetTokenMetadata";
+} from "./hooks/useGetTokenMetadata";
 
 type BalanceOf = ReturnType<
     typeof useReadErc1155BalanceOf<
