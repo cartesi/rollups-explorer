@@ -1,6 +1,6 @@
-FROM node:20-alpine as base
+FROM node:20-alpine AS base
 
-FROM base as builder
+FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
@@ -25,8 +25,6 @@ RUN yarn install
 # Build the project
 COPY --from=builder /app/out/full/ .
 ARG ENVIRONMENT=localhost
-# TODO: Remove temporary variable
-ARG PREVIEW_API_URL
 COPY --from=builder /app/out/full/apps/web/.env.${ENVIRONMENT} ./apps/web/.env
 RUN yarn build --filter=web
 
@@ -50,7 +48,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/we
 
 USER nextjs
 EXPOSE 3000
-ENV PORT 3000
-ENV HOSTNAME 0.0.0.0
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 CMD ["node", "apps/web/server.js"]

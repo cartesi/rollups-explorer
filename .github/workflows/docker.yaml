@@ -11,8 +11,6 @@ permissions:
     contents: read
     packages: write
     id-token: write
-env:
-    PREVIEW_API_URL: ${{vars.NEXT_PUBLIC_PREVIEW_EXPLORER_API_URL}}
 jobs:
     build:
         runs-on: ubuntu-latest
