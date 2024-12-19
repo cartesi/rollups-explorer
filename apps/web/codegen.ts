@@ -3,12 +3,10 @@ import type { Types } from "@graphql-codegen/plugin-helpers";
 import { join, sep } from "path";
 
 const basePath = join("src", "graphql");
-const rollupsBasePath = join("graphql", "rollups");
-// FIXUP: to be replaced with new deployed API.
-const explorerSchema =
-    process.env.NEXT_PUBLIC_PREVIEW_EXPLORER_API_URL ??
-    "https://api.cartesiscan.io/graphql";
+//TODO: Evaluate if keep a schema locally is better than fetch externally.
+const explorerSchema = join(".", "graphql", "schema.graphql");
 const explorerAPIQueries = join(".", "graphql", "queries.graphql");
+const rollupsBasePath = join("graphql", "rollups");
 const rollupsSchema = join(".", rollupsBasePath, "schema.graphql");
 const rollupsDocuments = join(".", rollupsBasePath, "queries.graphql");
 const rollupsV2Schema = join(".", rollupsBasePath, "v2", "schema.graphql");
