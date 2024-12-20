@@ -838,11 +838,13 @@ describe("ERC-1155 Batch Deposit", () => {
                 screen.queryByTestId(testid.METADATA_VIEW),
             ).not.toBeInTheDocument();
 
-            expect(
-                await screen.findByText(
-                    "Something is wrong with the URI returned by the contract.",
-                ),
-            ).toBeVisible();
+            await waitFor(() =>
+                expect(
+                    screen.getByText(
+                        "Something is wrong with the URI returned by the contract.",
+                    ),
+                ).toBeVisible(),
+            );
 
             expect(screen.getByText("URI is not defined.")).toBeVisible();
         });
