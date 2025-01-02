@@ -15,6 +15,7 @@ import {
     useTokensQuery,
     useMultiTokensQuery,
 } from "../../src/graphql/explorer/hooks/queries";
+import { useBalance } from "wagmi";
 
 vi.mock("../../src/graphql/explorer/hooks/queries");
 const useApplicationsQueryMock = vi.mocked(useApplicationsQuery, {
@@ -35,6 +36,7 @@ vi.mock("viem", async () => {
 
 vi.mock("@cartesi/rollups-wagmi");
 vi.mock("wagmi");
+const useBalanceMock = vi.mocked(useBalance, { partial: true });
 
 vi.mock("@tanstack/react-query", async () => {
     const actual = await vi.importActual("@tanstack/react-query");
@@ -58,6 +60,12 @@ describe("SendTransaction component", () => {
         useMultiTokensQueryMock.mockReturnValue([
             { data: {}, fetching: false },
         ] as any);
+        useBalanceMock.mockReturnValue({
+            data: {
+                value: 355943959031747438n,
+                decimals: 18,
+            },
+        });
     });
 
     afterEach(() => {
