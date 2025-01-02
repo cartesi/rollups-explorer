@@ -1,6 +1,15 @@
 "use client";
 import { CodeHighlight } from "@mantine/code-highlight";
-import { Alert, Card, Stack, Text, Textarea, Title } from "@mantine/core";
+import {
+    Alert,
+    Card,
+    px,
+    Stack,
+    Text,
+    Textarea,
+    Title,
+    useMantineTheme,
+} from "@mantine/core";
 import { decodePayload } from "../decoder";
 import { useSpecFormContext } from "../form/context";
 import { buildSpecification, stringifyContent } from "../utils";
@@ -13,9 +22,16 @@ export const DecodingPreview = () => {
     const envelope =
         tempSpec && encodedData ? decodePayload(tempSpec, encodedData) : null;
     const content = envelope?.result ? stringifyContent(envelope.result) : null;
+    const theme = useMantineTheme();
+    const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (
-        <Card shadow="sm" withBorder pos="sticky" top="4.75rem">
+        <Card
+            shadow="sm"
+            withBorder
+            pos="sticky"
+            top={themeDefaultProps?.header.height + px("1rem") ?? px("4.75rem")}
+        >
             <Title order={3}>Preview</Title>
             <Stack gap="lg">
                 <Textarea
