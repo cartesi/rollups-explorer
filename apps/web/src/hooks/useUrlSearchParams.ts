@@ -10,12 +10,7 @@ export const limitBounds = {
 
 export type LimitBound = (typeof limitBounds)[keyof typeof limitBounds];
 
-export type UsePaginationReturn = [
-    { limit: LimitBound; page: number; query: string },
-    (page: number, limit: LimitBound, query: string) => void,
-];
-
-export const useUrlSearchParams = (): UsePaginationReturn => {
+export const useUrlSearchParams = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathName = usePathname();
@@ -41,8 +36,13 @@ export const useUrlSearchParams = (): UsePaginationReturn => {
         [router, pathName],
     );
 
-    return useMemo(
+    const value: [
+        { page: number; limit: LimitBound; query: string },
+        (page: number, limit: LimitBound, query: string) => void,
+    ] = useMemo(
         () => [{ page, limit, query }, updateParams],
         [page, limit, query, updateParams],
     );
+
+    return value;
 };
