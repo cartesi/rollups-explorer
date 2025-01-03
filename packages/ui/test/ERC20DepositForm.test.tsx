@@ -1,8 +1,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { ERC20DepositForm } from "../src";
 import withMantineTheme from "./utils/WithMantineTheme";
 import { getAddress } from "viem";
+import {
+    useSimulateErc20Approve,
+    useSimulateErc20PortalDepositErc20Tokens,
+    useWriteErc20Approve,
+    useWriteErc20PortalDepositErc20Tokens,
+} from "@cartesi/rollups-wagmi";
 
 const Component = withMantineTheme(ERC20DepositForm);
 
@@ -32,34 +38,21 @@ const defaultProps = {
     onSuccess: () => undefined,
 };
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    const actual = await vi.importActual("@cartesi/rollups-wagmi");
-    return {
-        ...(actual as any),
-        useSimulateErc20Approve: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc20Approve: () => ({
-            data: {},
-            wait: vi.fn(),
-            reset: vi.fn(),
-        }),
-        useSimulateErc20PortalDepositErc20Tokens: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteErc20PortalDepositErc20Tokens: () => ({
-            data: {},
-            wait: vi.fn(),
-            reset: vi.fn(),
-        }),
-    };
+vi.mock("@cartesi/rollups-wagmi");
+const useSimulateErc20ApproveMock = vi.mocked(useSimulateErc20Approve, {
+    partial: true,
 });
+const useWriteErc20ApproveMock = vi.mocked(useWriteErc20Approve, {
+    partial: true,
+});
+const useSimulateErc20PortalDepositErc20TokensMock = vi.mocked(
+    useSimulateErc20PortalDepositErc20Tokens,
+    { partial: true },
+);
+const useWriteErc20PortalDepositErc20TokensMock = vi.mocked(
+    useWriteErc20PortalDepositErc20Tokens,
+    { partial: true },
+);
 
 vi.mock("wagmi", async () => {
     return {
@@ -112,6 +105,26 @@ vi.mock("../src/hooks/useWatchQueryOnBlockChange", () => ({
 }));
 
 describe("Rollups ERC20DepositForm", () => {
+    beforeEach(() => {
+        useSimulateErc20ApproveMock.mockReturnValue({
+            data: {
+                request: {},
+            },
+        });
+        useWriteErc20ApproveMock.mockReturnValue({
+            data: "0x721be000f6054b5e0e57aaab791015b53f0a18f4",
+            reset: vi.fn(),
+        });
+        useSimulateErc20PortalDepositErc20TokensMock.mockReturnValue({
+            data: {
+                request: {},
+            },
+        });
+        useWriteErc20PortalDepositErc20TokensMock.mockReturnValue({
+            data: "0x721be000f6054b5e0e57aaab791015b53f0a18f4",
+            reset: vi.fn(),
+        });
+    });
     describe("ApplicationAutocomplete", () => {
         it("should display correct label", () => {
             render(<Component {...defaultProps} />);
@@ -190,16 +203,17 @@ describe("Rollups ERC20DepositForm", () => {
             expect(onSuccessMock).toHaveBeenCalled();
         });
 
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format address", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateErc20PortalDepositErc20Tokens,
+                data: {
+                    request: {},
+                },
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.useSimulateErc20PortalDepositErc20Tokens = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            useSimulateErc20PortalDepositErc20TokensMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -320,16 +334,15 @@ describe("Rollups ERC20DepositForm", () => {
             expect(screen.getByDisplayValue(value) === amountInput).toBe(true);
         });
 
-        it("should correctly process small decimal numbers", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly process small decimal numbers", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateErc20Approve,
+                data: {
+                    request: {},
+                },
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.useSimulateErc20Approve = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            useSimulateErc20ApproveMock.mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const amountInput = container.querySelector(
@@ -350,6 +363,72 @@ describe("Rollups ERC20DepositForm", () => {
                 ],
                 query: {
                     enabled: true,
+                },
+            });
+        });
+
+        it("should disable approve call when amount is '0'", () => {
+            const mockedHook = vi.fn().mockReturnValue({
+                data: {
+                    request: {},
+                },
+                loading: false,
+                error: null,
+            });
+            useSimulateErc20ApproveMock.mockImplementation(mockedHook);
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                address: "0x0000000000000000000000000000000000000000",
+                args: ["0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB", 0n],
+                query: {
+                    enabled: false,
+                },
+            });
+        });
+
+        it("should disable deposit call when amount is '0'", () => {
+            const mockedHook = vi.fn().mockReturnValue({
+                data: {
+                    request: {},
+                },
+                loading: false,
+                error: null,
+            });
+            useSimulateErc20PortalDepositErc20TokensMock.mockImplementation(
+                mockedHook,
+            );
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            fireEvent.change(amountInput, {
+                target: {
+                    value: "0",
+                },
+            });
+
+            expect(mockedHook).toHaveBeenLastCalledWith({
+                args: [
+                    "0x0000000000000000000000000000000000000000",
+                    "0x0000000000000000000000000000000000000000",
+                    0n,
+                    "0x",
+                ],
+                query: {
+                    enabled: false,
                 },
             });
         });
@@ -435,45 +514,6 @@ describe("Rollups ERC20DepositForm", () => {
         });
     });
 
-    describe("Amount input", () => {
-        it("should correctly process small decimal numbers", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateErc20Approve,
-                data: {
-                    request: {},
-                },
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateErc20Approve = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const amountInput = container.querySelector(
-                '[type="number"]',
-            ) as HTMLInputElement;
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.0000001",
-                },
-            });
-
-            expect(mockedHook).toHaveBeenLastCalledWith({
-                address: "0x0000000000000000000000000000000000000000",
-                args: [
-                    "0x9C21AEb2093C32DDbC53eEF24B873BDCd1aDa1DB",
-                    100000000000n,
-                ],
-                query: {
-                    enabled: true,
-                },
-            });
-        });
-    });
-
     describe("Deposit button", () => {
         it("should invoke onSearchApplications function after successful deposit", async () => {
             const wagmi = await import("wagmi");
@@ -494,16 +534,17 @@ describe("Rollups ERC20DepositForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it("should correctly format extra data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
+        it("should correctly format extra data", () => {
             const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateErc20PortalDepositErc20Tokens,
+                data: {
+                    request: {},
+                },
                 loading: false,
                 error: null,
             });
-            rollupsWagmi.useSimulateErc20PortalDepositErc20Tokens = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            useSimulateErc20PortalDepositErc20TokensMock.mockImplementation(
+                mockedHook,
+            );
 
             const { container } = render(<Component {...defaultProps} />);
             const textarea = container.querySelector(
