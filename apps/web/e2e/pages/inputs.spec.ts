@@ -72,11 +72,12 @@ test("should search for specific input", async ({ page }) => {
         .getByRole("paragraph");
 
     const addresses = await fromAddress.all();
-    addresses.map(async (address) => {
+
+    for (const address of addresses) {
         const linkHref = (await address.textContent()) as string;
 
         expect(
             linkHref.toLowerCase().startsWith(addressPrefix.toLowerCase()),
         ).toBe(true);
-    });
+    }
 });
