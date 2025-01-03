@@ -200,6 +200,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
             enabled:
                 amountBigInt !== undefined &&
                 allowance !== undefined &&
+                amountBigInt > 0 &&
                 amountBigInt > allowance,
         },
     });
@@ -213,12 +214,10 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         args: [erc20Address, applicationAddress, amountBigInt!, execLayerData],
         query: {
             enabled:
+                form.isValid() &&
                 amountBigInt !== undefined &&
                 balance !== undefined &&
                 allowance !== undefined &&
-                !form.errors.erc20Address &&
-                !form.errors.application &&
-                isHex(execLayerData) &&
                 amountBigInt <= balance &&
                 amountBigInt <= allowance,
         },
@@ -233,6 +232,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         allowance !== undefined &&
         decimals !== undefined &&
         amountBigInt !== undefined &&
+        amountBigInt > 0 &&
         allowance < amountBigInt;
 
     const canDeposit =
