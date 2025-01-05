@@ -39,7 +39,7 @@
         "highlightjs-solidity": "^2.0.6",
         "jotai": "^2.9.0",
         "lokijs": "^1",
-        "next": "^14.2.15",
+        "next": "^14.2.21",
         "pino-pretty": "^10",
         "pretty-ms": "^8",
         "ramda": "0.30.1",
