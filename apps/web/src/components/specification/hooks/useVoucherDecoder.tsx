@@ -1,9 +1,11 @@
 "use client";
+import { v2OutputFactoryAbi } from "@cartesi/rollups-wagmi";
 import { whatsabi } from "@shazow/whatsabi";
 import { any, isNil } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState } from "react";
-import { Abi, Hex, createPublicClient } from "viem";
+import { Abi, Hex, createPublicClient, decodeFunctionData } from "viem";
+import { RollupVersion } from "../../../graphql/explorer/types";
 import getSupportedChainInfo, {
     SupportedChainId,
 } from "../../../lib/supportedChains";
@@ -16,6 +18,8 @@ type UseVoucherDecoderProps = {
     destination: Hex;
     payload: Hex;
     chainId: number;
+    /** default to RollupVersion.V1 */
+    appVersion?: RollupVersion;
 };
 const cache = new Map<string, Abi>();
 
@@ -61,6 +65,101 @@ const buildSpecification = (
     };
 };
 
+type DecodeOutputReturn =
+    | {
+          isEtherWithdraw: true;
+          withdrawData: {
+              destination: Hex;
+              value: bigint;
+              method: "Transfer";
+              type: "Ether";
+          };
+      }
+    | {
+          isEtherWithdraw?: false;
+          payload: Hex;
+      };
+
+/**
+ *
+ * In case the payload is from a RollupVersion.V1, the payload is returned as is.
+ *
+ * @summary Decodes an v2 output and returns the payload as Hex data after decoding or
+ * prepare an ether-withdraw meta object in a human-readable format as there is no need to fetch the destination's ABI
+ * to decode. Usually, the data after the decoding with the Output-ABI is `0x` and that is considered an ether-withdraw.
+ *
+ * @param payload
+ * @param appVersion
+ * @returns
+ */
+const decodeOutput = (
+    payload: Hex,
+    appVersion: RollupVersion,
+): DecodeOutputReturn => {
+    try {
+        if (appVersion === RollupVersion.V2) {
+            const { functionName, args } = decodeFunctionData({
+                abi: v2OutputFactoryAbi,
+                data: payload,
+            });
+
+            if (functionName === "Voucher") {
+                const [destination, value, data] = args;
+
+                if (data === "0x") {
+                    return {
+                        isEtherWithdraw: true,
+                        withdrawData: {
+                            destination,
+                            value,
+                            method: "Transfer",
+                            type: "Ether",
+                        },
+                    };
+                } else {
+                    return {
+                        isEtherWithdraw: false,
+                        payload: data,
+                    };
+                }
+            }
+        }
+    } catch (error: any) {
+        console.info(error.shortMessage ?? error.message);
+    }
+
+    return { payload };
+};
+
+interface FetchDestinationABIAndDecodeParams
+    extends Omit<UseVoucherDecoderProps, "appVersion"> {}
+
+const fetchDestinationABIAndDecode = async ({
+    chainId,
+    destination,
+    payload,
+}: FetchDestinationABIAndDecodeParams) => {
+    let result: string;
+    const baseMessage = "Skipping voucher decoding. Reason:";
+
+    try {
+        const abi = await fetchAbiFor(destination, chainId);
+        const spec = buildSpecification(destination, chainId, abi);
+        const envelope = decodePayload(spec, payload);
+
+        if (!envelope.error) result = stringifyContent(envelope.result);
+        else {
+            console.info(`${baseMessage} ${envelope.error.message}`);
+            result = payload;
+        }
+    } catch (error: any) {
+        console.info(`${baseMessage} ${error.message}`);
+        result = payload;
+    }
+
+    return result;
+};
+
 interface Result {
     status: "loading" | "idle";
     data: string | null;
@@ -70,6 +169,7 @@ const useVoucherDecoder = ({
     destination,
     payload,
     chainId,
+    appVersion = RollupVersion.V1,
 }: UseVoucherDecoderProps) => {
     const [result, setResult] = useState<Result>({
         status: "idle",
@@ -77,32 +177,24 @@ const useVoucherDecoder = ({
     });
 
     useEffect(() => {
-        if (any(isNilOrEmpty)([destination, chainId, payload])) return;
+        if (any(isNilOrEmpty)([destination, chainId, payload, appVersion]))
+            return;
 
         setResult((old) => ({ ...old, status: "loading" }));
 
         (async () => {
-            let result: string;
-
-            const baseMessage = "Skipping voucher decoding. Reason:";
-            try {
-                const abi = await fetchAbiFor(destination, chainId);
-                const spec = buildSpecification(destination, chainId, abi);
-                const envelope = decodePayload(spec, payload);
-
-                if (!envelope.error) result = stringifyContent(envelope.result);
-                else {
-                    console.info(`${baseMessage} ${envelope.error.message}`);
-                    result = payload;
-                }
-            } catch (error: any) {
-                console.info(`${baseMessage} ${error.message}`);
-                result = payload;
-            }
+            const outputResult = decodeOutput(payload, appVersion);
+            const result = outputResult.isEtherWithdraw
+                ? stringifyContent(outputResult.withdrawData)
+                : await fetchDestinationABIAndDecode({
+                      chainId,
+                      destination,
+                      payload: outputResult.payload,
+                  });
 
             setResult(() => ({ status: "idle", data: result }));
         })();
-    }, [destination, chainId, payload]);
+    }, [destination, chainId, payload, appVersion]);
 
     return result;
 };

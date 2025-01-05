@@ -1,17 +1,18 @@
-import { Stack } from "@mantine/core";
+import { Card, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import Link from "next/link";
+import { RedirectType, notFound, redirect } from "next/navigation";
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import { FC } from "react";
 import { TbStack2 } from "react-icons/tb";
-import { Address as AddressType } from "viem";
+import { Address as AddressType, Hex } from "viem";
 import Address from "../../../components/address";
-import ApplicationSummary from "../../../components/applications/applicationSummary";
 import Breadcrumbs from "../../../components/breadcrumbs";
 import PageTitle from "../../../components/layout/pageTitle";
 import {
-    ApplicationByIdDocument,
-    ApplicationByIdQuery,
-    ApplicationByIdQueryVariables,
+    ApplicationsDocument,
+    ApplicationsQuery,
+    ApplicationsQueryVariables,
 } from "../../../graphql/explorer/operations";
 import getConfiguredChainId from "../../../lib/getConfiguredChain";
 import { getUrqlServerClient } from "../../../lib/urql";
@@ -24,16 +25,22 @@ export async function generateMetadata({
     };
 }
 
-async function getApplication(appId: string) {
+async function getApplicationBy(address: string, chainId: string) {
     const client = getUrqlServerClient();
     const result = await client.query<
-        ApplicationByIdQuery,
-        ApplicationByIdQueryVariables
-    >(ApplicationByIdDocument, {
-        id: appId,
+        ApplicationsQuery,
+        ApplicationsQueryVariables
+    >(ApplicationsDocument, {
+        limit: 10,
+        where: {
+            address_eq: address?.toLowerCase(),
+            chain: {
+                id_eq: chainId,
+            },
+        },
     });
 
-    return result.data?.applicationById;
+    return result.data?.applications;
 }
 
 export type ApplicationPageProps = {
@@ -42,11 +49,21 @@ export type ApplicationPageProps = {
 
 const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
     const chainId = getConfiguredChainId();
-    const appId = `${chainId}-${params.address?.toLowerCase()}`;
-    const application = await getApplication(appId);
+    const applications =
+        (await getApplicationBy(params.address, chainId)) ?? [];
+    const foundApps = isNotNilOrEmpty(applications);
+    const hasMoreThanOne = applications.length > 1;
 
-    if (!application) {
+    if (!foundApps) {
         notFound();
+    }
+
+    if (!hasMoreThanOne) {
+        const [app] = applications;
+        redirect(
+            `/applications/${app.address}/${app.rollupVersion}`,
+            RedirectType.replace,
+        );
     }
 
     return (
@@ -67,7 +84,35 @@ const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
             </Breadcrumbs>
 
             <PageTitle title="Summary" Icon={TbStack2} />
-            <ApplicationSummary applicationId={params.address} />
+            <Stack>
+                <Container size="lg">
+                    <Title order={3} c="dimmed">
+                        We found the following apps with this address
+                    </Title>
+                    <Title order={4} fw="bold">
+                        Choose one
+                    </Title>
+                    {applications.map((app) => (
+                        <Card
+                            key={app.id}
+                            my="lg"
+                            component={Link}
+                            href={`/applications/${app.address}/${app.rollupVersion}`}
+                        >
+                            <Group justify="center" gap={1}>
+                                <Address
+                                    value={app.address as Hex}
+                                    icon
+                                    shorten
+                                />
+                                <Text c="dimmed" size="xs" fw="bold">
+                                    Rollups {app.rollupVersion}
+                                </Text>
+                            </Group>
+                        </Card>
+                    ))}
+                </Container>
+            </Stack>
         </Stack>
     );
 };

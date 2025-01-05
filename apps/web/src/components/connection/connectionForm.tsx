@@ -1,7 +1,7 @@
 "use client";
+import { ApplicationAutocomplete } from "@cartesi/rollups-explorer-ui";
 import {
     Alert,
-    Autocomplete,
     Button,
     Flex,
     List,
@@ -213,15 +213,18 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
             })}
         >
             <Flex direction="column" gap="sm">
-                <Autocomplete
+                <ApplicationAutocomplete
                     withAsterisk
                     label="Address"
                     description="The application smart contract address."
                     rightSection={showLoader ? <Loader size="sm" /> : ""}
                     placeholder="0x"
-                    data={applications}
+                    applications={applications}
                     data-testid="connection-address"
                     {...form.getInputProps("address")}
+                    onApplicationSelected={(app) => {
+                        form.setFieldValue("address", app.address);
+                    }}
                 />
 
                 {isAddress(address) && !applications.length && !fetching && (

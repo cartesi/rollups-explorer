@@ -13,12 +13,14 @@ import { sepolia } from "viem/chains";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
+import { RollupVersion } from "../../../src/graphql/explorer/types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../../utils/WithMantineTheme";
 import { useConnectionConfigReturnStub } from "../../utils/connectionHelpers";
 import {
     inputDetailsSample,
     inputDetailsSampleForPaging,
+    inputDetailsSampleForPagingV2,
     inputSample,
     inputSampleEtherDeposit,
 } from "../../utils/dataSamples";
@@ -44,6 +46,17 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
                 request: {},
             },
         }),
+        useReadV2CartesiApplicationWasOutputExecuted: () => ({
+            data: true,
+        }),
+        useSimulateV2CartesiApplicationExecuteOutput: () => ({
+            data: {
+                request: {},
+            },
+        }),
+        useWriteV2CartesiApplicationExecuteOutput: () => ({
+            data: {},
+        }),
     };
 });
 vi.mock("wagmi");
@@ -60,7 +73,9 @@ const useWaitForTransactionReceiptMock = vi.mocked(
 const View = withMantineTheme(InputDetailsView);
 
 describe("Input details view component", () => {
+    const { error } = console;
     beforeEach(() => {
+        vi.spyOn(console, "error").mockImplementation((m: any, ...rest) => {});
         useQueryMock.mockImplementation(queryMockImplBuilder());
         useConnectionConfigReturnStub.listConnections.mockReturnValue([]);
         useConnectionConfigReturnStub.getConnection.mockReturnValue(undefined);
@@ -182,7 +197,7 @@ describe("Input details view component", () => {
 
     describe("With connection", () => {
         const connection = {
-            address: inputSample.application.id as Address,
+            address: inputSample.application.address as Address,
             url: "localhost:8080/graphql",
         };
 
@@ -361,6 +376,46 @@ describe("Input details view component", () => {
             fireEvent.click(getByText(panel, "Previous content"));
 
             expect(reExecQuery).toHaveBeenCalledTimes(3);
+        });
+
+        it("should be able to navigate vouchers paged entries (Application v2)", () => {
+            const reExecQuery = vi.fn();
+            useQueryMock.mockImplementation(
+                queryMockImplBuilder({
+                    inputDetailsV2: {
+                        data: inputDetailsSampleForPagingV2,
+                    },
+                    execQuery: reExecQuery,
+                }),
+            );
+
+            const { container } = render(
+                <View
+                    input={{
+                        ...inputSample,
+                        application: {
+                            ...inputSample.application,
+                            rollupVersion: RollupVersion.V2,
+                        },
+                    }}
+                />,
+            );
+
+            expect(reExecQuery).toHaveBeenCalledTimes(1);
+
+            const panel = screen.getByTestId("panel-vouchers");
+
+            fireEvent.click(screen.getByText("Vouchers"));
+
+            fireEvent.click(getByText(panel, "Next content"));
+
+            expect(reExecQuery).toHaveBeenCalledTimes(2);
+
+            fireEvent.click(getByText(panel, "Previous content"));
+
+            expect(reExecQuery).toHaveBeenCalledTimes(3);
+
+            expect(screen.getByText("Executed")).toBeInTheDocument();
         });
 
         it("should not display additional controls for input when decoded value doesn't exist", () => {
