@@ -13,7 +13,7 @@ import {
     useSearchParams,
 } from "next/navigation";
 import { describe } from "vitest";
-import { useQueryParams } from "../../src/hooks/useQueryParams";
+import { useUrlSearchParams } from "../../src/hooks/useUrlSearchParams";
 import { withMantineTheme } from "../utils/WithMantineTheme";
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -24,8 +24,8 @@ const usePathnameMock = vi.mocked(usePathname, true);
 const useRouterMock = vi.mocked(useRouter, true);
 const useSearchParamsMock = vi.mocked(useSearchParams, true);
 
-vi.mock("../../src/hooks/useQueryParams");
-const useQueryParamsMock = vi.mocked(useQueryParams, true);
+vi.mock("../../src/hooks/useUrlSearchParams");
+const useUrlSearchParamsMock = vi.mocked(useUrlSearchParams, true);
 
 const Component = withMantineTheme(Search);
 const queryAddress = "0xF94C3d8dB01c4CF428d5DBeDC514B4c5f2FcE6F0";
@@ -43,10 +43,11 @@ describe("Search Component", () => {
         useSearchParamsMock.mockReturnValue(
             new URLSearchParams() as unknown as ReadonlyURLSearchParams,
         );
-        useQueryParamsMock.mockReturnValue({
-            query: "",
-            updateQueryParams: (value: string) => undefined,
-        });
+
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 1, query: "" },
+            vi.fn(),
+        ]);
     });
     afterEach(() => {
         vi.clearAllMocks();
@@ -73,10 +74,10 @@ describe("Search Component", () => {
         const mockedUpdateParams = vi.fn();
         const initialQuery = "0x872";
 
-        useQueryParamsMock.mockReturnValue({
-            query: initialQuery,
-            updateQueryParams: mockedUpdateParams,
-        });
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 1, query: initialQuery },
+            mockedUpdateParams,
+        ]);
         render(<Component {...defaultProps} />);
         const searchInput = screen.getByTestId(
             "search-input",
@@ -85,19 +86,23 @@ describe("Search Component", () => {
     });
     it("should call updateQueryParams hooks when input change", async () => {
         const mockedUpdateParams = vi.fn();
-
-        useQueryParamsMock.mockReturnValue({
-            query: "",
-            updateQueryParams: mockedUpdateParams,
-        });
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 1, query: "" },
+            mockedUpdateParams,
+        ]);
         render(<Component {...defaultProps} />);
         const searchInput = screen.getByTestId("search-input");
         fireEvent.focus(searchInput);
         await waitFor(() => userEvent.type(searchInput, queryAddress));
         await waitFor(
-            () => expect(mockedUpdateParams).toHaveBeenCalledWith(queryAddress),
+            () =>
+                expect(mockedUpdateParams).toHaveBeenCalledWith(
+                    1,
+                    10,
+                    queryAddress,
+                ),
             {
-                timeout: 500,
+                timeout: 400,
             },
         );
     });

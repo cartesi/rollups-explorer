@@ -5,12 +5,12 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
-import { useQueryParams } from "../../hooks/useQueryParams";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
 import Search from "../search";
+import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
@@ -22,7 +22,7 @@ const Inputs: FC<InputsProps> = ({
     applicationId,
 }) => {
     const chainId = getConfiguredChainId();
-    const { query: urlQuery } = useQueryParams();
+    const [{ query: urlQuery }] = useUrlSearchParams();
     const [query, setQuery] = useState(urlQuery);
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);

@@ -1,7 +1,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { pathOr } from "ramda";
 import { useCallback, useMemo } from "react";
-import { useQueryParams } from "./useQueryParams";
 
 export const limitBounds = {
     "10": 10,
@@ -11,36 +10,39 @@ export const limitBounds = {
 
 export type LimitBound = (typeof limitBounds)[keyof typeof limitBounds];
 
-export type UsePaginationReturn = [
-    { limit: LimitBound; page: number },
-    (page: number, limit: LimitBound) => void,
-];
-
-export const usePaginationParams = (): UsePaginationReturn => {
+export const useUrlSearchParams = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathName = usePathname();
-    const { query } = useQueryParams();
     const urlSearchParams = new URLSearchParams(searchParams);
     const pg = parseInt(urlSearchParams.get("pg") ?? "");
     const lt = urlSearchParams.get("lt") ?? limitBounds[10];
     const limit = pathOr(limitBounds[10], [lt], limitBounds);
     const page = isNaN(pg) ? 1 : pg;
+    const query = urlSearchParams.get("query") ?? "";
+
     const updateParams = useCallback(
-        (page: number, limit: number): void => {
+        (page: number, limit: number, query: string): void => {
             const urlSearchParams = new URLSearchParams({
                 query: query.toString(),
                 pg: page.toString(),
                 lt: limit.toString(),
             });
+
             router.push(`${pathName}?${urlSearchParams.toString()}`, {
                 scroll: false,
             });
         },
-        [query, router, pathName],
+        [router, pathName],
     );
-    return useMemo(
-        () => [{ page, limit }, updateParams],
-        [limit, page, updateParams],
+
+    const value: [
+        { page: number; limit: LimitBound; query: string },
+        (page: number, limit: LimitBound, query: string) => void,
+    ] = useMemo(
+        () => [{ page, limit, query }, updateParams],
+        [page, limit, query, updateParams],
     );
+
+    return value;
 };
