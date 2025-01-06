@@ -16,7 +16,9 @@ import {
 import getConfiguredChainId from "../../../lib/getConfiguredChain";
 import { getUrqlServerClient } from "../../../lib/urql";
 
-export async function generateMetadata(props: ApplicationPageProps): Promise<Metadata> {
+export async function generateMetadata(
+    props: ApplicationPageProps,
+): Promise<Metadata> {
     const params = await props.params;
     return {
         title: `Application ${params.address}`,
@@ -39,7 +41,7 @@ export type ApplicationPageProps = {
     params: Promise<{ address: string }>;
 };
 
-const ApplicationPage: FC<ApplicationPageProps> = async props => {
+const ApplicationPage: FC<ApplicationPageProps> = async (props) => {
     const params = await props.params;
     const chainId = getConfiguredChainId();
     const appId = `${chainId}-${params.address?.toLowerCase()}`;
