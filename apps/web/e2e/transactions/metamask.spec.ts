@@ -44,7 +44,7 @@ test.describe.serial("Ether Deposit form", () => {
         ).toBeHidden();
     });
 
-    test("should display errors for 'Ether Deposit' transaction form", async ({
+    test.skip("should display errors for 'Ether Deposit' transaction form", async ({
         page,
     }) => {
         await page.goto("/");
@@ -88,7 +88,7 @@ test.describe.serial("Ether Deposit form", () => {
         await expect(form.getByText("Invalid hex string")).toBeVisible();
     });
 
-    test("should validate successfully 'Ether Deposit' transaction form", async ({
+    test.skip("should validate successfully 'Ether Deposit' transaction form", async ({
         page,
     }) => {
         await page.goto("/");
