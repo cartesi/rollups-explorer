@@ -40,9 +40,9 @@ const ResponsiveTable = <T extends { id: string | number }>(
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
     const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
+    const { childrenRef, isVisible } = useElementVisibility(
+        tableRowRef.current,
+    );
 
     return (
         <TableResponsiveWrapper ref={tableRowRef}>

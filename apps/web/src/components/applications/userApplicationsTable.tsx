@@ -29,9 +29,9 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
     const bgColor = colorScheme === "dark" ? theme.colors.dark[7] : theme.white;
-    const { childrenRef, isVisible } = useElementVisibility({
-        element: tableRowRef,
-    });
+    const { childrenRef, isVisible } = useElementVisibility(
+        tableRowRef.current,
+    );
     const [timeType, setTimeType] = useState<"timestamp" | "age">("age");
 
     const onChangeTimeColumnType = useCallback(() => {
