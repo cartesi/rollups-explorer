@@ -36,6 +36,7 @@ import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { TransactionProgress } from "./TransactionProgress";
 import useUndeployedApplication from "./hooks/useUndeployedApplication";
 import { TransactionFormSuccessData } from "./DepositFormTypes";
+import { useFormattedBalance } from "./hooks/useFormattedBalance";
 
 export interface EtherDepositFormProps {
     applications: string[];
@@ -53,6 +54,8 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
     } = props;
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     const { chain } = useAccount();
+    const balance = useFormattedBalance();
+
     const form = useForm({
         validateInputOnBlur: true,
         initialValues: {
@@ -63,8 +66,16 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         validate: {
             application: (value) =>
                 value !== "" && isAddress(value) ? null : "Invalid application",
-            amount: (value) =>
-                value !== "" && Number(value) > 0 ? null : "Invalid amount",
+            amount: (value) => {
+                if (value !== "" && Number(value) > 0) {
+                    if (Number(value) > Number(balance)) {
+                        return `The amount ${value} exceeds your current balance of ${balance} ETH`;
+                    }
+                    return null;
+                } else {
+                    return "Invalid amount";
+                }
+            },
             execLayerData: (value) =>
                 isHex(value) ? null : "Invalid hex string",
         },

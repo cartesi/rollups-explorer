@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, describe, it } from "vitest";
+import { afterAll, beforeEach, describe, it } from "vitest";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
 import { getAddress } from "viem";
+import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
 
 const Component = withMantineTheme(EtherDepositForm);
 
@@ -35,18 +36,13 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
     };
 });
 
-vi.mock("wagmi", async () => {
-    return {
-        useWaitForTransactionReceipt: () => ({}),
-        useAccount: () => ({
-            chain: {
-                nativeCurrency: {
-                    decimals: 18,
-                },
-            },
-        }),
-    };
-});
+vi.mock("wagmi");
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    { partial: true },
+);
+const useAccountMock = vi.mocked(useAccount, { partial: true });
+const useBalanceMock = vi.mocked(useBalance, { partial: true });
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -65,6 +61,25 @@ vi.mock("@mantine/form", async () => {
 });
 
 describe("Rollups EtherDepositForm", () => {
+    beforeEach(() => {
+        useWaitForTransactionReceiptMock.mockReturnValue({});
+        useAccountMock.mockReturnValue({
+            chain: {
+                nativeCurrency: {
+                    name: "ether",
+                    symbol: "ETH",
+                    decimals: 18,
+                },
+            } as any,
+        });
+        useBalanceMock.mockReturnValue({
+            data: {
+                value: 355943959031747438n,
+                decimals: 18,
+            },
+        });
+    });
+
     afterAll(() => {
         vi.restoreAllMocks();
     });
@@ -215,7 +230,7 @@ describe("Rollups EtherDepositForm", () => {
 
             fireEvent.change(amountInput, {
                 target: {
-                    value: "1",
+                    value: "0.1",
                 },
             });
 
@@ -226,10 +241,9 @@ describe("Rollups EtherDepositForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should invoke onSearchApplications function after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSearchApplications function after successful deposit", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: {},
                 error: null,
                 status: "success",
                 isSuccess: true,
@@ -375,10 +389,9 @@ describe("Rollups EtherDepositForm", () => {
             });
         });
 
-        it("should invoke onSuccess callback after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSuccess callback after successful deposit", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: {},
                 error: null,
                 isSuccess: true,
             });
@@ -483,10 +496,9 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Alerts", () => {
-        it("should display alert for successful transaction", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should display alert for successful transaction", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: {},
                 error: null,
                 status: "success",
                 isSuccess: true,
@@ -498,14 +510,13 @@ describe("Rollups EtherDepositForm", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display alert for failed transaction", async () => {
-            const wagmi = await import("wagmi");
+        it("should display alert for failed transaction", () => {
             const message = "User declined the transaction";
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: {},
                 error: {
                     message,
-                },
+                } as any,
                 status: "error",
             });
 
@@ -548,6 +559,52 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
         });
+
+        it("should correctly validate amount based on available balance", () => {
+            const balanceValue = 355943959031747438n;
+            const formattedBalanceValue = "0.355943959031747438";
+            useBalanceMock.mockReturnValue({
+                data: {
+                    value: balanceValue,
+                    decimals: 18,
+                },
+            });
+
+            const { container } = render(<Component {...defaultProps} />);
+            const amountInput = container.querySelector(
+                '[type="number"]',
+            ) as HTMLInputElement;
+
+            let value = 0.4;
+            fireEvent.change(amountInput, {
+                target: {
+                    value: value.toString(),
+                },
+            });
+
+            fireEvent.blur(amountInput);
+
+            expect(
+                screen.getByText(
+                    `The amount ${value} exceeds your current balance of ${formattedBalanceValue} ETH`,
+                ),
+            ).toBeInTheDocument();
+
+            value = 0.3;
+            fireEvent.change(amountInput, {
+                target: {
+                    value: value.toString(),
+                },
+            });
+
+            fireEvent.blur(amountInput);
+
+            expect(() =>
+                screen.getByText(
+                    `The amount ${value} exceeds your current balance of ${formattedBalanceValue} ETH`,
+                ),
+            ).toThrow("Unable to find an element with the text");
+        });
     });
 
     describe("Form", () => {
@@ -567,9 +624,8 @@ describe("Rollups EtherDepositForm", () => {
                 reset: resetMock,
             } as any);
 
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: {},
                 error: null,
                 isSuccess: true,
             });
