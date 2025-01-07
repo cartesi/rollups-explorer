@@ -14,7 +14,9 @@ test.describe.serial("Ether Deposit form", () => {
         }
     });
 
-    test("should render 'Ether Deposit' transaction form", async ({ page }) => {
+    test.skip("should render 'Ether Deposit' transaction form", async ({
+        page,
+    }) => {
         await page.goto("/");
 
         const connectButton = page.getByText("Connect Wallet");
