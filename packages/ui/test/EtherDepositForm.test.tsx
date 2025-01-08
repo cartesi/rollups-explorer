@@ -3,11 +3,13 @@ import {
     useWriteEtherPortalDepositEther,
 } from "@cartesi/rollups-wagmi";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act } from "react";
 import { getAddress } from "viem";
 import { beforeEach, describe, it } from "vitest";
 import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
+import { factoryWaitStatus } from "./utils/helpers";
 
 vi.mock("wagmi");
 vi.mock("viem", async () => {
@@ -507,6 +509,49 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Amount input", () => {
+        it("should display the connected account's balance", () => {
+            useSimulateDepositEtherMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                error: null,
+                data: {
+                    request: {},
+                },
+            });
+            render(<Component {...defaultProps} />);
+
+            expect(
+                screen.getByText("Balance: 0.456632268985698099"),
+            ).toBeVisible();
+
+            expect(screen.getByText("Max")).toBeVisible();
+        });
+
+        it("should fill the amount input when clicking the max button", () => {
+            render(<Component {...defaultProps} />);
+
+            act(() => fireEvent.click(screen.getByText("Max")));
+
+            expect(
+                screen.getByDisplayValue("0.456632268985698099"),
+            ).toBeVisible();
+        });
+
+        it("should not display the max option when the balance is zero", () => {
+            useBalanceMock.mockReturnValue({
+                data: {
+                    value: 0n,
+                    decimals: 18,
+                },
+                refetch: balanceRefetchMock,
+            });
+
+            render(<Component {...defaultProps} />);
+
+            expect(screen.getByText("Balance: 0")).toBeVisible();
+            expect(screen.queryByText("Max")).not.toBeInTheDocument();
+        });
+
         it("should correctly process small decimal numbers", async () => {
             useSimulateDepositEtherMock.mockReturnValue({
                 status: "success",
@@ -575,22 +620,29 @@ describe("Rollups EtherDepositForm", () => {
         });
     });
 
-    describe.skip("Form", () => {
+    describe("Form", () => {
         it("should reset form after successful submission", async () => {
-            const mantineForm = await import("@mantine/form");
-            const [application] = applications;
-            const resetMock = vi.fn();
-            vi.spyOn(mantineForm, "useForm").mockReturnValue({
-                getTransformedValues: () => ({
-                    address: getAddress(application),
-                    rawInput: "0x",
-                }),
-                isValid: () => true,
-                getInputProps: () => {},
-                errors: {},
-                setFieldValue: () => "",
-                reset: resetMock,
-            } as any);
+            // Emulate success and reset wait-status to avoid infinite loop.
+            const depositWaitStatus = factoryWaitStatus();
+            useWriteDepositEtherMock.mockReturnValue({
+                status: "success",
+                data: "0x0001",
+                reset: () => {
+                    depositWaitStatus.reset();
+                },
+            });
+
+            useWaitForTransactionReceiptMock.mockImplementation((params) => {
+                return params?.hash === "0x0001"
+                    ? {
+                          ...depositWaitStatus.props,
+                          fetchStatus: "idle",
+                          data: { transactionHash: "0x01" },
+                      }
+                    : {
+                          fetchStatus: "idle",
+                      };
+            });
 
             useWaitForTransactionReceiptMock.mockReturnValue({
                 data: {},
@@ -598,8 +650,25 @@ describe("Rollups EtherDepositForm", () => {
                 isSuccess: true,
             });
 
-            render(<Component {...defaultProps} />);
-            expect(resetMock).toHaveBeenCalled();
+            const onSearchMock = vi.fn();
+            const onSuccessMock = vi.fn();
+
+            render(
+                <Component
+                    {...defaultProps}
+                    onSearchApplications={onSearchMock}
+                    onSuccess={onSuccessMock}
+                />,
+            );
+
+            await setRequiredValues(applications[0], "0.2");
+
+            expect(onSearchMock).toHaveBeenCalledWith("");
+            expect(onSuccessMock).toHaveBeenCalledWith({
+                type: "ETHER",
+                receipt: {},
+            });
+            expect(balanceRefetchMock).toHaveBeenCalled();
         });
     });
 });
