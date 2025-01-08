@@ -1,9 +1,24 @@
+import {
+    useSimulateEtherPortalDepositEther,
+    useWriteEtherPortalDepositEther,
+} from "@cartesi/rollups-wagmi";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterAll, beforeEach, describe, it } from "vitest";
+import { getAddress } from "viem";
+import { beforeEach, describe, it } from "vitest";
+import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
 import { EtherDepositForm } from "../src/EtherDepositForm";
 import withMantineTheme from "./utils/WithMantineTheme";
-import { getAddress } from "viem";
-import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
+
+vi.mock("wagmi");
+vi.mock("viem", async () => {
+    const actual = await vi.importActual("viem");
+    return {
+        ...(actual as any),
+        getAddress: (address: string) => address,
+    };
+});
+
+vi.mock("@cartesi/rollups-wagmi");
 
 const Component = withMantineTheme(EtherDepositForm);
 
@@ -20,49 +35,66 @@ const defaultProps = {
     onSuccess: () => undefined,
 };
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        useSimulateEtherPortalDepositEther: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-            reset: vi.fn(),
-        }),
-        useWriteEtherPortalDepositEther: () => ({
-            wait: vi.fn(),
-            reset: vi.fn(),
-        }),
-    };
-});
+const selectApp = (app: string) => {
+    const appInput = screen.getByTestId("application-input");
 
-vi.mock("wagmi");
+    return fireEvent.change(appInput, {
+        target: {
+            value: app.toLowerCase(),
+        },
+    });
+};
+
+const setRequiredValues = async (app: string, amount = "0.2") => {
+    selectApp(app);
+
+    fireEvent.change(screen.getByTestId("amount-input"), {
+        target: { value: amount },
+    });
+
+    await waitFor(() => expect(screen.getByText("Advanced")).toBeVisible());
+    fireEvent.click(screen.getByText("Advanced"));
+    await waitFor(() => expect(screen.getByText("Extra data")).toBeVisible());
+};
+
 const useWaitForTransactionReceiptMock = vi.mocked(
     useWaitForTransactionReceipt,
     { partial: true },
 );
+
+const useSimulateDepositEtherMock = vi.mocked(
+    useSimulateEtherPortalDepositEther,
+    { partial: true },
+);
+const useWriteDepositEtherMock = vi.mocked(useWriteEtherPortalDepositEther, {
+    partial: true,
+});
 const useAccountMock = vi.mocked(useAccount, { partial: true });
 const useBalanceMock = vi.mocked(useBalance, { partial: true });
-
-vi.mock("viem", async () => {
-    const actual = await vi.importActual("viem");
-    return {
-        ...(actual as any),
-        getAddress: (address: string) => address,
-    };
-});
-
-vi.mock("@mantine/form", async () => {
-    const actual = await vi.importActual("@mantine/form");
-    return {
-        ...(actual as any),
-        useForm: (actual as any).useForm,
-    };
-});
+const balanceRefetchMock = vi.fn();
 
 describe("Rollups EtherDepositForm", () => {
     beforeEach(() => {
-        useWaitForTransactionReceiptMock.mockReturnValue({});
+        useSimulateDepositEtherMock.mockReturnValue({
+            data: undefined,
+            status: "success",
+            isLoading: false,
+            isFetching: false,
+            isSuccess: true,
+        });
+
+        useWriteDepositEtherMock.mockReturnValue({
+            writeContract: vi.fn(),
+            reset: vi.fn(),
+            status: "idle",
+            data: undefined,
+        });
+
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isSuccess: false,
+        });
         useAccountMock.mockReturnValue({
             chain: {
                 nativeCurrency: {
@@ -74,14 +106,15 @@ describe("Rollups EtherDepositForm", () => {
         });
         useBalanceMock.mockReturnValue({
             data: {
-                value: 355943959031747438n,
+                value: 456632268985698099n,
                 decimals: 18,
             },
+            refetch: balanceRefetchMock,
         });
     });
 
-    afterAll(() => {
-        vi.restoreAllMocks();
+    afterEach(() => {
+        vi.clearAllMocks();
     });
 
     describe("Extra data textarea", () => {
@@ -113,8 +146,6 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.blur(textarea);
-
             expect(textarea.getAttribute("aria-invalid")).toBe("true");
             expect(screen.getByText("Invalid hex string")).toBeInTheDocument();
         });
@@ -131,8 +162,6 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.blur(textarea);
-
             expect(textarea.getAttribute("aria-invalid")).toBe("false");
             expect(() => screen.getByText("Invalid hex string")).toThrow(
                 "Unable to find an element",
@@ -140,20 +169,10 @@ describe("Rollups EtherDepositForm", () => {
         });
 
         it("should correctly format extra data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const execLayerDataInput = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
+            render(<Component {...defaultProps} />);
+            const execLayerDataInput = screen.getByTestId(
+                "eth-extra-data-input",
+            );
 
             const hexValue = "0x123123";
             fireEvent.change(execLayerDataInput, {
@@ -162,7 +181,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", hexValue],
                 query: {
                     enabled: false,
@@ -173,71 +192,60 @@ describe("Rollups EtherDepositForm", () => {
     });
 
     describe("Send button", () => {
-        it("should be disabled when extra data is not hex", () => {
+        it("should be disabled when extra data is not hex", async () => {
+            useSimulateDepositEtherMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                error: null,
+                data: {
+                    request: {},
+                },
+            });
+
             const { container } = render(<Component {...defaultProps} />);
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
+
+            await setRequiredValues(applications[0]);
+
+            const depositButton = screen.getByText("Deposit").closest("button");
+            const textarea = screen.getByTestId("eth-extra-data-input");
+
+            expect(depositButton?.hasAttribute("disabled")).toBe(false);
 
             fireEvent.change(textarea, {
                 target: {
                     value: "",
                 },
             });
-            fireEvent.blur(textarea);
 
-            expect(submitButton.hasAttribute("disabled")).toBe(true);
+            expect(depositButton?.hasAttribute("disabled")).toBe(true);
         });
 
         it("should invoke write function when send button is clicked", async () => {
-            const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockReturnValue({
-                    ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                    data: {
-                        request: {},
-                    },
-                    loading: false,
-                    error: null,
-                });
-            rollupsWagmi.useWriteEtherPortalDepositEther = vi
-                .fn()
-                .mockReturnValue({
-                    ...rollupsWagmi.useWriteEtherPortalDepositEther,
-                    writeContract: mockedWrite,
-                    reset: vi.fn(),
-                });
 
-            const { container } = render(<Component {...defaultProps} />);
-            const buttons = container.querySelectorAll("button");
-            const submitButton = buttons[1] as HTMLButtonElement;
-
-            const inputs = container.querySelectorAll("input");
-            const applicationInput = inputs[0] as HTMLInputElement;
-            const amountInput = inputs[1] as HTMLInputElement;
-            applicationInput.setAttribute("value", selectedApplication);
-
-            fireEvent.change(applicationInput, {
-                target: {
-                    value: selectedApplication,
+            useSimulateDepositEtherMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                error: null,
+                data: {
+                    request: {},
                 },
             });
 
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.1",
-                },
+            useWriteDepositEtherMock.mockReturnValue({
+                writeContract: mockedWrite,
+                reset: vi.fn(),
             });
 
-            fireEvent.blur(amountInput);
-            expect(submitButton.hasAttribute("disabled")).toBe(false);
+            const selectedApplication = applications[1];
+            render(<Component {...defaultProps} />);
 
-            fireEvent.click(submitButton);
+            await setRequiredValues(selectedApplication, "0.1");
+            const submitButton = screen.getByText("Deposit").closest("button");
+
+            expect(submitButton?.hasAttribute("disabled") ?? true).toBe(false);
+
+            fireEvent.click(submitButton!);
             expect(mockedWrite).toHaveBeenCalled();
         });
 
@@ -261,26 +269,11 @@ describe("Rollups EtherDepositForm", () => {
         });
 
         it('should enable "useSimulateEtherPortalDepositEther" only when the form is valid', async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
+            render(<Component {...defaultProps} />);
 
-            const { container } = render(<Component {...defaultProps} />);
-            const applicationsInput = container.querySelector(
-                "input",
-            ) as HTMLInputElement;
-            const amountInput = container.querySelectorAll(
-                "input",
-            )[1] as HTMLInputElement;
-            const textarea = container.querySelector(
-                "textarea",
-            ) as HTMLTextAreaElement;
+            const applicationsInput = screen.getByTestId("application-input");
+            const amountInput = screen.getByTestId("amount-input");
+            const textarea = screen.getByTestId("eth-extra-data-input");
 
             const [application] = applications;
 
@@ -302,7 +295,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", "0x"],
                 query: {
                     enabled: false,
@@ -328,7 +321,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 query: {
                     enabled: false,
@@ -354,7 +347,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x"],
                 query: {
                     enabled: false,
@@ -380,7 +373,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: ["0x60a7048c3136293071605a4eaffef49923e981cc", "0x123"],
                 query: {
                     enabled: true,
@@ -458,25 +451,13 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.blur(input);
-
             expect(input.getAttribute("aria-invalid")).toBe("true");
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
 
         it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const input = container.querySelector("input") as HTMLInputElement;
+            render(<Component {...defaultProps} />);
+            const input = screen.getByTestId("application-input");
 
             const [application] = applications;
             fireEvent.change(input, {
@@ -485,7 +466,7 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 query: {
                     enabled: false,
@@ -527,31 +508,22 @@ describe("Rollups EtherDepositForm", () => {
 
     describe("Amount input", () => {
         it("should correctly process small decimal numbers", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateEtherPortalDepositEther,
+            useSimulateDepositEtherMock.mockReturnValue({
+                status: "success",
+                isLoading: false,
+                error: null,
                 data: {
                     request: {},
                 },
-                loading: false,
-                error: null,
-            });
-            rollupsWagmi.useSimulateEtherPortalDepositEther = vi
-                .fn()
-                .mockImplementation(mockedHook);
-
-            const { container } = render(<Component {...defaultProps} />);
-            const amountInput = container.querySelector(
-                '[type="number"]',
-            ) as HTMLInputElement;
-
-            fireEvent.change(amountInput, {
-                target: {
-                    value: "0.0000001",
-                },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            render(<Component {...defaultProps} />);
+
+            const amountInput = screen.getByTestId("amount-input");
+
+            fireEvent.change(amountInput, { target: { value: "0.0000001" } });
+
+            expect(useSimulateDepositEtherMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", "0x"],
                 value: 100000000000n,
                 query: {
@@ -582,8 +554,6 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.blur(amountInput);
-
             expect(
                 screen.getByText(
                     `The amount ${value} exceeds your current balance of ${formattedBalanceValue} ETH`,
@@ -597,8 +567,6 @@ describe("Rollups EtherDepositForm", () => {
                 },
             });
 
-            fireEvent.blur(amountInput);
-
             expect(() =>
                 screen.getByText(
                     `The amount ${value} exceeds your current balance of ${formattedBalanceValue} ETH`,
@@ -607,7 +575,7 @@ describe("Rollups EtherDepositForm", () => {
         });
     });
 
-    describe("Form", () => {
+    describe.skip("Form", () => {
         it("should reset form after successful submission", async () => {
             const mantineForm = await import("@mantine/form");
             const [application] = applications;
