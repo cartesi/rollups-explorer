@@ -38,9 +38,9 @@ const InputsTable: FC<InputsTableProps> = ({
         setTimeType((timeType) => (timeType === "age" ? "timestamp" : "age"));
     }, []);
     const tableRowRef = useRef<HTMLDivElement>(null);
-    const { childrenRef, isVisible } = useElementVisibility(
-        tableRowRef.current,
-    );
+    const { childrenRef, isVisible } = useElementVisibility({
+        element: tableRowRef,
+    });
     const { listConnections } = useConnectionConfig();
     const connectionsLength = listConnections().length;
 
