@@ -8,9 +8,14 @@ import {
     within,
 } from "@testing-library/react";
 import { mainnet } from "viem/chains";
-import { afterAll, describe, it } from "vitest";
+import { afterAll, beforeEach, describe, it } from "vitest";
 import Shell from "../../../src/components/layout/shell";
 import withMantineTheme from "../../utils/WithMantineTheme";
+import { useAccount, useConfig } from "wagmi";
+import getConfiguredChainId from "../../../src/lib/getConfiguredChain";
+
+vi.mock("../../../src/lib/getConfiguredChain");
+const getConfiguredChainIdMock = vi.mocked(getConfiguredChainId, true);
 
 const Component = withMantineTheme(Shell);
 
@@ -75,50 +80,23 @@ vi.mock("@cartesi/rollups-wagmi", async () => {
     };
 });
 
-vi.mock("wagmi", async () => {
-    return {
-        useConfig: () => ({
-            chains: [mainnet],
-        }),
-        useContractReads: () => ({
-            isLoading: false,
-            isSuccess: true,
-            data: [
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-                {
-                    result: undefined,
-                    error: undefined,
-                },
-            ],
-        }),
-        useAccount: () => ({
-            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
-        }),
-        usePrepareContractWrite: () => ({}),
-        useWaitForTransaction: () => ({}),
-        useContractWrite: () => ({}),
-        useNetwork: () => ({
-            chain: {
-                nativeCurrency: {
-                    decimals: 18,
-                },
-            },
-        }),
-    };
-});
+vi.mock("wagmi");
+const useConfigMock = vi.mocked(useConfig, { partial: true });
+const useAccountMock = vi.mocked(useAccount, { partial: true });
 
 describe("Shell component", () => {
+    beforeEach(() => {
+        useConfigMock.mockReturnValue({
+            chains: [mainnet],
+        });
+
+        useAccountMock.mockReturnValue({
+            address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
+        });
+
+        getConfiguredChainIdMock.mockReturnValue("31337");
+    });
+
     afterAll(() => {
         vi.restoreAllMocks();
     });
@@ -134,7 +112,7 @@ describe("Shell component", () => {
     });
 
     describe("Header", () => {
-        it("should display transaction link in header", () => {
+        it("should display 'Send Transaction' button in header", () => {
             render(<Component>Children</Component>);
 
             expect(
@@ -142,6 +120,36 @@ describe("Shell component", () => {
                     "transaction-button",
                 ),
             ).toBeInTheDocument();
+        });
+
+        it("should enable 'Send Transaction' button when network is correct", () => {
+            useAccountMock.mockReturnValue({
+                address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
+                isConnected: true,
+                chainId: 31337,
+            });
+            getConfiguredChainIdMock.mockReturnValue("31337");
+            render(<Component>Children</Component>);
+
+            const button = within(screen.getByTestId("header")).getByTestId(
+                "transaction-button",
+            );
+            expect(button.hasAttribute("disabled")).toBe(false);
+        });
+
+        it("should display disable 'Send Transaction' button when network is wrong", () => {
+            useAccountMock.mockReturnValue({
+                address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
+                isConnected: true,
+                chainId: 31337,
+            });
+            getConfiguredChainIdMock.mockReturnValue("");
+            render(<Component>Children</Component>);
+
+            const button = within(screen.getByTestId("header")).getByTestId(
+                "transaction-button",
+            );
+            expect(button.hasAttribute("disabled")).toBe(true);
         });
 
         it("should not display home and applications links in header", () => {
