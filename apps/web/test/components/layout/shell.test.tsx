@@ -17,72 +17,11 @@ import getConfiguredChainId from "../../../src/lib/getConfiguredChain";
 vi.mock("../../../src/lib/getConfiguredChain");
 const getConfiguredChainIdMock = vi.mocked(getConfiguredChainId, true);
 
-const Component = withMantineTheme(Shell);
-
-vi.mock("../../../src/graphql", async () => {
-    return {
-        useApplicationsQuery: () => [{ data: {}, fetching: false }],
-        useTokensQuery: () => [{ data: {}, fetching: false }],
-    };
-});
-
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        usePrepareInputBoxAddInput: () => ({
-            config: {},
-        }),
-        useInputBoxAddInput: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-    };
-});
-
-vi.mock("viem", async () => {
-    const actual = await vi.importActual("viem");
-    return {
-        ...(actual as any),
-        getAddress: (address: string) => address,
-    };
-});
-
-vi.mock("@rainbow-me/rainbowkit", async () => {
-    return {
-        ConnectButton: () => <></>,
-    };
-});
-
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    const actual = await vi.importActual("@cartesi/rollups-wagmi");
-    return {
-        ...(actual as any),
-        usePrepareErc20Approve: () => ({
-            config: {},
-        }),
-        useErc20Approve: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        usePrepareErc20PortalDepositErc20Tokens: () => ({
-            config: {},
-        }),
-        useErc20PortalDepositErc20Tokens: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-        usePrepareEtherPortalDepositEther: () => ({
-            config: {},
-        }),
-        useEtherPortalDepositEther: () => ({
-            data: {},
-            wait: vi.fn(),
-        }),
-    };
-});
-
 vi.mock("wagmi");
 const useConfigMock = vi.mocked(useConfig, { partial: true });
 const useAccountMock = vi.mocked(useAccount, { partial: true });
+
+const Component = withMantineTheme(Shell);
 
 describe("Shell component", () => {
     beforeEach(() => {
@@ -166,7 +105,7 @@ describe("Shell component", () => {
             ).toThrow("Unable to find an element");
         });
 
-        it("should display the cartesiscan chain button", async () => {
+        it("should display the cartesiscan chain button", () => {
             render(<Component>Children</Component>);
 
             const headerEl = screen.getByTestId("header");
