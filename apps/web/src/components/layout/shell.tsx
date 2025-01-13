@@ -32,6 +32,7 @@ import CartesiLogo from "../../components/cartesiLogo";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
 import { CartesiScanChains } from "../networks/cartesiScanNetworks";
+import getConfiguredChainId from "../../lib/getConfiguredChain";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
@@ -52,7 +53,9 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const hideBalanceViewport = useMediaQuery(
         `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
     );
-    const { isConnected } = useAccount();
+    const { isConnected, chainId } = useAccount();
+    const configuredChainId = getConfiguredChainId();
+    const isValidNetwork = chainId === Number(configuredChainId);
     const { colorScheme, toggleColorScheme } = useMantineColorScheme({
         keepTransitions: true,
     });
@@ -96,7 +99,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 variant="subtle"
                                 leftSection={<TbArrowsDownUp />}
                                 onClick={openTransaction}
-                                disabled={!isConnected}
+                                disabled={!isConnected || !isValidNetwork}
                                 visibleFrom="sm"
                                 data-testid="transaction-button"
                             >
