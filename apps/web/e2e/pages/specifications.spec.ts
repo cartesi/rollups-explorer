@@ -16,5 +16,19 @@ test("should have correct title", async ({ page }) => {
 test("should display empty state", async ({ page }) => {
     await expect(page.getByText("No Specifications Found!")).toBeVisible();
     await expect(page.getByText("Create one")).toBeVisible();
-    await expect(page.getByText("Import Specifications")).toBeVisible();
+    await expect(page.getByText("Import specifications")).toBeVisible();
+});
+
+test("should open file chooser when 'Import Specifications' is clicked", async ({
+    page,
+}) => {
+    const importSpecificationsButton = page.getByText("Import specifications");
+    await expect(importSpecificationsButton).toBeVisible();
+
+    const fileChooserPromise = page.waitForEvent("filechooser");
+    await importSpecificationsButton.click();
+
+    const fileChooser = await fileChooserPromise;
+
+    expect(fileChooser.isMultiple()).toBe(false);
 });
