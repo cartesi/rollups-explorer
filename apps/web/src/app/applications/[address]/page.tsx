@@ -16,9 +16,10 @@ import {
 import getConfiguredChainId from "../../../lib/getConfiguredChain";
 import { getUrqlServerClient } from "../../../lib/urql";
 
-export async function generateMetadata({
-    params,
-}: ApplicationPageProps): Promise<Metadata> {
+export async function generateMetadata(
+    props: ApplicationPageProps,
+): Promise<Metadata> {
+    const params = await props.params;
     return {
         title: `Application ${params.address}`,
     };
@@ -37,10 +38,11 @@ async function getApplication(appId: string) {
 }
 
 export type ApplicationPageProps = {
-    params: { address: string };
+    params: Promise<{ address: string }>;
 };
 
-const ApplicationPage: FC<ApplicationPageProps> = async ({ params }) => {
+const ApplicationPage: FC<ApplicationPageProps> = async (props) => {
+    const params = await props.params;
     const chainId = getConfiguredChainId();
     const appId = `${chainId}-${params.address?.toLowerCase()}`;
     const application = await getApplication(appId);

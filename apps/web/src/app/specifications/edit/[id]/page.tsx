@@ -9,12 +9,13 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
-export default function EditSpecificationPage({ params }: PageProps) {
+export default async function EditSpecificationPage(props: PageProps) {
+    const params = await props.params;
     return (
         <Stack>
             <Breadcrumbs

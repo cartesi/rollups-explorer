@@ -8,8 +8,7 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import { FC } from "react";
-import { act } from "react-dom/test-utils";
+import { FC, act } from "react";
 import { SpecificationFormView } from "../../../src/components/specification/SpecificationFormView";
 import localRepository from "../../../src/components/specification/hooks/localRepository";
 import {

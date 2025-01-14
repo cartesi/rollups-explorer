@@ -1,7 +1,8 @@
 import { useIntersection } from "@mantine/hooks";
-import { useMemo } from "react";
+import { RefObject, useMemo } from "react";
+
 type UseElementVisibilityParamsProps<T extends Element> = {
-    element: React.RefObject<T>;
+    element: RefObject<T | null>;
     threshold?: number;
 };
 
