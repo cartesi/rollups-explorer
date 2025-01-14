@@ -5,6 +5,10 @@ export { ERC20DepositForm } from "./ERC20DepositForm";
 export { ERC721DepositForm } from "./ERC721DepositForm";
 export { EtherDepositForm } from "./EtherDepositForm";
 export {
+    GenericInputForm,
+    type GenericInputFormSpecification,
+} from "./GenericInputForm";
+export {
     InputContent,
     InputDetails,
     NoticeContent,
@@ -16,7 +20,3 @@ export { Summary } from "./Summary";
 export { SummaryCard } from "./SummaryCard";
 export { TransactionProgress } from "./TransactionProgress";
 export { default as useWatchQueryOnBlockChange } from "./hooks/useWatchQueryOnBlockChange";
-export {
-    GenericInputForm,
-    type GenericInputFormSpecification,
-} from "./GenericInputForm";
