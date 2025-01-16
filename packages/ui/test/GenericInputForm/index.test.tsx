@@ -1050,6 +1050,37 @@ describe("GenericInputForm", () => {
             fireEvent.click(submitButton);
             expect(mockedWrite).toHaveBeenCalled();
         });
+
+        it("should disable existing ABI option when no specifications are available", () => {
+            render(<Component {...defaultProps} specifications={[]} />);
+            const button = screen.getByText("ABI to Hex");
+            fireEvent.click(button);
+
+            const existingAbiOption = screen.getByText(
+                "ABI from an existing JSON_ABI specification",
+            ).parentNode as HTMLDivElement;
+
+            expect(
+                existingAbiOption.getAttribute("data-combobox-disabled"),
+            ).toBe("true");
+            expect(existingAbiOption.getAttribute("aria-selected")).toBe(
+                "false",
+            );
+        });
+
+        it("should preselect 'New ABI' option when no specifications are available", () => {
+            render(<Component {...defaultProps} specifications={[]} />);
+            const button = screen.getByText("ABI to Hex");
+            fireEvent.click(button);
+
+            const newAbiOption = screen.getByText("New ABI")
+                .parentNode as HTMLDivElement;
+
+            expect(newAbiOption.hasAttribute("data-combobox-disabled")).toBe(
+                false,
+            );
+            expect(newAbiOption.getAttribute("aria-selected")).toBe("true");
+        });
     });
 
     describe("Form", () => {
