@@ -33,7 +33,7 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
         showConnectionModal,
         removeConnection,
     } = useConnectionConfig();
-    const appId = application.id as AddressType;
+    const appId = application.address as AddressType;
     const connection = getConnection(appId);
     return (
         <Table.Tr key={application.id}>
