@@ -30,12 +30,63 @@ test("should be able to add a connection", async ({ page }) => {
     await createConnection(page, "0x60a7048c3136293071605a4eaffef49923e981cc");
 });
 
-test("should be able to remove a connection", async ({ page }) => {
+test("should display a confirmation modal for removing a connection", async ({
+    page,
+}) => {
     await createConnection(page, "0x60a7048c3136293071605a4eaffef49923e981cc");
 
     const deleteButton = page.getByTestId("remove-connection");
     await deleteButton.click();
 
+    await expect(page.getByText("Delete connection?")).toBeVisible();
+    await expect(
+        page.getByText(
+            "This will delete the data for this connection. Are you sure you want to proceed?",
+        ),
+    ).toBeVisible();
+});
+
+test("should close the confirmation modal when canceling the connection deletion", async ({
+    page,
+}) => {
+    await createConnection(page, "0x60a7048c3136293071605a4eaffef49923e981cc");
+
+    const deleteButton = page.getByTestId("remove-connection");
+    await deleteButton.click();
+
+    await expect(page.getByText("Delete connection?")).toBeVisible();
+    await expect(
+        page.getByText(
+            "This will delete the data for this connection. Are you sure you want to proceed?",
+        ),
+    ).toBeVisible();
+
+    const cancelButton = page.getByText("Cancel");
+    await cancelButton.click();
+
+    await expect(page.getByText("Delete connection?")).not.toBeVisible();
+    await expect(page.getByText("No connections found.")).not.toBeVisible();
+});
+
+test("should remove the connection when the delete action was confirmed", async ({
+    page,
+}) => {
+    await createConnection(page, "0x60a7048c3136293071605a4eaffef49923e981cc");
+
+    const deleteButton = page.getByTestId("remove-connection");
+    await deleteButton.click();
+
+    await expect(page.getByText("Delete connection?")).toBeVisible();
+    await expect(
+        page.getByText(
+            "This will delete the data for this connection. Are you sure you want to proceed?",
+        ),
+    ).toBeVisible();
+
+    const cancelButton = page.getByText("Confirm");
+    await cancelButton.click();
+
+    await expect(page.getByText("Delete connection?")).not.toBeVisible();
     await expect(page.getByText("No connections found.")).toBeVisible();
 });
 

@@ -81,20 +81,4 @@ describe("Connection view component", () => {
         );
         expect(screen.getByText(connections[1].url)).toBeInTheDocument();
     });
-
-    it("should call the remove connection correctly when clicking the trash can", () => {
-        const { removeConnection, listConnections } =
-            useConnectionConfigReturnStub;
-        listConnections.mockReturnValue(connections);
-
-        render(<View />);
-
-        fireEvent.click(
-            screen.getByText(
-                `Remove connection for address ${connections[0].address}`,
-            ),
-        );
-
-        expect(removeConnection).toHaveBeenCalledWith(connections[0].address);
-    });
 });
