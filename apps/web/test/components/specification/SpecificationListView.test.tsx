@@ -3,6 +3,7 @@ import {
     getByText,
     render,
     screen,
+    waitFor,
     waitForElementToBeRemoved,
 } from "@testing-library/react";
 import { clone } from "ramda";
@@ -46,6 +47,85 @@ describe("Specification Listing View", () => {
         expect(screen.getByText("Import specifications")).toBeInTheDocument();
     });
 
+    it("should open the confirmation modal when clicking on the trash icon", async () => {
+        render(
+            <StatefulView
+                specs={[erc1155JSONABISpecStub, systemSpecificationAsList[0]]}
+            />,
+        );
+
+        await waitForElementToBeRemoved(
+            screen.getByTestId("fetching-feedback"),
+        );
+
+        expect(
+            screen.getByText(erc1155JSONABISpecStub.name),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(systemSpecificationAsList[0].name),
+        ).toBeInTheDocument();
+
+        fireEvent.click(
+            screen.getByTestId(
+                `remove-specification-${erc1155JSONABISpecStub.id}`,
+            ),
+        );
+
+        await waitFor(() => screen.getByText("Delete specification?"));
+        expect(
+            screen.getByText(
+                "This will delete the data for this specification. Are you sure you want to proceed?",
+            ),
+        ).toBeInTheDocument();
+    });
+
+    it("should close the confirmation modal when clicking on cancel button", async () => {
+        render(
+            <StatefulView
+                specs={[erc1155JSONABISpecStub, systemSpecificationAsList[0]]}
+            />,
+        );
+
+        await waitForElementToBeRemoved(
+            screen.getByTestId("fetching-feedback"),
+        );
+
+        expect(
+            screen.getByText(erc1155JSONABISpecStub.name),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(systemSpecificationAsList[0].name),
+        ).toBeInTheDocument();
+
+        fireEvent.click(
+            screen.getByTestId(
+                `remove-specification-${erc1155JSONABISpecStub.id}`,
+            ),
+        );
+
+        await waitFor(() => screen.getByText("Delete specification?"));
+        expect(
+            screen.getByText(
+                "This will delete the data for this specification. Are you sure you want to proceed?",
+            ),
+        ).toBeInTheDocument();
+
+        const cancelButton = screen.getByText("Cancel");
+        fireEvent.click(cancelButton);
+
+        await waitFor(() =>
+            expect(() => screen.getByText("Delete specification?")).toThrow(
+                "Unable to find an element with the text: Delete specification?",
+            ),
+        );
+
+        expect(
+            screen.getByText(systemSpecificationAsList[0].name),
+        ).toBeInTheDocument();
+    });
+
     it("should be able to delete a specification", async () => {
         render(
             <StatefulView
@@ -70,6 +150,11 @@ describe("Specification Listing View", () => {
                 `remove-specification-${erc1155JSONABISpecStub.id}`,
             ),
         );
+
+        await waitFor(() => screen.getByText("Delete specification?"));
+
+        const confirmButton = screen.getByText("Confirm");
+        fireEvent.click(confirmButton);
 
         await waitForElementToBeRemoved(
             screen.getByText(erc1155JSONABISpecStub.name),
