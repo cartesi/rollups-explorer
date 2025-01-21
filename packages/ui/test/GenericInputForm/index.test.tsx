@@ -138,14 +138,12 @@ describe("GenericInputForm", () => {
         });
 
         it("should correctly format hex data", () => {
-            const mockedHook = vi.fn().mockReturnValue({
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
-                loading: false,
                 error: null,
             });
-            useSimulateInputBoxAddInputMock.mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const execLayerDataInput = container.querySelector(
@@ -159,7 +157,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", hexValue],
                 query: {
                     enabled: false,
@@ -283,11 +281,9 @@ describe("GenericInputForm", () => {
         });
 
         it('should enable "useSimulateInputBoxAddInput" only when the form is valid', () => {
-            const mockedHook = vi.fn().mockReturnValue({
-                loading: false,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 error: null,
             });
-            useSimulateInputBoxAddInputMock.mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -308,7 +304,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), ""],
                 query: {
                     enabled: false,
@@ -327,7 +323,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", "0x"],
                 query: {
                     enabled: false,
@@ -346,7 +342,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 query: {
                     enabled: true,
@@ -427,11 +423,12 @@ describe("GenericInputForm", () => {
         });
 
         it("should correctly format address", () => {
-            const mockedHook = vi.fn().mockReturnValue({
-                loading: false,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
+                data: {
+                    request: {},
+                },
                 error: null,
             });
-            useSimulateInputBoxAddInputMock.mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -443,7 +440,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 value: undefined,
                 query: {
