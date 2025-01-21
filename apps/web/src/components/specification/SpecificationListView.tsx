@@ -11,6 +11,7 @@ import {
     Flex,
     Grid,
     Group,
+    Modal,
     SegmentedControl,
     Skeleton,
     Stack,
@@ -20,6 +21,7 @@ import {
     useMantineTheme,
     VisuallyHidden,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { cond, filter, isEmpty, propEq, range, T } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import React, { FC, useState } from "react";
@@ -303,6 +305,10 @@ export const SpecificationListView: FC = () => {
         useSpecification();
 
     const specifications = listSpecifications();
+    const [opened, { open, close }] = useDisclosure(false);
+    const [specForRemoval, setSpecForRemoval] = useState<Specification | null>(
+        null,
+    );
 
     if (fetching) return <Feedback />;
     if (isNilOrEmpty(specifications)) return <NoSpecifications />;
@@ -313,119 +319,152 @@ export const SpecificationListView: FC = () => {
     });
 
     return (
-        <Stack>
-            <Flex justify="stretch">
-                <Group mr="auto">
-                    <SegmentedControl
-                        data-testid="specification-filter-control"
-                        data={[
-                            { value: "all", label: "All" },
-                            { value: JSON_ABI, label: "JSON ABI" },
-                            { value: ABI_PARAMS, label: "ABI Params" },
-                        ]}
-                        value={filter}
-                        onChange={(value) => setFilter(value as ModeFilter)}
-                    />
-                    <NewSpecificationButton />
-                    <SpecificationsActionsMenu />
-                </Group>
-            </Flex>
-
-            {isNilOrEmpty(filteredSpecs) && (
-                <NoSpecificationsFiltered
-                    filterName={filter}
-                    quantity={specifications?.length ?? 0}
-                />
-            )}
-
-            <Grid
-                justify="flex-start"
-                align="stretch"
-                data-testid="specs-grid"
-                role="grid"
+        <>
+            <Modal
+                opened={opened}
+                onClose={close}
+                title="Delete specification?"
+                centered
             >
-                {filteredSpecs?.map((spec, idx) => (
-                    <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
-                        <Card
-                            style={{ minHeight: CARD_MIN_HEIGHT }}
-                            data-testid={`specification-${spec.id}-card`}
-                            role="gridcell"
-                        >
-                            <Card.Section
-                                inheritPadding
-                                py="sm"
-                                data-testid={`specification-${spec.id}`}
+                <Text>
+                    This will delete the data for this specification. Are you
+                    sure you want to proceed?
+                </Text>
+
+                <Group mt="xl" justify="flex-end">
+                    <Button variant="default" onClick={close}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            if (specForRemoval) {
+                                removeSpecification(specForRemoval.id!);
+                            }
+                            close();
+                        }}
+                    >
+                        Confirm
+                    </Button>
+                </Group>
+            </Modal>
+            <Stack>
+                <Flex justify="stretch">
+                    <Group mr="auto">
+                        <SegmentedControl
+                            data-testid="specification-filter-control"
+                            data={[
+                                { value: "all", label: "All" },
+                                { value: JSON_ABI, label: "JSON ABI" },
+                                { value: ABI_PARAMS, label: "ABI Params" },
+                            ]}
+                            value={filter}
+                            onChange={(value) => setFilter(value as ModeFilter)}
+                        />
+                        <NewSpecificationButton />
+                        <SpecificationsActionsMenu />
+                    </Group>
+                </Flex>
+
+                {isNilOrEmpty(filteredSpecs) && (
+                    <NoSpecificationsFiltered
+                        filterName={filter}
+                        quantity={specifications?.length ?? 0}
+                    />
+                )}
+
+                <Grid
+                    justify="flex-start"
+                    align="stretch"
+                    data-testid="specs-grid"
+                    role="grid"
+                >
+                    {filteredSpecs?.map((spec, idx) => (
+                        <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
+                            <Card
+                                style={{ minHeight: CARD_MIN_HEIGHT }}
+                                data-testid={`specification-${spec.id}-card`}
+                                role="gridcell"
                             >
-                                <Group justify="space-between" wrap="nowrap">
-                                    <Title
-                                        order={3}
-                                        lineClamp={1}
-                                        title={spec.name}
+                                <Card.Section
+                                    inheritPadding
+                                    py="sm"
+                                    data-testid={`specification-${spec.id}`}
+                                >
+                                    <Group
+                                        justify="space-between"
+                                        wrap="nowrap"
                                     >
-                                        {spec.name}
-                                    </Title>
-                                    <Group gap={0} wrap="nowrap">
-                                        <EditSpecificationButton
-                                            id={spec.id!}
-                                            iconSize={theme.other.iconSize}
-                                        />
-                                        <Button
-                                            aria-label={`remove-${spec.name}`}
-                                            role="button"
-                                            size="compact-sm"
-                                            variant="transparent"
-                                            color="red"
-                                            data-testid={`remove-specification-${spec.id}`}
-                                            onClick={() =>
-                                                removeSpecification(spec.id!)
-                                            }
+                                        <Title
+                                            order={3}
+                                            lineClamp={1}
+                                            title={spec.name}
                                         >
-                                            <TbTrash
-                                                size={theme.other.iconSize}
+                                            {spec.name}
+                                        </Title>
+                                        <Group gap={0} wrap="nowrap">
+                                            <EditSpecificationButton
+                                                id={spec.id!}
+                                                iconSize={theme.other.iconSize}
                                             />
-                                            <VisuallyHidden>
-                                                Remove specification id{" "}
-                                                {spec.id}
-                                            </VisuallyHidden>
-                                        </Button>
+                                            <Button
+                                                aria-label={`remove-${spec.name}`}
+                                                role="button"
+                                                size="compact-sm"
+                                                variant="transparent"
+                                                color="red"
+                                                data-testid={`remove-specification-${spec.id}`}
+                                                onClick={() => {
+                                                    setSpecForRemoval(spec);
+                                                    open();
+                                                }}
+                                            >
+                                                <TbTrash
+                                                    size={theme.other.iconSize}
+                                                />
+                                                <VisuallyHidden>
+                                                    Remove specification id{" "}
+                                                    {spec.id}
+                                                </VisuallyHidden>
+                                            </Button>
+                                        </Group>
                                     </Group>
-                                </Group>
-                            </Card.Section>
-                            <Badge>
-                                {spec.mode === "abi_params"
-                                    ? "ABI Parameters"
-                                    : "Json ABI"}
-                            </Badge>
+                                </Card.Section>
+                                <Badge>
+                                    {spec.mode === "abi_params"
+                                        ? "ABI Parameters"
+                                        : "Json ABI"}
+                                </Badge>
 
-                            <Accordion
-                                variant="default"
-                                chevronPosition="right"
-                                py="sm"
-                                data-testid={`specification-${spec.id}-accordion`}
-                            >
-                                {spec.mode === "json_abi" && (
-                                    <DisplayABI abi={spec.abi} />
-                                )}
+                                <Accordion
+                                    variant="default"
+                                    chevronPosition="right"
+                                    py="sm"
+                                    data-testid={`specification-${spec.id}-accordion`}
+                                >
+                                    {spec.mode === "json_abi" && (
+                                        <DisplayABI abi={spec.abi} />
+                                    )}
 
-                                {spec.mode === "abi_params" && (
-                                    <>
-                                        <DisplayABIParams
-                                            abiParams={spec.abiParams}
-                                            sliceTarget={spec.sliceTarget}
-                                        />
-                                        <DisplayInstructions
-                                            slices={spec.sliceInstructions}
-                                        />
-                                    </>
-                                )}
-                                <DisplayConditional
-                                    conditionals={spec.conditionals ?? []}
-                                />
-                            </Accordion>
-                        </Card>
-                    </Grid.Col>
-                ))}
-            </Grid>
-        </Stack>
+                                    {spec.mode === "abi_params" && (
+                                        <>
+                                            <DisplayABIParams
+                                                abiParams={spec.abiParams}
+                                                sliceTarget={spec.sliceTarget}
+                                            />
+                                            <DisplayInstructions
+                                                slices={spec.sliceInstructions}
+                                            />
+                                        </>
+                                    )}
+                                    <DisplayConditional
+                                        conditionals={spec.conditionals ?? []}
+                                    />
+                                </Accordion>
+                            </Card>
+                        </Grid.Col>
+                    ))}
+                </Grid>
+            </Stack>
+        </>
     );
 };

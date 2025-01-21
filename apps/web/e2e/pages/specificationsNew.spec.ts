@@ -224,5 +224,8 @@ test("should be able to delete JSON ABI spec", async ({ page }) => {
     const deleteButton = page.getByTestId(`remove-specification-${specId}`);
     await deleteButton.click();
 
+    await expect(page.getByText("Delete specification?")).toBeVisible();
+    await page.getByText("Confirm").click();
+
     await expect(gridCell).not.toBeVisible();
 });
