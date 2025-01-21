@@ -347,7 +347,6 @@ export const SpecificationListView: FC = () => {
                     </Button>
                 </Group>
             </Modal>
-
             <Stack>
                 <Flex justify="stretch">
                     <Group mr="auto">
@@ -377,12 +376,14 @@ export const SpecificationListView: FC = () => {
                     justify="flex-start"
                     align="stretch"
                     data-testid="specs-grid"
+                    role="grid"
                 >
                     {filteredSpecs?.map((spec, idx) => (
                         <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
                             <Card
                                 style={{ minHeight: CARD_MIN_HEIGHT }}
                                 data-testid={`specification-${spec.id}-card`}
+                                role="gridcell"
                             >
                                 <Card.Section
                                     inheritPadding
