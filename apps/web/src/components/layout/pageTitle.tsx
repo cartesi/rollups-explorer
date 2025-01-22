@@ -10,7 +10,7 @@ const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
     return (
         <Group mb="sm" data-testid="page-title">
             <Icon size={40} />
-            <Title order={2}>{title}</Title>
+            <Title order={1}>{title}</Title>
         </Group>
     );
 };
