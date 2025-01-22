@@ -81,7 +81,17 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
                 rightSection={
                     <Button
                         data-testid="abi-parameter-add-button"
-                        onClick={addABIParam}
+                        onClick={() => {
+                            try {
+                                parseAbiParameters(abiParamEntry);
+                                addABIParam();
+                            } catch (error: any) {
+                                form.setFieldError(
+                                    "abiParamEntry",
+                                    error.message,
+                                );
+                            }
+                        }}
                     >
                         Add
                     </Button>
