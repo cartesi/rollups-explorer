@@ -22,8 +22,11 @@ test("should have correct title", async ({ page }) => {
     await expect(title.first()).toBeVisible();
 });
 
-test("should have empty label", async ({ page }) => {
-    await expect(page.getByText("No connections found.")).toBeVisible();
+test("should have empty label and a create connection button", async ({
+    page,
+}) => {
+    await expect(page.getByText("No Connections Found!")).toBeVisible();
+    await expect(page.getByText("Create a connection")).toBeVisible();
 });
 
 test("should be able to add a connection", async ({ page }) => {
@@ -87,7 +90,7 @@ test("should remove the connection when the delete action was confirmed", async 
     await cancelButton.click();
 
     await expect(page.getByText("Delete connection?")).not.toBeVisible();
-    await expect(page.getByText("No connections found.")).toBeVisible();
+    await expect(page.getByText("No Connections Found!")).toBeVisible();
 });
 
 test("should display correct list with connections", async ({ page }) => {
