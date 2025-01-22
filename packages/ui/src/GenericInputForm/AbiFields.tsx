@@ -27,6 +27,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
         value: s.id,
         label: s.name,
     }));
+    const hasSpecifications = specifications.length > 0;
 
     return (
         <>
@@ -40,6 +41,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                     {
                         value: "existing",
                         label: "ABI from an existing JSON_ABI specification",
+                        disabled: !hasSpecifications,
                     },
                     { value: "new", label: "New ABI" },
                 ]}

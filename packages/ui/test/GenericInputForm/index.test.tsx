@@ -1,9 +1,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { AbiFunction, getAddress, stringToHex } from "viem";
-import { afterAll, describe, it } from "vitest";
+import { afterEach, describe, it } from "vitest";
 import { GenericInputForm } from "../../src/GenericInputForm";
 import withMantineTheme from "../utils/WithMantineTheme";
 import { abiParam, formSpecification, functionSignature } from "./mocks";
+import {
+    useSimulateInputBoxAddInput,
+    useWriteInputBoxAddInput,
+} from "@cartesi/rollups-wagmi";
+import { useWaitForTransactionReceipt } from "wagmi";
 
 const Component = withMantineTheme(GenericInputForm);
 
@@ -25,27 +30,19 @@ const defaultProps = {
 
 vi.mock("../../src/GenericInputForm/initialValues");
 
-vi.mock("@cartesi/rollups-wagmi", async () => {
-    return {
-        useSimulateInputBoxAddInput: () => ({
-            data: {
-                request: {},
-            },
-            config: {},
-        }),
-        useWriteInputBoxAddInput: () => ({
-            wait: vi.fn(),
-            reset: vi.fn(),
-            execute: vi.fn(),
-        }),
-    };
+vi.mock("@cartesi/rollups-wagmi");
+const useSimulateInputBoxAddInputMock = vi.mocked(useSimulateInputBoxAddInput, {
+    partial: true,
+});
+const useWriteInputBoxAddInputMock = vi.mocked(useWriteInputBoxAddInput, {
+    partial: true,
 });
 
-vi.mock("wagmi", async () => {
-    return {
-        useWaitForTransactionReceipt: () => ({}),
-    };
-});
+vi.mock("wagmi");
+const useWaitForTransactionReceiptMock = vi.mocked(
+    useWaitForTransactionReceipt,
+    { partial: true },
+);
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -65,8 +62,25 @@ vi.mock("@mantine/form", async () => {
 });
 
 describe("GenericInputForm", () => {
-    // beforeAll(() => {
-    afterAll(() => {
+    beforeEach(() => {
+        useSimulateInputBoxAddInputMock.mockReturnValue({
+            data: {
+                request: {},
+            },
+        });
+
+        useWriteInputBoxAddInputMock.mockReturnValue({
+            reset: vi.fn(),
+        });
+
+        useWaitForTransactionReceiptMock.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isSuccess: false,
+        });
+    });
+
+    afterEach(() => {
         vi.clearAllMocks();
     });
 
@@ -85,7 +99,7 @@ describe("GenericInputForm", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display error when value is not hex", async () => {
+        it("should display error when value is not hex", () => {
             render(<Component {...defaultProps} />);
             const textarea = screen.getByTestId(
                 "hex-textarea",
@@ -123,16 +137,13 @@ describe("GenericInputForm", () => {
             );
         });
 
-        it("should correctly format hex data", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
+        it("should correctly format hex data", () => {
+            useSimulateInputBoxAddInputMock.mockReturnValue({
+                data: {
+                    request: {},
+                },
                 error: null,
             });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const execLayerDataInput = container.querySelector(
@@ -146,7 +157,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", hexValue],
                 query: {
                     enabled: false,
@@ -218,21 +229,17 @@ describe("GenericInputForm", () => {
             expect(button.hasAttribute("disabled")).toBe(true);
         });
 
-        it("should invoke write function when send button is clicked", async () => {
+        it("should invoke write function when send button is clicked", () => {
             const selectedApplication = applications[1];
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -255,10 +262,9 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should invoke onSearchApplications function after successful submission", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSearchApplications function after successful submission", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
+                data: undefined,
                 error: null,
                 isSuccess: true,
             });
@@ -274,16 +280,10 @@ describe("GenericInputForm", () => {
             expect(onSearchApplicationsMock).toHaveBeenCalledWith("");
         });
 
-        it('should enable "useSimulateInputBoxAddInput" only when the form is valid', async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
+        it('should enable "useSimulateInputBoxAddInput" only when the form is valid', () => {
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 error: null,
             });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -304,7 +304,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), ""],
                 query: {
                     enabled: false,
@@ -323,7 +323,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: ["0x0000000000000000000000000000000000000000", "0x"],
                 query: {
                     enabled: false,
@@ -342,7 +342,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 query: {
                     enabled: true,
@@ -350,10 +350,8 @@ describe("GenericInputForm", () => {
             });
         });
 
-        it("should invoke onSuccess callback after successful deposit", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should invoke onSuccess callback after successful deposit", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
                 isSuccess: true,
             });
@@ -424,16 +422,13 @@ describe("GenericInputForm", () => {
             expect(screen.getByText("Invalid application")).toBeInTheDocument();
         });
 
-        it("should correctly format address", async () => {
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            const mockedHook = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
-                loading: false,
+        it("should correctly format address", () => {
+            useSimulateInputBoxAddInputMock.mockReturnValue({
+                data: {
+                    request: {},
+                },
                 error: null,
             });
-            rollupsWagmi.useSimulateInputBoxAddInput = vi
-                .fn()
-                .mockImplementation(mockedHook);
 
             const { container } = render(<Component {...defaultProps} />);
             const input = container.querySelector("input") as HTMLInputElement;
@@ -445,7 +440,7 @@ describe("GenericInputForm", () => {
                 },
             });
 
-            expect(mockedHook).toHaveBeenLastCalledWith({
+            expect(useSimulateInputBoxAddInputMock).toHaveBeenLastCalledWith({
                 args: [getAddress(application), "0x"],
                 value: undefined,
                 query: {
@@ -456,10 +451,8 @@ describe("GenericInputForm", () => {
     });
 
     describe("Alerts", () => {
-        it("should display alert for successful transaction", async () => {
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+        it("should display alert for successful transaction", () => {
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
                 status: "success",
                 isSuccess: true,
@@ -471,12 +464,11 @@ describe("GenericInputForm", () => {
             ).toBeInTheDocument();
         });
 
-        it("should display alert for failed transaction", async () => {
-            const wagmi = await import("wagmi");
+        it("should display alert for failed transaction", () => {
             const message = "User declined the transaction";
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: {
+                    name: "Error",
                     message,
                 },
                 status: "error",
@@ -489,21 +481,17 @@ describe("GenericInputForm", () => {
     });
 
     describe("ABI encoding", () => {
-        it("should send ABI encoded data from existing JSON_ABI specification", async () => {
+        it("should send ABI encoded data from existing JSON_ABI specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -575,21 +563,17 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should validate form when attempting to submit invalid ABI encoded data from existing JSON_ABI specification", async () => {
+        it("should validate form when attempting to submit invalid ABI encoded data from existing JSON_ABI specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -687,21 +671,17 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should send ABI encoded data from new JSON_ABI specification", async () => {
+        it("should send ABI encoded data from new JSON_ABI specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -772,21 +752,17 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should validate form when attempting to submit invalid ABI encoded data from new JSON_ABI specification", async () => {
+        it("should validate form when attempting to submit invalid ABI encoded data from new JSON_ABI specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -889,21 +865,17 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should send ABI encoded data from new ABI params specification", async () => {
+        it("should send ABI encoded data from new ABI params specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -971,21 +943,17 @@ describe("GenericInputForm", () => {
             expect(mockedWrite).toHaveBeenCalled();
         });
 
-        it("should validate form when attempting to submit invalid ABI encoded data from new ABI params specification", async () => {
+        it("should validate form when attempting to submit invalid ABI encoded data from new ABI params specification", () => {
             const selectedApplication = applications[0] as string;
             const mockedWrite = vi.fn();
-            const rollupsWagmi = await import("@cartesi/rollups-wagmi");
-            rollupsWagmi.useSimulateInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useSimulateInputBoxAddInput,
+            useSimulateInputBoxAddInputMock.mockReturnValue({
                 data: {
                     request: {},
                 },
                 error: null,
             });
-            rollupsWagmi.useWriteInputBoxAddInput = vi.fn().mockReturnValue({
-                ...rollupsWagmi.useWriteInputBoxAddInput,
+            useWriteInputBoxAddInputMock.mockReturnValue({
                 writeContract: mockedWrite,
-                execute: vi.fn(),
                 reset: vi.fn(),
             });
 
@@ -1079,6 +1047,37 @@ describe("GenericInputForm", () => {
             fireEvent.click(submitButton);
             expect(mockedWrite).toHaveBeenCalled();
         });
+
+        it("should disable existing ABI option when no specifications are available", () => {
+            render(<Component {...defaultProps} specifications={[]} />);
+            const button = screen.getByText("ABI to Hex");
+            fireEvent.click(button);
+
+            const existingAbiOption = screen.getByText(
+                "ABI from an existing JSON_ABI specification",
+            ).parentNode as HTMLDivElement;
+
+            expect(
+                existingAbiOption.getAttribute("data-combobox-disabled"),
+            ).toBe("true");
+            expect(existingAbiOption.getAttribute("aria-selected")).toBe(
+                "false",
+            );
+        });
+
+        it("should preselect 'New ABI' option when no specifications are available", () => {
+            render(<Component {...defaultProps} specifications={[]} />);
+            const button = screen.getByText("ABI to Hex");
+            fireEvent.click(button);
+
+            const newAbiOption = screen.getByText("New ABI")
+                .parentNode as HTMLDivElement;
+
+            expect(newAbiOption.hasAttribute("data-combobox-disabled")).toBe(
+                false,
+            );
+            expect(newAbiOption.getAttribute("aria-selected")).toBe("true");
+        });
     });
 
     describe("Form", () => {
@@ -1103,9 +1102,7 @@ describe("GenericInputForm", () => {
                 reset: resetMock,
             } as any);
 
-            const wagmi = await import("wagmi");
-            wagmi.useWaitForTransactionReceipt = vi.fn().mockReturnValue({
-                ...wagmi.useWaitForTransactionReceipt,
+            useWaitForTransactionReceiptMock.mockReturnValue({
                 error: null,
                 isSuccess: true,
             });

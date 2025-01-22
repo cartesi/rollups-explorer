@@ -22,14 +22,19 @@ import { useRef } from "react";
 import { equals, omit } from "ramda";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
-    const lastSelectedSpecification = useRef<FormSpecification | undefined>();
+    const lastSelectedSpecification = useRef<FormSpecification | undefined>(
+        undefined,
+    );
     const lastSelectedSpecificationWithIds = useRef<
         FormSpecification | undefined
-    >();
+    >(undefined);
 
     return useForm({
         validateInputOnBlur: true,
-        initialValues,
+        initialValues: {
+            ...initialValues,
+            abiMethod: specifications.length > 0 ? "existing" : "new",
+        },
         validate: {
             application: validateApplication,
             rawInput: validateHexInput,
