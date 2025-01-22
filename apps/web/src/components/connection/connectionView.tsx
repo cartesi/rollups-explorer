@@ -1,69 +1,78 @@
 "use client";
 import {
-    Avatar,
-    Button,
+    Card,
+    Center,
+    Flex,
     Grid,
     Group,
-    Text,
+    Skeleton,
     Title,
-    useMantineTheme,
-    VisuallyHidden,
 } from "@mantine/core";
-import { TbPlus } from "react-icons/tb";
+import { range } from "ramda";
+import { FC } from "react";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
+import NewConnectionButton from "./components/NewConnectionButton";
 import ConnectionInfo from "./connectionInfo";
 
+const Feedback: FC = () => (
+    <Grid justify="flex-start" align="stretch" data-testid="fetching-feedback">
+        {range(0, 4).map((n) => (
+            <Grid.Col span={{ base: 12, md: 6 }} key={n}>
+                <Card>
+                    <Group justify="space-between">
+                        <Skeleton height={18} mb="xl" width="70%" />
+                        <Skeleton height={18} mb="xl" width="5%" />
+                    </Group>
+                    <Skeleton height={18} my="xs" mb={0} />
+                </Card>
+            </Grid.Col>
+        ))}
+    </Grid>
+);
+
+const NoConnections: FC = () => {
+    return (
+        <Center>
+            <Flex direction="column" align="center" justify="center" gap="sm">
+                <Title order={3} c="dimmed">
+                    No Connections Found!
+                </Title>
+
+                <NewConnectionButton data-testid="add-connection">
+                    Create a connection
+                </NewConnectionButton>
+            </Flex>
+        </Center>
+    );
+};
+
 const ConnectionView = () => {
-    const { listConnections, showConnectionModal, fetching } =
-        useConnectionConfig();
-    const theme = useMantineTheme();
+    const { listConnections, fetching } = useConnectionConfig();
     const connections = listConnections();
     const hasConnections = connections.length > 0;
 
+    if (fetching) return <Feedback />;
+    if (!hasConnections) return <NoConnections />;
+
     return (
         <>
-            <Group justify="space-between">
-                <Group align="center" justify="center">
-                    <Button
-                        size="compact-sm"
-                        variant="filled"
-                        data-testid="add-connection"
-                        onClick={() => showConnectionModal()}
-                    >
-                        <TbPlus />
-                        <VisuallyHidden>Create connection</VisuallyHidden>
-                    </Button>
-
-                    <Title data-testid="page-title" size="h2">
-                        Connections
-                    </Title>
-                    {hasConnections && (
-                        <Avatar size="sm" color={theme.primaryColor}>
-                            {connections.length}
-                        </Avatar>
-                    )}
-                </Group>
+            <Group justify="flex-start">
+                <NewConnectionButton data-testid="add-connection">
+                    New
+                </NewConnectionButton>
             </Group>
 
-            {hasConnections ? (
-                <Grid gutter="sm">
-                    {connections.map((connection) => (
-                        <Grid.Col
-                            key={connection.address}
-                            span={{ base: 12, sm: 6 }}
-                            mt="md"
-                        >
-                            <ConnectionInfo connection={connection} />
-                        </Grid.Col>
-                    ))}
-                </Grid>
-            ) : (
-                <Text c="dimmed" py="sm" ta="center">
-                    {fetching
-                        ? "Fetching connections..."
-                        : "No connections found."}
-                </Text>
-            )}
+            <Grid gutter="sm">
+                {connections.map((connection) => (
+                    <Grid.Col
+                        key={connection.address}
+                        span={{ base: 12, sm: 6 }}
+                        mt="md"
+                    >
+                        <ConnectionInfo connection={connection} />
+                    </Grid.Col>
+                ))}
+            </Grid>
         </>
     );
 };
