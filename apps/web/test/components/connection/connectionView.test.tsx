@@ -27,8 +27,9 @@ describe("Connection view component", () => {
             ...useConnectionConfigReturnStub,
             fetching: true,
         });
+
         render(<View />);
-        expect(screen.getByText("Fetching connections...")).toBeInTheDocument();
+        expect(screen.getByTestId("fetching-feedback")).toBeVisible();
     });
 
     it("should not display loading state when not fetching connections", () => {
@@ -45,17 +46,16 @@ describe("Connection view component", () => {
     it("should display default state without connections", () => {
         render(<View />);
 
-        expect(screen.getByText("Create connection")).toBeInTheDocument();
-        expect(screen.getByText("Connections")).toBeInTheDocument();
-        expect(screen.getByText("No connections found.")).toBeInTheDocument();
+        expect(screen.getByText("No Connections Found!")).toBeInTheDocument();
+        expect(screen.getByText("Create a connection")).toBeVisible();
     });
 
-    it("should call the creation form when clicking the plus sign", () => {
+    it("should call the creation form when clicking the create a connection button", () => {
         const { showConnectionModal } = useConnectionConfigReturnStub;
 
         render(<View />);
 
-        fireEvent.click(screen.getByText("Create connection"));
+        fireEvent.click(screen.getByText("Create a connection"));
 
         expect(showConnectionModal).toHaveBeenCalledOnce();
     });
