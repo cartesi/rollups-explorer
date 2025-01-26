@@ -68,11 +68,14 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async (props) => {
                 <Address
                     value={params.address as AddressType}
                     href={`/applications/${params.address}`}
+                    shorten
+                    icon
+                    mr={-8}
                 />
                 <Text>Inputs</Text>
             </Breadcrumbs>
 
-            <PageTitle title="Inputs" Icon={TbInbox} />
+            <PageTitle title="Application Inputs" Icon={TbInbox} />
             <Inputs applicationId={params.address} />
         </Stack>
     );
