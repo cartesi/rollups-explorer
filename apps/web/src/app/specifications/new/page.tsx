@@ -1,8 +1,9 @@
-import { Group, Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 import { TbFileCode } from "react-icons/tb";
 import Breadcrumbs from "../../../components/breadcrumbs";
 import { SpecificationContainer } from "../../../components/specification/SpecificationContainer";
+import PageTitle from "../../../components/layout/pageTitle";
 
 export const metadata: Metadata = {
     title: "New Specification",
@@ -24,10 +25,7 @@ export default function NewSpecificationPage() {
                 ]}
             />
 
-            <Group mb="xl">
-                <TbFileCode size={40} />
-                <Title order={1}>Create a Specification</Title>
-            </Group>
+            <PageTitle title="Create a Specification" Icon={TbFileCode} />
 
             <SpecificationContainer />
         </Stack>
