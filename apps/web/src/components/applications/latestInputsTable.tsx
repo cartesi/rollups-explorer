@@ -65,7 +65,7 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
                     )
                 )}
                 {inputs.map((input) => (
-                    <Table.Tr key={`${input.application}-${input.timestamp}`}>
+                    <Table.Tr key={input.id}>
                         <Table.Td>
                             <Box
                                 display="flex"
