@@ -1,8 +1,9 @@
-import { Group, Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 import { TbFileCode } from "react-icons/tb";
 import Breadcrumbs from "../../../../components/breadcrumbs";
 import { SpecificationContainer } from "../../../../components/specification/SpecificationContainer";
+import PageTitle from "../../../../components/layout/pageTitle";
 
 export const metadata: Metadata = {
     title: "Edit Specifications",
@@ -31,10 +32,7 @@ export default async function EditSpecificationPage(props: PageProps) {
                 ]}
             />
 
-            <Group mb="xl">
-                <TbFileCode size={40} />
-                <Title order={1}>Edit Specifications</Title>
-            </Group>
+            <PageTitle title="Edit Specifications" Icon={TbFileCode} />
 
             <SpecificationContainer specificationId={params.id} />
         </Stack>
