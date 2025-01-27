@@ -32,7 +32,7 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
     }, []);
 
     return (
-        <Table>
+        <Table width="100%" miw={500} style={{ borderCollapse: "collapse" }}>
             <Table.Thead>
                 <Table.Tr>
                     <Table.Th>From</Table.Th>
