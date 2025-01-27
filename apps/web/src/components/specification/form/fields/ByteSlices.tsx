@@ -473,12 +473,10 @@ export const ByteSlices: FC<ByteSlicesProps> = ({
             </Group>
 
             {isActive ? (
-                <Stack pl="sm">
-                    <SliceInstructionFields
-                        onSliceInstructionsChange={onSliceInstructionsChange}
-                        onSliceTargetChange={onSliceTargetChange}
-                    />
-                </Stack>
+                <SliceInstructionFields
+                    onSliceInstructionsChange={onSliceInstructionsChange}
+                    onSliceTargetChange={onSliceTargetChange}
+                />
             ) : (
                 ""
             )}
