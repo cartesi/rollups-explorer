@@ -66,7 +66,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
     return (
         <Stack>
             <Grid gutter="sm">
-                <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
+                <Grid.Col span={{ base: 6, md: 3 }} mb="sm">
                     <SummaryCard
                         title="Inputs"
                         value={data?.inputsConnection?.totalCount ?? 0}
@@ -116,7 +116,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                         </Text>
                     </Group>
 
-                    <Group gap={5}>
+                    <Group gap={5} style={{ overflowX: "auto" }}>
                         <LatestInputsTable
                             inputs={inputs}
                             fetching={fetching}
