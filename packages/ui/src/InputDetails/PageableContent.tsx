@@ -63,7 +63,9 @@ const Connect: FC<ConnectProps> = ({ onConnect }) => {
                 radius="xl"
             />
             <Group justify="center">
-                <Button onClick={() => onConnect()}>Connect</Button>
+                <Button mr="auto" onClick={() => onConnect()}>
+                    Connect
+                </Button>
             </Group>
         </Stack>
     );
