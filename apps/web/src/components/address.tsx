@@ -74,7 +74,7 @@ const Address: FC<AddressProps> = ({
     );
     return (
         <Group gap={0} {...restProps}>
-            <Group gap={10}>
+            <Group gap={8}>
                 {icon && (
                     <Jazzicon
                         diameter={iconSize ?? 20}
