@@ -29,21 +29,21 @@ export const ConnectionSummary: FC<ConnectionSummaryProps> = ({ url }) => {
 
     return (
         <>
-            <Grid.Col span={{ base: 6, md: 3 }} mb="sm">
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
                 <SummaryCard
                     title="Notices"
                     value={result.data?.notices.totalCount ?? 0}
                     icon={TbAlertTriangle}
                 />
             </Grid.Col>
-            <Grid.Col span={{ base: 6, md: 3 }} mb="sm">
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
                 <SummaryCard
                     title="Vouchers"
                     value={result.data?.vouchers.totalCount ?? 0}
                     icon={TbTicket}
                 />
             </Grid.Col>
-            <Grid.Col span={{ base: 6, md: 3 }} mb="sm">
+            <Grid.Col span={{ base: 12, sm: 6, md: 3 }} mb="sm">
                 <SummaryCard
                     title="Reports"
                     value={result.data?.reports.totalCount ?? 0}

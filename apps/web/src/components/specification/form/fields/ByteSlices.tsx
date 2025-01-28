@@ -242,7 +242,10 @@ const SliceInstructionFields: FC<SliceInstructionFieldsProps> = ({
     }, [key]);
 
     return (
-        <Stack data-testid="slice-instruction-fields">
+        <Stack
+            pl={{ base: 0, xs: "sm" }}
+            data-testid="slice-instruction-fields"
+        >
             <Fieldset p="xs">
                 <Group justify="space-between">
                     <Text fw="bold">Define a slice</Text>

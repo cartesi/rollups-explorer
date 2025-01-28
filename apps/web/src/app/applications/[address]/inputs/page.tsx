@@ -75,7 +75,7 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async (props) => {
                 <Text>Inputs</Text>
             </Breadcrumbs>
 
-            <PageTitle title="Application Inputs" Icon={TbInbox} />
+            <PageTitle title="Inputs" Icon={TbInbox} />
             <Inputs applicationId={params.address} />
         </Stack>
     );

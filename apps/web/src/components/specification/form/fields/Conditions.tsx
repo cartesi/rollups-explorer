@@ -98,7 +98,7 @@ export const AddConditions: FC<AddConditionsProps> = ({
     }, [isValid, conditions, logicalOperator, onConditionalsChange]);
 
     return (
-        <Stack gap="xs">
+        <Stack pl={{ base: 0, xs: "sm" }} gap="xs">
             {conditions.map((cond, idx) => (
                 <Stack key={idx}>
                     {idx > 0 ? (
