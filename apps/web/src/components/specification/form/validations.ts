@@ -1,6 +1,6 @@
 import { includes } from "ramda";
 import { isBlank, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { Abi, Hex, isHex } from "viem";
+import { Abi, Hex, isHex, parseAbiParameters } from "viem";
 import { Modes, Predicate, SliceInstruction } from "../types";
 import { SpecFormValues } from "./context";
 
@@ -38,6 +38,12 @@ const specAbiParamValidation = (value: string[], values: SpecFormValues) => {
             isNilOrEmpty(value)
         )
             return `A slice name ${values.sliceTarget} was selected, making ABI parameter required!`;
+
+        try {
+            parseAbiParameters(value);
+        } catch (error: any) {
+            return error.message;
+        }
     }
 
     return null;
