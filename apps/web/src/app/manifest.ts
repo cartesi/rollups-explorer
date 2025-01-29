@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
     return {
         name: "CartesiScan",
-        short_name: "CS",
+        short_name: "CartesiScan",
         description:
             "Scan DApp inputs and interact with DApp's backend at ease.",
         start_url: "/",
