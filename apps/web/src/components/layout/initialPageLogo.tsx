@@ -1,7 +1,12 @@
+"use client";
+
 import { InitialLogo } from "../cartesiLogo";
+import { useMounted } from "@mantine/hooks";
 
 export const InitialPageLogo = () => {
-    return (
+    const isMounted = useMounted();
+
+    return isMounted ? null : (
         <div
             style={{
                 position: "absolute",
