@@ -84,6 +84,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 <Group h="100%" px="md">
                     <Burger
                         data-testid="burger-menu-btn"
+                        aria-label="Navigation"
                         opened={opened}
                         onClick={toggleMobileMenu}
                         hiddenFrom="sm"
