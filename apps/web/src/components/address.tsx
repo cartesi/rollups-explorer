@@ -103,6 +103,7 @@ const Address: FC<AddressProps> = ({
                             <ActionIcon
                                 color={copied ? "teal" : "gray"}
                                 variant="subtle"
+                                aria-label="Copy address"
                                 onClick={copy}
                             >
                                 {copied ? (
