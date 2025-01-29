@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import type { FC, ReactNode } from "react";
 import { Shell } from "../components/layout/shell-container";
+import { InitialPageLogo } from "../components/layout/initialPageLogo";
 import { Providers } from "../providers/providers";
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                 <ColorSchemeScript defaultColorScheme="auto" />
             </head>
             <body>
+                <InitialPageLogo />
                 <Providers>
                     <>
                         <Notifications />
