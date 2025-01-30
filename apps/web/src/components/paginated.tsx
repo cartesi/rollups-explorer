@@ -7,6 +7,7 @@ import {
     Stack,
     StackProps,
     Text,
+    VisuallyHidden,
 } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
@@ -88,6 +89,9 @@ const Paginated: FC<PaginatedProps> = (props) => {
                 value={activePage}
                 total={totalPages}
                 onChange={onChangeTopPagination}
+                getControlProps={(control) => ({
+                    "aria-label": control,
+                })}
             />
 
             {children}
@@ -96,7 +100,12 @@ const Paginated: FC<PaginatedProps> = (props) => {
                 <Group>
                     <Text>Show:</Text>
                     <Select
-                        style={{ width: "5rem" }}
+                        label={
+                            <VisuallyHidden>
+                                Change number of items per page
+                            </VisuallyHidden>
+                        }
+                        style={{ width: "5rem", display: "flex" }}
                         value={limit.toString()}
                         onChange={onChangeLimit}
                         data={perPageList}
@@ -108,6 +117,9 @@ const Paginated: FC<PaginatedProps> = (props) => {
                     value={activePage}
                     total={totalPages}
                     onChange={onChangeBottomPagination}
+                    getControlProps={(control) => ({
+                        "aria-label": control,
+                    })}
                 />
             </Group>
         </Stack>

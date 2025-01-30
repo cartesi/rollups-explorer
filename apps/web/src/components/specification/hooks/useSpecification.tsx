@@ -2,7 +2,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { find, isNil, reject } from "ramda";
 import { isFunction } from "ramda-adjunct";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Specification } from "../types";
 import localRepository from "./localRepository";
 
@@ -136,7 +136,7 @@ export const useSpecification = () => {
     const [specifications, setSpecifications] = useAtom(specificationsAtom);
     const actions = useActions();
     const value = useAtomValue(loadSpecificationAtom);
-    const fetching = value.state === "loading";
+    const [fetching, setFetching] = useState(value.state === "loading");
 
     const getSpecification = (id: string) =>
         find((val) => val.id === id, specifications ?? []);
@@ -149,6 +149,12 @@ export const useSpecification = () => {
             setSpecifications(value.data);
         }
     }, [setSpecifications, value, specifications]);
+
+    useEffect(() => {
+        if (value.state !== "loading") {
+            setFetching(false);
+        }
+    }, [value.state]);
 
     return {
         ...actions,

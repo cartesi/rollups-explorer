@@ -24,6 +24,7 @@ export const SpecificationsActionsMenu = () => {
                         <ActionIcon
                             size="lg"
                             data-testid="specifications-actions-menu-target"
+                            aria-label="Actions menu"
                         >
                             <TbDotsVertical />
                         </ActionIcon>
@@ -36,6 +37,7 @@ export const SpecificationsActionsMenu = () => {
                             href={specificationExportLink}
                             download="cartesiscan_specifications_export.json"
                             data-testid="specification-export-link"
+                            aria-label="Download specifications"
                         >
                             Download specifications
                         </Menu.Item>
@@ -44,6 +46,7 @@ export const SpecificationsActionsMenu = () => {
                                 resetRef={resetFileRef}
                                 accept="application/json"
                                 data-testid="import-specification-button"
+                                aria-label="Upload specifications"
                                 onChange={onUploadFile}
                             >
                                 {(props) => (
