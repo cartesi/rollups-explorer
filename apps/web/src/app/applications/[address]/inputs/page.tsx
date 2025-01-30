@@ -69,8 +69,7 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async (props) => {
                     value={params.address as AddressType}
                     href={`/applications/${params.address}`}
                     shorten
-                    icon
-                    mr={-8}
+                    canCopy={false}
                 />
                 <Text>Inputs</Text>
             </Breadcrumbs>
