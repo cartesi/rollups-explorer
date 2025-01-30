@@ -33,6 +33,7 @@ export interface AddressProps extends GroupProps {
     icon?: boolean;
     iconSize?: number;
     shorten?: boolean;
+    canCopy?: boolean;
 }
 
 const cartesi: Record<AddressType, string> = {
@@ -55,6 +56,7 @@ const Address: FC<AddressProps> = ({
     iconSize,
     shorten,
     hrefTarget = "_self",
+    canCopy = true,
     ...restProps
 }) => {
     value = getAddress(value);
@@ -90,27 +92,29 @@ const Address: FC<AddressProps> = ({
                     label
                 )}
             </Group>
-            <CopyButton value={value} timeout={2000}>
-                {({ copied, copy }) => (
-                    <Tooltip
-                        label={copied ? "Copied" : "Copy"}
-                        withArrow
-                        position="right"
-                    >
-                        <ActionIcon
-                            color={copied ? "teal" : "gray"}
-                            variant="subtle"
-                            onClick={copy}
+            {canCopy && (
+                <CopyButton value={value} timeout={2000}>
+                    {({ copied, copy }) => (
+                        <Tooltip
+                            label={copied ? "Copied" : "Copy"}
+                            withArrow
+                            position="right"
                         >
-                            {copied ? (
-                                <TbCheck style={{ width: rem(16) }} />
-                            ) : (
-                                <TbCopy style={{ width: rem(16) }} />
-                            )}
-                        </ActionIcon>
-                    </Tooltip>
-                )}
-            </CopyButton>
+                            <ActionIcon
+                                color={copied ? "teal" : "gray"}
+                                variant="subtle"
+                                onClick={copy}
+                            >
+                                {copied ? (
+                                    <TbCheck style={{ width: rem(16) }} />
+                                ) : (
+                                    <TbCopy style={{ width: rem(16) }} />
+                                )}
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                </CopyButton>
+            )}
         </Group>
     );
 };
