@@ -141,6 +141,7 @@ const InputRow: FC<InputRowProps> = ({
                                 radius={50}
                                 ml={4}
                                 data-testid="show-connection-modal"
+                                aria-label="Add connection"
                                 onClick={() => showConnectionModal(to)}
                             >
                                 <TbQuestionMark />
@@ -188,6 +189,10 @@ const InputRow: FC<InputRowProps> = ({
                         <ActionIcon
                             variant="default"
                             data-testid="input-row-toggle"
+                            aria-label={
+                                opened ? "Close details" : "Open details"
+                            }
+                            size="lg"
                             onClick={toggle}
                         >
                             {opened ? <TbX /> : <TbFileText />}
