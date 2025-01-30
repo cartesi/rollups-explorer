@@ -384,8 +384,12 @@ export const SpecificationListView: FC = () => {
                     data-testid="specs-grid"
                     role="grid"
                 >
-                    {filteredSpecs?.map((spec, idx) => (
-                        <Grid.Col span={{ base: 12, md: 6 }} key={spec.id}>
+                    {filteredSpecs?.map((spec) => (
+                        <Grid.Col
+                            span={{ base: 12, md: 6 }}
+                            key={spec.id}
+                            role="row"
+                        >
                             <Card
                                 style={{ minHeight: CARD_MIN_HEIGHT }}
                                 data-testid={`specification-${spec.id}-card`}
