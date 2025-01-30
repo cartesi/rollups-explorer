@@ -98,7 +98,7 @@ export const AddConditions: FC<AddConditionsProps> = ({
     }, [isValid, conditions, logicalOperator, onConditionalsChange]);
 
     return (
-        <Stack>
+        <Stack pl={{ base: 0, xs: "sm" }} gap="xs">
             {conditions.map((cond, idx) => (
                 <Stack key={idx}>
                     {idx > 0 ? (
@@ -224,11 +224,7 @@ export const Conditions: FC<Props> = ({
                 />
             </Group>
             {isActive ? (
-                <Stack pl="sm" gap="xs">
-                    <AddConditions
-                        onConditionalsChange={onConditionalsChange}
-                    />
-                </Stack>
+                <AddConditions onConditionalsChange={onConditionalsChange} />
             ) : (
                 ""
             )}

@@ -9,8 +9,14 @@ interface PageTitleProps {
 const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
     return (
         <Group mb="sm" data-testid="page-title">
-            <Icon size={40} />
-            <Title order={1}>{title}</Title>
+            <Title order={1} display="inline-flex">
+                <Icon
+                    size={40}
+                    aria-hidden
+                    style={{ marginRight: "0.5rem", marginTop: "0.215rem" }}
+                />
+                {title}
+            </Title>
         </Group>
     );
 };

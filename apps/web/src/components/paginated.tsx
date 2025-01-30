@@ -1,14 +1,16 @@
 "use client";
 
 import {
+    Flex,
     Group,
     Pagination,
     Select,
     Stack,
     StackProps,
     Text,
+    useMantineTheme,
 } from "@mantine/core";
-import { useScrollIntoView } from "@mantine/hooks";
+import { useMediaQuery, useScrollIntoView } from "@mantine/hooks";
 import { pathOr } from "ramda";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import { limitBounds, useUrlSearchParams } from "../hooks/useUrlSearchParams";
@@ -31,6 +33,8 @@ const Paginated: FC<PaginatedProps> = (props) => {
     const totalPages = Math.ceil(
         totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
     );
+    const theme = useMantineTheme();
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.xs})`);
 
     const [activePage, setActivePage] = useState(
         page > totalPages ? totalPages : page,
@@ -84,9 +88,12 @@ const Paginated: FC<PaginatedProps> = (props) => {
     return (
         <Stack {...restProps}>
             <Pagination
-                styles={{ root: { alignSelf: "flex-end" } }}
+                styles={{
+                    root: { alignSelf: "flex-end" },
+                }}
                 value={activePage}
                 total={totalPages}
+                siblings={isSmallDevice ? 0 : 1}
                 onChange={onChangeTopPagination}
             />
 
@@ -107,6 +114,7 @@ const Paginated: FC<PaginatedProps> = (props) => {
                     styles={{ root: { alignSelf: "flex-end" } }}
                     value={activePage}
                     total={totalPages}
+                    siblings={isSmallDevice ? 0 : 1}
                     onChange={onChangeBottomPagination}
                 />
             </Group>

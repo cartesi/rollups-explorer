@@ -1,5 +1,5 @@
 "use client";
-import { Card, Group, Text } from "@mantine/core";
+import { Card, Flex, Text } from "@mantine/core";
 import { FC } from "react";
 import { IconType } from "react-icons";
 import TweenedNumber from "./TweenedNumber";
@@ -13,15 +13,17 @@ export type SummaryCardProps = {
 export const SummaryCard: FC<SummaryCardProps> = (props) => {
     return (
         <Card shadow="xs">
-            <Group gap={5}>
+            <Flex gap={5} align="center">
                 {props.icon && (
                     <props.icon
-                        size={20}
+                        size={28}
                         data-testid={`summary-card-${props.title?.toLowerCase()}-icon`}
                     />
                 )}
-                <Text c="dimmed">{props.title}</Text>
-            </Group>
+                <Text c="dimmed" size="lg" inline>
+                    {props.title}
+                </Text>
+            </Flex>
             <Text fw="bold" fz="2rem">
                 <TweenedNumber value={props.value} />
             </Text>

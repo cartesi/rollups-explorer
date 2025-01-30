@@ -360,8 +360,10 @@ export const SpecificationListView: FC = () => {
                             value={filter}
                             onChange={(value) => setFilter(value as ModeFilter)}
                         />
-                        <NewSpecificationButton />
-                        <SpecificationsActionsMenu />
+                        <Group>
+                            <NewSpecificationButton />
+                            <SpecificationsActionsMenu />
+                        </Group>
                     </Group>
                 </Flex>
 

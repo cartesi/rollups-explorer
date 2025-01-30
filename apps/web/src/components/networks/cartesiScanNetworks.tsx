@@ -1,14 +1,14 @@
 "use client";
 import {
-    Button,
     Divider,
     Group,
     Indicator,
     Menu,
     Text,
     Tooltip,
-    VisuallyHidden,
+    UnstyledButton,
     useMantineTheme,
+    VisuallyHidden,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC } from "react";
@@ -147,14 +147,21 @@ const NetworkGroup: FC<NetworkGroupProps> = ({
 };
 
 const CaretIcon: FC<{ up: boolean }> = ({ up }) => {
+    const theme = useMantineTheme();
     const styles = {
         transform: `rotateZ(${up ? 0 : 180}deg)`,
         transitionTimingFunction: "ease-in-out",
         transitionDuration: "300ms",
-        tansitionProperty: "all",
+        transitionProperty: "all",
     };
 
-    return <TbCaretUpFilled style={styles} size={18} />;
+    return (
+        <TbCaretUpFilled
+            style={styles}
+            size={18}
+            color={theme.colors.cyan[5]}
+        />
+    );
 };
 
 const allNetworks = [...mainnets, ...testnets];
@@ -171,7 +178,11 @@ const MainIcon: FC<{ chainId: number }> = ({ chainId }) => {
     return <Icon size={28} id={`chain-${chainId}-icon`} />;
 };
 
-export const CartesiScanChains = () => {
+interface CartesiScanChainsProps {
+    onOpen: () => void;
+}
+
+export const CartesiScanChains: FC<CartesiScanChainsProps> = ({ onOpen }) => {
     const [isOpen, { close, open }] = useDisclosure(false);
     const config = useConfig();
     const chain = config.chains[0];
@@ -179,20 +190,27 @@ export const CartesiScanChains = () => {
 
     return (
         <Menu
+            id="cartesiscan-chain-menu"
             withArrow
             withinPortal={false}
+            zIndex={120}
+            offset={9}
+            arrowSize={12}
+            shadow="xl"
             onClose={close}
-            onOpen={open}
-            id="cartesiscan-chain-menu"
+            onOpen={() => {
+                open();
+                onOpen();
+            }}
         >
             <Menu.Target>
-                <Button variant="transparent" p={0}>
+                <UnstyledButton variant="transparent" p={0}>
                     <Group gap={3}>
                         <VisuallyHidden>{chainName}</VisuallyHidden>
                         <MainIcon chainId={chain.id} />
                         <CaretIcon up={isOpen} />
                     </Group>
-                </Button>
+                </UnstyledButton>
             </Menu.Target>
 
             <Menu.Dropdown>

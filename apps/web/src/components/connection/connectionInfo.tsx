@@ -55,13 +55,12 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
 
             <Card
                 withBorder
-                py="lg"
                 radius="sm"
                 shadow="sm"
                 data-testid="connection-card"
             >
-                <Card.Section inheritPadding withBorder>
-                    <Flex justify="space-between">
+                <Card.Section withBorder py={4}>
+                    <Flex justify="space-between" pl={12}>
                         <Address value={connection.address} shorten icon />
                         <Button
                             aria-label={`remove-${connection.address}`}
@@ -82,13 +81,17 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
                     </Flex>
                 </Card.Section>
 
-                <List pt="sm" center>
-                    <List.Item icon={<TbNetwork size={theme.other.iconSize} />}>
-                        <Text style={{ lineBreak: "anywhere" }}>
-                            {connection.url}
-                        </Text>
-                    </List.Item>
-                </List>
+                <Card.Section py="md" px="sm">
+                    <List center>
+                        <List.Item
+                            icon={<TbNetwork size={theme.other.iconSize} />}
+                        >
+                            <Text style={{ lineBreak: "anywhere" }}>
+                                {connection.url}
+                            </Text>
+                        </List.Item>
+                    </List>
+                </Card.Section>
             </Card>
         </>
     );

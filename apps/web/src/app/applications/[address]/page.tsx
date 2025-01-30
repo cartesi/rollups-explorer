@@ -65,7 +65,11 @@ const ApplicationPage: FC<ApplicationPageProps> = async (props) => {
                     },
                 ]}
             >
-                <Address value={params.address as AddressType} icon />
+                <Address
+                    value={params.address as AddressType}
+                    shorten
+                    canCopy={false}
+                />
             </Breadcrumbs>
 
             <PageTitle title="Summary" Icon={TbStack2} />
