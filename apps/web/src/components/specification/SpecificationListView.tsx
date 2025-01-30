@@ -73,7 +73,9 @@ const DisplayABIParams: FC<{
 }> = ({ abiParams, sliceTarget }) => (
     <Accordion.Item key="abi-params-item" value="abi-params-item">
         <Accordion.Control>
-            <Title order={4}>ABI Parameters</Title>
+            <Title order={3} size="lg">
+                ABI Parameters
+            </Title>
         </Accordion.Control>
 
         <Accordion.Panel>
@@ -99,7 +101,9 @@ const DisplayABIParams: FC<{
 const DisplayABI: FC<{ abi: Abi }> = ({ abi }) => (
     <Accordion.Item key="abi-item" value="abi-item">
         <Accordion.Control>
-            <Title order={4}>ABI</Title>
+            <Title order={3} size="lg">
+                ABI
+            </Title>
         </Accordion.Control>
 
         <Accordion.Panel>
@@ -243,7 +247,7 @@ const NoSpecifications: FC = () => {
     return (
         <Center>
             <Flex direction="column" align="center" justify="center">
-                <Title order={3} c="dimmed">
+                <Title order={3} c="dimmed" size="lg">
                     No Specifications Found!
                 </Title>
                 <Box my={8}>
@@ -274,7 +278,7 @@ const NoSpecificationsFiltered: FC<{
     return (
         <Center py="lg">
             <Group gap="xs" data-testid="no-specification-filtered-message">
-                <Title order={3} c="dimmed">
+                <Title order={3} c="dimmed" size="lg">
                     {quantity > 1 &&
                         `You have ${quantity} specifications, but none of them are the type`}{" "}
                     {quantity === 1 &&
@@ -397,9 +401,10 @@ export const SpecificationListView: FC = () => {
                                         wrap="nowrap"
                                     >
                                         <Title
-                                            order={3}
+                                            order={2}
                                             lineClamp={1}
                                             title={spec.name}
+                                            size="xl"
                                         >
                                             {spec.name}
                                         </Title>
