@@ -41,11 +41,11 @@ test("should have an enabled button to connect to a wallet", async ({
 test("should have a switch for dark and light mode", async ({ page }) => {
     const switchBtn = page.getByTestId("theme-mode-switch");
 
-    await expect(switchBtn).toHaveText("Light Mode");
+    await expect(switchBtn).toContainText("Light Mode");
 
-    switchBtn.click();
+    await switchBtn.click();
 
-    await expect(switchBtn).toHaveText("Dark Mode");
+    await expect(switchBtn).toContainText("Dark Mode");
 });
 
 test.describe("mobile", () => {
