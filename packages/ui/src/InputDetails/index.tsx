@@ -53,7 +53,7 @@ const MemoTabs = memo(function MemoTabs({ isSmallDevice }: MemoTabsProps) {
                 // eslint-disable-next-line react/display-name
                 const CText = forwardRef<HTMLParagraphElement>(
                     (_props, ref) => (
-                        <Text ref={ref} size={isSmallDevice ? "xs" : "md"}>
+                        <Text ref={ref} size={isSmallDevice ? "sm" : "md"}>
                             {item.label}
                         </Text>
                     ),
@@ -137,7 +137,7 @@ const Details: FC<InputDetailsProps> = (props) => {
 
     useEffect(() => {
         dispatch({ type: "SET_DEFINED_CONTENT", payload: dict });
-    }, [dict]);
+    }, [dict, dispatch]);
 
     return (
         <Tabs

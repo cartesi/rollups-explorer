@@ -68,6 +68,8 @@ const ApplicationInputsPage: FC<ApplicationInputsPageProps> = async (props) => {
                 <Address
                     value={params.address as AddressType}
                     href={`/applications/${params.address}`}
+                    shorten
+                    canCopy={false}
                 />
                 <Text>Inputs</Text>
             </Breadcrumbs>

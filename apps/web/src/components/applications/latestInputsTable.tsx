@@ -32,7 +32,7 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
     }, []);
 
     return (
-        <Table>
+        <Table width="100%" miw={500} style={{ borderCollapse: "collapse" }}>
             <Table.Thead>
                 <Table.Tr>
                     <Table.Th>From</Table.Th>
@@ -65,7 +65,7 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
                     )
                 )}
                 {inputs.map((input) => (
-                    <Table.Tr key={`${input.application}-${input.timestamp}`}>
+                    <Table.Tr key={`${input.application.id}-${input.id}`}>
                         <Table.Td>
                             <Box
                                 display="flex"

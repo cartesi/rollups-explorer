@@ -59,6 +59,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const { colorScheme, toggleColorScheme } = useMantineColorScheme({
         keepTransitions: true,
     });
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.xs})`);
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
 
     return (
@@ -80,21 +81,20 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             >
                 <SendTransaction />
             </Modal>
-            <AppShell.Header data-testid="header">
+            <AppShell.Header data-testid="header" zIndex={110}>
                 <Group h="100%" px="md">
                     <Burger
                         data-testid="burger-menu-btn"
                         opened={opened}
                         onClick={toggleMobileMenu}
                         hiddenFrom="sm"
-                        size="sm"
                     />
                     <Group justify="space-between" style={{ flex: 1 }}>
                         <Link href="/">
-                            <CartesiLogo height={40} />
+                            <CartesiLogo height={isSmallDevice ? 30 : 40} />
                         </Link>
                         <Group ml={{ lg: "xl" }}>
-                            <CartesiScanChains />
+                            <CartesiScanChains onOpen={closeMobileMenu} />
                             <Button
                                 variant="subtle"
                                 leftSection={<TbArrowsDownUp />}
@@ -144,7 +144,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     </Group>
                 </Group>
             </AppShell.Header>
-            <AppShell.Navbar py="md" px={4} data-testid="navbar">
+            <AppShell.Navbar py="md" px={4} zIndex={110} data-testid="navbar">
                 <Stack px={13}>
                     <NavLink
                         component={Link}

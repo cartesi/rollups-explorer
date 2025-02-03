@@ -58,7 +58,7 @@ const ConnectionView = () => {
         <>
             <Group justify="flex-start">
                 <NewConnectionButton data-testid="add-connection">
-                    New
+                    Create connection
                 </NewConnectionButton>
             </Group>
 

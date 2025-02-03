@@ -116,7 +116,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                         </Text>
                     </Group>
 
-                    <Group gap={5}>
+                    <Group gap={5} style={{ overflowX: "auto" }}>
                         <LatestInputsTable
                             inputs={inputs}
                             fetching={fetching}
