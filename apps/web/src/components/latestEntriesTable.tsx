@@ -30,7 +30,11 @@ const LatestEntriesTable: FC<LatestEntriesTableProps> = ({
     }, []);
 
     return (
-        <Table>
+        <Table
+            width="100%"
+            miw="max-content"
+            style={{ borderCollapse: "collapse" }}
+        >
             <Table.Thead>
                 <Table.Tr>
                     <Table.Th>Address</Table.Th>
