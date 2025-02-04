@@ -11,7 +11,7 @@ import {
 import { createFormActions, useForm } from "@mantine/form";
 import { clone } from "ramda";
 import { isFunction, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, ReactNode, useEffect, useMemo, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import { TbTrash } from "react-icons/tb";
 import { parseAbiParameters } from "viem";
 
@@ -49,10 +49,7 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
 
     const ref = useRef<HTMLInputElement>(null);
     const { entries, abiParamEntry } = form.getTransformedValues();
-    const error = useMemo(
-        () => (isNotNilOrEmpty(entries) ? checkError(entries) : null),
-        [entries],
-    );
+    const error = isNotNilOrEmpty(entries) ? checkError(entries) : null;
     const onAbiParamsChange = props.onAbiParamsChange;
 
     const addABIParam = () => {
