@@ -19,9 +19,13 @@ import {
 import { Address as AddressType } from "viem";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
-import { ApplicationRowProps } from "./applicationRow";
+import { useDisclosure } from "@mantine/hooks";
+import { Application } from "../../graphql/explorer/types";
+import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
 
-export interface UserApplicationsRowProps extends ApplicationRowProps {
+export interface UserApplicationsRowProps {
+    application: Omit<Application, "inputs">;
+    keepDataColVisible: boolean;
     timeType: "timestamp" | "age";
 }
 
@@ -35,63 +39,21 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
     } = useConnectionConfig();
     const appId = application.address as AddressType;
     const connection = getConnection(appId);
-    return (
-        <Table.Tr key={application.id}>
-            <Table.Td>
-                <Box
-                    display="flex"
-                    w="max-content"
-                    style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Address value={appId} icon shorten />
-                </Box>
-            </Table.Td>
-            <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
-            <Table.Td>
-                <Box
-                    display="flex"
-                    w="max-content"
-                    style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Text>
-                        {application && application?.timestamp && (
-                            <>
-                                {timeType === "age"
-                                    ? `${prettyMilliseconds(
-                                          Date.now() -
-                                              application.timestamp * 1000,
-                                          {
-                                              unitCount: 2,
-                                              secondsDecimalDigits: 0,
-                                              verbose: true,
-                                          },
-                                      )} ago`
-                                    : new Date(
-                                          application.timestamp * 1000,
-                                      ).toISOString()}
-                            </>
-                        )}
-                    </Text>
-                </Box>
-            </Table.Td>
+    const [opened, { open, close }] = useDisclosure(false);
 
-            <Table.Td
-                pos={keepDataColVisible ? "initial" : "sticky"}
-                top={0}
-                right={0}
-                p={0}
-            >
-                <Paper
-                    shadow={keepDataColVisible ? undefined : "xl"}
-                    radius={0}
-                    p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
-                >
+    return (
+        <>
+            <DeleteConnectionModal
+                isOpened={opened}
+                onClose={close}
+                onConfirm={() => {
+                    removeConnection(appId);
+                    close();
+                }}
+            />
+
+            <Table.Tr key={application.id}>
+                <Table.Td>
                     <Box
                         display="flex"
                         w="max-content"
@@ -100,57 +62,112 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                             justifyContent: "center",
                         }}
                     >
-                        <Group gap="xs">
-                            <Tooltip label="Summary">
-                                <Link
-                                    href={`/applications/${appId}`}
-                                    data-testid="applications-summary-link"
-                                >
-                                    <ActionIcon variant="default">
-                                        <TbStack2 />
-                                    </ActionIcon>
-                                </Link>
-                            </Tooltip>
-                            <Tooltip label="Inputs">
-                                <Link
-                                    href={`/applications/${appId}/inputs`}
-                                    data-testid="applications-link"
-                                >
-                                    <ActionIcon variant="default">
-                                        <TbInbox />
-                                    </ActionIcon>
-                                </Link>
-                            </Tooltip>
-                            {hasConnection(appId) ? (
-                                <Tooltip label="Remove connection">
-                                    <ActionIcon
-                                        data-testid="remove-connection"
-                                        variant="default"
-                                        ml={4}
-                                        onClick={() => removeConnection(appId)}
-                                    >
-                                        <TbPlugConnectedX />
-                                    </ActionIcon>
-                                </Tooltip>
-                            ) : (
-                                <Tooltip label="Add a connection">
-                                    <ActionIcon
-                                        data-testid="add-connection"
-                                        variant="default"
-                                        ml={4}
-                                        onClick={() =>
-                                            showConnectionModal(appId)
-                                        }
-                                    >
-                                        <TbPlugConnected />
-                                    </ActionIcon>
-                                </Tooltip>
-                            )}
-                        </Group>
+                        <Address value={appId} icon shorten />
                     </Box>
-                </Paper>
-            </Table.Td>
-        </Table.Tr>
+                </Table.Td>
+                <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
+                <Table.Td>
+                    <Box
+                        display="flex"
+                        w="max-content"
+                        style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Text>
+                            {application && application?.timestamp && (
+                                <>
+                                    {timeType === "age"
+                                        ? `${prettyMilliseconds(
+                                              Date.now() -
+                                                  application.timestamp * 1000,
+                                              {
+                                                  unitCount: 2,
+                                                  secondsDecimalDigits: 0,
+                                                  verbose: true,
+                                              },
+                                          )} ago`
+                                        : new Date(
+                                              application.timestamp * 1000,
+                                          ).toISOString()}
+                                </>
+                            )}
+                        </Text>
+                    </Box>
+                </Table.Td>
+
+                <Table.Td
+                    pos={keepDataColVisible ? "initial" : "sticky"}
+                    top={0}
+                    right={0}
+                    p={0}
+                >
+                    <Paper
+                        shadow={keepDataColVisible ? undefined : "xl"}
+                        radius={0}
+                        p="var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))"
+                    >
+                        <Box
+                            display="flex"
+                            w="max-content"
+                            style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Group gap="xs">
+                                <Tooltip label="Summary">
+                                    <Link
+                                        href={`/applications/${appId}`}
+                                        data-testid="applications-summary-link"
+                                    >
+                                        <ActionIcon variant="default">
+                                            <TbStack2 />
+                                        </ActionIcon>
+                                    </Link>
+                                </Tooltip>
+                                <Tooltip label="Inputs">
+                                    <Link
+                                        href={`/applications/${appId}/inputs`}
+                                        data-testid="applications-link"
+                                    >
+                                        <ActionIcon variant="default">
+                                            <TbInbox />
+                                        </ActionIcon>
+                                    </Link>
+                                </Tooltip>
+                                {hasConnection(appId) ? (
+                                    <Tooltip label="Remove connection">
+                                        <ActionIcon
+                                            data-testid="remove-connection"
+                                            variant="default"
+                                            ml={4}
+                                            onClick={open}
+                                        >
+                                            <TbPlugConnectedX />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip label="Add a connection">
+                                        <ActionIcon
+                                            data-testid="add-connection"
+                                            variant="default"
+                                            ml={4}
+                                            onClick={() =>
+                                                showConnectionModal(appId)
+                                            }
+                                        >
+                                            <TbPlugConnected />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                )}
+                            </Group>
+                        </Box>
+                    </Paper>
+                </Table.Td>
+            </Table.Tr>
+        </>
     );
 };
 
