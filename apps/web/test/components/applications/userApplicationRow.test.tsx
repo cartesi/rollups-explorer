@@ -1,5 +1,11 @@
 import { Table } from "@mantine/core";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import type { FC } from "react";
 import { afterEach, beforeEach, describe, it } from "vitest";
@@ -168,21 +174,70 @@ describe("UserApplicationRow component", () => {
         expect(screen.getByTestId("remove-connection")).toBeInTheDocument();
     });
 
-    it("should invoke removeConnection with application address, when remove-connection button is clicked", () => {
-        const removeConnectionMock = vi.fn();
+    it("should open the confirmation modal when clicking on the trash icon", async () => {
         useConnectionConfigMock.mockReturnValue({
             ...useConnectionConfigMock(),
             hasConnection: () => true,
-            removeConnection: removeConnectionMock,
         });
-
         render(<Component {...defaultProps} />);
+        const removeConnectionButton = screen.getByTestId("remove-connection");
+        fireEvent.click(removeConnectionButton);
 
-        const addConnectionButton = screen.getByTestId("remove-connection");
+        await waitFor(() => screen.getByText("Delete connection?"));
+        expect(
+            screen.getByText(
+                "This will delete the data for this connection. Are you sure you want to proceed?",
+            ),
+        ).toBeInTheDocument();
+    });
 
-        fireEvent.click(addConnectionButton);
+    it("should close the confirmation modal when clicking on cancel button", async () => {
+        useConnectionConfigMock.mockReturnValue({
+            ...useConnectionConfigMock(),
+            hasConnection: () => true,
+        });
+        render(<Component {...defaultProps} />);
+        const removeConnectionButton = screen.getByTestId("remove-connection");
+        fireEvent.click(removeConnectionButton);
 
-        expect(removeConnectionMock).toHaveBeenCalledWith(
+        await waitFor(() => screen.getByText("Delete connection?"));
+        expect(
+            screen.getByText(
+                "This will delete the data for this connection. Are you sure you want to proceed?",
+            ),
+        ).toBeInTheDocument();
+
+        const cancelButton = screen.getByText("Cancel");
+        fireEvent.click(cancelButton);
+
+        await waitFor(() =>
+            expect(() => screen.getByText("Delete connection?")).toThrow(
+                "Unable to find an element with the text: Delete connection?",
+            ),
+        );
+    });
+
+    it("should call the remove action when confirming the connection deletion", async () => {
+        const removeConnectionSpy = vi.fn();
+        useConnectionConfigMock.mockReturnValue({
+            ...useConnectionConfigMock(),
+            hasConnection: () => true,
+            removeConnection: removeConnectionSpy,
+        });
+        render(<Component {...defaultProps} />);
+        const removeConnectionButton = screen.getByTestId("remove-connection");
+        fireEvent.click(removeConnectionButton);
+
+        await waitFor(() => screen.getByText("Delete connection?"));
+        expect(
+            screen.getByText(
+                "This will delete the data for this connection. Are you sure you want to proceed?",
+            ),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText("Confirm"));
+
+        expect(removeConnectionSpy).toHaveBeenCalledWith(
             defaultProps.application.address,
         );
     });
