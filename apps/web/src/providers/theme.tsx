@@ -17,6 +17,7 @@ const themeOverride: MantineThemeOverride = createTheme({
     other: {
         iconSize: 21,
         chainIconSize: 24,
+        footerZIndex: 102,
     },
     components: {
         Modal: Modal.extend({

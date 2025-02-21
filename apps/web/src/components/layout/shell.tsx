@@ -31,8 +31,8 @@ import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
-import { CartesiScanChains } from "../networks/cartesiScanNetworks";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { CartesiScanChains } from "../networks/cartesiScanNetworks";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
@@ -61,6 +61,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     });
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.xs})`);
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
+    const footerZIndex = theme.other.footerZIndex ?? 102;
 
     return (
         <AppShell
@@ -144,7 +145,12 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     </Group>
                 </Group>
             </AppShell.Header>
-            <AppShell.Navbar py="md" px={4} zIndex={110} data-testid="navbar">
+            <AppShell.Navbar
+                py="md"
+                px={4}
+                zIndex={isSmallDevice ? footerZIndex + 2 : "auto"}
+                data-testid="navbar"
+            >
                 <Stack px={13}>
                     <NavLink
                         component={Link}
