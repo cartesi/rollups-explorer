@@ -1,4 +1,3 @@
-import type { FC, ReactNode } from "react";
 import {
     Anchor,
     Box,
@@ -10,6 +9,7 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Link from "next/link";
+import type { FC, ReactNode } from "react";
 import {
     TbBrandDiscord,
     TbBrandGithub,
@@ -44,12 +44,13 @@ const Footer: FC = () => {
     const theme = useMantineTheme();
     const { colorScheme } = useMantineColorScheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
+    const zIndex = theme.other.footerZIndex ?? 102;
 
     return (
         <footer
             style={{
                 position: "relative",
-                zIndex: 102,
+                zIndex,
                 backgroundColor: "var(--mantine-color-body)",
                 padding: isSmallDevice ? "2rem" : "3rem 4rem",
                 borderTop: `calc(0.0625rem * var(--mantine-scale)) solid ${
