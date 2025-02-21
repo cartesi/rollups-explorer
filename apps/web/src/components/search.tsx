@@ -1,7 +1,8 @@
 import { Box, Loader, TextInput } from "@mantine/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { useUrlSearchParams } from "../hooks/useUrlSearchParams";
+import { LimitBound, useUrlSearchParams } from "../hooks/useUrlSearchParams";
+import { useDebouncedCallback } from "@mantine/hooks";
 
 export type SearchProps = {
     isLoading: boolean;
@@ -12,14 +13,14 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     const [{ limit, page, query }, updateParams] = useUrlSearchParams();
     const [search, setSearch] = useState<string>(query);
     const lastSearch = useRef(search);
+    const isInputValueSyncedWithQuery = useRef(false);
 
-    useEffect(() => {
-        if (lastSearch.current !== query) {
-            setSearch(query);
-            onChange(query);
-            lastSearch.current = query;
-        }
-    }, [query, onChange]);
+    const onUpdateParams = useDebouncedCallback(
+        (page: number, limit: LimitBound, search: string) => {
+            updateParams(page, limit, search);
+        },
+        500,
+    );
 
     const onSearch = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,11 +28,28 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
             lastSearch.current = nextSearch;
 
             setSearch(nextSearch);
-            updateParams(page, limit, nextSearch);
             onChange(nextSearch);
+            onUpdateParams(page, limit, nextSearch);
         },
-        [limit, page, onChange, updateParams],
+        [onUpdateParams, page, limit, onChange],
     );
+
+    /**
+     * @description Synchronize the search value with the query value once, on page load
+     */
+    const syncSearchWithQuery = useCallback(() => {
+        if (
+            !isInputValueSyncedWithQuery.current &&
+            lastSearch.current !== query
+        ) {
+            setSearch(query);
+            onChange(query);
+            lastSearch.current = query;
+            isInputValueSyncedWithQuery.current = true;
+        }
+    }, [query, onChange]);
+
+    useEffect(() => syncSearchWithQuery(), [syncSearchWithQuery]);
 
     return (
         <Box w={{ sm: "10%%", lg: "50%" }} mb={{ sm: "1rem", lg: "-3.25rem" }}>

@@ -102,7 +102,7 @@ describe("Search Component", () => {
                     queryAddress,
                 ),
             {
-                timeout: 400,
+                timeout: 600,
             },
         );
     });

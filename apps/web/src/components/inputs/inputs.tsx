@@ -2,7 +2,7 @@
 
 import { Stack } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
 import { InputOrderByInput } from "../../graphql/explorer/types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
@@ -42,27 +42,44 @@ const Inputs: FC<InputsProps> = ({
             ),
         },
     });
-    const inputs = data?.inputsConnection.edges.map((edge) => edge.node) ?? [];
+    const totalCount = data?.inputsConnection.totalCount ?? 0;
+
+    const inputs = useMemo(
+        () => data?.inputsConnection.edges.map((edge) => edge.node) ?? [],
+        [data?.inputsConnection.edges],
+    );
 
     const onChangePagination = useCallback((limit: number, page: number) => {
         setLimit(limit);
         setPage(page);
     }, []);
 
-    return (
-        <Stack>
-            <Search isLoading={fetching} onChange={setQuery} />
+    /**
+     * @description Memoized paginated table component
+     * The memoization is required so that the component doesn't re-render
+     * whenever the search input value changes
+     */
+    const MemoizedTable = useMemo(
+        () => (
             <Paginated
                 fetching={fetching}
-                totalCount={data?.inputsConnection.totalCount}
+                totalCount={totalCount}
                 onChange={onChangePagination}
             >
                 <InputsTable
                     inputs={inputs}
                     fetching={fetching}
-                    totalCount={data?.inputsConnection.totalCount ?? 0}
+                    totalCount={totalCount}
                 />
             </Paginated>
+        ),
+        [fetching, onChangePagination, inputs, totalCount],
+    );
+
+    return (
+        <Stack>
+            <Search isLoading={fetching} onChange={setQuery} />
+            {MemoizedTable}
         </Stack>
     );
 };
