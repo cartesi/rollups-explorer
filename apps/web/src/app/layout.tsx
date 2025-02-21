@@ -1,5 +1,5 @@
 import "@mantine/code-highlight/styles.css";
-import { ColorSchemeScript } from "@mantine/core";
+import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
@@ -9,6 +9,7 @@ import { Metadata } from "next";
 import type { FC, ReactNode } from "react";
 import { Providers } from "../providers/providers";
 import { Shell } from "../components/layout/shell-container";
+import { InitialPageLogo } from "../components/layout/initialPageLogo";
 
 export const metadata: Metadata = {
     title: {
@@ -28,11 +29,12 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children }) => {
     return (
-        <html lang="en">
+        <html lang="en" {...mantineHtmlProps}>
             <head>
                 <ColorSchemeScript />
             </head>
             <body>
+                <InitialPageLogo />
                 <Providers>
                     <>
                         <Notifications />

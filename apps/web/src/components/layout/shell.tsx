@@ -86,12 +86,13 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 <Group h="100%" px="md">
                     <Burger
                         data-testid="burger-menu-btn"
+                        aria-label="Navigation"
                         opened={opened}
                         onClick={toggleMobileMenu}
                         hiddenFrom="sm"
                     />
                     <Group justify="space-between" style={{ flex: 1 }}>
-                        <Link href="/">
+                        <Link href="/" aria-label="Home">
                             <CartesiLogo height={isSmallDevice ? 30 : 40} />
                         </Link>
                         <Group ml={{ lg: "xl" }}>
@@ -112,6 +113,11 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 />
                             )}
                             <Switch
+                                label={
+                                    <VisuallyHidden>
+                                        Theme mode switch
+                                    </VisuallyHidden>
+                                }
                                 wrapperProps={{
                                     "data-testid": "theme-mode-switch",
                                 }}
@@ -180,6 +186,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     />
 
                     <NavLink
+                        component={Link}
+                        href="#"
                         label="Settings"
                         leftSection={<TbAdjustmentsHorizontal />}
                         data-testid="settings-link"
