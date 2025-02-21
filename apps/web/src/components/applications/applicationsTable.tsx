@@ -14,6 +14,8 @@ import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
 import ResponsiveTable from "../responsiveTable";
+import { useDisclosure } from "@mantine/hooks";
+import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -45,61 +47,73 @@ const ConnectionUrlColumn: FC<ColumnProps> = ({ application }) => {
 const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
     const { hasConnection, removeConnection, showConnectionModal } =
         useConnectionConfig();
+    const [opened, { open, close }] = useDisclosure(false);
     const appId = application.address as AddressType;
 
     return (
-        <Box
-            display="flex"
-            w="max-content"
-            style={{
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
-            <Group gap="xs">
-                <Tooltip label="Summary">
-                    <Link
-                        href={`/applications/${appId}`}
-                        data-testid="applications-summary-link"
-                    >
-                        <ActionIcon variant="default">
-                            <TbStack2 />
-                        </ActionIcon>
-                    </Link>
-                </Tooltip>
-                <Tooltip label="Inputs">
-                    <Link
-                        href={`/applications/${appId}/inputs`}
-                        data-testid="applications-link"
-                    >
-                        <ActionIcon variant="default">
-                            <TbInbox />
-                        </ActionIcon>
-                    </Link>
-                </Tooltip>
-                {hasConnection(appId) ? (
-                    <Tooltip label="Remove connection">
-                        <ActionIcon
-                            data-testid="remove-connection"
-                            variant="default"
-                            onClick={() => removeConnection(appId)}
+        <>
+            <DeleteConnectionModal
+                isOpened={opened}
+                onClose={close}
+                onConfirm={() => {
+                    removeConnection(appId);
+                    close();
+                }}
+            />
+
+            <Box
+                display="flex"
+                w="max-content"
+                style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Group gap="xs">
+                    <Tooltip label="Summary">
+                        <Link
+                            href={`/applications/${appId}`}
+                            data-testid="applications-summary-link"
                         >
-                            <TbPlugConnectedX />
-                        </ActionIcon>
+                            <ActionIcon variant="default">
+                                <TbStack2 />
+                            </ActionIcon>
+                        </Link>
                     </Tooltip>
-                ) : (
-                    <Tooltip label="Add a connection">
-                        <ActionIcon
-                            data-testid="add-connection"
-                            variant="default"
-                            onClick={() => showConnectionModal(appId)}
+                    <Tooltip label="Inputs">
+                        <Link
+                            href={`/applications/${appId}/inputs`}
+                            data-testid="applications-link"
                         >
-                            <TbPlugConnected />
-                        </ActionIcon>
+                            <ActionIcon variant="default">
+                                <TbInbox />
+                            </ActionIcon>
+                        </Link>
                     </Tooltip>
-                )}
-            </Group>
-        </Box>
+                    {hasConnection(appId) ? (
+                        <Tooltip label="Remove connection">
+                            <ActionIcon
+                                data-testid="remove-connection"
+                                variant="default"
+                                onClick={open}
+                            >
+                                <TbPlugConnectedX />
+                            </ActionIcon>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip label="Add a connection">
+                            <ActionIcon
+                                data-testid="add-connection"
+                                variant="default"
+                                onClick={() => showConnectionModal(appId)}
+                            >
+                                <TbPlugConnected />
+                            </ActionIcon>
+                        </Tooltip>
+                    )}
+                </Group>
+            </Box>
+        </>
     );
 };
 

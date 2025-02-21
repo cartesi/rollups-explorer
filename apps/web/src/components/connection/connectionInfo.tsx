@@ -2,12 +2,10 @@ import {
     Button,
     Card,
     Flex,
-    Group,
     List,
-    Modal,
     Text,
-    VisuallyHidden,
     useMantineTheme,
+    VisuallyHidden,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC } from "react";
@@ -15,6 +13,7 @@ import { TbNetwork, TbTrash } from "react-icons/tb";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Connection } from "../../providers/connectionConfig/types";
 import Address from "../address";
+import { DeleteConnectionModal } from "./deleteConnectionModal";
 
 interface ConnectionInfoProps {
     connection: Connection;
@@ -27,31 +26,14 @@ const ConnectionInfo: FC<ConnectionInfoProps> = ({ connection }) => {
 
     return (
         <>
-            <Modal
-                opened={opened}
+            <DeleteConnectionModal
+                isOpened={opened}
                 onClose={close}
-                title="Delete connection?"
-                centered
-            >
-                <Text>
-                    This will delete the data for this connection. Are you sure
-                    you want to proceed?
-                </Text>
-
-                <Group mt="xl" justify="flex-end">
-                    <Button variant="default" onClick={close}>
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            removeConnection(connection.address);
-                            close();
-                        }}
-                    >
-                        Confirm
-                    </Button>
-                </Group>
-            </Modal>
+                onConfirm={() => {
+                    removeConnection(connection.address);
+                    close();
+                }}
+            />
 
             <Card
                 withBorder
