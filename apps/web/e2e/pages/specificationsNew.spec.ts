@@ -105,8 +105,7 @@ test("should validate JSON ABI spec", async ({ page }) => {
     });
 });
 
-// TODO: Resume using this test after https://github.com/cartesi/rollups-explorer/issues/297 is tackled
-test.skip("should validate ABI Parameters spec", async ({ page }) => {
+test("should validate ABI Parameters spec", async ({ page }) => {
     const abiParametersTab = page.getByText("ABI Parameters");
     await abiParametersTab.click();
 
