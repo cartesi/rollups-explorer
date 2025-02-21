@@ -56,7 +56,7 @@ export const LatestEntriesCard: FC<LatestEntriesCard> = (props) => {
                 </Text>
             </Group>
 
-            <Group gap={5}>
+            <Group gap={5} style={{ overflowX: "auto" }}>
                 <LatestEntriesTable
                     entries={entries}
                     fetching={fetching}
