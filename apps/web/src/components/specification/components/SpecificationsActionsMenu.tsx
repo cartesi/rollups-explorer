@@ -3,11 +3,11 @@
 import React from "react";
 import {
     ActionIcon,
+    Box,
     FileButton,
     Group,
     Menu,
     Tooltip,
-    UnstyledButton,
 } from "@mantine/core";
 import { TbDotsVertical, TbDownload, TbUpload } from "react-icons/tb";
 import { useSpecificationsTransfer } from "../hooks/useSpecificationsTransfer";
@@ -47,7 +47,7 @@ export const SpecificationsActionsMenu = () => {
                                 onChange={onUploadFile}
                             >
                                 {(props) => (
-                                    <UnstyledButton
+                                    <Box
                                         style={{
                                             fontSize:
                                                 "var(--mantine-font-size-sm)",
@@ -55,7 +55,7 @@ export const SpecificationsActionsMenu = () => {
                                         {...props}
                                     >
                                         Upload specifications
-                                    </UnstyledButton>
+                                    </Box>
                                 )}
                             </FileButton>
                         </Menu.Item>
