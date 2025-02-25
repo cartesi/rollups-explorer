@@ -27,6 +27,7 @@ import {
     optimismSepolia,
     sepolia,
 } from "wagmi/chains";
+import { useMounted } from "@mantine/hooks";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
@@ -159,6 +160,7 @@ const queryClient = new QueryClient();
 
 const WalletProvider = ({ children }: { children: ReactNode }) => {
     const scheme = useMantineColorScheme();
+    const isMounted = useMounted();
 
     // XXX: make this match the mantine theme
     const themeOptions: ThemeOptions = {
@@ -171,7 +173,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
             ? darkTheme(themeOptions)
             : lightTheme(themeOptions);
 
-    return (
+    return isMounted ? (
         <WagmiProvider config={wagmiConfig}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider
@@ -183,7 +185,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider>
-    );
+    ) : null;
 };
 
 export default WalletProvider;
