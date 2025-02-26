@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { createFormActions, useForm } from "@mantine/form";
 import { clone } from "ramda";
-import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
+import { isFunction, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { TbTrash } from "react-icons/tb";
 import { parseAbiParameters } from "viem";
@@ -86,7 +86,7 @@ export const HumanReadableABIParameter: FC<HumanReadableABIParameter> = (
                         Add
                     </Button>
                 }
-                error={props.error || form.errors.abiParamEntry}
+                error={isNilOrEmpty(entries) ? props.error : null}
             />
 
             {entries.length > 0 && (

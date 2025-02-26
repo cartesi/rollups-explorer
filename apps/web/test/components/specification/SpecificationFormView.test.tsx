@@ -355,6 +355,32 @@ describe("Specification Form View", () => {
             expect(screen.queryByText(abiParameter)).not.toBeInTheDocument();
         });
 
+        it("should not allow adding invalid abi parameters", async () => {
+            await act(async () => render(<StatefulView />));
+
+            const abiParameter = "address from, uint amount";
+            const invalidAbiParam = "invalid-abi-params";
+
+            act(() => {
+                fireEvent.click(
+                    screen.getByText("ABI Parameters")
+                        .parentNode as HTMLLabelElement,
+                );
+
+                fireEvent.change(screen.getByLabelText("ABI Parameter"), {
+                    target: { value: invalidAbiParam },
+                });
+
+                fireEvent.click(screen.getByTestId("abi-parameter-add-button"));
+            });
+
+            await waitFor(() =>
+                expect(() => screen.getByText(abiParameter)).toThrow(
+                    "Unable to find an element",
+                ),
+            );
+        });
+
         it("should be able to add and remove byte range definitions", async () => {
             await act(async () => render(<StatefulView />));
 
