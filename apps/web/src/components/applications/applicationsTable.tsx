@@ -75,7 +75,11 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                             href={`/applications/${appId}`}
                             data-testid="applications-summary-link"
                         >
-                            <ActionIcon variant="default">
+                            <ActionIcon
+                                variant="default"
+                                aria-label="View application summary"
+                                size="lg"
+                            >
                                 <TbStack2 />
                             </ActionIcon>
                         </Link>
@@ -85,7 +89,11 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                             href={`/applications/${appId}/inputs`}
                             data-testid="applications-link"
                         >
-                            <ActionIcon variant="default">
+                            <ActionIcon
+                                variant="default"
+                                aria-label="View application inputs"
+                                size="lg"
+                            >
                                 <TbInbox />
                             </ActionIcon>
                         </Link>
@@ -95,6 +103,8 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                             <ActionIcon
                                 data-testid="remove-connection"
                                 variant="default"
+                                aria-label="Remove connection"
+                                size="lg"
                                 onClick={open}
                             >
                                 <TbPlugConnectedX />
@@ -105,6 +115,8 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                             <ActionIcon
                                 data-testid="add-connection"
                                 variant="default"
+                                aria-label="Add connection"
+                                size="lg"
                                 onClick={() => showConnectionModal(appId)}
                             >
                                 <TbPlugConnected />
