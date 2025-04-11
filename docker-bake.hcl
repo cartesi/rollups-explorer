@@ -6,6 +6,6 @@ target "default" {
   dockerfile = "docker/Dockerfile"
   context    = "."
   args = {
-    "ENVIRONMENT" = "sunodo"
+    "ENVIRONMENT" = "cartesi"
   }
 }
