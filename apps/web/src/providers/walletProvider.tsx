@@ -21,6 +21,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     foundry,
     mainnet,
     optimism,
@@ -33,6 +34,7 @@ const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const chain =
     [
+        cannon,
         foundry,
         mainnet,
         sepolia,
@@ -86,6 +88,7 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
 const [defaultMainnetRpcUrl] = mainnet.rpcUrls.default.http;
 const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
+const [defaultCannonRpcUrl] = cannon.rpcUrls.default.http;
 const [defaultOptimismRpcUrl] = optimism.rpcUrls.default.http;
 const [defaultOptimismSepoliaRpcUrl] = optimismSepolia.rpcUrls.default.http;
 const [defaultBaseRpcUrl] = base.rpcUrls.default.http;
@@ -111,6 +114,7 @@ const wagmiConfig = createConfig({
               ])
             : http(defaultSepoliaRpcUrl),
         [foundry.id]: http(defaultFoundryRpcUrl),
+        [cannon.id]: http(defaultCannonRpcUrl),
         [optimism.id]: alchemyApiKey
             ? fallback([
                   http(`https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),

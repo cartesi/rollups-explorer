@@ -3,6 +3,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     foundry,
     mainnet,
     optimism,
@@ -18,6 +19,7 @@ export const supportedChains = Object.freeze({
     [optimism.id]: optimism,
     [optimismSepolia.id]: optimismSepolia,
     [foundry.id]: foundry,
+    [cannon.id]: cannon,
     [arbitrum.id]: arbitrum,
     [arbitrumSepolia.id]: arbitrumSepolia,
 });
