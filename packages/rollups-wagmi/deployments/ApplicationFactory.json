@@ -1,0 +1,164 @@
+{
+  "address": "0x2210ad1d9B0bD2D470c2bfA4814ab6253BC421A0",
+  "abi": [
+    {
+      "type": "function",
+      "name": "calculateApplicationAddress",
+      "inputs": [
+        {
+          "name": "outputsMerkleRootValidator",
+          "type": "address",
+          "internalType": "contract IOutputsMerkleRootValidator"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "newApplication",
+      "inputs": [
+        {
+          "name": "outputsMerkleRootValidator",
+          "type": "address",
+          "internalType": "contract IOutputsMerkleRootValidator"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IApplication"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "newApplication",
+      "inputs": [
+        {
+          "name": "outputsMerkleRootValidator",
+          "type": "address",
+          "internalType": "contract IOutputsMerkleRootValidator"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IApplication"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "ApplicationCreated",
+      "inputs": [
+        {
+          "name": "outputsMerkleRootValidator",
+          "type": "address",
+          "indexed": true,
+          "internalType": "contract IOutputsMerkleRootValidator"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        },
+        {
+          "name": "appContract",
+          "type": "address",
+          "indexed": false,
+          "internalType": "contract IApplication"
+        }
+      ],
+      "anonymous": false
+    }
+  ],
+  "constructorArgs": [],
+  "linkedLibraries": {},
+  "deployTxnHash": "0x3f64dd4339edba3bed5a1b76c0721f54b5ff7430a90233c60ab1ebfd7e213f43",
+  "deployTxnBlockNumber": "1",
+  "deployTimestamp": "1742931756",
+  "sourceName": "src/dapp/ApplicationFactory.sol",
+  "contractName": "ApplicationFactory",
+  "deployedOn": "deploy.ApplicationFactory",
+  "gasUsed": 1249720,
+  "gasCost": "1307089154"
+}

@@ -1,0 +1,110 @@
+{
+  "address": "0xb85D3942e551E6E5f19AC2CCF8dAb195f5f0347E",
+  "abi": [
+    {
+      "type": "function",
+      "name": "calculateQuorumAddress",
+      "inputs": [
+        {
+          "name": "validators",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "newQuorum",
+      "inputs": [
+        {
+          "name": "validators",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IQuorum"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "newQuorum",
+      "inputs": [
+        {
+          "name": "validators",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IQuorum"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "QuorumCreated",
+      "inputs": [
+        {
+          "name": "quorum",
+          "type": "address",
+          "indexed": false,
+          "internalType": "contract IQuorum"
+        }
+      ],
+      "anonymous": false
+    }
+  ],
+  "constructorArgs": [],
+  "linkedLibraries": {},
+  "deployTxnHash": "0xfcb247d903064f7336c1aa5e54f33b467c010a0d05aacd58d37c8404d3a8c9d7",
+  "deployTxnBlockNumber": "1",
+  "deployTimestamp": "1742931756",
+  "sourceName": "src/consensus/quorum/QuorumFactory.sol",
+  "contractName": "QuorumFactory",
+  "deployedOn": "deploy.QuorumFactory",
+  "gasUsed": 625423,
+  "gasCost": "1398280091"
+}

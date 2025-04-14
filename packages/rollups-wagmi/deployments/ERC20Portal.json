@@ -1,0 +1,74 @@
+{
+  "address": "0x05355c2F9bA566c06199DEb17212c3B78C1A3C31",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "inputBox",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "depositERC20Tokens",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "contract IERC20"
+        },
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "execLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getInputBox",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "error",
+      "name": "ERC20TransferFailed",
+      "inputs": []
+    }
+  ],
+  "constructorArgs": [
+    "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+  ],
+  "linkedLibraries": {},
+  "deployTxnHash": "0xb0d47464356a7fbecf4b193349c8a176c08e20002da4cbd3317666e94adbcc9a",
+  "deployTxnBlockNumber": "5",
+  "deployTimestamp": "1742931756",
+  "sourceName": "src/portals/ERC20Portal.sol",
+  "contractName": "ERC20Portal",
+  "deployedOn": "deploy.ERC20Portal",
+  "gasUsed": 220318,
+  "gasCost": "1590706765"
+}

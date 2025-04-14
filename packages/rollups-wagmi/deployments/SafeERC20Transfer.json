@@ -1,0 +1,49 @@
+{
+  "address": "0x35187C9f069D34aB73c02327ae155746a8274208",
+  "abi": [
+    {
+      "type": "function",
+      "name": "safeTransfer",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "contract IERC20"
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "error",
+      "name": "SafeERC20FailedOperation",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        }
+      ]
+    }
+  ],
+  "constructorArgs": [],
+  "linkedLibraries": {},
+  "deployTxnHash": "0xe0eaefca9d4c789933a0c279b6fa3acd0d88108ee625a9ce39b3b3f15b2f4ab9",
+  "deployTxnBlockNumber": "1",
+  "deployTimestamp": "1742931756",
+  "sourceName": "src/delegatecall/SafeERC20Transfer.sol",
+  "contractName": "SafeERC20Transfer",
+  "deployedOn": "deploy.SafeERC20Transfer",
+  "gasUsed": 116262,
+  "gasCost": "1350570860"
+}
