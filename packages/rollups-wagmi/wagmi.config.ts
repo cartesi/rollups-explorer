@@ -6,7 +6,7 @@ import { react } from "@wagmi/cli/plugins";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Abi, Address, Hex, erc20Abi, erc721Abi } from "viem";
-import CartesiDAppContract from "../../node_modules/@cartesi/rollups/export/artifacts/contracts/dapp/CartesiDApp.sol/CartesiDApp.json";
+import CartesiDAppContract from "../../node_modules/@cartesi/rollups/export/artifacts/contracts/dapp/CartesiDApp.sol/CartesiDApp.json" with { type: "json" };
 import { erc1155Abi } from "./abi/ERC1155";
 
 interface Deployment {
@@ -36,7 +36,9 @@ const generateV2ContractsConfig = (): ContractConfig[] => {
     const files = readdirSync(deploymentsDir);
 
     const contractConfigs: ContractConfig[] = files.map((file) => {
-        const content = readFileSync(join(deploymentsDir, file), { encoding: "utf-8" });
+        const content = readFileSync(join(deploymentsDir, file), {
+            encoding: "utf-8",
+        });
         const deployment = JSON.parse(content) as Deployment;
 
         return {

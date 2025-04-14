@@ -138,8 +138,8 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
                         {isExecuted
                             ? "Executed"
                             : prepare.isLoading
-                            ? "Preparing voucher..."
-                            : "Execute"}
+                              ? "Preparing voucher..."
+                              : "Execute"}
                     </Button>
                 </Tooltip>
             )}

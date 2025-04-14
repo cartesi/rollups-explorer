@@ -133,7 +133,7 @@ const useDecodingOnInput = (
 
     const specification = isNilOrEmpty(specId)
         ? findSpecificationFor(input, specifications)
-        : find((spec) => spec.id === specId, specifications) ?? null;
+        : (find((spec) => spec.id === specId, specifications) ?? null);
 
     const envelope = specification
         ? decodePayload(specification, input.payload as Hex)

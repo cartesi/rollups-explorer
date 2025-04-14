@@ -841,16 +841,16 @@ describe("ERC721 Portal Deposit Form", () => {
                               data: undefined,
                           }
                         : parameters?.hash === "0x0001"
-                        ? {
-                              status: "success",
-                              fetchStatus: "idle",
-                              data: { transactionHash: "0x01" },
-                          }
-                        : {
-                              data: undefined,
-                              status: "pending",
-                              isLoading: false,
-                          };
+                          ? {
+                                status: "success",
+                                fetchStatus: "idle",
+                                data: { transactionHash: "0x01" },
+                            }
+                          : {
+                                data: undefined,
+                                status: "pending",
+                                isLoading: false,
+                            };
                 },
             );
 

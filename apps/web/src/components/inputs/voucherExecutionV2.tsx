@@ -66,8 +66,8 @@ const VoucherExecutionV2: FC<Props> = ({ input, voucher }) => {
     const tooltipText = hasErrors
         ? "There is a problem with this voucher. Check the notification."
         : !isConnected
-        ? "Connect your wallet to execute the voucher"
-        : "";
+          ? "Connect your wallet to execute the voucher"
+          : "";
 
     const executing = execute.isPending || wait.isFetching;
 
@@ -125,10 +125,10 @@ const VoucherExecutionV2: FC<Props> = ({ input, voucher }) => {
                     {wasOutputExecuted
                         ? "Executed"
                         : checkingOutputExecution
-                        ? "Checking voucher..."
-                        : prepare.isFetching
-                        ? "Preparing voucher..."
-                        : "Execute"}
+                          ? "Checking voucher..."
+                          : prepare.isFetching
+                            ? "Preparing voucher..."
+                            : "Execute"}
                 </Button>
             </Tooltip>
         </div>
