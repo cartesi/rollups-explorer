@@ -11,7 +11,7 @@ import {
     sepolia,
 } from "viem/chains";
 
-export const supportedChains = Object.freeze({
+export const supportedChains = {
     [mainnet.id]: mainnet,
     [sepolia.id]: sepolia,
     [base.id]: base,
@@ -22,16 +22,17 @@ export const supportedChains = Object.freeze({
     [cannon.id]: cannon,
     [arbitrum.id]: arbitrum,
     [arbitrumSepolia.id]: arbitrumSepolia,
-});
+} as const;
 
 export type SupportedChainId = keyof typeof supportedChains;
+export type SupportedChain = (typeof supportedChains)[SupportedChainId];
 
 /**
  * Return information about a supported chain. Otherwise undefined is returned
  * @param { SupportedChainId } chainId
  * @returns
  */
-const getSupportedChainInfo = (chainId: SupportedChainId) => {
+const getSupportedChainInfo = (chainId: SupportedChainId): SupportedChain => {
     return supportedChains[chainId];
 };
 

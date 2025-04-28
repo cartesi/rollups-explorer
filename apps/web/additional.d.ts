@@ -10,9 +10,10 @@ declare namespace NodeJS {
         NEXT_PUBLIC_EXPLORER_API_URL: string;
 
         /**
-         * Alchemy API key to have an extra rpc-node to work in conjunction with public nodes.
+         * The node RPC provider to communicate (i.e. send transactions). (e.g. provider alchemy / infura)
          */
-        NEXT_PUBLIC_ALCHEMY_API_KEY: string;
+        NEXT_PUBLIC_NODE_RPC_URL: string;
+
         /**
          * Optional rollups-explorer-api URL to work with server-side calls.
          * Internal calls may need a different URI to become reachable.

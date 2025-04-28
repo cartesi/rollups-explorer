@@ -9,6 +9,7 @@ describe("SupportedChains functionalities", () => {
             "1",
             "10",
             "8453",
+            "13370",
             "31337",
             "42161",
             "84532",

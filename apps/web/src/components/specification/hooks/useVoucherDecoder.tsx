@@ -4,12 +4,12 @@ import { whatsabi } from "@shazow/whatsabi";
 import { any, isNil } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState } from "react";
-import { Abi, Hex, createPublicClient, decodeFunctionData } from "viem";
+import { Abi, Hex, decodeFunctionData } from "viem";
 import { RollupVersion } from "../../../graphql/explorer/types";
 import getSupportedChainInfo, {
     SupportedChainId,
 } from "../../../lib/supportedChains";
-import buildTransport from "../../../lib/transport";
+import createClientFor from "../../../lib/transportClient";
 import { decodePayload } from "../decoder";
 import { Specification } from "../types";
 import { stringifyContent } from "../utils";
@@ -28,10 +28,7 @@ const buildClient = (chainId: number) => {
 
     if (isNil(chain)) throw new Error(`ChainId ${chainId} is not supported!`);
 
-    return createPublicClient({
-        transport: buildTransport(chain.id),
-        chain,
-    });
+    return createClientFor(chain);
 };
 
 const fetchAbiFor = async (destination: Hex, chainId: number) => {
