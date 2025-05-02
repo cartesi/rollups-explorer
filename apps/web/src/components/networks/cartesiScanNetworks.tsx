@@ -11,6 +11,7 @@ import {
     VisuallyHidden,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { isFunction } from "ramda-adjunct";
 import { FC } from "react";
 import { TbCaretUpFilled, TbExternalLink } from "react-icons/tb";
 import {
@@ -19,6 +20,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     mainnet,
     optimism,
     optimismSepolia,
@@ -27,6 +29,7 @@ import {
 import { useConfig } from "wagmi";
 import ArbitrumIcon from "../icons/Arbitrum";
 import BaseIcon from "../icons/Base";
+import CannonIcon from "../icons/Cannon";
 import EthereumIcon from "../icons/Ethereum";
 import HardhatIcon from "../icons/Hardhat";
 import OptimismIcon from "../icons/Optimism";
@@ -41,6 +44,7 @@ const chainIds = [
     anvil.id,
     arbitrum.id,
     arbitrumSepolia.id,
+    cannon.id,
 ] as const;
 
 type IconType = typeof EthereumIcon;
@@ -113,6 +117,21 @@ const testnets: NetworkGroup[] = [
     },
 ];
 
+const devnets: NetworkGroup[] = [
+    {
+        Icon: CannonIcon,
+        text: cannon.name,
+        chainId: cannon.id,
+        externalLink: "",
+    },
+    {
+        Icon: HardhatIcon,
+        text: anvil.name,
+        chainId: anvil.id,
+        externalLink: "",
+    },
+];
+
 const NetworkGroup: FC<NetworkGroupProps> = ({
     Icon,
     externalLink,
@@ -164,7 +183,7 @@ const CaretIcon: FC<{ up: boolean }> = ({ up }) => {
     );
 };
 
-const allNetworks = [...mainnets, ...testnets];
+const allNetworks = [...mainnets, ...testnets, ...devnets];
 
 const getIconByChainId = (id: number) => {
     const network = allNetworks.find((network) => network.chainId === id);
@@ -179,7 +198,7 @@ const MainIcon: FC<{ chainId: number }> = ({ chainId }) => {
 };
 
 interface CartesiScanChainsProps {
-    onOpen: () => void;
+    onOpen?: () => void;
 }
 
 export const CartesiScanChains: FC<CartesiScanChainsProps> = ({ onOpen }) => {
@@ -200,7 +219,7 @@ export const CartesiScanChains: FC<CartesiScanChainsProps> = ({ onOpen }) => {
             onClose={close}
             onOpen={() => {
                 open();
-                onOpen();
+                if (isFunction(onOpen)) onOpen();
             }}
         >
             <Menu.Target>

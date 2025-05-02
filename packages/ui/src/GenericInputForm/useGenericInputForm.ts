@@ -1,4 +1,15 @@
+import { equals, omit } from "ramda";
+import { useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { AbiFunction, Hex, getAddress, isAddress, zeroAddress } from "viem";
 import { useForm } from "./context";
+import { initialValues } from "./initialValues";
+import { FormSpecification, GenericFormAbiFunction } from "./types";
+import {
+    augmentInputsWithIds,
+    generateAbiParamFormSpecification,
+    generateHumanAbiFormSpecification,
+} from "./utils";
 import {
     validateAbiFunctionName,
     validateAbiFunctionParamValue,
@@ -9,17 +20,6 @@ import {
     validateHumanAbi,
     validateSpecificationId,
 } from "./validations";
-import { AbiFunction, getAddress, Hex, isAddress, zeroAddress } from "viem";
-import { FormSpecification, GenericFormAbiFunction } from "./types";
-import {
-    augmentInputsWithIds,
-    generateAbiParamFormSpecification,
-    generateHumanAbiFormSpecification,
-} from "./utils";
-import { initialValues } from "./initialValues";
-import { v4 as uuidv4 } from "uuid";
-import { useRef } from "react";
-import { equals, omit } from "ramda";
 
 export const useGenericInputForm = (specifications: FormSpecification[]) => {
     const lastSelectedSpecification = useRef<FormSpecification | undefined>(
@@ -54,8 +54,8 @@ export const useGenericInputForm = (specifications: FormSpecification[]) => {
                           (s) => s.id === values.specificationId,
                       )
                     : values.specificationMode === "json_abi"
-                    ? generateHumanAbiFormSpecification(values.humanAbi)
-                    : generateAbiParamFormSpecification(values.savedAbiParam);
+                      ? generateHumanAbiFormSpecification(values.humanAbi)
+                      : generateAbiParamFormSpecification(values.savedAbiParam);
 
             if (
                 selectedSpecification &&

@@ -8,11 +8,13 @@ import {
     GenericInputForm,
     GenericInputFormSpecification,
     TransactionFormSuccessData,
+    type RollupVersion as RollupVersionUI,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
+import { RollupVersion } from "../graphql/explorer/types";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
@@ -36,28 +38,40 @@ interface DepositProps {
 
 const DEBOUNCE_TIME = 400 as const;
 
+type ApplicationSearchableParams = {
+    address: string;
+    rollupVersion?: RollupVersion;
+};
+
 const SendTransaction: FC<DepositProps> = ({
     initialDepositType = "ether",
 }) => {
     const [depositType, setDepositType] =
         useState<DepositType>(initialDepositType);
-    const [applicationId, setApplicationId] = useState<string>("");
+    const [applicationSearchableParams, setApplicationSearchableParams] =
+        useState<ApplicationSearchableParams>({ address: "" });
+
     const [multiTokenId, setMultiTokenId] = useState<string>("");
     const [tokenId, setTokenId] = useState<string>("");
-    const [debouncedApplicationId] = useDebouncedValue(
-        applicationId,
+
+    const [debouncedApplicationSearchableParams] = useDebouncedValue(
+        applicationSearchableParams,
         DEBOUNCE_TIME,
     );
+
     const [debouncedTokenId] = useDebouncedValue(tokenId, DEBOUNCE_TIME);
     const [debouncedMultiTokenId] = useDebouncedValue(
         multiTokenId,
         DEBOUNCE_TIME,
     );
+
     const chainId = getConfiguredChainId();
     const { applications, fetching } = useSearchApplications({
-        address: debouncedApplicationId,
+        address: debouncedApplicationSearchableParams.address,
+        rollupVersion: debouncedApplicationSearchableParams.rollupVersion,
         chainId,
     });
+
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
         chainId,
@@ -92,8 +106,17 @@ const SendTransaction: FC<DepositProps> = ({
             });
 
             setMultiTokenId("");
-            setApplicationId("");
+            setApplicationSearchableParams({ address: "" });
         },
+        [],
+    );
+
+    const updateApplicationSearchParams = useCallback(
+        (address: string, rollupVersion?: RollupVersionUI) =>
+            setApplicationSearchableParams({
+                address,
+                rollupVersion: rollupVersion as RollupVersion,
+            }),
         [],
     );
 
@@ -132,7 +155,7 @@ const SendTransaction: FC<DepositProps> = ({
                 value={depositType}
                 onChange={(nextValue) => {
                     setDepositType(nextValue as DepositType);
-                    setApplicationId("");
+                    setApplicationSearchableParams({ address: "" });
                 }}
             />
 
@@ -140,7 +163,7 @@ const SendTransaction: FC<DepositProps> = ({
                 <EtherDepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : depositType === "erc20" ? (
@@ -148,7 +171,7 @@ const SendTransaction: FC<DepositProps> = ({
                     tokens={tokens}
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setTokenId}
                     onSuccess={onSuccess}
                 />
@@ -156,7 +179,7 @@ const SendTransaction: FC<DepositProps> = ({
                 <ERC721DepositForm
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : depositType === "input" ? (
@@ -166,7 +189,7 @@ const SendTransaction: FC<DepositProps> = ({
                         specifications as GenericInputFormSpecification[]
                     }
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : depositType === "erc1155" ? (
@@ -175,7 +198,7 @@ const SendTransaction: FC<DepositProps> = ({
                     tokens={multiTokens}
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setMultiTokenId}
                     onSuccess={onSuccess}
                 />
@@ -185,7 +208,7 @@ const SendTransaction: FC<DepositProps> = ({
                     tokens={multiTokens}
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSearchTokens={setMultiTokenId}
                     onSuccess={onSuccess}
                 />
@@ -193,7 +216,7 @@ const SendTransaction: FC<DepositProps> = ({
                 <AddressRelayForm
                     applications={applications}
                     isLoadingApplications={fetching}
-                    onSearchApplications={setApplicationId}
+                    onSearchApplications={updateApplicationSearchParams}
                     onSuccess={onSuccess}
                 />
             ) : null}

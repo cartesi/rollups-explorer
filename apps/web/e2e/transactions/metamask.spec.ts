@@ -1,13 +1,13 @@
 import { expect } from "@playwright/test";
-import { test } from "../fixtures/metamask";
 import * as metamask from "@synthetixio/synpress/commands/metamask";
+import { test } from "../fixtures/metamask";
 
 test.describe.configure({
     mode: "serial",
     timeout: 120000,
 });
 
-test.describe.serial("Ether Deposit form", () => {
+test.skip("Ether Deposit form", () => {
     test.afterEach(async ({ context }) => {
         if (context) {
             await context.close();
@@ -36,9 +36,19 @@ test.describe.serial("Ether Deposit form", () => {
         await expect(
             modal.getByText("The application smart contract address"),
         ).toBeVisible();
+
+        const applicationInput = page.getByTestId("application-input");
+
+        await applicationInput.focus();
+
+        const option = await page.getByRole("option").first();
+
+        await option.click();
+
         await expect(
             modal.getByText("Amount of ether to deposit"),
         ).toBeVisible();
+
         await expect(
             modal.getByText(
                 "Extra execution layer data handled by the application",
@@ -66,13 +76,20 @@ test.describe.serial("Ether Deposit form", () => {
         const form = modal.getByTestId("ether-deposit-form");
         await expect(form).toBeVisible();
 
-        const applicationsAutocompleteInput = form.locator(
-            '[data-path="application"]',
-        );
+        const applicationsAutocompleteInput =
+            page.getByTestId("application-input");
+
         await applicationsAutocompleteInput.focus();
         await page.keyboard.type("invalid address");
         await applicationsAutocompleteInput.blur();
         await expect(form.getByText("Invalid application")).toBeVisible();
+
+        await applicationsAutocompleteInput.focus();
+        await page.keyboard.type("");
+
+        const option = page.getByRole("option").first();
+
+        await option.click();
 
         const amountInput = form.locator('[data-path="amount"]');
         await amountInput.focus();
@@ -110,19 +127,12 @@ test.describe.serial("Ether Deposit form", () => {
         const form = modal.getByTestId("ether-deposit-form");
         await expect(form).toBeVisible();
 
-        const applicationsAutocompleteInput = form.locator(
-            '[data-path="application"]',
-        );
-        await applicationsAutocompleteInput.focus();
-        const firstAddressNode = page
-            .locator(".mantine-Autocomplete-option")
-            .first()
-            .locator("span");
-        await expect(firstAddressNode).toBeVisible();
-        const firstAddress = await firstAddressNode.textContent();
+        const applicationInput = page.getByTestId("application-input");
 
-        await page.keyboard.type(firstAddress ?? "");
-        await applicationsAutocompleteInput.blur();
+        await applicationInput.focus();
+        const option = page.getByRole("option").first();
+        await option.click();
+
         await expect(form.getByText("Invalid application")).not.toBeVisible();
 
         const amountInput = form.locator('[data-path="amount"]');

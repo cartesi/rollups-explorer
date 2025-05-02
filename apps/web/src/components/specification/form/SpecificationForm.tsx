@@ -212,8 +212,8 @@ export const SpecificationForm: FC<SpecificationFormProps> = ({
                                 mode === "json_abi"
                                     ? { mode, abiParams: [] }
                                     : mode === "abi_params"
-                                    ? { mode, abi: undefined }
-                                    : { mode };
+                                      ? { mode, abi: undefined }
+                                      : { mode };
 
                             form.setValues(changes);
                         }}

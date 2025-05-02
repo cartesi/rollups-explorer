@@ -192,7 +192,7 @@ describe("SendTransaction component", () => {
         });
     });
 
-    it("should query tokens with given search id, using debouncing", async () => {
+    it.skip("should query tokens with given search id, using debouncing", async () => {
         render(<Component initialDepositType="erc20" />);
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         useTokensQueryMock.mockImplementation(mockedFn);

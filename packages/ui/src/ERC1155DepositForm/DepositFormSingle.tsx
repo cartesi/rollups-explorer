@@ -1,13 +1,8 @@
 import {
     erc1155Abi,
-    erc1155SinglePortalAddress,
     useReadErc1155BalanceOf,
     useReadErc1155IsApprovedForAll,
     useReadErc1155SupportsInterface,
-    useSimulateErc1155SetApprovalForAll,
-    useSimulateErc1155SinglePortalDepositSingleErc1155Token,
-    useWriteErc1155SetApprovalForAll,
-    useWriteErc1155SinglePortalDepositSingleErc1155Token,
 } from "@cartesi/rollups-wagmi";
 import {
     Alert,
@@ -19,7 +14,8 @@ import {
     Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FC, useEffect } from "react";
+import { isNotNil } from "ramda";
+import { FC, useEffect, useState } from "react";
 import {
     TbAlertCircle,
     TbCheck,
@@ -29,21 +25,28 @@ import {
 } from "react-icons/tb";
 import {
     BaseError,
-    getAddress,
     Hex,
+    getAddress,
     isAddress,
     isHex,
     parseUnits,
     zeroAddress,
 } from "viem";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount } from "wagmi";
+import ApplicationAutocomplete from "../ApplicationAutocomplete";
 import { interfaceIdForERC1155 } from "../ERC165Identifiers";
+import RollupVersionSegment from "../RollupVersionSegment";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
+import RollupContract from "../commons/RollupContract";
+import { RollupVersion } from "../commons/interfaces";
+import useUndeployedApplication from "../hooks/useUndeployedApplication";
 import useWatchQueryOnBlockChange from "../hooks/useWatchQueryOnBlockChange";
 import AdvancedFields from "./AdvancedFields";
 import TokenFields from "./TokenFields";
 import { FormProvider, useForm } from "./context";
+import { useERC1155ApproveForAll } from "./hooks/useERC1155ApproveForAll";
+import { useERC1155SinglePortalDeposit } from "./hooks/useERC1155SinglePortalDeposit";
 import { ERC1155DepositFormProps } from "./types";
 import {
     amountValidation,
@@ -69,6 +72,9 @@ const DepositFormSingle: FC<Props> = (props) => {
     const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
     // connected account
     const { address } = useAccount();
+    const [userSelectedAppVersion, setUserSelectedAppVersion] = useState<
+        RollupVersion | undefined
+    >();
 
     const form = useForm({
         validateInputOnChange: true,
@@ -121,6 +127,20 @@ const DepositFormSingle: FC<Props> = (props) => {
         execLayerData,
     } = form.getTransformedValues();
 
+    const foundAddresses = applications.map((a) => a.address);
+    const isUndeployedApp = useUndeployedApplication(
+        applicationAddress,
+        foundAddresses,
+    );
+
+    // The app version checks
+    const hasFoundOneApp = applications.length === 1;
+    const app = hasFoundOneApp ? applications[0] : undefined;
+    const appVersion = app?.rollupVersion || userSelectedAppVersion;
+
+    const { address: erc1155SinglePortalAddress } =
+        RollupContract.getERC1155SinglePortalConfig(appVersion);
+
     const erc1155Contract = {
         abi: erc1155Abi,
         address: erc1155Address !== zeroAddress ? erc1155Address : undefined,
@@ -147,10 +167,12 @@ const DepositFormSingle: FC<Props> = (props) => {
 
     const approvedForAll = useReadErc1155IsApprovedForAll({
         address: erc1155Contract.address,
-        args: [getAddress(address!), erc1155SinglePortalAddress],
+        args: [getAddress(address!), erc1155SinglePortalAddress!],
         query: {
             enabled:
-                validContractResult.isValid && !isCheckingContractInterface,
+                isNotNil(erc1155SinglePortalAddress) &&
+                validContractResult.isValid &&
+                !isCheckingContractInterface,
         },
     });
 
@@ -164,56 +186,42 @@ const DepositFormSingle: FC<Props> = (props) => {
         .map((d) => (d.error as BaseError).shortMessage);
 
     // prepare approve transaction
-    const approvePrepare = useSimulateErc1155SetApprovalForAll({
-        address: erc1155Address,
-        args: [erc1155SinglePortalAddress, true],
-        query: {
-            enabled:
-                accountBalance !== undefined &&
-                amount !== undefined &&
-                amount > 0 &&
-                amount <= accountBalance,
-        },
-    });
-
-    const approve = useWriteErc1155SetApprovalForAll();
-    const approveWait = useWaitForTransactionReceipt({
-        hash: approve.data,
+    const { approve, approvePrepare, approveWait } = useERC1155ApproveForAll({
+        erc1155Address,
+        args: [erc1155SinglePortalAddress!, true],
+        isQueryEnabled:
+            isNotNil(erc1155SinglePortalAddress) &&
+            isNotNil(accountBalance) &&
+            isNotNil(amount) &&
+            amount > 0 &&
+            amount <= accountBalance,
     });
 
     // prepare deposit transaction
-    const depositPrepare =
-        useSimulateErc1155SinglePortalDepositSingleErc1155Token({
-            args: [
-                erc1155Address!,
-                applicationAddress,
-                tokenId!,
-                amount!,
-                baseLayerData,
-                execLayerData,
-            ],
-            query: {
-                enabled:
-                    tokenId !== undefined &&
-                    amount !== undefined &&
-                    accountBalance !== undefined &&
-                    amount <= accountBalance &&
-                    !form.errors.application &&
-                    !form.errors.erc1155Address &&
-                    isHex(execLayerData) &&
-                    isHex(baseLayerData) &&
-                    isApproved,
+    const { deposit, depositPrepare, depositWait } =
+        useERC1155SinglePortalDeposit({
+            appVersion,
+            contractParams: {
+                args: [
+                    erc1155Address!,
+                    applicationAddress,
+                    tokenId!,
+                    amount!,
+                    baseLayerData,
+                    execLayerData,
+                ],
             },
+            isQueryEnabled:
+                tokenId !== undefined &&
+                amount !== undefined &&
+                accountBalance !== undefined &&
+                amount <= accountBalance &&
+                !form.errors.application &&
+                !form.errors.erc1155Address &&
+                isHex(execLayerData) &&
+                isHex(baseLayerData) &&
+                isApproved == true,
         });
-
-    const deposit = useWriteErc1155SinglePortalDepositSingleErc1155Token();
-
-    const depositWait = useWaitForTransactionReceipt({
-        hash: deposit.data,
-        query: {
-            enabled: isApproved,
-        },
-    });
 
     const canDeposit =
         accountBalance !== undefined &&
@@ -232,11 +240,22 @@ const DepositFormSingle: FC<Props> = (props) => {
         transactionState(depositPrepare, deposit, depositWait, true);
 
     useEffect(() => {
+        return () => {
+            onSearchApplications("");
+            onSearchTokens("");
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
         if (depositWait.isSuccess) {
             onSuccess({ receipt: depositWait.data, type: "ERC-1155" });
             form.reset();
             approve.reset();
             deposit.reset();
+            setUserSelectedAppVersion(undefined);
+            onSearchApplications("");
+            onSearchTokens("");
         }
     }, [
         depositWait.isSuccess,
@@ -245,17 +264,19 @@ const DepositFormSingle: FC<Props> = (props) => {
         deposit,
         form,
         depositWait.data,
+        onSearchApplications,
+        onSearchTokens,
     ]);
 
     return (
         <FormProvider form={form}>
             <form data-testid="erc1155-deposit-form">
                 <Stack>
-                    <Autocomplete
+                    <ApplicationAutocomplete
                         label="Application"
                         description="The application smart contract address"
                         placeholder="0x"
-                        data={applications}
+                        applications={applications}
                         withAsterisk
                         data-testid="application"
                         rightSection={
@@ -266,125 +287,166 @@ const DepositFormSingle: FC<Props> = (props) => {
                             form.setFieldValue("application", nextValue);
                             onSearchApplications(nextValue);
                         }}
-                    />
-
-                    {isAddress(applicationAddress) &&
-                        applicationAddress !== zeroAddress &&
-                        !applications.length && (
-                            <Alert
-                                variant="light"
-                                color="yellow"
-                                icon={<TbAlertCircle />}
-                            >
-                                This is a deposit to an undeployed application.
-                            </Alert>
-                        )}
-
-                    <Autocomplete
-                        label="ERC-1155"
-                        description="The ERC-1155 smart contract address"
-                        placeholder="0x"
-                        data={tokens}
-                        withAsterisk
-                        data-testid="erc1155Address"
-                        rightSection={
-                            (isCheckingContractInterface ||
-                                isCheckingApproval ||
-                                isCheckingBalance) && <Loader size="xs" />
-                        }
-                        {...form.getInputProps("erc1155Address")}
-                        error={
-                            validContractResult.errorMessage ||
-                            erc1155Errors[0] ||
-                            form.errors.erc1155Address
-                        }
-                        onChange={(nextValue) => {
-                            const formattedValue = nextValue.substring(
-                                nextValue.indexOf("0x"),
+                        onApplicationSelected={(app) => {
+                            form.setFieldValue("application", app.address);
+                            onSearchApplications(
+                                app.address,
+                                app.rollupVersion,
                             );
-                            form.setFieldValue(
-                                "erc1155Address",
-                                formattedValue,
-                            );
-                            form.setFieldValue("amount", "");
-                            form.setFieldValue("tokenId", "");
-                            onSearchTokens(formattedValue);
                         }}
                     />
 
-                    <TokenFields
-                        balanceOf={balanceOf}
-                        display={
-                            erc1155Address !== zeroAddress &&
-                            !isCheckingContractInterface &&
-                            validContractResult.isValid &&
-                            isAddress(erc1155Address)
-                        }
-                    />
+                    {!form.errors.application &&
+                        applicationAddress !== zeroAddress &&
+                        isUndeployedApp &&
+                        !isLoadingApplications && (
+                            <>
+                                <Alert
+                                    variant="light"
+                                    color="yellow"
+                                    icon={<TbAlertCircle />}
+                                >
+                                    This is a deposit to an undeployed
+                                    application.
+                                </Alert>
+                                <RollupVersionSegment
+                                    label="Cartesi Rollups version"
+                                    description="Set the rollup version to call the correct contracts."
+                                    onChange={setUserSelectedAppVersion}
+                                    value={userSelectedAppVersion ?? ""}
+                                    onUnmount={() => {
+                                        setUserSelectedAppVersion(undefined);
+                                    }}
+                                />
+                            </>
+                        )}
 
-                    <AdvancedFields display={advanced} />
+                    <Collapse
+                        in={isNotNil(appVersion) && !isLoadingApplications}
+                    >
+                        {appVersion && (
+                            <Stack>
+                                <Autocomplete
+                                    label="ERC-1155"
+                                    description="The ERC-1155 smart contract address"
+                                    placeholder="0x"
+                                    data={tokens}
+                                    withAsterisk
+                                    data-testid="erc1155Address"
+                                    rightSection={
+                                        (isCheckingContractInterface ||
+                                            isCheckingApproval ||
+                                            isCheckingBalance) && (
+                                            <Loader size="xs" />
+                                        )
+                                    }
+                                    {...form.getInputProps("erc1155Address")}
+                                    error={
+                                        validContractResult.errorMessage ||
+                                        erc1155Errors[0] ||
+                                        form.errors.erc1155Address
+                                    }
+                                    onChange={(nextValue) => {
+                                        const formattedValue =
+                                            nextValue.substring(
+                                                nextValue.indexOf("0x"),
+                                            );
+                                        form.setFieldValue(
+                                            "erc1155Address",
+                                            formattedValue,
+                                        );
+                                        form.setFieldValue("amount", "");
+                                        form.setFieldValue("tokenId", "");
+                                        onSearchTokens(formattedValue);
+                                    }}
+                                />
 
-                    <Collapse in={!approve.isIdle || approveWait.isLoading}>
-                        <TransactionProgress
-                            prepare={approvePrepare}
-                            execute={approve}
-                            wait={approveWait}
-                            confirmationMessage="Approve transaction confirmed"
-                        />
+                                <TokenFields
+                                    balanceOf={balanceOf}
+                                    display={
+                                        erc1155Address !== zeroAddress &&
+                                        !isCheckingContractInterface &&
+                                        validContractResult.isValid &&
+                                        isAddress(erc1155Address)
+                                    }
+                                />
+
+                                <AdvancedFields display={advanced} />
+
+                                <Collapse
+                                    in={
+                                        !approve.isIdle || approveWait.isLoading
+                                    }
+                                >
+                                    <TransactionProgress
+                                        prepare={approvePrepare}
+                                        execute={approve}
+                                        wait={approveWait}
+                                        confirmationMessage="Approve transaction confirmed"
+                                    />
+                                </Collapse>
+                                <Collapse in={!deposit.isIdle}>
+                                    <TransactionProgress
+                                        prepare={depositPrepare}
+                                        execute={deposit}
+                                        wait={depositWait}
+                                    />
+                                </Collapse>
+
+                                <Group justify="right">
+                                    <Button
+                                        leftSection={
+                                            advanced ? (
+                                                <TbChevronUp />
+                                            ) : (
+                                                <TbChevronDown />
+                                            )
+                                        }
+                                        size="xs"
+                                        visibleFrom="sm"
+                                        variant="transparent"
+                                        onClick={toggleAdvanced}
+                                    >
+                                        Advanced
+                                    </Button>
+                                    <Button
+                                        variant="filled"
+                                        disabled={isApproved || !form.isValid()}
+                                        leftSection={<TbCheck />}
+                                        loading={
+                                            isCheckingApproval || approveLoading
+                                        }
+                                        onClick={() =>
+                                            approve.writeContract(
+                                                approvePrepare.data!.request,
+                                            )
+                                        }
+                                    >
+                                        {!isCheckingApproval && isApproved
+                                            ? "Approved"
+                                            : "Approve"}
+                                    </Button>
+                                    <Button
+                                        variant="filled"
+                                        disabled={
+                                            depositDisabled ||
+                                            !canDeposit ||
+                                            !form.isValid()
+                                        }
+                                        leftSection={<TbPigMoney />}
+                                        loading={canDeposit && depositLoading}
+                                        onClick={() =>
+                                            deposit.writeContract(
+                                                depositPrepare.data!.request,
+                                            )
+                                        }
+                                    >
+                                        Deposit
+                                    </Button>
+                                </Group>
+                            </Stack>
+                        )}
                     </Collapse>
-                    <Collapse in={!deposit.isIdle}>
-                        <TransactionProgress
-                            prepare={depositPrepare}
-                            execute={deposit}
-                            wait={depositWait}
-                        />
-                    </Collapse>
-
-                    <Group justify="right">
-                        <Button
-                            leftSection={
-                                advanced ? <TbChevronUp /> : <TbChevronDown />
-                            }
-                            size="xs"
-                            visibleFrom="sm"
-                            variant="transparent"
-                            onClick={toggleAdvanced}
-                        >
-                            Advanced
-                        </Button>
-                        <Button
-                            variant="filled"
-                            disabled={isApproved || !form.isValid()}
-                            leftSection={<TbCheck />}
-                            loading={isCheckingApproval || approveLoading}
-                            onClick={() =>
-                                approve.writeContract(
-                                    approvePrepare.data!.request,
-                                )
-                            }
-                        >
-                            {!isCheckingApproval && isApproved
-                                ? "Approved"
-                                : "Approve"}
-                        </Button>
-                        <Button
-                            variant="filled"
-                            disabled={
-                                depositDisabled ||
-                                !canDeposit ||
-                                !form.isValid()
-                            }
-                            leftSection={<TbPigMoney />}
-                            loading={canDeposit && depositLoading}
-                            onClick={() =>
-                                deposit.writeContract(
-                                    depositPrepare.data!.request,
-                                )
-                            }
-                        >
-                            Deposit
-                        </Button>
-                    </Group>
                 </Stack>
             </form>
         </FormProvider>

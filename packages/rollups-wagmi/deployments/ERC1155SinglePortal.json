@@ -1,0 +1,79 @@
+{
+  "address": "0xB778147D50219544F113A55DE1d8de626f0cC1bB",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "inputBox",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "depositSingleERC1155Token",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "contract IERC1155"
+        },
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "baseLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "execLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getInputBox",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ],
+  "constructorArgs": [
+    "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+  ],
+  "linkedLibraries": {},
+  "deployTxnHash": "0xec303b5b9c845b64fed2e68f3d55bfa2d7f7e7a8f6becb85f3630891eaf6b8f2",
+  "deployTxnBlockNumber": "4",
+  "deployTimestamp": "1742931756",
+  "sourceName": "src/portals/ERC1155SinglePortal.sol",
+  "contractName": "ERC1155SinglePortal",
+  "deployedOn": "deploy.ERC1155SinglePortal",
+  "gasUsed": 259714,
+  "gasCost": "1673427744"
+}

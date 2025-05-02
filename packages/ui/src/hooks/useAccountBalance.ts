@@ -40,3 +40,5 @@ export const useAccountBalance = () => {
 
     return result;
 };
+
+export type UseAccountBalanceResult = ReturnType<typeof useAccountBalance>;

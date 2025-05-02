@@ -1,25 +1,35 @@
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { isHash, isHex } from "viem";
-import { InputWhereInput } from "../graphql/explorer/types";
+import { InputWhereInput, RollupVersion } from "../graphql/explorer/types";
 
 type QueryReturn = InputWhereInput;
 
 /**
  *
  * @param {string} input
- * @param {string} applicationId
+ * @param {string} appAddress
  * @param {string} chainId
+ * @param {RollupVersion} appVersion
  * @returns {QueryReturn}
  */
 export const checkQuery = (
     input: string,
-    applicationId: string = "",
+    appAddress: string = "",
     chainId: string,
+    appVersion?: RollupVersion,
 ): QueryReturn => {
     const chainQuery = { chain: { id_eq: chainId } };
-    if (isNotNilOrEmpty(applicationId)) {
+    const versionQuery = isNotNilOrEmpty(appVersion)
+        ? { rollupVersion_eq: appVersion }
+        : {};
+
+    if (isNotNilOrEmpty(appAddress)) {
         const byAppIdQuery: QueryReturn = {
-            application: { address_startsWith: applicationId, ...chainQuery },
+            application: {
+                address_startsWith: appAddress,
+                ...chainQuery,
+                ...versionQuery,
+            },
         };
 
         if (input) {
