@@ -21,6 +21,7 @@ import getSupportedChainInfo, {
     SupportedChainId,
 } from "../lib/supportedChains";
 import createClientFor from "../lib/transportClient";
+import { useMounted } from "@mantine/hooks";
 
 // select chain based on env var
 const chainId = parseInt(
@@ -79,6 +80,7 @@ const queryClient = new QueryClient();
 
 const WalletProvider = ({ children }: { children: ReactNode }) => {
     const scheme = useMantineColorScheme();
+    const isMounted = useMounted();
 
     // XXX: make this match the mantine theme
     const themeOptions: ThemeOptions = {
@@ -91,7 +93,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
             ? darkTheme(themeOptions)
             : lightTheme(themeOptions);
 
-    return (
+    return isMounted ? (
         <WagmiProvider config={wagmiConfig}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider
@@ -103,7 +105,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider>
-    );
+    ) : null;
 };
 
 export default WalletProvider;
