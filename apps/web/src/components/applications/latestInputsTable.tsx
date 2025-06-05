@@ -3,16 +3,10 @@ import { Badge, Box, Button, Group, Loader, Table, Text } from "@mantine/core";
 import prettyMilliseconds from "pretty-ms";
 import { FC, useCallback, useState } from "react";
 import { TbArrowRight } from "react-icons/tb";
-import type { Address as AddressType } from "viem";
+import { Address as AddressType } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
-import { methodResolver } from "../../lib/methodResolver";
+import RollupContractResolver from "../../lib/rollupContractResolver";
 import Address from "../address";
-
-export interface Entry {
-    appId: AddressType;
-    timestamp: number;
-    href: string;
-}
 
 export interface LatestInputsTableProps {
     inputs: InputItemFragment[];
@@ -112,7 +106,9 @@ const LatestInputsTable: FC<LatestInputsTableProps> = ({
                                 variant="default"
                                 style={{ textTransform: "none" }}
                             >
-                                {methodResolver(input) ?? "?"}
+                                {RollupContractResolver.resolveMethod(
+                                    input.msgSender as AddressType,
+                                ) ?? "?"}
                             </Badge>
                         </Table.Td>
                         <Table.Td>

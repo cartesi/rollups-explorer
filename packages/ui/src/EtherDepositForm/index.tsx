@@ -1,32 +1,9 @@
-import {
-    useSimulateEtherPortalDepositEther,
-    useWriteEtherPortalDepositEther,
-} from "@cartesi/rollups-wagmi";
-import {
-    Alert,
-    Autocomplete,
-    Button,
-    Collapse,
-    Flex,
-    Group,
-    Loader,
-    Stack,
-    Text,
-    TextInput,
-    Textarea,
-    UnstyledButton,
-} from "@mantine/core";
+import { Alert, Collapse, Loader, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
-import { FC, useEffect } from "react";
+import { isNotNil } from "ramda";
+import { FC, useEffect, useState } from "react";
+import { TbAlertCircle } from "react-icons/tb";
 import {
-    TbAlertCircle,
-    TbCheck,
-    TbChevronDown,
-    TbChevronUp,
-} from "react-icons/tb";
-import {
-    BaseError,
     Hex,
     getAddress,
     isAddress,
@@ -34,16 +11,23 @@ import {
     parseUnits,
     zeroAddress,
 } from "viem";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount } from "wagmi";
+import ApplicationAutocomplete from "../ApplicationAutocomplete";
 import { TransactionFormSuccessData } from "../DepositFormTypes";
-import { TransactionProgress } from "../TransactionProgress";
+import RollupVersionSegment from "../RollupVersionSegment";
+import { Application, RollupVersion } from "../commons/interfaces";
 import { useAccountBalance } from "../hooks/useAccountBalance";
 import useUndeployedApplication from "../hooks/useUndeployedApplication";
+import EtherDepositSection from "./EtherDepositSection";
+import { FormValues, TransformValues } from "./types";
 
 export interface EtherDepositFormProps {
-    applications: string[];
+    applications: Application[];
     isLoadingApplications: boolean;
-    onSearchApplications: (applicationId: string) => void;
+    onSearchApplications: (
+        appAddress: string,
+        rollupVersion?: RollupVersion,
+    ) => void;
     onSuccess: (receipt: TransactionFormSuccessData) => void;
 }
 
@@ -54,11 +38,15 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         onSearchApplications,
         onSuccess,
     } = props;
-    const [advanced, { toggle: toggleAdvanced }] = useDisclosure(false);
+
+    const [userSelectedAppVersion, setUserSelectedAppVersion] = useState<
+        RollupVersion | undefined
+    >();
+
     const { chain } = useAccount();
     const accountBalance = useAccountBalance();
 
-    const form = useForm({
+    const form = useForm<FormValues, TransformValues>({
         validateInputOnChange: true,
         initialValues: {
             accountBalance: accountBalance,
@@ -67,8 +55,11 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             execLayerData: "0x",
         },
         validate: {
-            application: (value) =>
-                value !== "" && isAddress(value) ? null : "Invalid application",
+            application: (value) => {
+                return value !== "" && isAddress(value)
+                    ? null
+                    : "Invalid application address";
+            },
             amount: (value, values) => {
                 if (value !== "" && Number(value) > 0) {
                     const val = parseUnits(
@@ -78,6 +69,7 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     if (val > values.accountBalance.value) {
                         return `The amount ${value} exceeds your current balance of ${values.accountBalance.formatted} ETH`;
                     }
+
                     return null;
                 } else {
                     return "Invalid amount";
@@ -86,52 +78,38 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
             execLayerData: (value) =>
                 isHex(value) ? null : "Invalid hex string",
         },
-        transformValues: (values) => {
-            return {
-                address: isAddress(values.application)
-                    ? getAddress(values.application)
-                    : zeroAddress,
-                amount:
-                    values.amount !== ""
-                        ? parseUnits(
-                              values.amount,
-                              chain?.nativeCurrency.decimals ?? 18,
-                          )
-                        : undefined,
-                execLayerData: values.execLayerData
-                    ? (values.execLayerData as Hex)
-                    : "0x",
-            };
-        },
+        transformValues: (values) => ({
+            address: isAddress(values.application)
+                ? getAddress(values.application)
+                : zeroAddress,
+            amount:
+                values.amount !== ""
+                    ? parseUnits(
+                          values.amount,
+                          chain?.nativeCurrency.decimals ?? 18,
+                      )
+                    : undefined,
+            execLayerData: values.execLayerData
+                ? (values.execLayerData as Hex)
+                : "0x",
+        }),
     });
 
-    const { address, amount, execLayerData } = form.getTransformedValues();
-    const prepare = useSimulateEtherPortalDepositEther({
-        args: [address, execLayerData],
-        value: amount,
-        query: {
-            enabled: form.isValid(),
-        },
-    });
-    const execute = useWriteEtherPortalDepositEther();
-    const wait = useWaitForTransactionReceipt({
-        hash: execute.data,
-    });
-    const canSubmit =
-        form.isValid() && !prepare.isLoading && prepare.error === null;
-    const loading = execute.isPending || wait.isLoading;
-    const isUndeployedApp = useUndeployedApplication(address, applications);
+    const { address } = form.getTransformedValues();
+    const appAddressList = applications.map((app) => app.address);
+    const isUndeployedApp = useUndeployedApplication(address, appAddressList);
 
-    useEffect(() => {
-        if (wait.isSuccess) {
-            onSuccess({ receipt: wait.data, type: "ETHER" });
-            form.reset();
-            execute.reset();
-            onSearchApplications("");
-            accountBalance.refetch();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wait, onSearchApplications, onSuccess, accountBalance]);
+    const hasFoundOneApp = applications.length === 1;
+    const app = hasFoundOneApp ? applications[0] : undefined;
+    const appVersion = app?.rollupVersion || userSelectedAppVersion;
+
+    const onDepositSuccess = (data: TransactionFormSuccessData) => {
+        onSuccess(data);
+        form.reset();
+        setUserSelectedAppVersion(undefined);
+        onSearchApplications("");
+        accountBalance.refetch();
+    };
 
     useEffect(() => {
         form.setValues({ accountBalance: accountBalance });
@@ -139,131 +117,64 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
         if (form.isDirty("amount")) {
             form.validateField("amount");
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- 'form' is not added on purpose because it has unstable reference
     }, [accountBalance]);
 
     return (
         <form data-testid="ether-deposit-form">
             <Stack>
-                <Autocomplete
+                <ApplicationAutocomplete
                     label="Application"
                     description="The application smart contract address"
                     data-testid="application-input"
                     placeholder="0x"
-                    data={applications}
+                    applications={applications}
                     withAsterisk
-                    rightSection={
-                        (prepare.isLoading || isLoadingApplications) && (
-                            <Loader size="xs" />
-                        )
-                    }
+                    rightSection={isLoadingApplications && <Loader size="xs" />}
                     {...form.getInputProps("application")}
-                    error={
-                        form.errors?.application ||
-                        (prepare.error as BaseError)?.shortMessage
-                    }
+                    error={form.errors?.application}
                     onChange={(nextValue) => {
                         form.setFieldValue("application", nextValue);
                         onSearchApplications(nextValue);
                     }}
+                    onApplicationSelected={(app) => {
+                        form.setFieldValue("application", app.address);
+                        onSearchApplications(app.address, app.rollupVersion);
+                    }}
                 />
 
                 {!form.errors.application && isUndeployedApp && (
-                    <Alert
-                        variant="light"
-                        color="yellow"
-                        icon={<TbAlertCircle />}
-                    >
-                        This is a deposit to an undeployed application.
-                    </Alert>
+                    <>
+                        <Alert
+                            variant="light"
+                            color="yellow"
+                            icon={<TbAlertCircle />}
+                        >
+                            This is a deposit to an undeployed application.
+                        </Alert>
+
+                        <RollupVersionSegment
+                            label="Cartesi Rollups version"
+                            description="Set the rollup version to call the correct contracts."
+                            onChange={setUserSelectedAppVersion}
+                            value={userSelectedAppVersion ?? ""}
+                            onUnmount={() => {
+                                setUserSelectedAppVersion(undefined);
+                            }}
+                        />
+                    </>
                 )}
 
-                <Stack gap="xs">
-                    <TextInput
-                        type="number"
-                        step="1"
-                        min={0}
-                        label="Amount"
-                        description="Amount of ether to deposit"
-                        data-testid="amount-input"
-                        placeholder="0"
-                        rightSectionWidth={60}
-                        rightSection={<Text>ETH</Text>}
-                        withAsterisk
-                        {...form.getInputProps("amount")}
-                    />
-
-                    <Flex c={"dark.2"} gap="3">
-                        <Text fz="xs">Balance: {accountBalance.formatted}</Text>
-                        {accountBalance.value > 0 && (
-                            <UnstyledButton
-                                fz={"xs"}
-                                c={"cyan"}
-                                onClick={() => {
-                                    form.setFieldValue(
-                                        "amount",
-                                        accountBalance.formatted,
-                                    );
-                                }}
-                                data-testid="max-button"
-                            >
-                                Max
-                            </UnstyledButton>
-                        )}
-                    </Flex>
-                </Stack>
-
-                <Collapse in={advanced}>
-                    <Textarea
-                        data-testid="eth-extra-data-input"
-                        label="Extra data"
-                        description="Extra execution layer data handled by the application"
-                        {...form.getInputProps("execLayerData")}
-                    />
+                <Collapse in={isNotNil(appVersion) && !isLoadingApplications}>
+                    {appVersion && (
+                        <EtherDepositSection
+                            appVersion={appVersion}
+                            form={form}
+                            onSuccess={onDepositSuccess}
+                        />
+                    )}
                 </Collapse>
-
-                <Collapse
-                    in={
-                        execute.isPending ||
-                        wait.isLoading ||
-                        execute.isSuccess ||
-                        execute.isError
-                    }
-                >
-                    <TransactionProgress
-                        prepare={prepare}
-                        execute={execute}
-                        wait={wait}
-                        confirmationMessage="Ether deposited successfully!"
-                        defaultErrorMessage={execute.error?.message}
-                    />
-                </Collapse>
-
-                <Group justify="right">
-                    <Button
-                        leftSection={
-                            advanced ? <TbChevronUp /> : <TbChevronDown />
-                        }
-                        size="xs"
-                        visibleFrom="sm"
-                        variant="transparent"
-                        onClick={toggleAdvanced}
-                    >
-                        Advanced
-                    </Button>
-
-                    <Button
-                        variant="filled"
-                        disabled={!canSubmit}
-                        leftSection={<TbCheck />}
-                        loading={loading}
-                        onClick={() =>
-                            execute.writeContract(prepare.data!.request)
-                        }
-                    >
-                        Deposit
-                    </Button>
-                </Group>
             </Stack>
         </form>
     );

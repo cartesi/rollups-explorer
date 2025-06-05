@@ -25,7 +25,7 @@ const EntriesSummary: FC = () => {
         pause: !isConnected,
     });
     const applicationsOwnedCount = isConnected
-        ? applicationsOwned?.applicationsConnection?.totalCount ?? 0
+        ? (applicationsOwned?.applicationsConnection?.totalCount ?? 0)
         : 0;
 
     return (

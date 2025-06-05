@@ -70,8 +70,8 @@ export const DisplayContent: FC<{ type?: ContentType; content: string }> = ({
         type === "raw"
             ? content
             : isHex(content)
-            ? hexToString(content)
-            : content;
+              ? hexToString(content)
+              : content;
     const ref = useRef<HTMLTextAreaElement | null>(null);
 
     useEffect(() => {

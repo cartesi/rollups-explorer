@@ -16,7 +16,7 @@ import { FC } from "react";
 import { TbArrowRight, TbFileText, TbQuestionMark, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits } from "viem";
 import { InputItemFragment } from "../../graphql/explorer/operations";
-import { methodResolver } from "../../lib/methodResolver";
+import RollupContractResolver from "../../lib/rollupContractResolver";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Connection } from "../../providers/connectionConfig/types";
 import Address from "../address";
@@ -55,7 +55,9 @@ const InputRow: FC<InputRowProps> = ({
 
     const method = (
         <Badge variant="default" style={{ textTransform: "none" }}>
-            {methodResolver(input) ?? "?"}
+            {RollupContractResolver.resolveMethod(
+                input.msgSender as AddressType,
+            ) ?? "?"}
         </Badge>
     );
     return (
@@ -116,7 +118,7 @@ const InputRow: FC<InputRowProps> = ({
                         <Address
                             value={to}
                             icon
-                            href={`/applications/${to}/inputs`}
+                            href={`/applications/${to}/${input.application.rollupVersion}/inputs`}
                             shorten
                         />
                     </Box>
@@ -130,6 +132,7 @@ const InputRow: FC<InputRowProps> = ({
                         <ConnectionInputStatusBadge
                             graphqlUrl={(getConnection(to) as Connection).url}
                             index={input.index}
+                            application={input.application}
                         />
                     ) : (
                         <Tooltip label="Click to add a connection and inspect the input status.">

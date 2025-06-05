@@ -18,7 +18,7 @@ import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import { Address } from "viem";
 import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
-import { InputOrderByInput } from "../../graphql/explorer/types";
+import { InputOrderByInput, RollupVersion } from "../../graphql/explorer/types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionSummary from "../connection/connectionSummary";
@@ -34,10 +34,14 @@ const SummarySkeletonCard = () => (
 );
 
 export type ApplicationSummaryProps = {
-    applicationId: string;
+    appAddress: string;
+    appVersion: RollupVersion;
 };
 
-const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
+const ApplicationSummary: FC<ApplicationSummaryProps> = ({
+    appAddress,
+    appVersion,
+}) => {
     const chainId = getConfiguredChainId();
     const [{ data, fetching }] = useInputsConnectionQuery({
         variables: {
@@ -45,7 +49,8 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
             limit: 6,
             where: {
                 application: {
-                    address_eq: applicationId.toLowerCase(),
+                    address_eq: appAddress.toLowerCase(),
+                    rollupVersion_eq: appVersion,
                     chain: {
                         id_eq: chainId,
                     },
@@ -58,8 +63,8 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
 
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
-    const connection = getConnection(applicationId as Address);
-    const isAppConnected = hasConnection(applicationId as Address);
+    const connection = getConnection(appAddress as Address);
+    const isAppConnected = hasConnection(appAddress as Address);
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
 
@@ -100,7 +105,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                             fullWidth={isSmallDevice}
                             data-testid="add-connection"
                             onClick={() =>
-                                showConnectionModal(applicationId as Address)
+                                showConnectionModal(appAddress as Address)
                             }
                         >
                             Add connection
@@ -128,7 +133,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({ applicationId }) => {
                         <Group gap={5} mt="auto">
                             <Button
                                 component={Link}
-                                href={`/applications/${applicationId}/inputs`}
+                                href={`/applications/${appAddress}/${appVersion}/inputs`}
                                 variant="light"
                                 fullWidth={isSmallDevice}
                                 mt="md"

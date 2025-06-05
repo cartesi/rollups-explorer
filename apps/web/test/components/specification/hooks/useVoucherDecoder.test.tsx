@@ -1,8 +1,9 @@
 import { whatsabi } from "@shazow/whatsabi";
 import { renderHook, waitFor } from "@testing-library/react";
-import { afterEach, describe, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, it, vi } from "vitest";
 import useVoucherDecoder from "../../../../src/components/specification/hooks/useVoucherDecoder";
 import { stringifyContent } from "../../../../src/components/specification/utils";
+import { RollupVersion } from "../../../../src/graphql/explorer/types";
 import { voucherDecoderStubs } from "./stubs";
 
 vi.mock("@shazow/whatsabi");
@@ -16,6 +17,10 @@ const {
     validABIByDestination,
     destination2,
     payload2,
+    payloadVoucherOutputV2,
+    payloadWithdrawEtherV2,
+    voucherOutputV2Destination,
+    withdrawV2EtherDestination,
 } = voucherDecoderStubs;
 
 describe("useVoucherDecoder hook", () => {
@@ -49,7 +54,11 @@ describe("useVoucherDecoder hook", () => {
         whatabiMock.autoload.mockReturnValue(promise);
 
         const { result } = renderHook(() =>
-            useVoucherDecoder({ destination, chainId: 11155111, payload }),
+            useVoucherDecoder({
+                destination,
+                chainId: 11155111,
+                payload,
+            }),
         );
 
         await waitFor(() => expect(result.current.status).toEqual("loading"));
@@ -80,7 +89,87 @@ describe("useVoucherDecoder hook", () => {
         );
     });
 
+    describe("Handling v2 outputs", () => {
+        it("should return the payload decoded when returned abi is correct", async () => {
+            whatabiMock.autoload.mockResolvedValue({
+                abi: validABIByDestination[voucherOutputV2Destination],
+                address: voucherOutputV2Destination,
+                proxies: [],
+            });
+
+            const { result } = renderHook(() =>
+                useVoucherDecoder({
+                    destination: voucherOutputV2Destination,
+                    chainId,
+                    payload: payloadVoucherOutputV2,
+                    appVersion: RollupVersion.V2,
+                }),
+            );
+
+            await waitFor(() => expect(result.current.data).not.toEqual(null));
+
+            expect(result.current.data).toEqual(
+                stringifyContent({
+                    functionName: "mint",
+                    args: ["0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", "0"],
+                    orderedNamedArgs: [
+                        [
+                            "address",
+                            "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+                        ],
+                        ["uint256", "0"],
+                    ],
+                }),
+            );
+        });
+
+        it("should return human-readable for outputs for ether-withdraw", async () => {
+            const { result } = renderHook(() =>
+                useVoucherDecoder({
+                    destination: withdrawV2EtherDestination,
+                    chainId,
+                    payload: payloadWithdrawEtherV2,
+                    appVersion: RollupVersion.V2,
+                }),
+            );
+
+            await waitFor(() => expect(result.current.data).not.toEqual(null));
+
+            expect(result.current.data).toEqual(
+                stringifyContent({
+                    destination: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                    value: "2000000000000000000",
+                    method: "Transfer",
+                    type: "Ether",
+                }),
+            );
+        });
+
+        it("should not search for the destination address ABI when output is an ether-withdraw", async () => {
+            const { result } = renderHook(() =>
+                useVoucherDecoder({
+                    destination: withdrawV2EtherDestination,
+                    chainId,
+                    payload: payloadWithdrawEtherV2,
+                    appVersion: RollupVersion.V2,
+                }),
+            );
+
+            await waitFor(() => expect(result.current.data).not.toEqual(null));
+
+            expect(whatabiMock.autoload).not.toHaveBeenCalled();
+        });
+    });
+
     describe("Decoding failures", () => {
+        beforeEach(() => {
+            vi.spyOn(console, "info").mockImplementation((m: any) => {});
+        });
+
+        afterEach(() => {
+            vi.clearAllMocks();
+        });
+
         it("should return the original payload format", async () => {
             whatabiMock.autoload.mockResolvedValue({
                 abi: validABIByDestination[destination2],

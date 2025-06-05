@@ -1,0 +1,141 @@
+{
+  "address": "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051",
+  "abi": [
+    {
+      "type": "function",
+      "name": "addInput",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "payload",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getDeploymentBlockNumber",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getInputHash",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "index",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getNumberOfInputs",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "InputAdded",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "index",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
+          "name": "input",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "InputTooLarge",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "inputLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "maxInputLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    }
+  ],
+  "constructorArgs": [],
+  "linkedLibraries": {},
+  "deployTxnHash": "0x6362936bea9a78f1d079aabf8200ed60f6ada33c6c2800d7ae01203430eabcaf",
+  "deployTxnBlockNumber": "1",
+  "deployTimestamp": "1748610369",
+  "sourceName": "src/inputs/InputBox.sol",
+  "contractName": "InputBox",
+  "deployedOn": "deploy.InputBox",
+  "gasUsed": 234148,
+  "gasCost": "2000000000"
+}

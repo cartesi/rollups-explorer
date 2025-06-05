@@ -1,6 +1,7 @@
 "use client";
 
 import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { FC } from "react";
 import {
@@ -13,9 +14,8 @@ import { Address as AddressType } from "viem";
 import { ApplicationItemFragment } from "../../graphql/explorer/operations";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
-import ResponsiveTable from "../responsiveTable";
-import { useDisclosure } from "@mantine/hooks";
 import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
+import ResponsiveTable from "../responsiveTable";
 
 export interface ApplicationsTableProps {
     applications: ApplicationItemFragment[];
@@ -49,6 +49,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
         useConnectionConfig();
     const [opened, { open, close }] = useDisclosure(false);
     const appId = application.address as AddressType;
+    const version = application.rollupVersion;
 
     return (
         <>
@@ -72,7 +73,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                 <Group gap="xs">
                     <Tooltip label="Summary">
                         <Link
-                            href={`/applications/${appId}`}
+                            href={`/applications/${appId}/${version}`}
                             data-testid="applications-summary-link"
                         >
                             <ActionIcon variant="default">
@@ -82,7 +83,7 @@ const ApplicationDataColumn: FC<ColumnProps> = ({ application }) => {
                     </Tooltip>
                     <Tooltip label="Inputs">
                         <Link
-                            href={`/applications/${appId}/inputs`}
+                            href={`/applications/${appId}/${version}/inputs`}
                             data-testid="applications-link"
                         >
                             <ActionIcon variant="default">

@@ -1,0 +1,74 @@
+{
+  "address": "0xc700d52F5290e978e9CAe7D1E092935263b60051",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "inputBox",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "depositERC721Token",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "contract IERC721"
+        },
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "baseLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "execLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getInputBox",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ],
+  "constructorArgs": [
+    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
+  ],
+  "linkedLibraries": {},
+  "deployTxnHash": "0x41cd6b2726b240a9e6a00990a260e578e142c9ec1ec429a35fd2b2a9a3e3a25d",
+  "deployTxnBlockNumber": "6",
+  "deployTimestamp": "1748610367",
+  "sourceName": "src/portals/ERC721Portal.sol",
+  "contractName": "ERC721Portal",
+  "deployedOn": "deploy.ERC721Portal",
+  "gasUsed": 253126,
+  "gasCost": "1517833487"
+}

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import InputRow, {
     InputRowProps,
 } from "../../../src/components/inputs/inputRow";
+import { RollupVersion } from "../../../src/graphql/explorer/types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 
@@ -32,6 +33,7 @@ const defaultProps: InputRowProps = {
         application: {
             id: `11155111-0xdb84080e7d2b4654a7e384de851a6cf7281643de`,
             address: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+            rollupVersion: RollupVersion.V1,
         },
         index: 1,
         payload: "0x68656c6c6f2032",

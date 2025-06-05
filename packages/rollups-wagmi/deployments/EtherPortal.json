@@ -1,0 +1,64 @@
+{
+  "address": "0xc70076a466789B595b50959cdc261227F0D70051",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "inputBox",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "depositEther",
+      "inputs": [
+        {
+          "name": "appContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "execLayerData",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "getInputBox",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IInputBox"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "error",
+      "name": "EtherTransferFailed",
+      "inputs": []
+    }
+  ],
+  "constructorArgs": [
+    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
+  ],
+  "linkedLibraries": {},
+  "deployTxnHash": "0xca315ebb01393b8fdf13cbcab8fe77e49b323919245f58f8dd42a75735b13cd8",
+  "deployTxnBlockNumber": "7",
+  "deployTimestamp": "1748610368",
+  "sourceName": "src/portals/EtherPortal.sol",
+  "contractName": "EtherPortal",
+  "deployedOn": "deploy.EtherPortal",
+  "gasUsed": 193966,
+  "gasCost": "1454196611"
+}

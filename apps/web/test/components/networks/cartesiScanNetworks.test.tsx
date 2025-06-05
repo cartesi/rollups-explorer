@@ -13,6 +13,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     mainnet,
     optimism,
     optimismSepolia,
@@ -100,6 +101,19 @@ describe("CartesiScanNetworks component", () => {
         );
     });
 
+    it("should display the Cannon icon when chain set is Cannon (13370)", () => {
+        useConfigMock.mockReturnValue({
+            chains: [cannon],
+        });
+
+        render(<Component />);
+
+        expect(screen.getByText("Cannon")).toBeInTheDocument();
+        expect(screen.getByRole("img").getAttribute("aria-label")).toEqual(
+            "The Cannon icon",
+        );
+    });
+
     it("Should display the Base network icon when chain set is Base Mainnet", () => {
         useConfigMock.mockReturnValue({
             chains: [base],
@@ -153,7 +167,7 @@ describe("CartesiScanNetworks component", () => {
     });
 
     it("should list the networks cartesiscan supports as links to the live sites", async () => {
-        const { container } = render(<Component />);
+        render(<Component />);
 
         expect(screen.queryByRole("menu")).not.toBeInTheDocument();
 
