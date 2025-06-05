@@ -51,7 +51,9 @@ const generateV2ContractsConfig = (): ContractConfig[] => {
     return contractConfigs;
 };
 
-export default defineConfig({
+type Config = ReturnType<typeof defineConfig>;
+
+const config: Config = defineConfig({
     out: "src/index.tsx",
     contracts: [
         {
@@ -89,3 +91,5 @@ export default defineConfig({
         react(),
     ],
 });
+
+export default config;

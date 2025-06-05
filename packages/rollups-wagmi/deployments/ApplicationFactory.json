@@ -1,5 +1,5 @@
 {
-  "address": "0x2210ad1d9B0bD2D470c2bfA4814ab6253BC421A0",
+  "address": "0xc7006f70875BaDe89032001262A846D3Ee160051",
   "abi": [
     {
       "type": "function",
@@ -153,12 +153,12 @@
   ],
   "constructorArgs": [],
   "linkedLibraries": {},
-  "deployTxnHash": "0x3f64dd4339edba3bed5a1b76c0721f54b5ff7430a90233c60ab1ebfd7e213f43",
+  "deployTxnHash": "0x39c05a189bd69011782ddff4b94f1151bee0ece3324aa333e9f9f60a51f4be54",
   "deployTxnBlockNumber": "1",
-  "deployTimestamp": "1742931756",
+  "deployTimestamp": "1748610367",
   "sourceName": "src/dapp/ApplicationFactory.sol",
   "contractName": "ApplicationFactory",
   "deployedOn": "deploy.ApplicationFactory",
-  "gasUsed": 1249720,
-  "gasCost": "1307089154"
+  "gasUsed": 1241858,
+  "gasCost": "1307280719"
 }

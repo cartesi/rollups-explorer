@@ -1,5 +1,5 @@
 {
-  "address": "0xBc70d79F916A6d48aB0b8F03AC58f89742dEDA34",
+  "address": "0xc700A2e5531E720a2434433b6ccf4c0eA2400051",
   "abi": [
     {
       "type": "constructor",
@@ -65,15 +65,15 @@
     }
   ],
   "constructorArgs": [
-    "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
   ],
   "linkedLibraries": {},
-  "deployTxnHash": "0x2076bc2995b4cda946265fa53f6a5a51c86803c2042793f175f6173edc8b885f",
+  "deployTxnHash": "0x80b3b6038ad0caede6191b27a812c67264e6d63a801441cdcdadab0586bc657b",
   "deployTxnBlockNumber": "3",
-  "deployTimestamp": "1742931756",
+  "deployTimestamp": "1748610367",
   "sourceName": "src/portals/ERC1155BatchPortal.sol",
   "contractName": "ERC1155BatchPortal",
   "deployedOn": "deploy.ERC1155BatchPortal",
-  "gasUsed": 306740,
-  "gasCost": "1767389905"
+  "gasUsed": 297734,
+  "gasCost": "1767332330"
 }
