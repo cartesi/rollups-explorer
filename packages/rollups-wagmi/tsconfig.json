@@ -4,6 +4,7 @@
     "exclude": ["dist", "build", "node_modules"],
     "compilerOptions": {
         "resolveJsonModule": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "moduleResolution": "bundler"
     }
 }

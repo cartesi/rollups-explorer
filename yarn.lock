@@ -1631,10 +1631,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@cartesi/rollups-v2@npm:@cartesi/rollups@2.0.0-rc.17":
-  version "2.0.0-rc.17"
-  resolved "https://registry.yarnpkg.com/@cartesi/rollups/-/rollups-2.0.0-rc.17.tgz#9f93843796759b5b2c333a7120b06e0d4064c9a9"
-  integrity sha512-W3yCVyRsbgv8t4qwSogKNT8Zy4bcdDxTIuK4rDNPKFvuDuppSQbZfKaaG2fx0NJGfbmm2c7M/t+on8aB+IN9mg==
+"@cartesi/rollups-v2@npm:@cartesi/rollups@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@cartesi/rollups/-/rollups-2.0.0.tgz#a0142a5f7ec7f5f43371dd5e259255a9823a158a"
+  integrity sha512-41Dtq73wD5JTepuryUiXumjMNx/e5AlOROKlao4/A0rG34R8emblnTGwvMaMpzKd+USDk2M/aLtIPZ6tnDXD/g==
 
 "@cartesi/rollups@^1.2.0":
   version "1.4.0"

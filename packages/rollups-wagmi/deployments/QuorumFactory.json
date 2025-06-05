@@ -1,5 +1,5 @@
 {
-  "address": "0xb85D3942e551E6E5f19AC2CCF8dAb195f5f0347E",
+  "address": "0xC7003CAb437640b91C3351B98e9e8aA413410051",
   "abi": [
     {
       "type": "function",
@@ -99,12 +99,12 @@
   ],
   "constructorArgs": [],
   "linkedLibraries": {},
-  "deployTxnHash": "0xfcb247d903064f7336c1aa5e54f33b467c010a0d05aacd58d37c8404d3a8c9d7",
+  "deployTxnHash": "0x260299cc5a8f37230a64d38aabdc9228afdf8a3823689afda758bcdb0fecebc3",
   "deployTxnBlockNumber": "1",
-  "deployTimestamp": "1742931756",
+  "deployTimestamp": "1748610367",
   "sourceName": "src/consensus/quorum/QuorumFactory.sol",
   "contractName": "QuorumFactory",
   "deployedOn": "deploy.QuorumFactory",
-  "gasUsed": 625423,
-  "gasCost": "1398280091"
+  "gasUsed": 723857,
+  "gasCost": "1398156191"
 }

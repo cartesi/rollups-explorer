@@ -1,5 +1,5 @@
 {
-  "address": "0x05355c2F9bA566c06199DEb17212c3B78C1A3C31",
+  "address": "0xc700D6aDd016eECd59d989C028214Eaa0fCC0051",
   "abi": [
     {
       "type": "constructor",
@@ -60,15 +60,15 @@
     }
   ],
   "constructorArgs": [
-    "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
   ],
   "linkedLibraries": {},
-  "deployTxnHash": "0xb0d47464356a7fbecf4b193349c8a176c08e20002da4cbd3317666e94adbcc9a",
+  "deployTxnHash": "0xecb4581f3880441c9f23649ac4f1fcc0805e5499ae90504e6c5331873f1aba2e",
   "deployTxnBlockNumber": "5",
-  "deployTimestamp": "1742931756",
+  "deployTimestamp": "1748610367",
   "sourceName": "src/portals/ERC20Portal.sol",
   "contractName": "ERC20Portal",
   "deployedOn": "deploy.ERC20Portal",
-  "gasUsed": 220318,
-  "gasCost": "1590706765"
+  "gasUsed": 216064,
+  "gasCost": "1590594402"
 }

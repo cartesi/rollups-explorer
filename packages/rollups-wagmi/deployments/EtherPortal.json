@@ -1,5 +1,5 @@
 {
-  "address": "0xd31aD6613bDaA139E7D12B2428C0Dd00fdBF8aDa",
+  "address": "0xc70076a466789B595b50959cdc261227F0D70051",
   "abi": [
     {
       "type": "constructor",
@@ -50,15 +50,15 @@
     }
   ],
   "constructorArgs": [
-    "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
   ],
   "linkedLibraries": {},
-  "deployTxnHash": "0x0019b2fa6a38eb92fe088a6534276ed0440e7d615016d593ee6e1c702819a9eb",
+  "deployTxnHash": "0xca315ebb01393b8fdf13cbcab8fe77e49b323919245f58f8dd42a75735b13cd8",
   "deployTxnBlockNumber": "7",
-  "deployTimestamp": "1742931756",
+  "deployTimestamp": "1748610368",
   "sourceName": "src/portals/EtherPortal.sol",
   "contractName": "EtherPortal",
   "deployedOn": "deploy.EtherPortal",
-  "gasUsed": 200794,
-  "gasCost": "1454308461"
+  "gasUsed": 193966,
+  "gasCost": "1454196611"
 }

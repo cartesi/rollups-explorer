@@ -1,5 +1,5 @@
 {
-  "address": "0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c",
+  "address": "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051",
   "abi": [
     {
       "type": "function",
@@ -130,12 +130,12 @@
   ],
   "constructorArgs": [],
   "linkedLibraries": {},
-  "deployTxnHash": "0x08152eb866e9611e4fb52f4c2b815f83d7d1d5358e8c3e348092b3f27f079709",
+  "deployTxnHash": "0x6362936bea9a78f1d079aabf8200ed60f6ada33c6c2800d7ae01203430eabcaf",
   "deployTxnBlockNumber": "1",
-  "deployTimestamp": "1742931757",
+  "deployTimestamp": "1748610369",
   "sourceName": "src/inputs/InputBox.sol",
   "contractName": "InputBox",
   "deployedOn": "deploy.InputBox",
-  "gasUsed": 242044,
+  "gasUsed": 234148,
   "gasCost": "2000000000"
 }
