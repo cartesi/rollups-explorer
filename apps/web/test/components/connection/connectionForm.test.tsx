@@ -16,7 +16,7 @@ import { checkStatusSample } from "../../utils/dataSamples";
 import { queryMockImplBuilder } from "../../utils/useQueryMock";
 
 vi.mock("urql");
-vi.mock("../../../src/graphql");
+vi.mock("@cartesi/rollups-explorer-domain/rollups-operations");
 vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("@mantine/notifications");
 

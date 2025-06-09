@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import prettyMilliseconds from "pretty-ms";
 import { describe, it } from "vitest";
 import LatestInputsTable from "../../../src/components/applications/latestInputsTable";
-import { RollupVersion } from "../../../src/graphql/explorer/types";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 const Component = withMantineTheme(LatestInputsTable);

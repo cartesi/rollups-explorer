@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { useQuery } from "urql";
 import { beforeEach, describe, expect, it } from "vitest";
 import ConnectionInputStatusBadge from "../../../src/components/connection/connectionInputStatusBadge";
-import { RollupVersion } from "../../../src/graphql/explorer/types";
-import { InputStatusDocument } from "../../../src/graphql/rollups/operations";
-import { InputStatusDocument as InputStatusDocumentV2 } from "../../../src/graphql/rollups/v2/operations";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
+import { InputStatusDocument } from "@cartesi/rollups-explorer-domain/rollups-operations";
+import { InputStatusDocument as InputStatusDocumentV2 } from "@cartesi/rollups-explorer-domain/rollups-v2-operations";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("urql");
