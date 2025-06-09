@@ -4,9 +4,10 @@ import { Summary } from "@cartesi/rollups-explorer-ui";
 import { FC } from "react";
 import { useAccount } from "wagmi";
 import {
-    useStatsApplicationsOwnerQuery,
     useStatsQuery,
-} from "../graphql/explorer/hooks/queries";
+    useStatsApplicationsOwnerQuery,
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
+
 import getConfiguredChainId from "../lib/getConfiguredChain";
 
 const EntriesSummary: FC = () => {

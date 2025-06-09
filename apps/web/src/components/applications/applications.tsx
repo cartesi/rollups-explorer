@@ -6,8 +6,8 @@ import { useAccount } from "wagmi";
 import {
     useApplicationsConnectionOwnerQuery,
     useApplicationsConnectionQuery,
-} from "../../graphql/explorer/hooks/queries";
-import { ApplicationOrderByInput } from "../../graphql/explorer/types";
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import { ApplicationOrderByInput } from "@cartesi/rollups-explorer-domain/explorer-types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import ApplicationsTable from "../applications/applicationsTable";
 import Paginated from "../paginated";

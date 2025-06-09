@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { useMultiTokensQuery } from "../graphql/explorer/hooks/queries";
+import { useMultiTokensQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 
 type SearchInput = { address?: string; limit?: number; chainId: string };
 type SearchOutput = { fetching: boolean; multiTokens: Address[] };

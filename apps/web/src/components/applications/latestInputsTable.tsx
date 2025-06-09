@@ -4,7 +4,7 @@ import prettyMilliseconds from "pretty-ms";
 import { FC, useCallback, useState } from "react";
 import { TbArrowRight } from "react-icons/tb";
 import { Address as AddressType } from "viem";
-import { InputItemFragment } from "../../graphql/explorer/operations";
+import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
 import RollupContractResolver from "../../lib/rollupContractResolver";
 import Address from "../address";
 

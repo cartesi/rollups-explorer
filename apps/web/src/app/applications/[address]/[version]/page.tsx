@@ -12,7 +12,7 @@ import {
     ApplicationByIdDocument,
     ApplicationByIdQuery,
     ApplicationByIdQueryVariables,
-} from "../../../../graphql/explorer/operations";
+} from "@cartesi/rollups-explorer-domain/explorer-operations";
 import getConfiguredChainId from "../../../../lib/getConfiguredChain";
 import { getUrqlServerClient } from "../../../../lib/urql";
 

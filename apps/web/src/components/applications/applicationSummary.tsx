@@ -17,8 +17,11 @@ import Link from "next/link";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import { Address } from "viem";
-import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
-import { InputOrderByInput, RollupVersion } from "../../graphql/explorer/types";
+import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import {
+    InputOrderByInput,
+    RollupVersion,
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionSummary from "../connection/connectionSummary";
