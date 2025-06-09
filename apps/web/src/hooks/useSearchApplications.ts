@@ -1,6 +1,6 @@
 import React from "react";
-import { useApplicationsQuery } from "../graphql/explorer/hooks/queries";
-import { RollupVersion } from "../graphql/explorer/types";
+import { useApplicationsQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 
 export const useSearchApplications = ({
     chainId,

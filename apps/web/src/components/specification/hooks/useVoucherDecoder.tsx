@@ -5,7 +5,7 @@ import { any, isNil } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState } from "react";
 import { Abi, Hex, decodeFunctionData } from "viem";
-import { RollupVersion } from "../../../graphql/explorer/types";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import getSupportedChainInfo, {
     SupportedChainId,
 } from "../../../lib/supportedChains";

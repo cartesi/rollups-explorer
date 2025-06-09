@@ -8,7 +8,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
-import { Application } from "../../graphql/explorer/types";
+import { Application } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { ApplicationsTableProps } from "./applicationsTable";
 import UserApplicationsRow from "./userApplicationsRow";
 import { useElementVisibility } from "../../hooks/useElementVisibility";

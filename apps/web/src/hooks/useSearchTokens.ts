@@ -1,5 +1,5 @@
 import React from "react";
-import { useTokensQuery } from "../graphql/explorer/hooks/queries";
+import { useTokensQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 
 export const useSearchTokens = ({
     address,

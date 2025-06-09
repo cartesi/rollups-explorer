@@ -27,7 +27,7 @@ import {
     CheckStatusDocument,
     CheckStatusQuery,
     CheckStatusQueryVariables,
-} from "../../graphql/rollups/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
 import { useSearchApplications } from "../../hooks/useSearchApplications";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";

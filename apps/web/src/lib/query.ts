@@ -1,6 +1,9 @@
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { isHash, isHex } from "viem";
-import { InputWhereInput, RollupVersion } from "../graphql/explorer/types";
+import {
+    InputWhereInput,
+    RollupVersion,
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 
 type QueryReturn = InputWhereInput;
 
