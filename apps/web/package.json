@@ -18,6 +18,7 @@
         "test:e2e:ui": "playwright test --ui"
     },
     "dependencies": {
+        "@cartesi/rollups-explorer-domain": "*",
         "@cartesi/rollups-explorer-ui": "*",
         "@cartesi/rollups-wagmi": "*",
         "@mantine/code-highlight": "^7.15.3",
