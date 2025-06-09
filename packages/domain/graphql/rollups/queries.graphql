@@ -1,0 +1,105 @@
+
+query inputDetails (
+  $inputIdx: Int!  
+  $firstNotices: Int
+  $lastNotices: Int
+  $noticesNextPage: String
+  $noticesPrevPage: String
+  $firstReports: Int
+  $lastReports: Int
+  $reportsNextPage: String
+  $reportsPrevPage: String
+  $firstVouchers: Int
+  $lastVouchers: Int
+  $vouchersNextPage: String
+  $vouchersPrevPage: String
+) {
+  input(index: $inputIdx){    
+    vouchers(first: $firstVouchers, after: $vouchersNextPage, before: $vouchersPrevPage, last: $lastVouchers) {
+      totalCount
+      edges {
+        node {
+          index
+          input {
+            index
+          }
+          destination
+          payload
+          proof {
+            context
+            validity {
+              inputIndexWithinEpoch
+              machineStateHash
+              noticesEpochRootHash
+              outputHashInOutputHashesSiblings
+              outputHashesInEpochSiblings
+              outputHashesRootHash
+              outputIndexWithinInput
+              vouchersEpochRootHash
+            }
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+    notices(first: $firstNotices, after: $noticesNextPage, before: $noticesPrevPage, last: $lastNotices){
+      totalCount
+      edges {
+        node {
+          index
+          payload
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+    reports(first: $firstReports, after: $reportsNextPage, before: $reportsPrevPage, last: $lastReports) {
+      totalCount
+      edges {
+        node {
+          index
+          payload
+        }
+        cursor
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+}
+
+query checkStatus {
+  inputs {
+    totalCount
+  }
+  vouchers {
+    totalCount
+  }
+  reports {
+    totalCount
+  }
+  notices {
+    totalCount
+  }
+}
+
+query inputStatus($index: Int!) {
+  input(index: $index) {
+    status
+  }
+}

@@ -1,0 +1,37 @@
+{
+    "name": "@cartesi/rollups-explorer-domain",
+    "version": "0.0.0",
+    "exports": {
+        "./explorer-hooks": "./src/graphql/explorer/hooks/queries.tsx",
+        "./explorer-operations": "./src/graphql/explorer/operations.ts",
+        "./explorer-types": "./src/graphql/explorer/types.ts",
+        "./rollups-hooks": "./src/graphql/rollups/hooks/queries.tsx",
+        "./rollups-operations": "./src/graphql/rollups/operations.ts",
+        "./rollups-types": "./src/graphql/rollups/types.ts",
+        "./rollups-v2-hooks": "./src/graphql/rollups/v2/hooks/queries.tsx",
+        "./rollups-v2-operations": "./src/graphql/rollups/v2/operations.ts",
+        "./rollups-v2-types": "./src/graphql/rollups/v2/types.ts"
+    },
+    "sideEffects": false,
+    "license": "Apache-2.0",
+    "scripts": {
+        "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        "codegen": "dotenv -e .env -c -- graphql-codegen"
+    },
+    "devDependencies": {
+        "@cartesi/tsconfig": "*",
+        "@graphql-codegen/add": "^5",
+        "@graphql-codegen/cli": "^5",
+        "@graphql-codegen/client-preset": "^4",
+        "@graphql-codegen/import-types-preset": "^3.0.0",
+        "@graphql-codegen/named-operations-object": "^3.0.0",
+        "@graphql-codegen/typed-document-node": "^5",
+        "@graphql-codegen/typescript": "^4",
+        "@graphql-codegen/typescript-operations": "^4",
+        "@graphql-codegen/typescript-urql": "^4",
+        "@graphql-typed-document-node/core": "^3",
+        "@types/node": "^20",
+        "dotenv-cli": "7.3.0",
+        "typescript": "^5"
+    }
+}
