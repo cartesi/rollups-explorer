@@ -3,7 +3,8 @@
     "compilerOptions": {
         "plugins": [{ "name": "next" }],
         "types": ["vitest/globals"],
-        "moduleResolution": "bundler"
+        "moduleResolution": "bundler",
+        "declaration": false
     },
     "include": [
         "src",
