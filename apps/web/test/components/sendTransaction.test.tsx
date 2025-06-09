@@ -14,10 +14,10 @@ import {
     useApplicationsQuery,
     useTokensQuery,
     useMultiTokensQuery,
-} from "../../src/graphql/explorer/hooks/queries";
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import { useBalance } from "wagmi";
 
-vi.mock("../../src/graphql/explorer/hooks/queries");
+vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
 const useApplicationsQueryMock = vi.mocked(useApplicationsQuery, {
     partial: true,
 });

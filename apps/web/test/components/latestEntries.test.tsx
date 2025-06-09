@@ -209,9 +209,9 @@ const applications = [
     },
 ];
 
-vi.mock("../../src/graphql/explorer/hooks/queries", async () => {
+vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks", async () => {
     const actual = await vi.importActual(
-        "../../src/graphql/explorer/hooks/queries",
+        "@cartesi/rollups-explorer-domain/explorer-hooks",
     );
     return {
         ...(actual as any),

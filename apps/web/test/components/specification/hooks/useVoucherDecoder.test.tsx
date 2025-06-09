@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
 import useVoucherDecoder from "../../../../src/components/specification/hooks/useVoucherDecoder";
 import { stringifyContent } from "../../../../src/components/specification/utils";
-import { RollupVersion } from "../../../../src/graphql/explorer/types";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { voucherDecoderStubs } from "./stubs";
 
 vi.mock("@shazow/whatsabi");
