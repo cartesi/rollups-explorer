@@ -8,7 +8,6 @@ import {
     lightTheme,
     RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
-import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
 import "@rainbow-me/rainbowkit/styles.css";
 import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -79,17 +78,19 @@ const queryClient = new QueryClient();
 
 const WalletProvider = ({ children }: { children: ReactNode }) => {
     const scheme = useMantineColorScheme();
-
-    // XXX: make this match the mantine theme
-    const themeOptions: ThemeOptions = {
-        accentColor: "rgb(12, 133, 153)",
-        borderRadius: "small",
-    };
+    const accentColor = "rgb(12, 133, 153)";
+    const borderRadius = "small";
 
     const walletTheme =
         scheme.colorScheme == "dark"
-            ? darkTheme(themeOptions)
-            : lightTheme(themeOptions);
+            ? darkTheme({
+                  accentColor,
+                  borderRadius,
+              })
+            : lightTheme({
+                  accentColor,
+                  borderRadius,
+              });
 
     return (
         <WagmiProvider config={wagmiConfig}>
