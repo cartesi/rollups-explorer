@@ -4,47 +4,35 @@
     "main": "dist/index.js",
     "module": "./dist/index.mjs",
     "types": "dist/index.d.ts",
-    "files": [
-        "dist",
-        "explorer-operations",
-        "explorer-hooks",
-        "explorer-types",
-        "rollups-operations",
-        "rollups-hooks",
-        "rollups-types",
-        "rollups-v2-operations",
-        "rollups-v2-hooks",
-        "rollups-v2-types"
-    ],
     "exports": {
         ".": "./dist/index.js",
-        "./explorer-operations": "./dist/explorer/operations.js",
-        "./explorer-hooks": "./dist/explorer/hooks/queries.js",
-        "./explorer-types": "./dist/explorer/types.js",
-        "./rollups-operations": "./dist/rollups/operations.js",
-        "./rollups-hooks": "./dist/rollups/hooks/queries.js",
-        "./rollups-types": "./dist/rollups/types.js",
-        "./rollups-v2-operations": "./dist/rollups/v2/operations.js",
-        "./rollups-v2-hooks": "./dist/rollups/v2/hooks/queries.js",
-        "./rollups-v2-types": "./dist/rollups/v2/types.js"
+        "./explorer-operations": "./dist/graphql/explorer/operations.js",
+        "./explorer-hooks": "./dist/graphql/explorer/hooks/queries.js",
+        "./explorer-types": "./dist/graphql/explorer/types.js",
+        "./rollups-operations": "./dist/graphql/rollups/operations.js",
+        "./rollups-hooks": "./dist/graphql/rollups/hooks/queries.js",
+        "./rollups-types": "./dist/graphql/rollups/types.js",
+        "./rollups-v2-operations": "./dist/graphql/rollups/v2/operations.js",
+        "./rollups-v2-hooks": "./dist/graphql/rollups/v2/hooks/queries.js",
+        "./rollups-v2-types": "./dist/graphql/rollups/v2/types.js"
     },
     "typesVersions": {
         "*": {
-            "explorer-operations": ["dist/explorer/operations.d.ts"],
-            "explorer-hooks": ["dist/explorer/hooks/queries.d.ts"],
-            "explorer-types": ["dist/explorer/types.d.ts"],
-            "rollups-operations": ["dist/rollups/operations.d.ts"],
-            "rollups-hooks": ["dist/rollups/hooks/queries.d.ts"],
-            "rollups-types": ["dist/rollups/types.d.ts"],
-            "rollups-v2-operations": ["dist/rollups/v2/operations.d.ts"],
-            "rollups-v2-hooks": ["dist/rollups/v2/hooks/queries.d.ts"],
-            "rollups-v2-types": ["dist/rollups/v2/types.d.ts"]
+            "explorer-operations": ["dist/graphql/explorer/operations.d.ts"],
+            "explorer-hooks": ["dist/graphql/explorer/hooks/queries.d.ts"],
+            "explorer-types": ["dist/graphql/explorer/types.d.ts"],
+            "rollups-operations": ["dist/graphql/rollups/operations.d.ts"],
+            "rollups-hooks": ["dist/graphql/rollups/hooks/queries.d.ts"],
+            "rollups-types": ["dist/graphql/rollups/types.d.ts"],
+            "rollups-v2-operations": ["dist/graphql/rollups/v2/operations.d.ts"],
+            "rollups-v2-hooks": ["dist/graphql/rollups/v2/hooks/queries.d.ts"],
+            "rollups-v2-types": ["dist/graphql/rollups/v2/types.d.ts"]
         }
     },
     "sideEffects": false,
     "license": "Apache-2.0",
     "scripts": {
-        "build": "tsup",
+        "build": "tsup --no-splitting",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "codegen": "dotenv -e .env -c -- graphql-codegen"
     },
