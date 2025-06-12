@@ -2,9 +2,7 @@
     "extends": "@cartesi/tsconfig/nextjs.json",
     "compilerOptions": {
         "plugins": [{ "name": "next" }],
-        "types": ["vitest/globals"],
-        "moduleResolution": "bundler",
-        "declaration": false
+        "types": ["vitest/globals"]
     },
     "include": [
         "src",
