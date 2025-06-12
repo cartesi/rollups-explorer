@@ -4,6 +4,18 @@
     "main": "dist/index.js",
     "module": "./dist/index.mjs",
     "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "explorer-operations",
+        "explorer-hooks",
+        "explorer-types",
+        "rollups-operations",
+        "rollups-hooks",
+        "rollups-types",
+        "rollups-v2-operations",
+        "rollups-v2-hooks",
+        "rollups-v2-types"
+    ],
     "exports": {
         ".": "./dist/index.js",
         "./explorer-operations": "./dist/explorer/operations.js",
