@@ -1,11 +1,9 @@
-import {
-    Application as ExplorerApplication,
-    RollupVersion as ExplorerRollupVersion,
-} from "@cartesi/rollups-explorer-domain/explorer-types";
+import { Hex } from "viem";
 
-export type RollupVersion = `${ExplorerRollupVersion}`;
+export type RollupVersion = "v1" | "v2";
 
-export type Application = Pick<
-    ExplorerApplication,
-    "id" | "address" | "rollupVersion"
->;
+export interface Application {
+    id: string;
+    address: string | Hex;
+    rollupVersion: RollupVersion;
+}
