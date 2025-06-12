@@ -14,9 +14,13 @@ import { useConnectionConfig } from "../../../src/providers/connectionConfig/hoo
 import withMantineTheme from "../../utils/WithMantineTheme";
 import { checkStatusSample } from "../../utils/dataSamples";
 import { queryMockImplBuilder } from "../../utils/useQueryMock";
+import { useApplicationsQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 
 vi.mock("urql");
 vi.mock("@cartesi/rollups-explorer-domain/rollups-operations");
+vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
+
 vi.mock("../../../src/providers/connectionConfig/hooks");
 vi.mock("@mantine/notifications");
 
@@ -24,6 +28,7 @@ const AppConnectionFormE = withMantineTheme(AppConnectionForm);
 const useQueryMock = vi.mocked(useQuery, true);
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 const notificationsMock = vi.mocked(notifications, true);
+const useApplicationsQueryMock = vi.mocked(useApplicationsQuery, true);
 
 describe("connectionForm", () => {
     beforeEach(() => {
@@ -38,6 +43,34 @@ describe("connectionForm", () => {
             showConnectionModal: vi.fn(),
             listConnections: vi.fn(),
         } as any);
+
+        useApplicationsQueryMock.mockReturnValue([
+            {
+                data: {
+                    applications: [
+                        {
+                            address:
+                                "0x60a7048c3136293071605a4eaffef49923e981cc",
+                            id: "11155111-0x60a7048c3136293071605a4eaffef49923e981cc-v1",
+                            rollupVersion: "v1" as RollupVersion,
+                        },
+                        {
+                            address:
+                                "0x70ac08179605af2d9e75782b8decdd3c22aa4d0c",
+                            id: "11155111-0x70ac08179605af2d9e75782b8decdd3c22aa4d0c-v1",
+                            rollupVersion: "v1" as RollupVersion,
+                        },
+                        {
+                            address:
+                                "0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3",
+                            id: "11155111-0x71ab24ee3ddb97dc01a161edf64c8d51102b0cd3-v1",
+                            rollupVersion: "v1" as RollupVersion,
+                        },
+                    ],
+                },
+                fetching: false,
+            },
+        ] as any);
     });
 
     afterEach(() => {
@@ -112,6 +145,14 @@ describe("connectionForm", () => {
         useQueryMock.mockImplementation(
             queryMockImplBuilder({ apps: { data: [] } }),
         );
+        useApplicationsQueryMock.mockReturnValue([
+            {
+                data: {
+                    applications: [],
+                },
+                fetching: false,
+            },
+        ] as any);
         const address = "0x60a7048c3136293071605a4eaffef49923e981cd";
 
         render(<AppConnectionFormE application={address} />);
