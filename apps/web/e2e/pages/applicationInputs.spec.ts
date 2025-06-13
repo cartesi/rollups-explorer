@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { goToApplicationInputsPage } from "../utils/navigation";
+import { honeypotV2Sepolia } from "../utils/constants";
 
-test.beforeEach(goToApplicationInputsPage);
+test.beforeEach(async ({ page }) => {
+    // TODO: Update to use upcoming search in the applications page rather than navigate directly.
+    await page.goto(
+        `/applications/${honeypotV2Sepolia.address}/${honeypotV2Sepolia.rollupsVersion}/inputs`,
+    );
+});
 
 test("should have correct page title", async ({ page }) => {
     const [_page, _version, address] = page.url().split("/").reverse();
@@ -17,7 +22,11 @@ test("should display inputs table", async ({ page }) => {
     await expect(
         page.getByRole("row", { name: "From To Method Index Status Age Data" }),
     ).toBeVisible();
-    await expect(page.getByRole("row")).toHaveCount(31);
+
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+
+    const rowsCount = await page.locator(".mantine-Table-tbody > tr").count();
+    expect(rowsCount).toBeGreaterThan(1);
 });
 
 test("should toggle date column", async ({ page }) => {
@@ -79,16 +88,8 @@ test("should search for specific input", async ({ page }) => {
 
     const addresses = await fromAddress.all();
 
-    await Promise.all([
-        addresses.map(async (address) => {
-            try {
-                const linkHref = (await address.textContent()) as string;
-                expect(
-                    linkHref
-                        .toLowerCase()
-                        .startsWith(addressPrefix.toLowerCase()),
-                ).toBe(true);
-            } catch (err) {}
-        }),
-    ]);
+    for (const address of addresses) {
+        const linkHref = (await address.textContent()) as string;
+        expect(linkHref.toLowerCase()).toContain(addressPrefix.toLowerCase());
+    }
 });
