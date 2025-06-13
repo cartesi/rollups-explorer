@@ -36,6 +36,10 @@
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "codegen": "dotenv -e .env -c -- graphql-codegen"
     },
+    "dependencies": {
+        "urql": "^4",
+        "react": "19.0.0"
+    },
     "devDependencies": {
         "@cartesi/tsconfig": "*",
         "@graphql-codegen/add": "^5",

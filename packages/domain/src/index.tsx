@@ -1,3 +1,5 @@
+export { Provider } from "urql";
+
 export * as explorerHooks from "./graphql/explorer/hooks/queries";
 export * as explorerOperations from "./graphql/explorer/operations";
 export * as explorerTypes from "./graphql/explorer/types";

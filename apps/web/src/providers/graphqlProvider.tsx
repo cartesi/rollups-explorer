@@ -1,5 +1,5 @@
 import { FC, ReactNode } from "react";
-import { Provider } from "urql";
+import { Provider } from "@cartesi/rollups-explorer-domain";
 import { getUrqlClient } from "../lib/urql";
 
 export type GraphQLProviderProps = {
