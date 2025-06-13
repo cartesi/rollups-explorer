@@ -9,7 +9,7 @@ import { notifications } from "@mantine/notifications";
 import { FC, useEffect } from "react";
 import type { Address } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { Voucher } from "../../graphql/rollups/types";
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 
 const typeCastProof = (voucher: Partial<Voucher>) => ({

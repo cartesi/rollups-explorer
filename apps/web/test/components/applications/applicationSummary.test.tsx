@@ -1,11 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import ApplicationSummary from "../../../src/components/applications/applicationSummary";
-import { useInputsConnectionQuery } from "../../../src/graphql/explorer/hooks/queries";
+import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import {
     InputOrderByInput,
     RollupVersion,
-} from "../../../src/graphql/explorer/types";
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { inputsConnectionMock } from "./mocks";
@@ -13,7 +13,7 @@ import { inputsConnectionMock } from "./mocks";
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
 
-vi.mock("../../../src/graphql/explorer/hooks/queries");
+vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
 const useInputsConnectionQueryMock = vi.mocked(useInputsConnectionQuery, true);
 
 const Component = withMantineTheme(ApplicationSummary);

@@ -16,11 +16,11 @@ import type { Address as AddressType } from "viem";
 import {
     useApplicationsConnectionQuery,
     useInputsQuery,
-} from "../graphql/explorer/hooks/queries";
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import {
     ApplicationOrderByInput,
     InputOrderByInput,
-} from "../graphql/explorer/types";
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 import getConfiguredChainId from "../lib/getConfiguredChain";
 import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 

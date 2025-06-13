@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { allOperations } from "../../src/graphql/rollups/operations";
 import { test } from "../fixtures/test";
 import { checkStatusSuccessResponse } from "../utils/checkStatus.data";
 import { createConnection, graphqlEndpoint } from "../utils/connection";
@@ -7,11 +6,7 @@ import { goToApplicationSummaryPage } from "../utils/navigation";
 
 test.beforeEach(async ({ page, interceptGQL }) => {
     await goToApplicationSummaryPage({ page });
-    await interceptGQL(
-        page,
-        allOperations.Query.checkStatus,
-        checkStatusSuccessResponse,
-    );
+    await interceptGQL(page, "checkStatus", checkStatusSuccessResponse);
 });
 
 test("should have correct page title", async ({ page }) => {

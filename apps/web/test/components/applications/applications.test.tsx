@@ -6,11 +6,11 @@ import { withMantineTheme } from "../../utils/WithMantineTheme";
 import {
     useApplicationsConnectionOwnerQuery,
     useApplicationsConnectionQuery,
-} from "../../../src/graphql/explorer/hooks/queries";
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import { ReactNode } from "react";
 
 vi.mock("wagmi");
-vi.mock("../../../src/graphql/explorer/hooks/queries");
+vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
 vi.mock("../../../src/components/paginated", async () => ({
     default: (props: { children: ReactNode; ["data-testid"]: string }) => (
         <div data-testid={props["data-testid"]}>{props.children}</div>
