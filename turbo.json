@@ -53,7 +53,7 @@
             ]
         },
         "test:e2e": {
-            "dependsOn": ["codegen"],
+            "dependsOn": ["build"],
             "outputs": ["playwright-report/**"],
             "inputs": ["src/**/*.ts", "src/**/*.tsx", "e2e/**/*.ts"]
         }
