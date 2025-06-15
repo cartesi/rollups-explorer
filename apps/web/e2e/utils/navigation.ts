@@ -2,42 +2,45 @@ import { expect, Page } from "@playwright/test";
 
 export const goToApplicationInputsPage = async ({ page }: { page: Page }) => {
     // Go to applications page
-    await page.goto("/applications");
+    await page.goto("/");
 
     // Wait for applications data to be loaded
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(
+        page.getByTestId("inputs-table-spinner").first(),
+    ).not.toBeVisible();
 
-    // Get the applications' links
-    const applicationInputsLinks = page
-        .getByTestId("applications-table")
-        .getByTestId("applications-link");
+    // Get the first link from the latest inputs table
+    const latestInputsTableFirstLink = page
+        .getByTestId("latest-inputs")
+        .getByRole("table")
+        .getByRole("link")
+        .first();
 
-    // Get the href attribute of the first link (this is the link to that application's inputs page)
-    const href = (await applicationInputsLinks
-        .first()
-        .getAttribute("href")) as string;
-
-    // navigate to the href
-    await page.goto(href);
+    await latestInputsTableFirstLink.click();
 };
 
 export const goToApplicationSummaryPage = async ({ page }: { page: Page }) => {
     // Go to applications page
-    await page.goto("/applications");
+    await page.goto("/");
 
     // Wait for applications data to be loaded
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(
+        page.getByTestId("inputs-table-spinner").first(),
+    ).not.toBeVisible();
 
-    // Get the applications' links
-    const applicationInputsLinks = page
-        .getByTestId("applications-table")
-        .getByTestId("applications-summary-link");
+    // Get the first link from the latest inputs table
+    const latestInputsTableFirstLink = page
+        .getByTestId("latest-inputs")
+        .getByRole("table")
+        .getByRole("link")
+        .first();
 
-    // Get the href attribute of the first link (this is the link to that application's inputs page)
-    const href = (await applicationInputsLinks
-        .first()
-        .getAttribute("href")) as string;
+    const href = await latestInputsTableFirstLink.getAttribute("href");
+
+    const summaryHref = href?.replace("/inputs", "");
+
+    expect(summaryHref).toBeDefined();
 
     // navigate to the href
-    await page.goto(href);
+    await page.goto(summaryHref as string);
 };
