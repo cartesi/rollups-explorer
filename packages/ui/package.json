@@ -26,6 +26,7 @@
         "test:ci": "vitest run --coverage"
     },
     "dependencies": {
+        "@cartesi/rollups-explorer-domain": "*",
         "@cartesi/rollups-wagmi": "*",
         "@mantine/core": "^7.15.3",
         "@mantine/form": "^7.15.3",

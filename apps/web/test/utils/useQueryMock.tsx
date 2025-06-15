@@ -9,7 +9,7 @@ import {
     ApplicationsDocument,
     ApplicationsQuery,
     ApplicationsQueryVariables,
-} from "../../src/graphql/explorer/operations";
+} from "@cartesi/rollups-explorer-domain/explorer-operations";
 import {
     CheckStatusDocument,
     CheckStatusQuery,
@@ -17,12 +17,12 @@ import {
     InputDetailsDocument,
     InputDetailsQuery,
     InputDetailsQueryVariables,
-} from "../../src/graphql/rollups/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
 import {
     InputDetailsDocument as InputDetailsDocumentV2,
     InputDetailsQuery as InputDetailsQueryV2,
     InputDetailsQueryVariables as InputDetailsQueryVariablesV2,
-} from "../../src/graphql/rollups/v2/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-v2-operations";
 import {
     applicationsSample,
     checkStatusSample,

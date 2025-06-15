@@ -9,7 +9,7 @@ import {
     CheckStatusDocument,
     CheckStatusQuery,
     CheckStatusQueryVariables,
-} from "../../graphql/rollups/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
 
 export interface ConnectionSummaryProps {
     url: string;

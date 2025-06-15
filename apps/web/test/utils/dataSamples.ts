@@ -1,6 +1,6 @@
-import { InputItemFragment } from "../../src/graphql/explorer/operations";
-import { RollupVersion } from "../../src/graphql/explorer/types";
-import { VoucherEdge } from "../../src/graphql/rollups/types";
+import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
+import { VoucherEdge } from "@cartesi/rollups-explorer-domain/rollups-types";
 
 export const chainId = "11155111";
 /**

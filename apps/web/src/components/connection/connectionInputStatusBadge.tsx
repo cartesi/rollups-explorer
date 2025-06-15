@@ -2,17 +2,17 @@
 import { Badge, Loader } from "@mantine/core";
 import { FC, useMemo } from "react";
 import { useQuery } from "urql";
-import { RollupVersion } from "../../graphql/explorer/types";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import {
     InputStatusDocument,
     InputStatusQuery,
     InputStatusQueryVariables,
-} from "../../graphql/rollups/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
 import {
     InputStatusDocument as V2StatusDocument,
     InputStatusQuery as V2StatusQuery,
     InputStatusQueryVariables as V2StatusQueryVariables,
-} from "../../graphql/rollups/v2/operations";
+} from "@cartesi/rollups-explorer-domain/rollups-v2-operations";
 
 interface ConnectionInputStatusBadgeProps {
     graphqlUrl: string;

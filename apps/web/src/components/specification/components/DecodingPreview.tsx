@@ -30,7 +30,7 @@ export const DecodingPreview = () => {
             shadow="sm"
             withBorder
             pos="sticky"
-            top={themeDefaultProps?.header.height + px("1rem") ?? px("4.75rem")}
+            top={themeDefaultProps?.header.height + px("1rem")}
         >
             <Title order={3}>Preview</Title>
             <Stack gap="lg">

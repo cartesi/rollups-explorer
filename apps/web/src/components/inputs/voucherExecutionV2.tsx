@@ -9,8 +9,8 @@ import { isNotNil, isNotNilOrEmpty } from "ramda-adjunct";
 import { FC, useEffect, useMemo } from "react";
 import { Address, Hex } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { InputItemFragment } from "../../graphql/explorer/operations";
-import { Voucher } from "../../graphql/rollups/v2/types";
+import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-v2-types";
 
 interface Props {
     input: InputItemFragment;
