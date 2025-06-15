@@ -3,10 +3,13 @@ import { allOperations } from "../../src/graphql/rollups/operations";
 import { test } from "../fixtures/test";
 import { checkStatusSuccessResponse } from "../utils/checkStatus.data";
 import { createConnection, graphqlEndpoint } from "../utils/connection";
-import { goToApplicationSummaryPage } from "../utils/navigation";
+import { honeypotV2Sepolia } from "../utils/constants";
 
 test.beforeEach(async ({ page, interceptGQL }) => {
-    await goToApplicationSummaryPage({ page });
+    // TODO: Update to use upcoming search in the applications page rather than navigate directly.
+    await page.goto(
+        `/applications/${honeypotV2Sepolia.address}/${honeypotV2Sepolia.rollupsVersion}`,
+    );
     await interceptGQL(
         page,
         allOperations.Query.checkStatus,
