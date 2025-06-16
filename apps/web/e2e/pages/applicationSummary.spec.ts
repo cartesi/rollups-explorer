@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { allOperations } from "@cartesi/rollups-explorer-domain/rollups-operations";
 import { test } from "../fixtures/test";
 import { checkStatusSuccessResponse } from "../utils/checkStatus.data";
 import { createConnection, graphqlEndpoint } from "../utils/connection";
@@ -10,11 +9,7 @@ test.beforeEach(async ({ page, interceptGQL }) => {
     await page.goto(
         `/applications/${honeypotV2Sepolia.address}/${honeypotV2Sepolia.rollupsVersion}`,
     );
-    await interceptGQL(
-        page,
-        allOperations.Query.checkStatus,
-        checkStatusSuccessResponse,
-    );
+    await interceptGQL(page, "checkStatus", checkStatusSuccessResponse);
 });
 
 test("should have correct page title", async ({ page }) => {
