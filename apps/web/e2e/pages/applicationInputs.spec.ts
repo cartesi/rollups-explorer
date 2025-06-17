@@ -30,7 +30,7 @@ test("should display inputs table", async ({ page }) => {
 });
 
 test("should toggle date column", async ({ page }) => {
-    const ageHeaderColumn = page.getByText("Age");
+    const ageHeaderColumn = page.getByText("Age").first();
     await ageHeaderColumn.click();
 
     await expect(

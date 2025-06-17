@@ -33,7 +33,8 @@ const FooterLink: FC<FooterLinkProps> = ({ children, href, color }) => {
             href={href}
             target="_blank"
             component={Link}
-            c={color ?? theme.colors.gray[colorScheme === "light" ? 7 : 6]}
+            c={color ?? theme.colors.gray[colorScheme === "light" ? 9 : 4]}
+            underline="always"
         >
             {children}
         </Anchor>
