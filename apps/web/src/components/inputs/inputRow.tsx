@@ -53,13 +53,6 @@ const InputRow: FC<InputRowProps> = ({
             <></>
         );
 
-    const method = (
-        <Badge variant="default" style={{ textTransform: "none" }}>
-            {RollupContractResolver.resolveMethod(
-                input.msgSender as AddressType,
-            ) ?? "?"}
-        </Badge>
-    );
     return (
         <>
             <Table.Tr>
@@ -123,7 +116,24 @@ const InputRow: FC<InputRowProps> = ({
                         />
                     </Box>
                 </Table.Td>
-                <Table.Td>{method}</Table.Td>
+                <Table.Td>
+                    <Badge variant="filled" style={{ textTransform: "none" }}>
+                        {input.application.rollupVersion}
+                    </Badge>
+                </Table.Td>
+                <Table.Td>
+                    <Badge
+                        variant="default"
+                        style={{
+                            textTransform: "none",
+                            minWidth: "max-content",
+                        }}
+                    >
+                        {RollupContractResolver.resolveMethod(
+                            input.msgSender as AddressType,
+                        ) ?? "?"}
+                    </Badge>
+                </Table.Td>
                 <Table.Td>
                     <Text>{input.index}</Text>
                 </Table.Td>

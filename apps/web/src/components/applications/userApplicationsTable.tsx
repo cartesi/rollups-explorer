@@ -45,6 +45,7 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
                     <Table.Tr>
                         <Table.Th>Id</Table.Th>
                         <Table.Th>URL</Table.Th>
+                        <Table.Th>Version</Table.Th>
                         <Table.Th>
                             <Button
                                 variant="transparent"
@@ -82,14 +83,14 @@ const UserApplicationsTable: FC<UserApplicationsTableProps> = (props) => {
                 <Table.Tbody>
                     {fetching ? (
                         <Table.Tr>
-                            <Table.Td align="center" colSpan={4}>
+                            <Table.Td align="center" colSpan={5}>
                                 <Loader />
                             </Table.Td>
                         </Table.Tr>
                     ) : (
                         totalCount === 0 && (
                             <Table.Tr>
-                                <Table.Td colSpan={4} align="center">
+                                <Table.Td colSpan={5} align="center">
                                     <Text fw={700}>{noResultsMessage}</Text>
                                 </Table.Td>
                             </Table.Tr>
