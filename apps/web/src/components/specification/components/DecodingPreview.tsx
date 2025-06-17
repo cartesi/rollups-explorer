@@ -13,6 +13,7 @@ import {
 import { decodePayload } from "../decoder";
 import { useSpecFormContext } from "../form/context";
 import { buildSpecification, stringifyContent } from "../utils";
+import { isNilOrEmpty } from "ramda-adjunct";
 
 export const DecodingPreview = () => {
     const form = useSpecFormContext();
@@ -24,14 +25,13 @@ export const DecodingPreview = () => {
     const content = envelope?.result ? stringifyContent(envelope.result) : null;
     const theme = useMantineTheme();
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
+    const headerHeight = themeDefaultProps?.header.height;
+    const cardTop = !isNilOrEmpty(headerHeight)
+        ? headerHeight + px("1rem")
+        : px("4.75rem");
 
     return (
-        <Card
-            shadow="sm"
-            withBorder
-            pos="sticky"
-            top={themeDefaultProps?.header.height + px("1rem")}
-        >
+        <Card shadow="sm" withBorder pos="sticky" top={cardTop}>
             <Title order={3}>Preview</Title>
             <Stack gap="lg">
                 <Textarea
