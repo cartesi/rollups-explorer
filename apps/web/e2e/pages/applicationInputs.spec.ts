@@ -20,7 +20,9 @@ test("should have correct title", async ({ page }) => {
 
 test("should display inputs table", async ({ page }) => {
     await expect(
-        page.getByRole("row", { name: "From To Method Index Status Age Data" }),
+        page.getByRole("row", {
+            name: "From To Version Method Index Status Age Data",
+        }),
     ).toBeVisible();
 
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
@@ -35,7 +37,7 @@ test("should toggle date column", async ({ page }) => {
 
     await expect(
         page.getByRole("row", {
-            name: "From To Method Index Status Timestamp (UTC) Data",
+            name: "From To Version Method Index Status Timestamp (UTC) Data",
         }),
     ).toBeVisible();
 
@@ -43,7 +45,9 @@ test("should toggle date column", async ({ page }) => {
     await timestampHeaderColumn.click();
 
     await expect(
-        page.getByRole("row", { name: "From To Method Index Status Age Data" }),
+        page.getByRole("row", {
+            name: "From To Version Method Index Status Age Data",
+        }),
     ).toBeVisible();
 });
 
