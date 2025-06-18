@@ -11,7 +11,7 @@ import {
     pipe,
     thunkify,
 } from "ramda";
-import { Input } from "../../graphql/explorer/types";
+import { Input } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { Condition, Predicate, Specification } from "./types";
 
 /**

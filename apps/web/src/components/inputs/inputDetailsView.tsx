@@ -7,20 +7,20 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { TbExclamationCircle } from "react-icons/tb";
 import { UseQueryResponse, useQuery } from "urql";
 import { Address, Hex } from "viem";
-import { InputItemFragment } from "../../graphql/explorer/operations";
-import { RollupVersion } from "../../graphql/explorer/types";
+import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import {
     InputDetailsDocument,
     InputDetailsQuery,
     InputDetailsQueryVariables,
-} from "../../graphql/rollups/operations";
-import { Voucher } from "../../graphql/rollups/types";
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
 import {
     InputDetailsDocument as V2InputDetailsDocument,
     InputDetailsQuery as V2InputDetailsQuery,
     InputDetailsQueryVariables as V2InputDetailsQueryVariables,
-} from "../../graphql/rollups/v2/operations";
-import { Voucher as VoucherV2 } from "../../graphql/rollups/v2/types";
+} from "@cartesi/rollups-explorer-domain/rollups-v2-operations";
+import { Voucher as VoucherV2 } from "@cartesi/rollups-explorer-domain/rollups-v2-types";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { theme } from "../../providers/theme";

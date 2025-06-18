@@ -13,7 +13,7 @@ import { sepolia } from "viem/chains";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import InputDetailsView from "../../../src/components/inputs/inputDetailsView";
-import { RollupVersion } from "../../../src/graphql/explorer/types";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import withMantineTheme from "../../utils/WithMantineTheme";
 import { useConnectionConfigReturnStub } from "../../utils/connectionHelpers";

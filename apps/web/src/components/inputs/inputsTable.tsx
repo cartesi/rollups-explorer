@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { FC, useCallback, useRef, useState } from "react";
 import { TbQuestionMark } from "react-icons/tb";
-import type { InputItemFragment } from "../../graphql/explorer/operations";
+import type { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
 import { useElementVisibility } from "../../hooks/useElementVisibility";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import TableResponsiveWrapper from "../tableResponsiveWrapper";

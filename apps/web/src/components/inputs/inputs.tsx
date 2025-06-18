@@ -3,8 +3,11 @@
 import { Stack } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useMemo, useState } from "react";
-import { useInputsConnectionQuery } from "../../graphql/explorer/hooks/queries";
-import { InputOrderByInput, RollupVersion } from "../../graphql/explorer/types";
+import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import {
+    InputOrderByInput,
+    RollupVersion,
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { checkQuery } from "../../lib/query";

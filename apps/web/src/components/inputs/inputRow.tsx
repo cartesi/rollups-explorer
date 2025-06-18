@@ -15,7 +15,7 @@ import prettyMilliseconds from "pretty-ms";
 import { FC } from "react";
 import { TbArrowRight, TbFileText, TbQuestionMark, TbX } from "react-icons/tb";
 import { Address as AddressType, formatUnits } from "viem";
-import { InputItemFragment } from "../../graphql/explorer/operations";
+import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
 import RollupContractResolver from "../../lib/rollupContractResolver";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { Connection } from "../../providers/connectionConfig/types";

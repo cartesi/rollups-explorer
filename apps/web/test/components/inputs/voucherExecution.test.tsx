@@ -13,7 +13,7 @@ import {
 import { afterEach, describe, it } from "vitest";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import VoucherExecution from "../../../src/components/inputs/voucherExecution";
-import { Voucher } from "../../../src/graphql/rollups/types";
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
 import { notifications } from "@mantine/notifications";
 

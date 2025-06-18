@@ -18,7 +18,7 @@ import {
     TbStack2,
 } from "react-icons/tb";
 import { Address as AddressType } from "viem";
-import { Application } from "../../graphql/explorer/types";
+import { Application } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import Address from "../address";
 import { DeleteConnectionModal } from "../connection/deleteConnectionModal";
