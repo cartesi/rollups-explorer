@@ -52,6 +52,7 @@ const InputsTable: FC<InputsTableProps> = ({
                         <Table.Th>From</Table.Th>
                         <Table.Th></Table.Th>
                         <Table.Th>To</Table.Th>
+                        <Table.Th>Version</Table.Th>
                         <Table.Th>Method</Table.Th>
                         <Table.Th>Index</Table.Th>
                         <Table.Th>
@@ -113,14 +114,14 @@ const InputsTable: FC<InputsTableProps> = ({
                 <Table.Tbody>
                     {fetching ? (
                         <Table.Tr>
-                            <Table.Td align="center" colSpan={7}>
+                            <Table.Td align="center" colSpan={8}>
                                 <Loader data-testid="inputs-table-spinner" />
                             </Table.Td>
                         </Table.Tr>
                     ) : (
                         totalCount === 0 && (
                             <Table.Tr>
-                                <Table.Td colSpan={7} align="center">
+                                <Table.Td colSpan={8} align="center">
                                     <Text fw={700}> No inputs</Text>
                                 </Table.Td>
                             </Table.Tr>

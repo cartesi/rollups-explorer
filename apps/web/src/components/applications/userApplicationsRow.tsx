@@ -1,5 +1,6 @@
 import {
     ActionIcon,
+    Badge,
     Box,
     Group,
     Paper,
@@ -67,6 +68,11 @@ const UserApplicationsRow: FC<UserApplicationsRowProps> = (props) => {
                     </Box>
                 </Table.Td>
                 <Table.Td>{connection?.url ?? "N/A"}</Table.Td>
+                <Table.Td>
+                    <Badge variant="filled" style={{ textTransform: "none" }}>
+                        {application.rollupVersion}
+                    </Badge>
+                </Table.Td>
                 <Table.Td>
                     <Box
                         display="flex"

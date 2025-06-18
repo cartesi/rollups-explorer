@@ -1,6 +1,6 @@
 "use client";
 
-import { ActionIcon, Box, Group, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Box, Group, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { FC } from "react";
@@ -189,6 +189,18 @@ const ApplicationsTable: FC<ApplicationsTableProps> = ({
                     label: "URL",
                     render: (application) => (
                         <ConnectionUrlColumn application={application} />
+                    ),
+                },
+                {
+                    key: "version",
+                    label: "Version",
+                    render: (application) => (
+                        <Badge
+                            variant="filled"
+                            style={{ textTransform: "none" }}
+                        >
+                            {application.rollupVersion}
+                        </Badge>
                     ),
                 },
                 {
