@@ -178,7 +178,9 @@ describe("Applications component", () => {
         const searchInput = screen.getByTestId("search-input");
         fireEvent.focus(searchInput);
 
-        await waitFor(() => userEvent.type(searchInput, address));
+        await waitFor(() => userEvent.type(searchInput, address), {
+            timeout: 2000,
+        });
         await waitFor(
             () =>
                 expect(
