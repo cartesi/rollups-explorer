@@ -1,6 +1,8 @@
 "use client";
 
 import {
+    Box,
+    Flex,
     Group,
     Pagination,
     Select,
@@ -24,17 +26,26 @@ export interface PaginatedProps extends Omit<StackProps, "onChange"> {
     children: ReactNode;
     totalCount?: number;
     fetching: boolean;
+    SearchInput?: ReactNode;
     onChange: (limit: number, page: number) => void;
 }
 
 const Paginated: FC<PaginatedProps> = (props) => {
-    const { children, totalCount, fetching, onChange, ...restProps } = props;
+    const {
+        children,
+        totalCount,
+        fetching,
+        SearchInput = null,
+        onChange,
+        ...restProps
+    } = props;
     const [{ limit, page, query }, updateParams] = useUrlSearchParams();
     const totalPages = Math.ceil(
         totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
     );
     const theme = useMantineTheme();
     const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.xs})`);
+    const hasSearchInput = SearchInput !== null;
 
     const [activePage, setActivePage] = useState(
         page > totalPages ? totalPages : page,
@@ -87,18 +98,23 @@ const Paginated: FC<PaginatedProps> = (props) => {
 
     return (
         <Stack {...restProps}>
-            <Pagination
-                styles={{
-                    root: { alignSelf: "flex-end" },
-                }}
-                value={activePage}
-                total={totalPages}
-                siblings={isSmallDevice ? 0 : 1}
-                onChange={onChangeTopPagination}
-                getControlProps={(control) => ({
-                    "aria-label": control,
-                })}
-            />
+            <Flex
+                direction={{ base: "column", lg: "row" }}
+                align={{ base: "flex-end", lg: "center" }}
+                justify={{ base: "flex-start", lg: "space-between" }}
+                gap={hasSearchInput ? "sm" : 0}
+            >
+                <Box w={{ base: "100%", lg: "50%" }}>{SearchInput}</Box>
+                <Pagination
+                    value={activePage}
+                    total={totalPages}
+                    siblings={isSmallDevice ? 0 : 1}
+                    onChange={onChangeTopPagination}
+                    getControlProps={(control) => ({
+                        "aria-label": control,
+                    })}
+                />
+            </Flex>
 
             {children}
 
