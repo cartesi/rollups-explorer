@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 import {
@@ -11,7 +12,9 @@ import { ApplicationOrderByInput } from "@cartesi/rollups-explorer-domain/explor
 import getConfiguredChainId from "../../lib/getConfiguredChain";
 import ApplicationsTable from "../applications/applicationsTable";
 import Paginated from "../paginated";
+import Search from "../search";
 import UserApplicationsTable from "./userApplicationsTable";
+import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 
 const UserApplications: FC = () => {
     const { address, isConnected } = useAccount();
@@ -68,18 +71,32 @@ const UserApplications: FC = () => {
 const AllApplications: FC = () => {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
+    const [{ query: urlQuery }] = useUrlSearchParams();
+    const [query, setQuery] = useState(urlQuery);
+    const [queryDebounced] = useDebouncedValue(query, 500);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
     const chainId = getConfiguredChainId();
-    const [query] = useApplicationsConnectionQuery({
-        variables: {
-            orderBy: ApplicationOrderByInput.IdAsc,
-            limit,
-            after,
-            chainId,
+    const formattedQueryDebounced = queryDebounced.toLowerCase();
+    const [{ data: data, fetching: fetching }] = useApplicationsConnectionQuery(
+        {
+            variables: {
+                orderBy: ApplicationOrderByInput.IdAsc,
+                limit,
+                after,
+                where: {
+                    chain: { id_eq: chainId },
+                    address_startsWith: formattedQueryDebounced,
+                    OR: [
+                        {
+                            owner_startsWith: formattedQueryDebounced,
+                        },
+                    ],
+                },
+            },
         },
-    });
+    );
     const applications =
-        query.data?.applicationsConnection.edges.map((edge) => edge.node) ?? [];
+        data?.applicationsConnection.edges.map((edge) => edge.node) ?? [];
 
     const onChangePagination = useCallback((limit: number, page: number) => {
         setLimit(limit);
@@ -88,16 +105,23 @@ const AllApplications: FC = () => {
 
     return (
         <Paginated
-            fetching={query.fetching}
-            totalCount={query.data?.applicationsConnection.totalCount}
+            fetching={fetching}
+            totalCount={data?.applicationsConnection.totalCount}
             onChange={onChangePagination}
             data-testid="all-applications"
             py="sm"
+            SearchInput={
+                <Search
+                    placeholder="Search by Address / Owner"
+                    isLoading={fetching}
+                    onChange={setQuery}
+                />
+            }
         >
             <ApplicationsTable
                 applications={applications}
-                fetching={query.fetching}
-                totalCount={query.data?.applicationsConnection.totalCount ?? 0}
+                fetching={fetching}
+                totalCount={data?.applicationsConnection.totalCount ?? 0}
             />
         </Paginated>
     );
