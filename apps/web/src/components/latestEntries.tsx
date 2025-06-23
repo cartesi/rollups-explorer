@@ -96,7 +96,9 @@ const LatestEntries: FC = () => {
             variables: {
                 orderBy: ApplicationOrderByInput.TimestampDesc,
                 limit: 6,
-                chainId: chainIdConfigured,
+                where: {
+                    chain: { id_eq: chainIdConfigured },
+                },
             },
         });
     const inputs =
