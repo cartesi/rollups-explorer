@@ -1,6 +1,6 @@
+import { isBlank } from "ramda-adjunct";
 import { isAddress, isHex, parseAbi, parseAbiParameters } from "viem";
 import { FormValues } from "./types";
-import { isBlank } from "ramda-adjunct";
 import { prepareSignatures } from "./utils";
 
 export const validateApplication = (value: string) =>
@@ -88,6 +88,10 @@ export const validateAbiFunctionParamValue = (
 };
 
 export const validateHumanAbi = (value: string, values: FormValues) => {
+    if (values.mode !== "abi") {
+        return null;
+    }
+
     if (
         values.abiMethod === "existing" ||
         values.specificationMode === "abi_params"
@@ -110,6 +114,10 @@ export const validateHumanAbi = (value: string, values: FormValues) => {
 };
 
 export const validateAbiParam = (value: string, values: FormValues) => {
+    if (values.mode !== "abi") {
+        return null;
+    }
+
     if (
         values.abiMethod === "existing" ||
         values.specificationMode === "json_abi"
