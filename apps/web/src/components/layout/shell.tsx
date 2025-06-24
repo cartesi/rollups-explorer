@@ -59,7 +59,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const { colorScheme, toggleColorScheme } = useMantineColorScheme({
         keepTransitions: true,
     });
-    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.xs})`);
+    const isSmallDevice = useMediaQuery(`(max-width:${theme.breakpoints.sm})`);
     const themeDefaultProps = theme.components?.AppShell?.defaultProps ?? {};
     const footerZIndex = theme.other.footerZIndex ?? 102;
 
