@@ -189,7 +189,7 @@ describe("Applications component", () => {
                     variables: {
                         after: undefined,
                         limit: 10,
-                        orderBy: "id_ASC",
+                        orderBy: "timestamp_DESC",
                         where: {
                             OR: [
                                 {
