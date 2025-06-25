@@ -23,6 +23,7 @@ import {
 } from "@cartesi/rollups-explorer-domain/explorer-types";
 import getConfiguredChainId from "../lib/getConfiguredChain";
 import LatestEntriesTable, { Entry } from "./latestEntriesTable";
+import { checkApplicationsQuery } from "../lib/query";
 
 interface LatestEntriesCard {
     title: string;
@@ -96,9 +97,9 @@ const LatestEntries: FC = () => {
             variables: {
                 orderBy: ApplicationOrderByInput.TimestampDesc,
                 limit: 6,
-                where: {
-                    chain: { id_eq: chainIdConfigured },
-                },
+                where: checkApplicationsQuery({
+                    chainId: chainIdConfigured,
+                }),
             },
         });
     const inputs =

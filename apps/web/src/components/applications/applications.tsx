@@ -15,6 +15,7 @@ import Paginated from "../paginated";
 import Search from "../search";
 import UserApplicationsTable from "./userApplicationsTable";
 import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
+import { checkApplicationsQuery } from "../../lib/query";
 
 const UserApplications: FC = () => {
     const { address, isConnected } = useAccount();
@@ -26,7 +27,7 @@ const UserApplications: FC = () => {
         variables: {
             after,
             limit,
-            orderBy: ApplicationOrderByInput.IdAsc,
+            orderBy: ApplicationOrderByInput.TimestampDesc,
             ownerId: address?.toLowerCase(),
             chainId,
         },
@@ -76,22 +77,16 @@ const AllApplications: FC = () => {
     const [queryDebounced] = useDebouncedValue(query, 500);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
     const chainId = getConfiguredChainId();
-    const formattedQueryDebounced = queryDebounced.toLowerCase();
     const [{ data: data, fetching: fetching }] = useApplicationsConnectionQuery(
         {
             variables: {
-                orderBy: ApplicationOrderByInput.IdAsc,
+                orderBy: ApplicationOrderByInput.TimestampDesc,
                 limit,
                 after,
-                where: {
-                    chain: { id_eq: chainId },
-                    address_startsWith: formattedQueryDebounced,
-                    OR: [
-                        {
-                            owner_startsWith: formattedQueryDebounced,
-                        },
-                    ],
-                },
+                where: checkApplicationsQuery({
+                    chainId,
+                    address: queryDebounced.toLowerCase(),
+                }),
             },
         },
     );
