@@ -71,7 +71,10 @@ const ConnectionInputStatusBadge: FC<ConnectionInputStatusBadgeProps> = ({
                     size="xs"
                 />
             ) : data?.input.status ? (
-                <Badge variant="default" style={{ textTransform: "none" }}>
+                <Badge
+                    variant="default"
+                    style={{ textTransform: "none", minWidth: "max-content" }}
+                >
                     {data.input.status}
                 </Badge>
             ) : (
