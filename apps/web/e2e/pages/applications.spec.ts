@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { honeypotV2Sepolia } from "../utils/constants";
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/applications");
@@ -36,7 +37,7 @@ test('should display empty state when "My apps" tab is active', async ({
 
 test("should open application summary page", async ({ page }) => {
     await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
-    const applicationSummaryLinks = await page.getByTestId(
+    const applicationSummaryLinks = page.getByTestId(
         "applications-summary-link",
     );
 
@@ -49,7 +50,7 @@ test("should open application summary page", async ({ page }) => {
 
 test("should open application inputs page", async ({ page }) => {
     await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
-    const applicationInputsLinks = await page.getByTestId("applications-link");
+    const applicationInputsLinks = page.getByTestId("applications-link");
 
     const firstLink = applicationInputsLinks.first();
     const href = (await firstLink.getAttribute("href")) as string;
@@ -60,10 +61,23 @@ test("should open application inputs page", async ({ page }) => {
 
 test("should open add-connection modal", async ({ page }) => {
     await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
-    const addConnectionButton = await page.getByTestId("add-connection");
+    const addConnectionButton = page.getByTestId("add-connection");
 
     const firstButton = addConnectionButton.first();
 
     await firstButton.click();
     await expect(page.getByText("Create App Connection")).toBeVisible();
+});
+
+test("should search for specific application", async ({ page }) => {
+    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+
+    const search = page.getByTestId("search-input");
+    await search.focus();
+    await page.keyboard.type(honeypotV2Sepolia.address);
+    await page.waitForTimeout(2000);
+
+    await expect(page.getByText("inputs-table-spinner")).not.toBeVisible();
+    await expect(page.getByRole("row", { name: "Id Owner URL" })).toBeVisible();
+    await expect(page.getByRole("row")).toHaveCount(2);
 });

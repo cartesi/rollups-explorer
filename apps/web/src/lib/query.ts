@@ -72,3 +72,35 @@ export const checkQuery = (
 
     return chainQuery;
 };
+
+interface CheckApplicationsQueryParams {
+    chainId: string;
+    address?: string;
+}
+
+/**
+ * @description Builds an applications' query
+ * @param params
+ */
+export const checkApplicationsQuery = (
+    params: CheckApplicationsQueryParams,
+) => {
+    const { chainId, address } = params;
+    const chainQuery = {
+        chain: { id_eq: chainId },
+    };
+
+    if (isNotNilOrEmpty(address)) {
+        return {
+            ...chainQuery,
+            address_startsWith: address,
+            OR: [
+                {
+                    owner_startsWith: address,
+                },
+            ],
+        };
+    }
+
+    return chainQuery;
+};

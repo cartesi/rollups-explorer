@@ -126,15 +126,14 @@ fragment ApplicationItem on Application {
 query applicationsConnection(
         $orderBy: [ApplicationOrderByInput!]!, 
         $limit: Int, 
-        $after: String, 
-        $factoryId: String, 
-        $chainId:String
+        $after: String,
+        $where: ApplicationWhereInput
     ) {
     applicationsConnection(
             orderBy: $orderBy, 
             first: $limit, 
-            after: $after, 
-            where: {factory: {id_startsWith: $factoryId}, chain: {id_eq: $chainId}}
+            after: $after,
+            where: $where
         ) {
         totalCount
         pageInfo {

@@ -1,5 +1,11 @@
 import { afterAll, beforeEach, describe, it } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
 import { useAccount } from "wagmi";
 import { Applications } from "../../../src/components/applications/applications";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
@@ -7,15 +13,26 @@ import {
     useApplicationsConnectionOwnerQuery,
     useApplicationsConnectionQuery,
 } from "@cartesi/rollups-explorer-domain/explorer-hooks";
-import { ReactNode } from "react";
+import userEvent from "@testing-library/user-event";
+import {
+    ReadonlyURLSearchParams,
+    usePathname,
+    useRouter,
+    useSearchParams,
+} from "next/navigation";
+import { useUrlSearchParams } from "../../../src/hooks/useUrlSearchParams";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+
+vi.mock("next/navigation");
+const usePathnameMock = vi.mocked(usePathname, true);
+const useRouterMock = vi.mocked(useRouter, true);
+const useSearchParamsMock = vi.mocked(useSearchParams, true);
+
+vi.mock("../../../src/hooks/useUrlSearchParams");
+const useUrlSearchParamsMock = vi.mocked(useUrlSearchParams, true);
 
 vi.mock("wagmi");
 vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
-vi.mock("../../../src/components/paginated", async () => ({
-    default: (props: { children: ReactNode; ["data-testid"]: string }) => (
-        <div data-testid={props["data-testid"]}>{props.children}</div>
-    ),
-}));
 
 const useAccountMock = vi.mocked(useAccount, true);
 const useAccountData = {
@@ -65,6 +82,19 @@ describe("Applications component", () => {
                 fetching: false,
             },
         ] as any);
+
+        usePathnameMock.mockReturnValue("/applications");
+        useRouterMock.mockReturnValue({
+            push: vi.fn(),
+        } as unknown as AppRouterInstance);
+        useSearchParamsMock.mockReturnValue(
+            new URLSearchParams() as unknown as ReadonlyURLSearchParams,
+        );
+
+        useUrlSearchParamsMock.mockReturnValue([
+            { limit: 10, page: 1, query: "" },
+            vi.fn(),
+        ]);
     });
 
     afterAll(() => {
@@ -110,5 +140,72 @@ describe("Applications component", () => {
 
         fireEvent.click(AllAppsButton);
         expect(screen.getByTestId("all-applications")).toBeInTheDocument();
+    });
+
+    it("should search for specific application", async () => {
+        const address = "0xccebaa7e541bcaa99de39ca248f0aa6cd33f9e3e";
+
+        useApplicationsConnectionQueryMock.mockReturnValue([
+            {
+                data: {
+                    applicationsConnection: {
+                        edges: [
+                            {
+                                node: {
+                                    id: "11155111-0xccebaa7e541bcaa99de39ca248f0aa6cd33f9e3e-v2",
+                                    address,
+                                    rollupVersion: "v2",
+                                    __typename: "Application",
+                                    owner: "0x0000000000000000000000000000000000000000",
+                                    timestamp: "1749557112",
+                                    factory: {
+                                        id: "11155111-0xc7006f70875bade89032001262a846d3ee160051",
+                                        address:
+                                            "0xc7006f70875bade89032001262a846d3ee160051",
+                                        __typename: "ApplicationFactory",
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                },
+                fetching: false,
+            },
+        ] as any);
+
+        render(<Component />);
+
+        const searchInput = screen.getByTestId("search-input");
+        fireEvent.focus(searchInput);
+
+        await waitFor(() => userEvent.type(searchInput, address), {
+            timeout: 2000,
+        });
+        await waitFor(
+            () =>
+                expect(
+                    useApplicationsConnectionQueryMock,
+                ).toHaveBeenLastCalledWith({
+                    variables: {
+                        after: undefined,
+                        limit: 10,
+                        orderBy: "timestamp_DESC",
+                        where: {
+                            OR: [
+                                {
+                                    owner_startsWith: address,
+                                },
+                            ],
+                            address_startsWith: address,
+                            chain: {
+                                id_eq: "11155111",
+                            },
+                        },
+                    },
+                }),
+            {
+                timeout: 1000,
+            },
+        );
     });
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import { Stack } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useMemo, useState } from "react";
 import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
@@ -65,12 +64,15 @@ const Inputs: FC<InputsProps> = ({
      * The memoization is required so that the component doesn't re-render
      * whenever the search input value changes
      */
-    const MemoizedTable = useMemo(
+    return useMemo(
         () => (
             <Paginated
                 fetching={fetching}
                 totalCount={totalCount}
                 onChange={onChangePagination}
+                SearchInput={
+                    <Search isLoading={fetching} onChange={setQuery} />
+                }
             >
                 <InputsTable
                     inputs={inputs}
@@ -80,13 +82,6 @@ const Inputs: FC<InputsProps> = ({
             </Paginated>
         ),
         [fetching, onChangePagination, inputs, totalCount],
-    );
-
-    return (
-        <Stack>
-            <Search isLoading={fetching} onChange={setQuery} />
-            {MemoizedTable}
-        </Stack>
     );
 };
 

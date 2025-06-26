@@ -1,15 +1,21 @@
-import { Box, Loader, TextInput } from "@mantine/core";
+import { Loader, TextInput } from "@mantine/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { CiSearch } from "react-icons/ci";
+import { TbSearch } from "react-icons/tb";
 import { LimitBound, useUrlSearchParams } from "../hooks/useUrlSearchParams";
 import { useDebouncedCallback } from "@mantine/hooks";
 
 export type SearchProps = {
+    placeholder?: string;
     isLoading: boolean;
     onChange: (query: string) => void;
 };
 
-const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
+const Search: React.FC<SearchProps> = (props) => {
+    const {
+        placeholder = "Search by Address / Txn Hash / Index",
+        onChange,
+        isLoading,
+    } = props;
     const [{ limit, page, query }, updateParams] = useUrlSearchParams();
     const [search, setSearch] = useState<string>(query);
     const lastSearch = useRef(search);
@@ -52,22 +58,18 @@ const Search: React.FC<SearchProps> = ({ onChange, isLoading }) => {
     useEffect(() => syncSearchWithQuery(), [syncSearchWithQuery]);
 
     return (
-        <Box w={{ sm: "10%%", lg: "50%" }} mb={{ sm: "1rem", lg: "-3.25rem" }}>
-            <TextInput
-                placeholder="Search by Address / Txn Hash / Index"
-                leftSection={<CiSearch />}
-                rightSection={
-                    search &&
-                    isLoading && (
-                        <Loader size={"xs"} aria-label="loader-input" />
-                    )
-                }
-                size="md"
-                data-testid="search-input"
-                value={search}
-                onChange={onSearch}
-            />
-        </Box>
+        <TextInput
+            placeholder={placeholder}
+            leftSection={<TbSearch />}
+            rightSection={
+                search &&
+                isLoading && <Loader size={"xs"} aria-label="loader-input" />
+            }
+            size="md"
+            data-testid="search-input"
+            value={search}
+            onChange={onSearch}
+        />
     );
 };
 
