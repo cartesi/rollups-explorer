@@ -13,19 +13,18 @@ type QueryReturn = InputWhereInput;
  * @param {string} input
  * @param {string} appAddress
  * @param {string} chainId
- * @param {RollupVersion} appVersion
+ * @param {RollupVersion[]} versions
  * @returns {QueryReturn}
  */
 export const checkQuery = (
     input: string,
     appAddress: string = "",
     chainId: string,
-    appVersion?: RollupVersion,
+    versions?: RollupVersion[],
 ): QueryReturn => {
-    const chainQuery = { chain: { id_eq: chainId } };
-    const versionQuery = isNotNilOrEmpty(appVersion)
-        ? { rollupVersion_eq: appVersion }
-        : {};
+    const chainQuery: InputWhereInput = { chain: { id_eq: chainId } };
+    const hasVersions = isNotNilOrEmpty(versions);
+    const versionQuery = hasVersions ? { rollupVersion_in: versions } : {};
 
     if (isNotNilOrEmpty(appAddress)) {
         const byAppIdQuery: QueryReturn = {
@@ -54,21 +53,52 @@ export const checkQuery = (
     } else if (input) {
         if (isHex(input)) {
             if (isHash(input)) {
-                return { transactionHash_eq: input, ...chainQuery };
+                const hashInputQuery: InputWhereInput = {
+                    transactionHash_eq: input,
+                    ...chainQuery,
+                };
+
+                if (hasVersions) {
+                    hashInputQuery.application = {
+                        ...versionQuery,
+                    };
+                }
+
+                return hashInputQuery;
             } else {
                 return {
                     OR: [
-                        { msgSender_startsWith: input, ...chainQuery },
                         {
-                            application: { address_startsWith: input },
+                            msgSender_startsWith: input,
+                            ...chainQuery,
+                            application: { ...versionQuery },
+                        },
+                        {
+                            application: {
+                                address_startsWith: input,
+                                ...versionQuery,
+                            },
                             ...chainQuery,
                         },
                     ],
                 };
             }
         } else {
-            return { index_eq: parseInt(input), ...chainQuery };
+            return {
+                index_eq: parseInt(input),
+                ...chainQuery,
+            };
         }
+    }
+
+    if (hasVersions) {
+        const byAppVersionQuery: QueryReturn = {
+            application: {
+                ...versionQuery,
+            },
+        };
+
+        chainQuery.AND = [byAppVersionQuery];
     }
 
     return chainQuery;
@@ -77,7 +107,7 @@ export const checkQuery = (
 interface CheckApplicationsQueryParams {
     chainId: string;
     address?: string;
-    versions?: string[];
+    versions?: RollupVersion[];
 }
 
 /**
@@ -88,28 +118,24 @@ export const checkApplicationsQuery = (
     params: CheckApplicationsQueryParams,
 ) => {
     const { chainId, address, versions } = params;
-    const hasVersions = versions && versions.length > 0;
+    const versionQuery = isNotNilOrEmpty(versions)
+        ? { rollupVersion_in: versions }
+        : {};
     const chainQuery: ApplicationWhereInput = {
         chain: { id_eq: chainId },
+        ...versionQuery,
     };
 
-    if (hasVersions) {
-        chainQuery.rollupVersion_in = versions as RollupVersion[];
-    }
-
     if (isNotNilOrEmpty(address)) {
-        const orQuery: ApplicationWhereInput = {
-            owner_startsWith: address,
-        };
-
-        if (hasVersions) {
-            orQuery.rollupVersion_in = versions as RollupVersion[];
-        }
-
         return {
             ...chainQuery,
             address_startsWith: address,
-            OR: [orQuery],
+            OR: [
+                {
+                    owner_startsWith: address,
+                    ...versionQuery,
+                },
+            ],
         };
     }
 
