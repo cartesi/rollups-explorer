@@ -88,23 +88,28 @@ export const checkApplicationsQuery = (
     params: CheckApplicationsQueryParams,
 ) => {
     const { chainId, address, versions } = params;
+    const hasVersions = versions && versions.length > 0;
     const chainQuery: ApplicationWhereInput = {
         chain: { id_eq: chainId },
     };
 
-    if (versions && versions.length > 0) {
+    if (hasVersions) {
         chainQuery.rollupVersion_in = versions as RollupVersion[];
     }
 
     if (isNotNilOrEmpty(address)) {
+        const orQuery: ApplicationWhereInput = {
+            owner_startsWith: address,
+        };
+
+        if (hasVersions) {
+            orQuery.rollupVersion_in = versions as RollupVersion[];
+        }
+
         return {
             ...chainQuery,
             address_startsWith: address,
-            OR: [
-                {
-                    owner_startsWith: address,
-                },
-            ],
+            OR: [orQuery],
         };
     }
 
