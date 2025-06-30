@@ -66,13 +66,20 @@ export const checkQuery = (
 
                 return hashInputQuery;
             } else {
+                const inputQuery: InputWhereInput = {
+                    msgSender_startsWith: input,
+                    ...chainQuery,
+                };
+
+                if (hasVersions) {
+                    inputQuery.application = {
+                        ...versionQuery,
+                    };
+                }
+
                 return {
                     OR: [
-                        {
-                            msgSender_startsWith: input,
-                            ...chainQuery,
-                            application: { ...versionQuery },
-                        },
+                        inputQuery,
                         {
                             application: {
                                 address_startsWith: input,
