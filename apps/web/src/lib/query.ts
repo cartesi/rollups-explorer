@@ -1,6 +1,7 @@
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { isHash, isHex } from "viem";
 import {
+    ApplicationWhereInput,
     InputWhereInput,
     RollupVersion,
 } from "@cartesi/rollups-explorer-domain/explorer-types";
@@ -76,6 +77,7 @@ export const checkQuery = (
 interface CheckApplicationsQueryParams {
     chainId: string;
     address?: string;
+    versions?: string[];
 }
 
 /**
@@ -85,10 +87,14 @@ interface CheckApplicationsQueryParams {
 export const checkApplicationsQuery = (
     params: CheckApplicationsQueryParams,
 ) => {
-    const { chainId, address } = params;
-    const chainQuery = {
+    const { chainId, address, versions } = params;
+    const chainQuery: ApplicationWhereInput = {
         chain: { id_eq: chainId },
     };
+
+    if (versions && versions.length > 0) {
+        chainQuery.rollupVersion_in = versions as RollupVersion[];
+    }
 
     if (isNotNilOrEmpty(address)) {
         return {
