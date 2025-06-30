@@ -39,7 +39,8 @@ const Paginated: FC<PaginatedProps> = (props) => {
         onChange,
         ...restProps
     } = props;
-    const [{ limit, page, query }, updateParams] = useUrlSearchParams();
+    const [{ limit, page, query, version }, updateParams] =
+        useUrlSearchParams();
     const totalPages = Math.ceil(
         totalCount === undefined || totalCount === 0 ? 1 : totalCount / limit,
     );
@@ -58,33 +59,33 @@ const Paginated: FC<PaginatedProps> = (props) => {
 
     const onChangeTopPagination = useCallback(
         (pageN: number) => {
-            updateParams(pageN, limit, query);
+            updateParams(pageN, limit, query, version);
         },
-        [limit, query, updateParams],
+        [limit, query, updateParams, version],
     );
 
     const onChangeBottomPagination = useCallback(
         (pageN: number) => {
-            updateParams(pageN, limit, query);
+            updateParams(pageN, limit, query, version);
             scrollIntoView({ alignment: "center" });
         },
-        [limit, query, scrollIntoView, updateParams],
+        [limit, query, scrollIntoView, updateParams, version],
     );
 
     const onChangeLimit = useCallback(
         (val: string | null) => {
             const entry = val ?? limit;
             const nextLimit = pathOr(limit, [entry], limitBounds);
-            updateParams(page, nextLimit, query);
+            updateParams(page, nextLimit, query, version);
         },
-        [limit, page, query, updateParams],
+        [limit, page, query, updateParams, version],
     );
 
     useEffect(() => {
         if (!fetching && page > totalPages) {
-            updateParams(totalPages, limit, query);
+            updateParams(totalPages, limit, query, version);
         }
-    }, [limit, page, fetching, totalPages, updateParams, query]);
+    }, [limit, page, fetching, totalPages, updateParams, query, version]);
 
     useEffect(() => {
         setActivePage((activePage: number) =>
