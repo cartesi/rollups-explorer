@@ -20,13 +20,15 @@ export const useUrlSearchParams = () => {
     const limit = pathOr(limitBounds[10], [lt], limitBounds);
     const page = isNaN(pg) ? 1 : pg;
     const query = urlSearchParams.get("query") ?? "";
+    const version = urlSearchParams.get("version") ?? "";
 
     const updateParams = useCallback(
-        (page: number, limit: number, query: string): void => {
+        (page: number, limit: number, query: string, version = ""): void => {
             const urlSearchParams = new URLSearchParams({
                 query: query.toString(),
                 pg: page.toString(),
                 lt: limit.toString(),
+                version: version.toString(),
             });
 
             router.push(`${pathName}?${urlSearchParams.toString()}`, {
@@ -37,11 +39,16 @@ export const useUrlSearchParams = () => {
     );
 
     const value: [
-        { page: number; limit: LimitBound; query: string },
-        (page: number, limit: LimitBound, query: string) => void,
+        { page: number; limit: LimitBound; query: string; version: string },
+        (
+            page: number,
+            limit: LimitBound,
+            query: string,
+            version?: string,
+        ) => void,
     ] = useMemo(
-        () => [{ page, limit, query }, updateParams],
-        [page, limit, query, updateParams],
+        () => [{ page, limit, query, version }, updateParams],
+        [page, limit, query, version, updateParams],
     );
 
     return value;
