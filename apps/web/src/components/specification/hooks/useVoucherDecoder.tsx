@@ -1,15 +1,16 @@
 "use client";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { v2OutputFactoryAbi } from "@cartesi/rollups-wagmi";
 import { whatsabi } from "@shazow/whatsabi";
 import { any, isNil } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState } from "react";
 import { Abi, Hex, decodeFunctionData } from "viem";
-import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import getSupportedChainInfo, {
     SupportedChainId,
 } from "../../../lib/supportedChains";
 import createClientFor from "../../../lib/transportClient";
+import { useAppConfig } from "../../../providers/appConfigProvider";
 import { decodePayload } from "../decoder";
 import { Specification } from "../types";
 import { stringifyContent } from "../utils";
@@ -23,22 +24,26 @@ type UseVoucherDecoderProps = {
 };
 const cache = new Map<string, Abi>();
 
-const buildClient = (chainId: number) => {
+const buildClient = (chainId: number, nodeRpcUrl?: string) => {
     const chain = getSupportedChainInfo(chainId as SupportedChainId);
 
     if (isNil(chain)) throw new Error(`ChainId ${chainId} is not supported!`);
 
-    return createClientFor(chain);
+    return createClientFor(chain, nodeRpcUrl);
 };
 
-const fetchAbiFor = async (destination: Hex, chainId: number) => {
+const fetchAbiFor = async (
+    destination: Hex,
+    chainId: number,
+    nodeRpcUrl?: string,
+) => {
     const cacheKey = `${chainId}:${destination}`;
     const abi = cache.get(cacheKey);
 
     if (abi && isNotNilOrEmpty(abi)) return abi;
 
     const result = await whatsabi.autoload(destination, {
-        provider: buildClient(chainId),
+        provider: buildClient(chainId, nodeRpcUrl),
         followProxies: true,
         onError: () => false,
     });
@@ -129,18 +134,21 @@ const decodeOutput = (
 };
 
 interface FetchDestinationABIAndDecodeParams
-    extends Omit<UseVoucherDecoderProps, "appVersion"> {}
+    extends Omit<UseVoucherDecoderProps, "appVersion"> {
+    nodeRpcUrl?: string;
+}
 
 const fetchDestinationABIAndDecode = async ({
     chainId,
     destination,
     payload,
+    nodeRpcUrl,
 }: FetchDestinationABIAndDecodeParams) => {
     let result: string;
     const baseMessage = "Skipping voucher decoding. Reason:";
 
     try {
-        const abi = await fetchAbiFor(destination, chainId);
+        const abi = await fetchAbiFor(destination, chainId, nodeRpcUrl);
         const spec = buildSpecification(destination, chainId, abi);
         const envelope = decodePayload(spec, payload);
 
@@ -172,6 +180,8 @@ const useVoucherDecoder = ({
         status: "idle",
         data: null,
     });
+    const appConfig = useAppConfig();
+    const nodeRpcUrl = appConfig.nodeRpcUrl;
 
     useEffect(() => {
         if (any(isNilOrEmpty)([destination, chainId, payload, appVersion]))
@@ -187,11 +197,12 @@ const useVoucherDecoder = ({
                       chainId,
                       destination,
                       payload: outputResult.payload,
+                      nodeRpcUrl,
                   });
 
             setResult(() => ({ status: "idle", data: result }));
         })();
-    }, [destination, chainId, payload, appVersion]);
+    }, [destination, chainId, payload, appVersion, nodeRpcUrl]);
 
     return result;
 };

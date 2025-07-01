@@ -5,9 +5,24 @@ declare namespace NodeJS {
          */
         NEXT_PUBLIC_CHAIN_ID: string;
         /**
+         * Meant to add configuration flexibility (e.g. containers with different configurations).
+         * When empty the NEXT_PUBLIC version should be the fallback.
+         * Public available rollups-explorer-api graphql endpoint.
+         */
+        EXPLORER_API_URL?: string;
+
+        /**
+         * The value is interpolated and replace in build time by the value set.
          * Public available rollups-explorer-api graphql endpoint.
          */
         NEXT_PUBLIC_EXPLORER_API_URL: string;
+
+        /**
+         * Meant to add configuration flexibility (e.g. containers with different configurations).
+         * When empty the NEXT_PUBLIC version should be the fallback.
+         * The node RPC provider to communicate (i.e. send transactions). (e.g. provider alchemy / infura)
+         */
+        NODE_RPC_URL?: string;
 
         /**
          * The node RPC provider to communicate (i.e. send transactions). (e.g. provider alchemy / infura)
@@ -18,7 +33,12 @@ declare namespace NodeJS {
          * Optional rollups-explorer-api URL to work with server-side calls.
          * Internal calls may need a different URI to become reachable.
          */
-        INTERNAL_EXPLORER_API_URL: string;
+        INTERNAL_EXPLORER_API_URL?: string;
+
+        /**
+         * Signal the app is in an containerize environment.
+         */
+        NEXT_PUBLIC_IS_CONTAINER?: string;
 
         /**
          * CI=true is common set in most CI providers. e.g. Github, TravisCI

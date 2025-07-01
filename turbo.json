@@ -3,9 +3,13 @@
     "globalEnv": [
         "INTERNAL_EXPLORER_API_URL",
         "BASE_PATH",
+        "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_CHAIN_ID",
+        "NEXT_PUBLIC_IS_CONTAINER",
+        "EXPLORER_API_URL",
         "NEXT_PUBLIC_EXPLORER_API_URL",
         "NEXT_PUBLIC_PREVIEW_EXPLORER_API_URL",
+        "NODE_RPC_URL",
         "NEXT_PUBLIC_NODE_RPC_URL",
         "CI",
         "E2E_BASE_URL",
