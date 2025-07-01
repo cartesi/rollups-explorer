@@ -15,11 +15,12 @@ import { isNilOrEmpty } from "ramda-adjunct";
 export type FilterVersion = `${RollupVersion}`;
 
 interface VersionFilterProps {
+    isLoading: boolean;
     onChange: (versions: string[]) => void;
 }
 
-export const VersionsFilter: FC<VersionFilterProps> = (props) => {
-    const { onChange } = props;
+const VersionsFilter: FC<VersionFilterProps> = (props) => {
+    const { isLoading, onChange } = props;
     const [opened, setOpened] = useState(false);
     const [{ limit, page, query, version }, updateParams] =
         useUrlSearchParams();
@@ -102,7 +103,11 @@ export const VersionsFilter: FC<VersionFilterProps> = (props) => {
             onChange={onChangeOpened}
         >
             <Menu.Target>
-                <ActionIcon size="xl">
+                <ActionIcon
+                    size="xl"
+                    data-testid="versions-filter-trigger"
+                    loading={isLoading}
+                >
                     <FilterIcon style={{ width: "60%", height: "60%" }} />
                 </ActionIcon>
             </Menu.Target>
@@ -140,3 +145,5 @@ export const VersionsFilter: FC<VersionFilterProps> = (props) => {
         </Menu>
     );
 };
+
+export default VersionsFilter;
