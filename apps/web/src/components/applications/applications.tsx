@@ -16,7 +16,7 @@ import Search from "../search";
 import UserApplicationsTable from "./userApplicationsTable";
 import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 import { checkApplicationsQuery } from "../../lib/query";
-import { VersionsFilter } from "../versionsFilter";
+import VersionsFilter from "../versionsFilter";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/dist/graphql/explorer/types";
 
 const UserApplications: FC = () => {
@@ -118,7 +118,10 @@ const AllApplications: FC = () => {
                         isLoading={fetching}
                         onChange={setQuery}
                     />
-                    <VersionsFilter onChange={setVersions} />
+                    <VersionsFilter
+                        isLoading={fetching && versions.length > 0}
+                        onChange={setVersions}
+                    />
                 </Flex>
             }
         >

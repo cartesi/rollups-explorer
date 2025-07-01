@@ -14,7 +14,7 @@ import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
 import Search from "../search";
 import { Flex } from "@mantine/core";
-import { VersionsFilter } from "../versionsFilter";
+import VersionsFilter from "../versionsFilter";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
@@ -83,7 +83,10 @@ const Inputs: FC<InputsProps> = ({
                             onChange={setQuery}
                         />
                         {!appVersion && (
-                            <VersionsFilter onChange={setVersions} />
+                            <VersionsFilter
+                                isLoading={fetching && versions.length > 0}
+                                onChange={setVersions}
+                            />
                         )}
                     </Flex>
                 }
@@ -95,7 +98,14 @@ const Inputs: FC<InputsProps> = ({
                 />
             </Paginated>
         ),
-        [fetching, totalCount, onChangePagination, appVersion, inputs],
+        [
+            fetching,
+            totalCount,
+            onChangePagination,
+            appVersion,
+            versions,
+            inputs,
+        ],
     );
 };
 
