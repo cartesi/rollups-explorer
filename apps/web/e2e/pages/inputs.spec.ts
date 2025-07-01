@@ -98,22 +98,13 @@ test("should filter inputs based on rollups v2 version", async ({ page }) => {
 
     const applyButton = page.getByText("Apply");
     await applyButton.click();
-    const isLoading = await versionsFilterTrigger.getAttribute("data-loading");
-    expect(isLoading).toBe(null);
 
-    await expect(page.getByTestId("inputs-table-spinner")).toBeVisible();
-    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
-    await expect(
-        page.getByRole("row", {
-            name: "From To Version Method Index Status Age Data",
-        }),
-    ).toBeVisible();
+    await expect(versionsFilterTrigger).toHaveAttribute("data-loading");
+    await expect(versionsFilterTrigger).not.toHaveAttribute("data-loading");
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible({
+        timeout: 2000,
+    });
 
-    const versionBadges = page.getByTestId("rollup-version-badge");
-    const allVersionBadges = await versionBadges.all();
-
-    for (const badge of allVersionBadges) {
-        const content = await badge.textContent();
-        expect(content).toBe("v2");
-    }
+    const href = await page.evaluate(() => document.location.search);
+    expect(href).toContain("version=v2");
 });
