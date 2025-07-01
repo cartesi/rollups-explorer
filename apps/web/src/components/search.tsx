@@ -1,29 +1,31 @@
-import { Loader, TextInput } from "@mantine/core";
+import { Loader, TextInput, TextInputProps } from "@mantine/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TbSearch } from "react-icons/tb";
 import { LimitBound, useUrlSearchParams } from "../hooks/useUrlSearchParams";
 import { useDebouncedCallback } from "@mantine/hooks";
 
-export type SearchProps = {
+export interface SearchProps extends Omit<TextInputProps, "onChange"> {
     placeholder?: string;
     isLoading: boolean;
     onChange: (query: string) => void;
-};
+}
 
 const Search: React.FC<SearchProps> = (props) => {
     const {
         placeholder = "Search by Address / Txn Hash / Index",
         onChange,
         isLoading,
+        ...restProps
     } = props;
-    const [{ limit, page, query }, updateParams] = useUrlSearchParams();
+    const [{ limit, page, query, version }, updateParams] =
+        useUrlSearchParams();
     const [search, setSearch] = useState<string>(query);
     const lastSearch = useRef(search);
     const isInputValueSyncedWithQuery = useRef(false);
 
     const onUpdateParams = useDebouncedCallback(
-        (page: number, limit: LimitBound, search: string) => {
-            updateParams(page, limit, search);
+        (page: number, limit: LimitBound, search: string, version: string) => {
+            updateParams(page, limit, search, version);
         },
         500,
     );
@@ -35,9 +37,9 @@ const Search: React.FC<SearchProps> = (props) => {
 
             setSearch(nextSearch);
             onChange(nextSearch);
-            onUpdateParams(page, limit, nextSearch);
+            onUpdateParams(page, limit, nextSearch, version);
         },
-        [onUpdateParams, page, limit, onChange],
+        [onChange, onUpdateParams, page, limit, version],
     );
 
     /**
@@ -59,6 +61,7 @@ const Search: React.FC<SearchProps> = (props) => {
 
     return (
         <TextInput
+            {...restProps}
             placeholder={placeholder}
             leftSection={<TbSearch />}
             rightSection={

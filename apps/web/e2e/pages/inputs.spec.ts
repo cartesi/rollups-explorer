@@ -86,3 +86,25 @@ test("should search for specific input", async ({ page }) => {
         ).toBe(true);
     }
 });
+
+test("should filter inputs based on rollups v2 version", async ({ page }) => {
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+
+    const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
+    await versionsFilterTrigger.click();
+
+    const v1MenuItem = page.getByText("Rollups v2");
+    await v1MenuItem.click();
+
+    const applyButton = page.getByText("Apply");
+    await applyButton.click();
+
+    await expect(versionsFilterTrigger).toHaveAttribute("data-loading");
+    await expect(versionsFilterTrigger).not.toHaveAttribute("data-loading");
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible({
+        timeout: 2000,
+    });
+
+    const href = await page.evaluate(() => document.location.search);
+    expect(href).toContain("version=v2");
+});

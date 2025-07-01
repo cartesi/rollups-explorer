@@ -45,7 +45,7 @@ describe("Search Component", () => {
         );
 
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: "" },
+            { limit: 10, page: 1, query: "", version: "" },
             vi.fn(),
         ]);
     });
@@ -75,7 +75,7 @@ describe("Search Component", () => {
         const initialQuery = "0x872";
 
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: initialQuery },
+            { limit: 10, page: 1, query: initialQuery, version: "" },
             mockedUpdateParams,
         ]);
         render(<Component {...defaultProps} />);
@@ -87,7 +87,7 @@ describe("Search Component", () => {
     it("should call updateQueryParams hooks when input change", async () => {
         const mockedUpdateParams = vi.fn();
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: "" },
+            { limit: 10, page: 1, query: "", version: "" },
             mockedUpdateParams,
         ]);
         render(<Component {...defaultProps} />);
@@ -100,6 +100,7 @@ describe("Search Component", () => {
                     1,
                     10,
                     queryAddress,
+                    "",
                 ),
             {
                 timeout: 600,

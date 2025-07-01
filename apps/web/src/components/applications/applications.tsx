@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs } from "@mantine/core";
+import { Flex, Tabs } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useCallback, useState } from "react";
 import { useAccount } from "wagmi";
@@ -16,6 +16,8 @@ import Search from "../search";
 import UserApplicationsTable from "./userApplicationsTable";
 import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
 import { checkApplicationsQuery } from "../../lib/query";
+import VersionsFilter from "../versionsFilter";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/dist/graphql/explorer/types";
 
 const UserApplications: FC = () => {
     const { address, isConnected } = useAccount();
@@ -75,6 +77,8 @@ const AllApplications: FC = () => {
     const [{ query: urlQuery }] = useUrlSearchParams();
     const [query, setQuery] = useState(urlQuery);
     const [queryDebounced] = useDebouncedValue(query, 500);
+    const [versions, setVersions] = useState<string[]>([]);
+    const [versionsDebounced] = useDebouncedValue(versions, 500);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
     const chainId = getConfiguredChainId();
     const [{ data: data, fetching: fetching }] = useApplicationsConnectionQuery(
@@ -86,6 +90,7 @@ const AllApplications: FC = () => {
                 where: checkApplicationsQuery({
                     chainId,
                     address: queryDebounced.toLowerCase(),
+                    versions: versionsDebounced as RollupVersion[],
                 }),
             },
         },
@@ -106,11 +111,18 @@ const AllApplications: FC = () => {
             data-testid="all-applications"
             py="sm"
             SearchInput={
-                <Search
-                    placeholder="Search by Address / Owner"
-                    isLoading={fetching}
-                    onChange={setQuery}
-                />
+                <Flex gap={8}>
+                    <Search
+                        placeholder="Search by Address / Owner"
+                        flex={1}
+                        isLoading={fetching}
+                        onChange={setQuery}
+                    />
+                    <VersionsFilter
+                        isLoading={fetching && versions.length > 0}
+                        onChange={setVersions}
+                    />
+                </Flex>
             }
         >
             <ApplicationsTable
