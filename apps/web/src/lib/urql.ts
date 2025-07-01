@@ -1,6 +1,7 @@
 import { Client, cacheExchange, createClient, fetchExchange } from "urql/core";
+import { getConfiguredPublicExplorerAPI } from "./getConfigExplorerAPIUrl";
+import { getConfiguredInternalExplorerAPI } from "./getConfigExplorerInternalAPIUrl";
 
-let urqlClient: Client | null = null;
 let urqlServerClient: Client | null = null;
 
 const buildClient = (url?: string) => {
@@ -15,20 +16,15 @@ const buildClient = (url?: string) => {
     });
 };
 
-export const getUrqlClient = () => {
-    if (!urqlClient) {
-        const url = process.env.NEXT_PUBLIC_EXPLORER_API_URL ?? "";
-        urqlClient = buildClient(url);
-    }
-
-    return urqlClient;
+export const getUrqlClient = (url: string) => {
+    return buildClient(url);
 };
 
 export const getUrqlServerClient = () => {
     if (!urqlServerClient) {
         const url =
-            process.env.INTERNAL_EXPLORER_API_URL ??
-            process.env.NEXT_PUBLIC_EXPLORER_API_URL ??
+            getConfiguredInternalExplorerAPI() ??
+            getConfiguredPublicExplorerAPI() ??
             "";
 
         urqlServerClient = buildClient(url);
