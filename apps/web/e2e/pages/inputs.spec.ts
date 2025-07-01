@@ -86,3 +86,34 @@ test("should search for specific input", async ({ page }) => {
         ).toBe(true);
     }
 });
+
+test("should filter inputs based on rollups v2 version", async ({ page }) => {
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+
+    const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
+    await versionsFilterTrigger.click();
+
+    const v1MenuItem = page.getByText("Rollups v2");
+    await v1MenuItem.click();
+
+    const applyButton = page.getByText("Apply");
+    await applyButton.click();
+    const isLoading = await versionsFilterTrigger.getAttribute("data-loading");
+    expect(isLoading).toBe(null);
+
+    await expect(page.getByTestId("inputs-table-spinner")).toBeVisible();
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+    await expect(
+        page.getByRole("row", {
+            name: "From To Version Method Index Status Age Data",
+        }),
+    ).toBeVisible();
+
+    const versionBadges = page.getByTestId("rollup-version-badge");
+    const allVersionBadges = await versionBadges.all();
+
+    for (const badge of allVersionBadges) {
+        const content = await badge.textContent();
+        expect(content).toBe("v2");
+    }
+});
