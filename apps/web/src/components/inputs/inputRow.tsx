@@ -117,7 +117,11 @@ const InputRow: FC<InputRowProps> = ({
                     </Box>
                 </Table.Td>
                 <Table.Td>
-                    <Badge variant="filled" style={{ textTransform: "none" }}>
+                    <Badge
+                        variant="filled"
+                        style={{ textTransform: "none" }}
+                        data-testid="rollup-version-badge"
+                    >
                         {input.application.rollupVersion}
                     </Badge>
                 </Table.Td>
