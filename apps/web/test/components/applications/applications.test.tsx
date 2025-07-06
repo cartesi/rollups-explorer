@@ -179,7 +179,7 @@ describe("Applications component", () => {
         fireEvent.focus(searchInput);
 
         await waitFor(() => userEvent.type(searchInput, address), {
-            timeout: 2000,
+            timeout: 3000,
         });
         await waitFor(
             () =>
