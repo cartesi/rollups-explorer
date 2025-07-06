@@ -1,4 +1,4 @@
-import { Group, Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { TbInbox } from "react-icons/tb";
 import { Metadata } from "next";
 import Inputs from "../../components/inputs/inputs";
