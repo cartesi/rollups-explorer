@@ -19,7 +19,7 @@ test("should have a left menu with links", async ({ page }) => {
 test("should have a visible and disabled send transaction", async ({
     page,
 }) => {
-    const sendTransaction = await page.getByRole("button", {
+    const sendTransaction = page.getByRole("button", {
         name: "Send Transaction",
     });
     await expect(sendTransaction).toBeDisabled();
@@ -55,9 +55,7 @@ test.describe("mobile", () => {
         const burgerBtn = page.getByTestId("burger-menu-btn");
         await expect(burgerBtn).toBeVisible();
         await burgerBtn.click();
-        const sendTransaction = await page.getByTestId(
-            "menu-item-send-transaction",
-        );
+        const sendTransaction = page.getByTestId("menu-item-send-transaction");
         await expect(sendTransaction).toHaveAttribute("data-disabled", "true");
 
         await expect(sendTransaction).toBeVisible();

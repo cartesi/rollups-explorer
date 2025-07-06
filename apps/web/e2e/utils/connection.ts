@@ -18,13 +18,13 @@ export const createConnection = async (
 
     // Fill in the address
     if (shouldTypeAddress) {
-        const addressInput = await page.getByTestId("connection-address");
+        const addressInput = page.getByTestId("connection-address");
         await addressInput.focus();
         await page.keyboard.type(address);
     }
 
     // Fill in the url
-    const urlInput = await page.getByTestId("connection-url");
+    const urlInput = page.getByTestId("connection-url");
     await urlInput.focus();
     await page.keyboard.type(url);
 
