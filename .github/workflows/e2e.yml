@@ -22,7 +22,7 @@ jobs:
               run: yarn install --frozen-lockfile
 
             - name: Install Playwright
-              run: yarn playwright install --with-deps
+              run: npx playwright install
 
             - name: Run e2e tests
               run: yarn test:e2e
