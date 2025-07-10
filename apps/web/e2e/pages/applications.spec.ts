@@ -85,7 +85,6 @@ test("should search for specific application", async ({ page }) => {
 test("should filter applications based on rollups v2 version", async ({
     page,
 }) => {
-    await page.reload();
     await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
     const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
@@ -97,11 +96,14 @@ test("should filter applications based on rollups v2 version", async ({
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await expect(page.getByTestId("table-spinner")).toBeVisible();
+    await page.waitForURL("/applications", {
+        waitUntil: "networkidle",
+    });
+
     await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
     const href = await page.evaluate(() => document.location.search, {
-        timeout: 5000,
+        timeout: 1000,
     });
     expect(href).toContain("version=v2");
 });

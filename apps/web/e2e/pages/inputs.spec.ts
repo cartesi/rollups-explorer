@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("inputs");
+    await page.goto("/inputs");
 });
 
 test("should have correct page title", async ({ page }) => {
@@ -88,7 +88,6 @@ test("should search for specific input", async ({ page }) => {
 });
 
 test("should filter inputs based on rollups v2 version", async ({ page }) => {
-    await page.reload();
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
 
     const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
@@ -100,11 +99,14 @@ test("should filter inputs based on rollups v2 version", async ({ page }) => {
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await expect(page.getByTestId("inputs-table-spinner")).toBeVisible();
+    await page.waitForURL("/inputs", {
+        waitUntil: "networkidle",
+    });
+
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
 
     const href = await page.evaluate(() => document.location.search, {
-        timeout: 5000,
+        timeout: 1000,
     });
     expect(href).toContain("version=v2");
 });
