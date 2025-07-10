@@ -100,8 +100,7 @@ test("should filter inputs based on rollups v2 version", async ({ page }) => {
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await expect(versionsFilterTrigger).toHaveAttribute("data-loading");
-    await expect(versionsFilterTrigger).not.toHaveAttribute("data-loading");
+    await expect(page.getByTestId("inputs-table-spinner")).toBeVisible();
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
 
     const href = await page.evaluate(() => document.location.search, {

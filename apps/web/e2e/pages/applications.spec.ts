@@ -97,8 +97,7 @@ test("should filter applications based on rollups v2 version", async ({
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await expect(versionsFilterTrigger).toHaveAttribute("data-loading");
-    await expect(versionsFilterTrigger).not.toHaveAttribute("data-loading");
+    await expect(page.getByTestId("table-spinner")).toBeVisible();
     await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
     const href = await page.evaluate(() => document.location.search, {
