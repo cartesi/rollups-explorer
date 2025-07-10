@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("inputs");
+    await page.goto("/inputs");
 });
 
 test("should have correct page title", async ({ page }) => {
@@ -85,4 +85,28 @@ test("should search for specific input", async ({ page }) => {
             linkHref.toLowerCase().startsWith(addressPrefix.toLowerCase()),
         ).toBe(true);
     }
+});
+
+test("should filter inputs based on rollups v2 version", async ({ page }) => {
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+
+    const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
+    await versionsFilterTrigger.click();
+
+    const v1MenuItem = page.getByText("Rollups v2");
+    await v1MenuItem.click();
+
+    const applyButton = page.getByText("Apply");
+    await applyButton.click();
+
+    await page.waitForURL("/inputs", {
+        waitUntil: "networkidle",
+    });
+
+    await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
+
+    const href = await page.evaluate(() => document.location.search, {
+        timeout: 1000,
+    });
+    expect(href).toContain("version=v2");
 });
