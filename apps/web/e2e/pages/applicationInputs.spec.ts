@@ -53,7 +53,7 @@ test("should toggle date column", async ({ page }) => {
 
 test("should open input details", async ({ page }) => {
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
-    const inputRowToggle = await page.getByTestId("input-row-toggle");
+    const inputRowToggle = page.getByTestId("input-row-toggle");
 
     const firstInputRowToggle = inputRowToggle.first();
     await firstInputRowToggle.click();
@@ -75,7 +75,7 @@ test("should search for specific input", async ({ page }) => {
     const href = (await firstLink.textContent()) as string;
     const [addressPrefix] = href.split("...");
 
-    const search = await page.getByTestId("search-input");
+    const search = page.getByTestId("search-input");
     await search.focus();
     await page.keyboard.type(addressPrefix);
     await page.keyboard.press("Enter");
