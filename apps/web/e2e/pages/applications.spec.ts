@@ -36,7 +36,7 @@ test('should display empty state when "My apps" tab is active', async ({
 });
 
 test("should open application summary page", async ({ page }) => {
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
     const applicationSummaryLinks = page.getByTestId(
         "applications-summary-link",
     );
@@ -49,7 +49,7 @@ test("should open application summary page", async ({ page }) => {
 });
 
 test("should open application inputs page", async ({ page }) => {
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
     const applicationInputsLinks = page.getByTestId("applications-link");
 
     const firstLink = applicationInputsLinks.first();
@@ -60,7 +60,7 @@ test("should open application inputs page", async ({ page }) => {
 });
 
 test("should open add-connection modal", async ({ page }) => {
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
     const addConnectionButton = page.getByTestId("add-connection");
 
     const firstButton = addConnectionButton.first();
@@ -70,7 +70,7 @@ test("should open add-connection modal", async ({ page }) => {
 });
 
 test("should search for specific application", async ({ page }) => {
-    await expect(page.getByTestId("applications-spinner")).not.toBeVisible();
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
     const search = page.getByTestId("search-input");
     await search.focus();
@@ -80,4 +80,30 @@ test("should search for specific application", async ({ page }) => {
     await expect(page.getByText("inputs-table-spinner")).not.toBeVisible();
     await expect(page.getByRole("row", { name: "Id Owner URL" })).toBeVisible();
     await expect(page.getByRole("row")).toHaveCount(2);
+});
+
+test("should filter applications based on rollups v2 version", async ({
+    page,
+}) => {
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
+
+    const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
+    await versionsFilterTrigger.click();
+
+    const v1MenuItem = page.getByText("Rollups v2");
+    await v1MenuItem.click();
+
+    const applyButton = page.getByText("Apply");
+    await applyButton.click();
+
+    await page.waitForURL("/applications", {
+        waitUntil: "networkidle",
+    });
+
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
+
+    const href = await page.evaluate(() => document.location.search, {
+        timeout: 1000,
+    });
+    expect(href).toContain("version=v2");
 });

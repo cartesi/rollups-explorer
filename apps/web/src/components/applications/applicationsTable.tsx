@@ -198,6 +198,7 @@ const ApplicationsTable: FC<ApplicationsTableProps> = ({
                         <Badge
                             variant="filled"
                             style={{ textTransform: "none" }}
+                            data-testid="rollup-version-badge"
                         >
                             {application.rollupVersion}
                         </Badge>

@@ -41,7 +41,7 @@ describe("Paginated component", () => {
             new URLSearchParams() as unknown as ReadonlyURLSearchParams,
         );
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: "" },
+            { limit: 10, page: 1, query: "", version: "" },
             vi.fn(),
         ]);
         useScrollIntoViewMock.mockReturnValue({
@@ -79,7 +79,7 @@ describe("Paginated component", () => {
     it("should invoke updateParams function when top pagination prev page button is clicked", async () => {
         const mockedUpdateParams = vi.fn();
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 2, query: "" },
+            { limit: 10, page: 2, query: "", version: "" },
             mockedUpdateParams,
         ]);
         const { container } = render(
@@ -95,13 +95,13 @@ describe("Paginated component", () => {
         ) as HTMLButtonElement;
 
         fireEvent.click(prevPageButton);
-        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "");
+        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "", "");
     });
 
     it("should invoke updateParams function when bottom pagination button is clicked", async () => {
         const mockedUpdateParams = vi.fn();
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 2, query: "" },
+            { limit: 10, page: 2, query: "", version: "" },
             mockedUpdateParams,
         ]);
         const mockedScrollIntoView = vi.fn();
@@ -124,7 +124,7 @@ describe("Paginated component", () => {
         ) as HTMLButtonElement;
 
         fireEvent.click(prevPageButton);
-        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "");
+        expect(mockedUpdateParams).toHaveBeenCalledWith(1, 10, "", "");
         expect(mockedScrollIntoView).toHaveBeenCalled();
     });
 });

@@ -13,6 +13,8 @@ import { checkQuery } from "../../lib/query";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
 import Search from "../search";
+import { Flex } from "@mantine/core";
+import VersionsFilter from "../versionsFilter";
 
 export type InputsProps = {
     orderBy?: InputOrderByInput;
@@ -28,11 +30,12 @@ const Inputs: FC<InputsProps> = ({
     const chainId = getConfiguredChainId();
     const [{ query: urlQuery }] = useUrlSearchParams();
     const [query, setQuery] = useState(urlQuery);
+    const [queryDebounced] = useDebouncedValue(query, 500);
+    const [versions, setVersions] = useState<string[]>([]);
+    const [versionsDebounced] = useDebouncedValue(versions, 500);
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
-
-    const [queryDebounced] = useDebouncedValue(query, 500);
 
     const [{ data: data, fetching: fetching }] = useInputsConnectionQuery({
         variables: {
@@ -43,7 +46,9 @@ const Inputs: FC<InputsProps> = ({
                 queryDebounced.toLowerCase(),
                 appAddress?.toLowerCase(),
                 chainId,
-                appVersion,
+                appVersion
+                    ? [appVersion]
+                    : (versionsDebounced as RollupVersion[]),
             ),
         },
     });
@@ -71,7 +76,19 @@ const Inputs: FC<InputsProps> = ({
                 totalCount={totalCount}
                 onChange={onChangePagination}
                 SearchInput={
-                    <Search isLoading={fetching} onChange={setQuery} />
+                    <Flex gap={8}>
+                        <Search
+                            flex={1}
+                            isLoading={fetching}
+                            onChange={setQuery}
+                        />
+                        {!appVersion && (
+                            <VersionsFilter
+                                isLoading={fetching && versions.length > 0}
+                                onChange={setVersions}
+                            />
+                        )}
+                    </Flex>
                 }
             >
                 <InputsTable
@@ -81,7 +98,14 @@ const Inputs: FC<InputsProps> = ({
                 />
             </Paginated>
         ),
-        [fetching, onChangePagination, inputs, totalCount],
+        [
+            fetching,
+            totalCount,
+            onChangePagination,
+            appVersion,
+            versions,
+            inputs,
+        ],
     );
 };
 
