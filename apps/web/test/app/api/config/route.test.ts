@@ -15,6 +15,8 @@ vi.mock("next/server", async (importOriginal) => {
     };
 });
 
+const PUBLIC_CHAIN_ID_VAR_NAME = "NEXT_PUBLIC_CHAIN_ID";
+const DYNAMIC_CHAIN_ID_VAR_NAME = "CHAIN_ID";
 const IS_CONTAINER_VAR_NAME = "NEXT_PUBLIC_IS_CONTAINER";
 const PUBLIC_NODE_RPC_VAR_NAME = "NEXT_PUBLIC_NODE_RPC_URL";
 const DYNAMIC_NODE_RPC_VAR_NAME = "NODE_RPC_URL";
@@ -26,6 +28,7 @@ const NextResponseMock = vi.mocked(NextServer.NextResponse);
 describe("Config route", () => {
     beforeEach(() => {
         // usual default values
+        vi.stubEnv(PUBLIC_CHAIN_ID_VAR_NAME, "31337");
         vi.stubEnv(PUBLIC_EXPLORER_API_VAR_NAME, "http://build-time.io/api");
         vi.stubEnv(
             PUBLIC_NODE_RPC_VAR_NAME,
@@ -65,6 +68,7 @@ describe("Config route", () => {
         expect(NextResponseMock.json).toHaveBeenCalledWith({
             apiEndpoint: "http://build-time.io/api",
             nodeRpcUrl: "http://build-time.io/v2/rpc-json",
+            chainId: "31337",
         });
     });
 
@@ -78,6 +82,7 @@ describe("Config route", () => {
             DYNAMIC_NODE_RPC_VAR_NAME,
             "http://runtime-value.io:9090/v3/anvil",
         );
+        vi.stubEnv(DYNAMIC_CHAIN_ID_VAR_NAME, "11155111");
 
         await GET();
 
@@ -85,6 +90,7 @@ describe("Config route", () => {
         expect(NextResponseMock.json).toHaveBeenCalledWith({
             apiEndpoint: "http://runtime-value.io:9090/new-api/graphql",
             nodeRpcUrl: "http://runtime-value.io:9090/v3/anvil",
+            chainId: "11155111",
         });
     });
 });
