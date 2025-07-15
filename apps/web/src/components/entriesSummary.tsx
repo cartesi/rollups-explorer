@@ -1,17 +1,17 @@
 "use client";
 
+import {
+    useStatsApplicationsOwnerQuery,
+    useStatsQuery,
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import { Summary } from "@cartesi/rollups-explorer-ui";
 import { FC } from "react";
 import { useAccount } from "wagmi";
-import {
-    useStatsQuery,
-    useStatsApplicationsOwnerQuery,
-} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 
-import getConfiguredChainId from "../lib/getConfiguredChain";
+import { useAppConfig } from "../providers/appConfigProvider";
 
 const EntriesSummary: FC = () => {
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const { address, isConnected } = useAccount();
     const [{ data: stats }] = useStatsQuery({
         variables: {

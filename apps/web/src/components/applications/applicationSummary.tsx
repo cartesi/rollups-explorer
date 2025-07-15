@@ -1,5 +1,10 @@
 "use client";
 
+import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import {
+    InputOrderByInput,
+    RollupVersion,
+} from "@cartesi/rollups-explorer-domain/explorer-types";
 import { SummaryCard } from "@cartesi/rollups-explorer-ui";
 import {
     Button,
@@ -17,12 +22,7 @@ import Link from "next/link";
 import { FC } from "react";
 import { TbInbox } from "react-icons/tb";
 import { Address } from "viem";
-import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
-import {
-    InputOrderByInput,
-    RollupVersion,
-} from "@cartesi/rollups-explorer-domain/explorer-types";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import ConnectionSummary from "../connection/connectionSummary";
 import LatestInputsTable from "./latestInputsTable";
@@ -45,7 +45,7 @@ const ApplicationSummary: FC<ApplicationSummaryProps> = ({
     appAddress,
     appVersion,
 }) => {
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const [{ data, fetching }] = useInputsConnectionQuery({
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,

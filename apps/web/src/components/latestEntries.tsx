@@ -1,5 +1,13 @@
 "use client";
 import {
+    useApplicationsConnectionQuery,
+    useInputsQuery,
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
+import {
+    ApplicationOrderByInput,
+    InputOrderByInput,
+} from "@cartesi/rollups-explorer-domain/explorer-types";
+import {
     Button,
     Card,
     Grid,
@@ -13,17 +21,9 @@ import type { FC } from "react";
 import { IconType } from "react-icons";
 import { TbApps, TbInbox } from "react-icons/tb";
 import type { Address as AddressType } from "viem";
-import {
-    useApplicationsConnectionQuery,
-    useInputsQuery,
-} from "@cartesi/rollups-explorer-domain/explorer-hooks";
-import {
-    ApplicationOrderByInput,
-    InputOrderByInput,
-} from "@cartesi/rollups-explorer-domain/explorer-types";
-import getConfiguredChainId from "../lib/getConfiguredChain";
-import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 import { checkApplicationsQuery } from "../lib/query";
+import { useAppConfig } from "../providers/appConfigProvider";
+import LatestEntriesTable, { Entry } from "./latestEntriesTable";
 
 interface LatestEntriesCard {
     title: string;
@@ -84,7 +84,7 @@ export const LatestEntriesCard: FC<LatestEntriesCard> = (props) => {
 };
 
 const LatestEntries: FC = () => {
-    const chainIdConfigured = getConfiguredChainId();
+    const { chainId: chainIdConfigured } = useAppConfig();
     const [{ data: inputsData, fetching: isFetchingInputs }] = useInputsQuery({
         variables: {
             orderBy: InputOrderByInput.TimestampDesc,

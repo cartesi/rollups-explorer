@@ -1,4 +1,5 @@
 "use client";
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
 import {
     useReadCartesiDAppWasVoucherExecuted,
     useSimulateCartesiDAppExecuteVoucher,
@@ -9,8 +10,7 @@ import { notifications } from "@mantine/notifications";
 import { FC, useEffect } from "react";
 import type { Address } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { useAppConfig } from "../../providers/appConfigProvider";
 
 const typeCastProof = (voucher: Partial<Voucher>) => ({
     context: voucher.proof?.context as Address,
@@ -43,6 +43,7 @@ export interface VoucherExecutionType {
 const VoucherExecution: FC<VoucherExecutionType> = (props) => {
     const { appId, voucher } = props;
     const { isConnected } = useAccount();
+    const { chainId } = useAppConfig();
     const hasVoucherProof =
         typeof voucher?.proof === "object" && voucher?.proof !== null;
 
@@ -51,7 +52,7 @@ const VoucherExecution: FC<VoucherExecutionType> = (props) => {
             BigInt(voucher.input?.index as number),
             BigInt(voucher.index as number),
         ],
-        chainId: parseInt(getConfiguredChainId()),
+        chainId: parseInt(chainId),
         address: appId,
     });
 

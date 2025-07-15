@@ -9,13 +9,13 @@ import {
 } from "@testing-library/react";
 import { mainnet } from "viem/chains";
 import { afterAll, beforeEach, describe, it } from "vitest";
-import Shell from "../../../src/components/layout/shell";
-import withMantineTheme from "../../utils/WithMantineTheme";
 import { useAccount, useConfig } from "wagmi";
-import getConfiguredChainId from "../../../src/lib/getConfiguredChain";
+import Shell from "../../../src/components/layout/shell";
+import { useAppConfig } from "../../../src/providers/appConfigProvider";
+import withMantineTheme from "../../utils/WithMantineTheme";
 
-vi.mock("../../../src/lib/getConfiguredChain");
-const getConfiguredChainIdMock = vi.mocked(getConfiguredChainId, true);
+vi.mock("../../../src/providers/appConfigProvider");
+const useAppConfigMock = vi.mocked(useAppConfig, { partial: true });
 
 vi.mock("wagmi");
 const useConfigMock = vi.mocked(useConfig, { partial: true });
@@ -33,7 +33,7 @@ describe("Shell component", () => {
             address: "0x8FD78976f8955D13bAA4fC99043208F4EC020D7E",
         });
 
-        getConfiguredChainIdMock.mockReturnValue("31337");
+        useAppConfigMock.mockReturnValue({ chainId: "31337" });
     });
 
     afterAll(() => {
@@ -67,7 +67,7 @@ describe("Shell component", () => {
                 isConnected: true,
                 chainId: 31337,
             });
-            getConfiguredChainIdMock.mockReturnValue("31337");
+
             render(<Component>Children</Component>);
 
             const button = within(screen.getByTestId("header")).getByTestId(
@@ -82,7 +82,7 @@ describe("Shell component", () => {
                 isConnected: true,
                 chainId: 31337,
             });
-            getConfiguredChainIdMock.mockReturnValue("");
+            useAppConfigMock.mockReturnValue({ chainId: "11155111" });
             render(<Component>Children</Component>);
 
             const button = within(screen.getByTestId("header")).getByTestId(

@@ -1,4 +1,9 @@
 "use client";
+import {
+    CheckStatusDocument,
+    CheckStatusQuery,
+    CheckStatusQueryVariables,
+} from "@cartesi/rollups-explorer-domain/rollups-operations";
 import { ApplicationAutocomplete } from "@cartesi/rollups-explorer-ui";
 import {
     Alert,
@@ -23,13 +28,8 @@ import {
 } from "react-icons/tb";
 import { UseQueryState, useQuery } from "urql";
 import { Address, isAddress } from "viem";
-import {
-    CheckStatusDocument,
-    CheckStatusQuery,
-    CheckStatusQueryVariables,
-} from "@cartesi/rollups-explorer-domain/rollups-operations";
 import { useSearchApplications } from "../../hooks/useSearchApplications";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 
 interface AppConnectionFormProps {
@@ -104,7 +104,7 @@ const AppConnectionForm: FC<AppConnectionFormProps> = ({
 }) => {
     const { addConnection, hasConnection } = useConnectionConfig();
     const theme = useMantineTheme();
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {

@@ -31,7 +31,7 @@ import { useAccount } from "wagmi";
 import CartesiLogo from "../../components/cartesiLogo";
 import Footer from "../../components/layout/footer";
 import SendTransaction from "../../components/sendTransaction";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import { CartesiScanChains } from "../networks/cartesiScanNetworks";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
@@ -45,6 +45,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             toggle: toggleTransaction,
         },
     ] = useDisclosure(false);
+
     const theme = useMantineTheme();
     const showWalletNavbar = useMediaQuery(
         `(min-width:${theme.breakpoints.sm})`,
@@ -54,7 +55,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
         `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
     );
     const { isConnected, chainId } = useAccount();
-    const configuredChainId = getConfiguredChainId();
+    const { chainId: configuredChainId } = useAppConfig();
+
     const isValidNetwork = chainId === Number(configuredChainId);
     const { colorScheme, toggleColorScheme } = useMantineColorScheme({
         keepTransitions: true,

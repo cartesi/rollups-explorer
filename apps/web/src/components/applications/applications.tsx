@@ -1,30 +1,30 @@
 "use client";
 
-import { Flex, Tabs } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useCallback, useState } from "react";
-import { useAccount } from "wagmi";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/dist/graphql/explorer/types";
 import {
     useApplicationsConnectionOwnerQuery,
     useApplicationsConnectionQuery,
 } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import { ApplicationOrderByInput } from "@cartesi/rollups-explorer-domain/explorer-types";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { Flex, Tabs } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import { FC, useCallback, useState } from "react";
+import { useAccount } from "wagmi";
+import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
+import { checkApplicationsQuery } from "../../lib/query";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import ApplicationsTable from "../applications/applicationsTable";
 import Paginated from "../paginated";
 import Search from "../search";
-import UserApplicationsTable from "./userApplicationsTable";
-import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
-import { checkApplicationsQuery } from "../../lib/query";
 import VersionsFilter from "../versionsFilter";
-import { RollupVersion } from "@cartesi/rollups-explorer-domain/dist/graphql/explorer/types";
+import UserApplicationsTable from "./userApplicationsTable";
 
 const UserApplications: FC = () => {
     const { address, isConnected } = useAccount();
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const [query] = useApplicationsConnectionOwnerQuery({
         variables: {
             after,
@@ -80,7 +80,7 @@ const AllApplications: FC = () => {
     const [versions, setVersions] = useState<string[]>([]);
     const [versionsDebounced] = useDebouncedValue(versions, 500);
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const [{ data: data, fetching: fetching }] = useApplicationsConnectionQuery(
         {
             variables: {

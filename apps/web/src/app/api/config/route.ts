@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getConfiguredPublicExplorerAPI } from "../../../lib/getConfigExplorerAPIUrl";
 import { getConfiguredIsContainer } from "../../../lib/getConfigIsContainer";
 import { getConfiguredNodeRpcUrl } from "../../../lib/getConfigNodeRpcUrl";
+import getConfiguredChainId from "../../../lib/getConfiguredChain";
 
 export async function GET() {
     if (!getConfiguredIsContainer()) {
@@ -10,5 +11,6 @@ export async function GET() {
 
     const apiEndpoint = getConfiguredPublicExplorerAPI();
     const nodeRpcUrl = getConfiguredNodeRpcUrl();
-    return NextResponse.json({ apiEndpoint, nodeRpcUrl });
+    const chainId = getConfiguredChainId();
+    return NextResponse.json({ apiEndpoint, nodeRpcUrl, chainId });
 }

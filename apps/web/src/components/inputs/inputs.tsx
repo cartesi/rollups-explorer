@@ -1,19 +1,19 @@
 "use client";
 
-import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useCallback, useMemo, useState } from "react";
 import { useInputsConnectionQuery } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import {
     InputOrderByInput,
     RollupVersion,
 } from "@cartesi/rollups-explorer-domain/explorer-types";
+import { Flex } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import { FC, useCallback, useMemo, useState } from "react";
 import { useUrlSearchParams } from "../../hooks/useUrlSearchParams";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
 import { checkQuery } from "../../lib/query";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import InputsTable from "../inputs/inputsTable";
 import Paginated from "../paginated";
 import Search from "../search";
-import { Flex } from "@mantine/core";
 import VersionsFilter from "../versionsFilter";
 
 export type InputsProps = {
@@ -27,7 +27,7 @@ const Inputs: FC<InputsProps> = ({
     appAddress,
     appVersion,
 }) => {
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
     const [{ query: urlQuery }] = useUrlSearchParams();
     const [query, setQuery] = useState(urlQuery);
     const [queryDebounced] = useDebouncedValue(query, 500);
