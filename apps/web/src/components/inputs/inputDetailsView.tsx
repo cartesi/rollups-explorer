@@ -1,12 +1,4 @@
 "use client";
-import { ContentType, InputDetails } from "@cartesi/rollups-explorer-ui";
-import { Alert, Box, Group, Select, Stack, Text } from "@mantine/core";
-import { find, omit, pathOr } from "ramda";
-import { included, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
-import { FC, useEffect, useMemo, useState } from "react";
-import { TbExclamationCircle } from "react-icons/tb";
-import { UseQueryResponse, useQuery } from "urql";
-import { Address, Hex } from "viem";
 import { InputItemFragment } from "@cartesi/rollups-explorer-domain/explorer-operations";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import {
@@ -21,7 +13,15 @@ import {
     InputDetailsQueryVariables as V2InputDetailsQueryVariables,
 } from "@cartesi/rollups-explorer-domain/rollups-v2-operations";
 import { Voucher as VoucherV2 } from "@cartesi/rollups-explorer-domain/rollups-v2-types";
-import getConfiguredChainId from "../../lib/getConfiguredChain";
+import { ContentType, InputDetails } from "@cartesi/rollups-explorer-ui";
+import { Alert, Box, Group, Select, Stack, Text } from "@mantine/core";
+import { find, omit, pathOr } from "ramda";
+import { included, isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
+import { FC, useEffect, useMemo, useState } from "react";
+import { TbExclamationCircle } from "react-icons/tb";
+import { UseQueryResponse, useQuery } from "urql";
+import { Address, Hex } from "viem";
+import { useAppConfig } from "../../providers/appConfigProvider";
 import { useConnectionConfig } from "../../providers/connectionConfig/hooks";
 import { theme } from "../../providers/theme";
 import { useBlockExplorerData } from "../BlockExplorerLink";
@@ -182,8 +182,6 @@ const buildSelectData = (
     return groups;
 };
 
-const chainId = Number.parseInt(getConfiguredChainId());
-
 const getInputDetailsQueryFactoryByVersion = {
     [RollupVersion.V1]:
         (inputIdx: string) => (optionals: OptionalInputDetailsVariables) => {
@@ -216,6 +214,11 @@ const getInputDetailsQueryFactoryByVersion = {
 const InputDetailsView: FC<ApplicationInputDataProps> = ({ input }) => {
     const { getConnection, hasConnection, showConnectionModal } =
         useConnectionConfig();
+    const appConfig = useAppConfig();
+    const chainId = useMemo(
+        () => Number.parseInt(appConfig.chainId),
+        [appConfig.chainId],
+    );
     const appId = input.application.address as Address;
     const appVersion = input.application.rollupVersion;
     const requiredValue = input.index.toString();

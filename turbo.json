@@ -4,6 +4,7 @@
         "INTERNAL_EXPLORER_API_URL",
         "BASE_PATH",
         "NEXT_PUBLIC_BASE_PATH",
+        "CHAIN_ID",
         "NEXT_PUBLIC_CHAIN_ID",
         "NEXT_PUBLIC_IS_CONTAINER",
         "EXPLORER_API_URL",

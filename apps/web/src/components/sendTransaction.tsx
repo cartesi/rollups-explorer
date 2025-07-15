@@ -1,4 +1,5 @@
 "use client";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import {
     AddressRelayForm,
     ERC1155DepositForm,
@@ -14,11 +15,10 @@ import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { FC, useCallback, useState } from "react";
-import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
-import getConfiguredChainId from "../lib/getConfiguredChain";
+import { useAppConfig } from "../providers/appConfigProvider";
 import { BlockExplorerLink } from "./BlockExplorerLink";
 import { useSpecification } from "./specification/hooks/useSpecification";
 import { JSON_ABI } from "./specification/types";
@@ -65,7 +65,8 @@ const SendTransaction: FC<DepositProps> = ({
         DEBOUNCE_TIME,
     );
 
-    const chainId = getConfiguredChainId();
+    const { chainId } = useAppConfig();
+
     const { applications, fetching } = useSearchApplications({
         address: debouncedApplicationSearchableParams.address,
         rollupVersion: debouncedApplicationSearchableParams.rollupVersion,

@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { getConfiguredPublicExplorerAPI } from "../lib/getConfigExplorerAPIUrl";
 import { getConfiguredIsContainer } from "../lib/getConfigIsContainer";
 import { getConfiguredNodeRpcUrl } from "../lib/getConfigNodeRpcUrl";
+import getConfiguredChainId from "../lib/getConfiguredChain";
 import { initHighlightJSExtensions } from "./HighlightExtensionsStarter";
 import { AppConfigContextProps, AppConfigProvider } from "./appConfigProvider";
 import { ConnectionConfigProvider } from "./connectionConfig/connectionConfigProvider";
@@ -19,7 +20,7 @@ interface ProvidersProps {
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/";
 
-type Config = { apiEndpoint: string; nodeRpcUrl: string };
+type Config = { apiEndpoint: string; nodeRpcUrl: string; chainId: string };
 
 const loadConfig = async () => {
     const { origin } = window.location;
@@ -32,6 +33,7 @@ export function Providers({ children }: ProvidersProps) {
     const [value, setValue] = useState<AppConfigContextProps>({
         apiEndpoint: getConfiguredPublicExplorerAPI(),
         nodeRpcUrl: getConfiguredNodeRpcUrl(),
+        chainId: getConfiguredChainId(),
     });
 
     useEffect(() => {

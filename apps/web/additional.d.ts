@@ -1,6 +1,13 @@
 declare namespace NodeJS {
     export interface ProcessEnv {
         /**
+         * Meant to add configuration flexibility (e.g. containers with different configurations).
+         * When empty the NEXT_PUBLIC version should be the fallback.
+         * Network chain id
+         */
+        CHAIN_ID?: string;
+
+        /**
          * Network chain id
          */
         NEXT_PUBLIC_CHAIN_ID: string;

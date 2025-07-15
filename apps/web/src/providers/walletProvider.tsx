@@ -23,13 +23,6 @@ import getSupportedChainInfo, {
 import createClientFor from "../lib/transportClient";
 import { useAppConfig } from "./appConfigProvider";
 
-// select chain based on env var
-const chainId = parseInt(
-    process.env.NEXT_PUBLIC_CHAIN_ID || "31337",
-) as SupportedChainId;
-
-const chain = getSupportedChainInfo(chainId) || foundry;
-
 const projectId = "a6265c875f8a7513ac7c52362abf434b";
 
 const connectorsForWalletsParameters = {
@@ -59,7 +52,12 @@ const CustomAvatar: AvatarComponent = ({ address, size }) => {
     return <Jazzicon diameter={size} seed={jsNumberForAddress(address)} />;
 };
 
-const buildWagmiConfig = (nodeRpcUrl?: string) => {
+const buildWagmiConfig = (chainId: string, nodeRpcUrl?: string) => {
+    // select chain based on env var
+    const id = parseInt(chainId) as SupportedChainId;
+
+    const chain = getSupportedChainInfo(id) || foundry;
+
     return createConfig({
         ssr: false,
         connectors,
@@ -75,6 +73,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
     const isMounted = useMounted();
     const appConfig = useAppConfig();
     const nodeRpcUrl = appConfig.nodeRpcUrl;
+    const chainId = appConfig.chainId;
 
     // XXX: make this match the mantine theme
     const themeOptions: ThemeOptions = {
@@ -83,8 +82,8 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const wagmiConfig = useMemo(() => {
-        return buildWagmiConfig(nodeRpcUrl);
-    }, [nodeRpcUrl]);
+        return buildWagmiConfig(chainId, nodeRpcUrl);
+    }, [nodeRpcUrl, chainId]);
 
     const walletTheme =
         scheme.colorScheme == "dark"
