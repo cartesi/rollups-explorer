@@ -10,6 +10,11 @@ import InputRow, {
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { useConfig } from "wagmi";
+import { sepolia } from "viem/chains";
+
+vi.mock("wagmi");
+const useConfigMock = vi.mocked(useConfig, { partial: true });
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -58,6 +63,10 @@ const defaultInputStatusData = {
 
 describe("InputRow component", () => {
     beforeEach(() => {
+        useConfigMock.mockReturnValue({
+            chains: [sepolia],
+        });
+
         useConnectionConfigMock.mockReturnValue({
             getConnection: () => vi.fn(),
             hasConnection: () => vi.fn(),

@@ -1,23 +1,15 @@
 "use client";
 
-import {
-    ActionIcon,
-    Anchor,
-    CopyButton,
-    Group,
-    GroupProps,
-    rem,
-    Text,
-    Tooltip,
-} from "@mantine/core";
+import { Anchor, Group, GroupProps, Text, Tooltip } from "@mantine/core";
 import Link from "next/link";
 import { FC } from "react";
-import { TbCheck, TbCopy } from "react-icons/tb";
 import { jsNumberForAddress } from "react-jazzicon";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { Address as AddressType, getAddress } from "viem";
+import CopyButton from "./copyButton";
 
 import RollupContractResolver from "../lib/rollupContractResolver";
+import { shortenHash } from "../lib/textUtils";
 
 export interface AddressProps extends GroupProps {
     value: AddressType;
@@ -41,7 +33,7 @@ const Address: FC<AddressProps> = ({
 }) => {
     value = getAddress(value);
     const name = RollupContractResolver.resolveName(value);
-    const text = shorten ? `${value.slice(0, 8)}...${value.slice(-6)}` : value;
+    const text = shorten ? shortenHash(value) : value;
 
     const label = name ? (
         <Tooltip label={value} withArrow>
@@ -72,30 +64,7 @@ const Address: FC<AddressProps> = ({
                     label
                 )}
             </Group>
-            {canCopy && (
-                <CopyButton value={value} timeout={2000}>
-                    {({ copied, copy }) => (
-                        <Tooltip
-                            label={copied ? "Copied" : "Copy"}
-                            withArrow
-                            position="right"
-                        >
-                            <ActionIcon
-                                color={copied ? "teal" : "gray"}
-                                variant="subtle"
-                                aria-label="Copy address"
-                                onClick={copy}
-                            >
-                                {copied ? (
-                                    <TbCheck style={{ width: rem(16) }} />
-                                ) : (
-                                    <TbCopy style={{ width: rem(16) }} />
-                                )}
-                            </ActionIcon>
-                        </Tooltip>
-                    )}
-                </CopyButton>
-            )}
+            {canCopy && <CopyButton value={value} />}
         </Group>
     );
 };

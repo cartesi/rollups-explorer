@@ -49,6 +49,7 @@ const InputsTable: FC<InputsTableProps> = ({
             <Table width={"100%"} style={{ borderCollapse: "collapse" }}>
                 <Table.Thead>
                     <Table.Tr>
+                        <Table.Th>Transaction Hash</Table.Th>
                         <Table.Th>From</Table.Th>
                         <Table.Th></Table.Th>
                         <Table.Th>To</Table.Th>
@@ -114,14 +115,14 @@ const InputsTable: FC<InputsTableProps> = ({
                 <Table.Tbody>
                     {fetching ? (
                         <Table.Tr>
-                            <Table.Td align="center" colSpan={8}>
+                            <Table.Td align="center" colSpan={9}>
                                 <Loader data-testid="inputs-table-spinner" />
                             </Table.Td>
                         </Table.Tr>
                     ) : (
                         totalCount === 0 && (
                             <Table.Tr>
-                                <Table.Td colSpan={8} align="center">
+                                <Table.Td colSpan={9} align="center">
                                     <Text fw={700}> No inputs</Text>
                                 </Table.Td>
                             </Table.Tr>

@@ -22,6 +22,7 @@ import { Connection } from "../../providers/connectionConfig/types";
 import Address from "../address";
 import ConnectionInputStatusBadge from "../connection/connectionInputStatusBadge";
 import InputDetailsView from "./inputDetailsView";
+import TransactionHash from "../transactionHash";
 
 export type InputRowProps = {
     input: InputItemFragment;
@@ -56,6 +57,9 @@ const InputRow: FC<InputRowProps> = ({
     return (
         <>
             <Table.Tr>
+                <Table.Td>
+                    <TransactionHash transactionHash={input.transactionHash} />
+                </Table.Td>
                 <Table.Td>
                     <Box
                         display="flex"
