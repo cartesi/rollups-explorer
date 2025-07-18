@@ -27,9 +27,15 @@ const CopyButton: FC<CopyButtonProps> = ({ value }) => {
                         onClick={copy}
                     >
                         {copied ? (
-                            <TbCheck style={{ width: rem(16) }} />
+                            <TbCheck
+                                data-testid="copied-icon"
+                                style={{ width: rem(16) }}
+                            />
                         ) : (
-                            <TbCopy style={{ width: rem(16) }} />
+                            <TbCopy
+                                data-testid="copy-icon"
+                                style={{ width: rem(16) }}
+                            />
                         )}
                     </ActionIcon>
                 </Tooltip>
