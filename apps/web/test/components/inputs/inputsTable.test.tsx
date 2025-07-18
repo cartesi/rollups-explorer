@@ -6,6 +6,12 @@ import InputsTable, {
 } from "../../../src/components/inputs/inputsTable";
 import { useConnectionConfig } from "../../../src/providers/connectionConfig/hooks";
 import { withMantineTheme } from "../../utils/WithMantineTheme";
+import { useConfig } from "wagmi";
+import { sepolia } from "viem/chains";
+import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
+
+vi.mock("wagmi");
+const useConfigMock = vi.mocked(useConfig, { partial: true });
 
 vi.mock("../../../src/providers/connectionConfig/hooks");
 const useConnectionConfigMock = vi.mocked(useConnectionConfig, true);
@@ -20,6 +26,7 @@ const defaultProps: InputsTableProps = {
             application: {
                 id: "11155111-0xdb84080e7d2b4654a7e384de851a6cf7281643de",
                 address: "0xdb84080e7d2b4654a7e384de851a6cf7281643de",
+                rollupVersion: "v1" as RollupVersion,
             },
             index: 1,
             payload: "0x68656c6c6f2032",
@@ -46,6 +53,10 @@ const IntersectionObserverMock = vi.fn(() => ({
 vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
 describe("InputsTable component", () => {
     beforeEach(() => {
+        useConfigMock.mockReturnValue({
+            chains: [sepolia],
+        });
+
         useConnectionConfigMock.mockReturnValue({
             getConnection: () => vi.fn(),
             hasConnection: () => vi.fn(),

@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { withMantineTheme } from "../utils/WithMantineTheme";
 import userEvent from "@testing-library/user-event";
 import CopyButton from "../../src/components/copyButton";
@@ -12,13 +12,13 @@ describe("CopyButton", () => {
         render(<Component value={address} />);
 
         await userEvent.hover(screen.getByTestId("copy-icon"));
-        expect(screen.getByText("Copy")).toBeVisible();
+        await waitFor(() => expect(screen.getByText("Copy")).toBeVisible());
     });
 
     it("should display copied tooltip", async () => {
         render(<Component value={address} />);
 
         await userEvent.click(screen.getByTestId("copy-icon"));
-        expect(screen.getByText("Copied")).toBeVisible();
+        await waitFor(() => expect(screen.getByText("Copied")).toBeVisible());
     });
 });
