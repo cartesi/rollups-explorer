@@ -18,6 +18,7 @@ import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { Address as AddressType, getAddress } from "viem";
 
 import RollupContractResolver from "../lib/rollupContractResolver";
+import { shortenHash } from "../utils/text";
 
 export interface AddressProps extends GroupProps {
     value: AddressType;
@@ -41,7 +42,7 @@ const Address: FC<AddressProps> = ({
 }) => {
     value = getAddress(value);
     const name = RollupContractResolver.resolveName(value);
-    const text = shorten ? `${value.slice(0, 8)}...${value.slice(-6)}` : value;
+    const text = shorten ? shortenHash(value) : value;
 
     const label = name ? (
         <Tooltip label={value} withArrow>
