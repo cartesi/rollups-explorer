@@ -22,7 +22,7 @@ import { Connection } from "../../providers/connectionConfig/types";
 import Address from "../address";
 import ConnectionInputStatusBadge from "../connection/connectionInputStatusBadge";
 import InputDetailsView from "./inputDetailsView";
-import TransactionHash from "./transactionHash";
+import TransactionHash from "../transactionHash";
 
 export type InputRowProps = {
     input: InputItemFragment;

@@ -9,7 +9,7 @@ import { Address as AddressType, getAddress } from "viem";
 import CopyButton from "./copyButton";
 
 import RollupContractResolver from "../lib/rollupContractResolver";
-import { shortenHash } from "../utils/text";
+import { shortenHash } from "../lib/textUtils";
 
 export interface AddressProps extends GroupProps {
     value: AddressType;

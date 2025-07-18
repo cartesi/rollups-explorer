@@ -4,7 +4,7 @@ import { isNilOrEmpty } from "ramda-adjunct";
 import { FC } from "react";
 import { TbExternalLink } from "react-icons/tb";
 import { useConfig } from "wagmi";
-import { shortenHash } from "../utils/text";
+import { shortenHash } from "../lib/textUtils";
 
 interface BlockExplorerLinkProps {
     value: string;

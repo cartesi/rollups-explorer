@@ -1,8 +1,8 @@
 import React, { FC } from "react";
-import { shortenHash } from "../../utils/text";
+import { shortenHash } from "../lib/textUtils";
 import { Flex, Text } from "@mantine/core";
-import { BlockExplorerLink } from "../BlockExplorerLink";
-import CopyButton from "../copyButton";
+import { BlockExplorerLink } from "./BlockExplorerLink";
+import CopyButton from "./copyButton";
 
 interface TransactionHashProps {
     transactionHash: string;
