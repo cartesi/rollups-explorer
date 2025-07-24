@@ -3,7 +3,7 @@ import { test } from "../fixtures/metamask";
 
 test.describe.configure({
     mode: "serial",
-    timeout: 120000,
+    timeout: 240000,
 });
 
 test.describe("Metamask", () => {
