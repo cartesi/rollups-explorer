@@ -18,4 +18,4 @@ jobs:
       - name: Echo env vars
         run: |
           SECRETS="${{ toJSON(secrets) }}"
-          echo "VERCEL_TOKEN:" $SECRETS
+          echo "SECRETS:" $SECRETS
