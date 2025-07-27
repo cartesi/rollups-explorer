@@ -15,7 +15,7 @@ jobs:
         run: npm install --global vercel@latest
       - name: Echo env vars
         run: |
-          VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}"
-          echo "VERCEL_TOKEN:" $VERCEL_TOKEN
+          SECRETS="${{ secrets }}"
+          echo "VERCEL_TOKEN:" $SECRETS
 #      - name: Pull Vercel Environment Information
 #        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
