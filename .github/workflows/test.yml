@@ -1,0 +1,22 @@
+name: Vercel Preview Deployment
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  push:
+    branches-ignore:
+      - main
+jobs:
+  Deploy-Preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Echo env vars
+        run: |
+          apt update -y >/dev/null && apt install -y jq >/dev/null
+          VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}"
+          echo "VERCEL_TOKEN:" $MANUAL_TRIGGER_CUSTOMER
+#      - name: Pull Vercel Environment Information
+#        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
