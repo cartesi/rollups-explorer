@@ -59,7 +59,7 @@ test.describe("Navigations", () => {
         // Verify that table with correct columns is visible
         await expect(
             page.getByRole("row", {
-                name: "From To Version Method Index Status Age Data",
+                name: "Transaction Hash From To Version Method Index Status Age Data",
             }),
         ).toBeVisible();
 
@@ -154,7 +154,7 @@ test.describe("Navigations", () => {
             // Verify that table with correct columns is visible
             await expect(
                 page.getByRole("row", {
-                    name: "From To Version Method Index Status Age Data",
+                    name: "Transaction Hash From To Version Method Index Status Age Data",
                 }),
             ).toBeVisible();
 
