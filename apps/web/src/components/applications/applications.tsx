@@ -18,6 +18,7 @@ import Paginated from "../paginated";
 import Search from "../search";
 import VersionsFilter from "../versionsFilter";
 import UserApplicationsTable from "./userApplicationsTable";
+import { splitString } from "../../lib/textUtils";
 
 const UserApplications: FC = () => {
     const { address, isConnected } = useAccount();
@@ -74,11 +75,10 @@ const UserApplications: FC = () => {
 const AllApplications: FC = () => {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
-    const [{ query: urlQuery }] = useUrlSearchParams();
+    const [{ query: urlQuery, version }] = useUrlSearchParams();
     const [query, setQuery] = useState(urlQuery);
     const [queryDebounced] = useDebouncedValue(query, 500);
-    const [versions, setVersions] = useState<string[]>([]);
-    const [versionsDebounced] = useDebouncedValue(versions, 500);
+    const [versions, setVersions] = useState<string[]>(splitString(version));
     const after = page === 1 ? undefined : ((page - 1) * limit).toString();
     const { chainId } = useAppConfig();
     const [{ data: data, fetching: fetching }] = useApplicationsConnectionQuery(
@@ -90,7 +90,7 @@ const AllApplications: FC = () => {
                 where: checkApplicationsQuery({
                     chainId,
                     address: queryDebounced.toLowerCase(),
-                    versions: versionsDebounced as RollupVersion[],
+                    versions: versions as RollupVersion[],
                 }),
             },
         },
