@@ -10,7 +10,7 @@ import { ActionIcon, Button, Checkbox, Flex, Menu } from "@mantine/core";
 import { TbFilter, TbFilterFilled } from "react-icons/tb";
 import { useUrlSearchParams } from "../hooks/useUrlSearchParams";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
-import { isNilOrEmpty } from "ramda-adjunct";
+import { splitString } from "../lib/textUtils";
 
 export type FilterVersion = `${RollupVersion}`;
 
@@ -65,9 +65,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
             }
 
             if (!opened && !isApplied.current) {
-                const versions = isNilOrEmpty(version)
-                    ? []
-                    : (version.split(",") as FilterVersion[]);
+                const versions = splitString<FilterVersion>(version);
                 setActiveVersions(versions);
             }
         },
@@ -82,9 +80,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
             !isFilterSyncedWithQuery.current &&
             lastActiveVersions.current.join() !== version
         ) {
-            const versions = isNilOrEmpty(version)
-                ? []
-                : (version.split(",") as FilterVersion[]);
+            const versions = splitString<FilterVersion>(version);
             setActiveVersions(versions);
             onChange(versions);
             lastActiveVersions.current = versions;
