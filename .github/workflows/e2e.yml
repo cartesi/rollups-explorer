@@ -6,6 +6,23 @@ concurrency:
 env:
   NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    outputs:
+      pr-number: ${{ steps.check-prs.outputs.PR_NUMBER }}
+    steps:
+      - name: Check PRs
+        id: check-prs
+        run: |
+          # ...
+          echo "PR_NUMBER=$pr_number" >> $GITHUB_OUTPUT
+
+  publish:
+    needs: [ check-pr ]
+    runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ needs.check-pr.outputs.pr-number }}
+
   get-sepolia-deployment-url:
     runs-on: ubuntu-latest
     outputs:
@@ -25,7 +42,7 @@ jobs:
         run: |
           ROLLUPS_EXPLORER_SEPOLIA_URL=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
           echo "Rollups Explorer Sepolia Url: " $ROLLUPS_EXPLORER_SEPOLIA_URL
-          echo "PR_NUMBER=$pr_number" >> $ROLLUPS_EXPLORER_SEPOLIA_URL
+          echo "PR_NUMBER=$pr_number" >> $GITHUB_OUTPUT
 
   wait-for-vercel-deployment:
     needs: [get-sepolia-deployment-url]
