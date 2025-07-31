@@ -41,7 +41,7 @@ jobs:
         id: check-prs
         run: |
           pr_number=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
-          echo "Rollups Explorer Sepolia Urll: " $pr_number
+          echo "Rollups Explorer Sepolia Url: " $pr_number
           echo "PR_NUMBER=$pr_number" >> $GITHUB_OUTPUT
 
   wait-for-vercel-deployment:
