@@ -1,15 +1,59 @@
+/**
+ * @description Fetches data from the Vercel API
+ * @param version
+ * @param resource
+ * @param token
+ * @param params
+ * @returns {Promise<any>}
+ */
+const fetchFromVercelApi = async (
+    version,
+    resource,
+    token,
+    params = undefined,
+) => {
+    const baseUrl = "https://api.vercel.com";
+    const url = `${baseUrl}/${version}/${resource}${params ? `?${params}` : ""}`;
+
+    const request = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return await request.json();
+};
+
+/**
+ * @description Gets the available teams
+ * @param token
+ * @returns {Promise<*>}
+ */
+const getTeams = async (token) => {
+    return fetchFromVercelApi("v2", "teams", token);
+};
+
+/**
+ * @description Gets the current deployments
+ * @param token
+ * @param params
+ * @returns {Promise<*>}
+ */
+const getDeployments = async (token, params) => {
+    return fetchFromVercelApi("v6", "deployments", token, params);
+};
+
+/**
+ * @description Gets the Sepolia deployment url
+ * @returns {Promise<string>}
+ */
 async function main() {
     const [token] = process.argv.slice(2);
     let cartesiTeamId = null;
+    let sepoliaDeploymentUrl = null;
 
     try {
-        const request = await fetch("https://api.vercel.com/v2/teams", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        const response = await request.json();
+        const response = await getTeams(token);
 
         cartesiTeamId = response.teams.find(
             (team) => team.slug === "cartesi",
@@ -18,33 +62,24 @@ async function main() {
         console.log("Error while retrieving teams data:", error);
     }
 
-    let sepoliaDeploymentUrl = null;
-
     try {
         const params = new URLSearchParams({
             teamId: cartesiTeamId,
         }).toString();
-        const request = await fetch(
-            `https://api.vercel.com/v6/deployments?${params}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            },
-        );
+        const response = await getDeployments(token, params);
 
-        const response = await request.json();
-
-        const url = response.deployments.find(
+        sepoliaDeploymentUrl = response.deployments.find(
             (team) => team.name === "rollups-explorer-sepolia",
         ).url;
-
-        sepoliaDeploymentUrl = `https://${url}`;
     } catch (error) {
         console.log("Error while retrieving deployments data:", error);
     }
 
-    return sepoliaDeploymentUrl;
+    if (!sepoliaDeploymentUrl) {
+        throw new Error("Could not find deployment url for Sepolia");
+    }
+
+    return `https://${sepoliaDeploymentUrl}`;
 }
 
 const url = await main();
