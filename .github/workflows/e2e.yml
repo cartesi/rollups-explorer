@@ -20,15 +20,6 @@ jobs:
 
       - name: Test secrets
         run: |
-          # Get the team ids
-          TEAMS=`curl "https://api.vercel.com/v2/teams?limit=1" -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"`
-          echo "Teams: " $TEAMS
-          
-          # Get the Cartesi team id
-          node --version
-          CARTESI_TEAM_ID=`node -pe 'JSON.parse(process.argv[1]).teams.find((team) => team.slug === "cartesi").id' $TEAMS`
-          echo "Cartesi team id: " $CARTESI_TEAM_IDEAMS
-          
-          # Fetch all current Vercel deployments for the Cartesi team
-          VERCEL_DEPLOYMENTS=`curl "https://api.vercel.com/v6/deployments?teamId=$TEAM_ID" -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"`
-          echo "Vercel deployments for current team: " $VERCEL_DEPLOYMENTS
+          # Get the team id
+          TEAM_ID=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
+          echo "Cartesi team id: " $TEAM_ID
