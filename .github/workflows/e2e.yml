@@ -20,6 +20,6 @@ jobs:
 
       - name: Test secrets
         run: |
-          # Fetch all Vercel deployment from this project
-          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' https://api.vercel.com/v6/deployments?teamId=team_VQVaaDsBLjGMFcn81lPj2Nuk`
-          echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
+          # Get the team ids
+          TEAMS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' https://api.vercel.com/v2/teams`
+          echo "Vercel deployments for current team: " $TEAMS
