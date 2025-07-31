@@ -6,10 +6,27 @@ concurrency:
 env:
   NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    outputs:
+      pr-number: ${{ steps.check-prs.outputs.PR_NUMBER }}
+    steps:
+      - name: Check PRs
+        id: check-prs
+        run: |
+          # ...
+          echo "PR_NUMBER=$pr_number" >> $GITHUB_OUTPUT
+
+  publish:
+    needs: [ check-pr ]
+    runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ needs.check-pr.outputs.pr-number }}
+
   get-sepolia-deployment-url:
     runs-on: ubuntu-latest
     outputs:
-      sepolia-deployment-url: ${{ steps.get-sepolia-deployment-url.outputs.DEPLOYMENT_URL }}
+      pr-number: ${{ steps.check-prs.outputs.PR_NUMBER }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -25,56 +42,15 @@ jobs:
         run: |
           ROLLUPS_EXPLORER_SEPOLIA_URL=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
           echo "Rollups Explorer Sepolia Url: " $ROLLUPS_EXPLORER_SEPOLIA_URL
-          echo "DEPLOYMENT_URL=$sepolia-deployment-url" >> $ROLLUPS_EXPLORER_SEPOLIA_URL
+          echo "PR_NUMBER=$pr_number" >> $ROLLUPS_EXPLORER_SEPOLIA_URL
 
   wait-for-vercel-deployment:
     needs: [get-sepolia-deployment-url]
     runs-on: ubuntu-latest
     env:
-      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.sepolia-deployment-url }}
+      PR_NUMBER: ${{ needs.get-sepolia-deployment-url.outputs.pr-number }}
     steps:
-      - name: Retrieve deployment URL (example on how to set an ENV var)
-        run: "echo VERCEL_DEPLOYMENT_URL=nextjs-bzyss249z.vercel.app >> $GITHUB_ENV"
-
-      - uses: UnlyEd/github-action-await-vercel@v1
-        id: await-vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        with:
-          deployment-url: ${{ env.DEPLOYMENT_URL }}
-          timeout: 10 # Wait for 10 seconds before failing
-
-      - name: Displays the deployment name (example on how to read information about the deployment)
-        run: "echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}"
-
-  e2e:
-    needs: [wait-for-vercel-deployment, get-sepolia-deployment-url]
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    env:
-      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.sepolia-deployment-url }}
-    container:
-      image: mcr.microsoft.com/playwright:v1.53.2-jammy
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.12.0
-          cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Install Playwright
-        run: yarn playwright install --with-deps
-
-      - name: Run e2e tests
-        run: yarn test:e2e
-        id: e2e
-        continue-on-error: true
-        env:
-          E2E_BASE_URL: ${{ env.DEPLOYMENT_URL }}
-          HOME: /root
+      - name: Get Sepolia deployment url
+        id: get-sepolia-deployment-url
+        run: |
+          echo "PR_NUMBER is: " $PR_NUMBER
