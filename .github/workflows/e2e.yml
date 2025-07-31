@@ -42,7 +42,6 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         with:
           deployment-url: ${{ env.DEPLOYMENT_URL }}
-          timeout: 10 # Wait for 10 seconds before failing
 
   e2e:
     needs: [ get-sepolia-deployment-url, wait-for-vercel-deployment ]
