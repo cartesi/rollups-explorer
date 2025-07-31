@@ -20,5 +20,6 @@ jobs:
 
       - name: Test secrets
         run: |
-          SECRETS="${{ toJSON(secrets) }}"
-          echo "SECRETS:" $SECRETS
+          # Fetch all Vercel deployment from this project
+          ALL_VERCEL_DEPLOYMENTS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' https://api.vercel.com/v6/deployments`
+          echo "Vercel deployments for current team: " $ALL_VERCEL_DEPLOYMENTS
