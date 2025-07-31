@@ -18,9 +18,35 @@ async function main() {
         console.log("Error while retrieving teams data:", error);
     }
 
-    return cartesiTeamId;
+    let sepoliaDeploymentUrl = null;
+
+    try {
+        const params = new URLSearchParams({
+            teamId: cartesiTeamId,
+        }).toString();
+        const request = await fetch(
+            `https://api.vercel.com/v6/deployments?${params}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        );
+
+        const response = await request.json();
+
+        const url = response.deployments.find(
+            (team) => team.name === "rollups-explorer-sepolia",
+        ).url;
+
+        sepoliaDeploymentUrl = `https://${url}`;
+    } catch (error) {
+        console.log("Error while retrieving deployments data:", error);
+    }
+
+    return sepoliaDeploymentUrl;
 }
 
-const data = await main();
+const url = await main();
 
-process.stdout.write(data);
+process.stdout.write(url);

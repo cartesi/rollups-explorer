@@ -21,5 +21,5 @@ jobs:
       - name: Test secrets
         run: |
           # Get the team id
-          TEAM_ID=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
-          echo "Cartesi team id: " $TEAM_ID
+          ROLLUPS_EXPLORER_SEPOLIA_URL=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
+          echo "Rollups Explorer Sepolia Url: " $ROLLUPS_EXPLORER_SEPOLIA_URL
