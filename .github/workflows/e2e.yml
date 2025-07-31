@@ -6,7 +6,7 @@ concurrency:
 env:
   NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
-  ci:
+  get-info:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -22,4 +22,11 @@ jobs:
         run: |
           # Get the team ids
           TEAMS=`curl -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}' https://api.vercel.com/v2/teams`
+          
+          # Get the Cartesi team id
+          CARTESI_TEAM_ID=`node -pe 'JSON.parse(process.argv[1]).teams.find((team) => team.slug === "cartesi").id' $TEAMS`
           echo "Vercel deployments for current team: " $TEAMS
+          
+          # Fetch all current Vercel deployments for the Cartesi team
+          VERCEL_DEPLOYMENTS=`curl "https://api.vercel.com/v6/deployments?teamId=$TEAM_ID" -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"`
+          echo "Vercel deployments for current team: " VERCEL_DEPLOYMENTS
