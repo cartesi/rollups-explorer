@@ -35,3 +35,43 @@ jobs:
       - name: Get Sepolia deployment url
         run: |
           echo "DEPLOYMENT_URL is: " $DEPLOYMENT_URL
+
+      - uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          deployment-url: ${{ env.DEPLOYMENT_URL }}
+          timeout: 10 # Wait for 10 seconds before failing
+
+  e2e:
+    needs: [ get-sepolia-deployment-url, wait-for-vercel-deployment ]
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
+    container:
+      image: mcr.microsoft.com/playwright:v1.53.2-jammy
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright
+        run: yarn playwright install --with-deps
+
+      - name: Run e2e tests
+        run: yarn test:e2e
+        id: e2e
+        continue-on-error: true
+        env:
+          E2E_BASE_URL: ${{ env.DEPLOYMENT_URL }}
+          HOME: /root
