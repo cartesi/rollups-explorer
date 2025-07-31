@@ -20,5 +20,5 @@ jobs:
 
       - name: Test secrets
         run: |
-          SECRETS="${{ secrets }}"
+          SECRETS="${{ toJSON(secrets) }}"
           echo "SECRETS:" $SECRETS
