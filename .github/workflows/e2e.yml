@@ -9,7 +9,7 @@ jobs:
   get-sepolia-deployment-url:
     runs-on: ubuntu-latest
     outputs:
-      pr-number: ${{ steps.check-prs.outputs.PR_NUMBER }}
+      deployment-url: ${{ steps.get-deployment-url.outputs.DEPLOYMENT_URL }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -21,19 +21,17 @@ jobs:
           cache: "yarn"
 
       - name: Get Sepolia deployment url
-        id: check-prs
+        id: get-deployment-url
         run: |
-          pr_number=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
-          echo "Rollups Explorer Sepolia Url: " $pr_number
-          echo "PR_NUMBER=$pr_number" >> $GITHUB_OUTPUT
+          deployment_url=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
+          echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
 
   wait-for-vercel-deployment:
     needs: [get-sepolia-deployment-url]
     runs-on: ubuntu-latest
     env:
-      PR_NUMBER: ${{ needs.get-sepolia-deployment-url.outputs.pr-number }}
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
     steps:
       - name: Get Sepolia deployment url
-        id: get-sepolia-deployment-url
         run: |
-          echo "PR_NUMBER is: " $PR_NUMBER
+          echo "DEPLOYMENT_URL is: " $DEPLOYMENT_URL
