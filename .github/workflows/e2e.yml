@@ -6,8 +6,10 @@ concurrency:
 env:
   NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
-  get-info:
+  get-sepolia-deployment-url:
     runs-on: ubuntu-latest
+    outputs:
+      sepolia-deployment-url: ${{ steps.get-sepolia-deployment-url.outputs.DEPLOYMENT_URL }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -15,11 +17,64 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 22.11.0
+          node-version: 22.12.0
           cache: "yarn"
 
-      - name: Test secrets
+      - name: Get Sepolia deployment url
+        id: get-sepolia-deployment-url
         run: |
-          # Get the team id
           ROLLUPS_EXPLORER_SEPOLIA_URL=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
           echo "Rollups Explorer Sepolia Url: " $ROLLUPS_EXPLORER_SEPOLIA_URL
+          echo "DEPLOYMENT_URL=$deployment-url" >> $ROLLUPS_EXPLORER_SEPOLIA_URL
+
+  wait-for-vercel-deployment:
+    needs: [get-sepolia-deployment-url]
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
+    steps:
+      - name: Retrieve deployment URL (example on how to set an ENV var)
+        run: "echo VERCEL_DEPLOYMENT_URL=nextjs-bzyss249z.vercel.app >> $GITHUB_ENV"
+
+      - uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          deployment-url: ${{ env.DEPLOYMENT_URL }}
+          timeout: 10 # Wait for 10 seconds before failing
+
+      - name: Displays the deployment name (example on how to read information about the deployment)
+        run: "echo The deployment at ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).url }} is ${{ fromJson(steps.await-vercel.outputs.deploymentDetails).readyState }}"
+
+  e2e:
+    needs: [wait-for-vercel-deployment, get-sepolia-deployment-url]
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
+    container:
+      image: mcr.microsoft.com/playwright:v1.53.2-jammy
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright
+        run: yarn playwright install --with-deps
+
+      - name: Run e2e tests
+        run: yarn test:e2e
+        id: e2e
+        continue-on-error: true
+        env:
+          E2E_BASE_URL: ${{ env.DEPLOYMENT_URL }}
+          HOME: /root
