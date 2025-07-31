@@ -21,7 +21,7 @@ jobs:
       - name: Test secrets
         run: |
           # Get the team ids
-          TEAMS=`curl "https://api.vercel.com/v2/teams" -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"`
+          TEAMS=`curl "https://api.vercel.com/v2/teams?limit=1" -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"`
           echo "Teams: " $TEAMS
           
           # Get the Cartesi team id
