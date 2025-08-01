@@ -1,5 +1,5 @@
 /**
- * @description This script in this file is used by .github/workflows/e2e.yml
+ * @description The script in this file is used by .github/workflows/e2e.yml
  * to provide the sepolia deployment url
  */
 
@@ -49,7 +49,7 @@ const getDeployments = async (token, params) => {
 };
 
 /**
- * @description Gets the Sepolia deployment url
+ * @description Gets the latest Sepolia deployment url
  * @returns {Promise<string>}
  */
 async function main() {
