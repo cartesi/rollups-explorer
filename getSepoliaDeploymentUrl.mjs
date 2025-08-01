@@ -73,9 +73,13 @@ async function main() {
         }).toString();
         const response = await getDeployments(token, params);
 
-        sepoliaDeploymentUrl = response.deployments.find(
-            (team) => team.name === "rollups-explorer-sepolia",
-        ).url;
+        const [latestDeployment] = response.deployments
+            .filter(
+                (deployment) => deployment.name === "rollups-explorer-sepolia",
+            )
+            .sort((a, b) => a.created - b.created);
+
+        sepoliaDeploymentUrl = latestDeployment?.url;
     } catch (error) {
         console.log("Error while retrieving deployments data:", error);
     }
