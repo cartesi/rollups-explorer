@@ -77,7 +77,7 @@ async function main() {
             .filter(
                 (deployment) => deployment.name === "rollups-explorer-sepolia",
             )
-            .sort((a, b) => a.created - b.created);
+            .sort((a, b) => b.created - a.created);
 
         sepoliaDeploymentUrl = latestDeployment?.url;
     } catch (error) {
