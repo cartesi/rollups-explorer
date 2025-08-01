@@ -1,4 +1,9 @@
 /**
+ * @description This script in this file is used by .github/workflows/e2e.yml
+ * to provide the sepolia deployment url
+ */
+
+/**
  * @description Fetches data from the Vercel API
  * @param version
  * @param resource

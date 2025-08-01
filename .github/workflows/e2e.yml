@@ -1,4 +1,4 @@
-name: Test action
+name: Run e2e tests
 on: [push]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,26 +26,22 @@ jobs:
           deployment_url=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
           echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
 
-  wait-for-vercel-deployment:
+  wait-for-sepolia-deployment:
     needs: [get-sepolia-deployment-url]
     runs-on: ubuntu-latest
     env:
       DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
     steps:
-      - name: Get Sepolia deployment url
-        run: |
-          echo "DEPLOYMENT_URL is: " $DEPLOYMENT_URL
-
       - uses: UnlyEd/github-action-await-vercel@v1
         id: await-vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         with:
           deployment-url: ${{ env.DEPLOYMENT_URL }}
-          timeout: 1200 # Wait for 20 minutes before failing
+          timeout: 1200 # Wait for 1200 seconds (20 minutes) before failing
 
-  e2e:
-    needs: [ get-sepolia-deployment-url, wait-for-vercel-deployment ]
+  run-e2e-tests-on-sepolia:
+    needs: [ get-sepolia-deployment-url, wait-for-sepolia-deployment ]
     timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
