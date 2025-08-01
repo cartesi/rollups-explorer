@@ -110,7 +110,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
 
             <Menu.Dropdown>
                 <Menu.Label>Application Version</Menu.Label>
-                <Menu.Item>
+                <Menu.Item data-testid="rollups-v1">
                     <Checkbox
                         checked={activeVersions.includes("v1")}
                         label="Rollups v1"
@@ -118,7 +118,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
                         onChange={onChangeFilters}
                     />
                 </Menu.Item>
-                <Menu.Item mb={12}>
+                <Menu.Item mb={12} data-testid="rollups-v2">
                     <Checkbox
                         checked={activeVersions.includes("v2")}
                         label="Rollups v2"
