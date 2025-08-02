@@ -2,6 +2,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { pathOr } from "ramda";
 import { useCallback, useMemo } from "react";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
+import { splitString } from "../lib/textUtils";
 
 const availableVersions = Object.values(RollupVersion).reduce(
     (accumulator, version) => ({
@@ -30,7 +31,12 @@ export const useUrlSearchParams = () => {
     const page = isNaN(pg) ? 1 : pg;
     const query = urlSearchParams.get("query") ?? "";
     const versionParam = urlSearchParams.get("version") ?? "";
-    const version = pathOr("", [versionParam], availableVersions);
+    const version = versionParam.includes(",")
+        ? splitString<string>(versionParam)
+              .map((version) => pathOr("", [version], availableVersions))
+              .filter((version) => version !== "")
+              .join(",")
+        : pathOr("", [versionParam], availableVersions);
 
     const updateParams = useCallback(
         (page: number, limit: number, query: string, version = ""): void => {

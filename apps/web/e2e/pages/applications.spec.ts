@@ -107,3 +107,23 @@ test("should filter applications based on rollups v2 version", async ({
     });
     expect(href).toContain("version=v2");
 });
+
+test("should filter applications based on multiple version", async ({
+    page,
+}) => {
+    await page.goto("/applications?version=v1%2Cv2");
+    await expect(page.getByTestId("table-spinner")).not.toBeVisible();
+
+    const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
+    await versionsFilterTrigger.click();
+
+    const v1MenuItem = page
+        .getByTestId("rollups-v1")
+        .locator('[data-checked="true"]');
+    await expect(v1MenuItem).toBeVisible();
+
+    const v2MenuItem = page
+        .getByTestId("rollups-v2")
+        .locator('[data-checked="true"]');
+    await expect(v2MenuItem).toBeVisible();
+});

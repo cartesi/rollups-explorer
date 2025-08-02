@@ -10,7 +10,7 @@ import { ActionIcon, Button, Checkbox, Flex, Menu } from "@mantine/core";
 import { TbFilter, TbFilterFilled } from "react-icons/tb";
 import { useUrlSearchParams } from "../hooks/useUrlSearchParams";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
-import { isNilOrEmpty } from "ramda-adjunct";
+import { splitString } from "../lib/textUtils";
 
 export type FilterVersion = `${RollupVersion}`;
 
@@ -65,9 +65,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
             }
 
             if (!opened && !isApplied.current) {
-                const versions = isNilOrEmpty(version)
-                    ? []
-                    : (version.split(",") as FilterVersion[]);
+                const versions = splitString<FilterVersion>(version);
                 setActiveVersions(versions);
             }
         },
@@ -82,9 +80,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
             !isFilterSyncedWithQuery.current &&
             lastActiveVersions.current.join() !== version
         ) {
-            const versions = isNilOrEmpty(version)
-                ? []
-                : (version.split(",") as FilterVersion[]);
+            const versions = splitString<FilterVersion>(version);
             setActiveVersions(versions);
             onChange(versions);
             lastActiveVersions.current = versions;
@@ -114,7 +110,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
 
             <Menu.Dropdown>
                 <Menu.Label>Application Version</Menu.Label>
-                <Menu.Item>
+                <Menu.Item data-testid="rollups-v1">
                     <Checkbox
                         checked={activeVersions.includes("v1")}
                         label="Rollups v1"
@@ -122,7 +118,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
                         onChange={onChangeFilters}
                     />
                 </Menu.Item>
-                <Menu.Item mb={12}>
+                <Menu.Item mb={12} data-testid="rollups-v2">
                     <Checkbox
                         checked={activeVersions.includes("v2")}
                         label="Rollups v2"
