@@ -23,7 +23,8 @@ jobs:
       - name: Get Sepolia deployment url
         id: get-deployment-url
         run: |
-          deployment_url=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }})
+          deployment_url=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }} ${{ github.sha }})
+          echo "GITHUB SHA: " ${{ github.sha }}
           echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
 
   wait-for-sepolia-deployment:
