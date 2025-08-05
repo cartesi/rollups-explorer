@@ -53,7 +53,7 @@ const getDeployments = async (token, params) => {
  * @returns {Promise<string>}
  */
 async function main() {
-    const [token] = process.argv.slice(2);
+    const [token, githubSha] = process.argv.slice(2);
     let cartesiTeamId = null;
     let sepoliaDeploymentUrl = null;
 
@@ -75,7 +75,9 @@ async function main() {
 
         const [latestDeployment] = response.deployments
             .filter(
-                (deployment) => deployment.name === "rollups-explorer-sepolia",
+                (deployment) =>
+                    deployment.name === "rollups-explorer-sepolia" &&
+                    deployment.meta.githubCommitSha === githubSha,
             )
             .sort((a, b) => b.created - a.created);
 
