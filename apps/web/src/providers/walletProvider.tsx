@@ -59,7 +59,7 @@ const buildWagmiConfig = (chainId: string, nodeRpcUrl?: string) => {
     const chain = getSupportedChainInfo(id) || foundry;
 
     return createConfig({
-        ssr: false,
+        ssr: true,
         connectors,
         chains: [chain],
         client: ({ chain }) => createClientFor(chain, nodeRpcUrl),
