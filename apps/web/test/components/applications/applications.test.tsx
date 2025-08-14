@@ -1,4 +1,7 @@
-import { afterAll, beforeEach, describe, it } from "vitest";
+import {
+    useApplicationsConnectionOwnerQuery,
+    useApplicationsConnectionQuery,
+} from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import {
     cleanup,
     fireEvent,
@@ -6,22 +9,18 @@ import {
     screen,
     waitFor,
 } from "@testing-library/react";
-import { useAccount } from "wagmi";
-import { Applications } from "../../../src/components/applications/applications";
-import { withMantineTheme } from "../../utils/WithMantineTheme";
-import {
-    useApplicationsConnectionOwnerQuery,
-    useApplicationsConnectionQuery,
-} from "@cartesi/rollups-explorer-domain/explorer-hooks";
-import userEvent from "@testing-library/user-event";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
     ReadonlyURLSearchParams,
     usePathname,
     useRouter,
     useSearchParams,
 } from "next/navigation";
+import { afterAll, beforeEach, describe, it } from "vitest";
+import { useAccount } from "wagmi";
+import { Applications } from "../../../src/components/applications/applications";
 import { useUrlSearchParams } from "../../../src/hooks/useUrlSearchParams";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { withMantineTheme } from "../../utils/WithMantineTheme";
 
 vi.mock("next/navigation");
 const usePathnameMock = vi.mocked(usePathname, true);
@@ -92,9 +91,14 @@ describe("Applications component", () => {
         );
 
         useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: "" },
+            { limit: 10, page: 1, query: "", version: "" },
             vi.fn(),
         ]);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        cleanup();
     });
 
     afterAll(() => {
@@ -176,11 +180,8 @@ describe("Applications component", () => {
         render(<Component />);
 
         const searchInput = screen.getByTestId("search-input");
-        fireEvent.focus(searchInput);
+        fireEvent.change(searchInput, { target: { value: address } });
 
-        await waitFor(() => userEvent.type(searchInput, address), {
-            timeout: 3000,
-        });
         await waitFor(
             () =>
                 expect(
@@ -204,7 +205,7 @@ describe("Applications component", () => {
                     },
                 }),
             {
-                timeout: 1000,
+                timeout: 3000,
             },
         );
     });
