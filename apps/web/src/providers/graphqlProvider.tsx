@@ -1,5 +1,5 @@
 import { Provider } from "@cartesi/rollups-explorer-domain";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useMemo } from "react";
 import { getUrqlClient } from "../lib/urql";
 import { useAppConfig } from "./appConfigProvider";
 
@@ -9,7 +9,8 @@ export type GraphQLProviderProps = {
 
 const GraphQLProvider: FC<GraphQLProviderProps> = (props) => {
     const appConfig = useAppConfig();
-    const client = getUrqlClient(appConfig.apiEndpoint ?? "");
+    const url = appConfig.apiEndpoint ?? "";
+    const client = useMemo(() => getUrqlClient(url), [url]);
     return <Provider value={client}>{props.children}</Provider>;
 };
 
