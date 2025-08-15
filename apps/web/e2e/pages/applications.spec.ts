@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { honeypotV2Sepolia } from "../utils/constants";
+import { findApplicationsRequestForRollupsV2 } from "../utils/requests";
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/applications");
@@ -85,6 +86,10 @@ test("should search for specific application", async ({ page }) => {
 test("should filter applications based on rollups v2 version", async ({
     page,
 }) => {
+    const rollupsVersionV2Request = page.waitForRequest(
+        findApplicationsRequestForRollupsV2,
+    );
+
     await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
     const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
@@ -96,16 +101,18 @@ test("should filter applications based on rollups v2 version", async ({
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await page.waitForURL("/applications", {
-        waitUntil: "networkidle",
-    });
+    await rollupsVersionV2Request;
 
     await expect(page.getByTestId("table-spinner")).not.toBeVisible();
 
-    const href = await page.evaluate(() => document.location.search, {
-        timeout: 1000,
-    });
-    expect(href).toContain("version=v2");
+    const applicationBadges = await page
+        .getByTestId("rollup-version-badge")
+        .all();
+
+    for (const applicationBadge of applicationBadges) {
+        const textContent = await applicationBadge.textContent();
+        expect(textContent).toBe("v2");
+    }
 });
 
 test("should filter applications based on multiple version", async ({
