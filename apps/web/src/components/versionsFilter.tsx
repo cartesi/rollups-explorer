@@ -15,12 +15,10 @@ import { splitString } from "../lib/textUtils";
 export type FilterVersion = `${RollupVersion}`;
 
 interface VersionFilterProps {
-    isLoading: boolean;
     onChange: (versions: string[]) => void;
 }
 
-const VersionsFilter: FC<VersionFilterProps> = (props) => {
-    const { isLoading, onChange } = props;
+const VersionsFilter: FC<VersionFilterProps> = ({ onChange }) => {
     const [opened, setOpened] = useState(false);
     const [{ limit, page, query, version }, updateParams] =
         useUrlSearchParams();
@@ -99,11 +97,7 @@ const VersionsFilter: FC<VersionFilterProps> = (props) => {
             onChange={onChangeOpened}
         >
             <Menu.Target>
-                <ActionIcon
-                    size="xl"
-                    data-testid="versions-filter-trigger"
-                    loading={isLoading}
-                >
+                <ActionIcon size="xl" data-testid="versions-filter-trigger">
                     <FilterIcon style={{ width: "60%", height: "60%" }} />
                 </ActionIcon>
             </Menu.Target>
