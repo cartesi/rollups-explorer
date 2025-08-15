@@ -118,10 +118,7 @@ const AllApplications: FC = () => {
                         isLoading={fetching}
                         onChange={setQuery}
                     />
-                    <VersionsFilter
-                        isLoading={fetching && versions.length > 0}
-                        onChange={setVersions}
-                    />
+                    <VersionsFilter onChange={setVersions} />
                 </Flex>
             }
         >

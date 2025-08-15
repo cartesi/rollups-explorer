@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { findInputsRequestForRollupsV2 } from "../utils/requests";
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/inputs");
@@ -88,6 +89,10 @@ test("should search for specific input", async ({ page }) => {
 });
 
 test("should filter inputs based on rollups v2 version", async ({ page }) => {
+    const rollupsVersionV2Request = page.waitForRequest(
+        findInputsRequestForRollupsV2,
+    );
+
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
 
     const versionsFilterTrigger = page.getByTestId("versions-filter-trigger");
@@ -99,16 +104,16 @@ test("should filter inputs based on rollups v2 version", async ({ page }) => {
     const applyButton = page.getByText("Apply");
     await applyButton.click();
 
-    await page.waitForURL("/inputs", {
-        waitUntil: "networkidle",
-    });
+    await rollupsVersionV2Request;
 
     await expect(page.getByTestId("inputs-table-spinner")).not.toBeVisible();
 
-    const href = await page.evaluate(() => document.location.search, {
-        timeout: 1000,
-    });
-    expect(href).toContain("version=v2");
+    const inputBadges = await page.getByTestId("rollup-version-badge").all();
+
+    for (const inputBadge of inputBadges) {
+        const textContent = await inputBadge.textContent();
+        expect(textContent).toBe("v2");
+    }
 });
 
 test("should filter applications based on multiple version", async ({
