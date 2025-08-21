@@ -8,8 +8,8 @@ export default function useWatchQueryOnBlockChange(
 ) {
     const queryClient = useQueryClient();
     const { data: blockNumber } = useBlockNumber({ watch: true });
-    const lastQueryKey = useRef(queryKey);
-    const lastBlockNumber = useRef(blockNumber);
+    const lastQueryKey = useRef<readonly unknown[] | null>(null);
+    const lastBlockNumber = useRef<bigint | undefined>(undefined);
 
     useEffect(() => {
         if (
