@@ -38,4 +38,32 @@ describe("useWatchQueryOnBlockChange hook", () => {
             }),
         );
     });
+
+    it('should not reinvoke "invalidateQueries" function if query key and block number are the same', async () => {
+        const queryKey = ["query-key"];
+        let invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+        const { rerender } = renderHook(() =>
+            useWatchQueryOnBlockChange(queryKey),
+        );
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledWith({
+                queryKey,
+            }),
+        );
+
+        invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+
+        rerender({ queryKey });
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+    });
 });
