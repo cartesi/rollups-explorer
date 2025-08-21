@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBlockNumber } from "wagmi";
-import { isEqual } from "../utils";
+import { equals } from "ramda";
 
 export default function useWatchQueryOnBlockChange(
     queryKey: readonly unknown[],
@@ -13,7 +13,7 @@ export default function useWatchQueryOnBlockChange(
 
     useEffect(() => {
         if (
-            !isEqual(queryKey, lastQueryKey.current) ||
+            !equals(queryKey, lastQueryKey.current) ||
             blockNumber !== lastBlockNumber.current
         ) {
             lastQueryKey.current = queryKey;
