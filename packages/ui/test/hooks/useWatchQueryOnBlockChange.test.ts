@@ -60,7 +60,7 @@ describe("useWatchQueryOnBlockChange hook", () => {
             invalidateQueries: invalidateQueriesMock,
         } as any);
 
-        rerender({ queryKey });
+        rerender({ queryKey: ["query-key"] });
 
         await waitFor(() =>
             expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
