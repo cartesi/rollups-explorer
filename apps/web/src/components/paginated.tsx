@@ -107,6 +107,7 @@ const Paginated: FC<PaginatedProps> = (props) => {
             >
                 <Box w={{ base: "100%", lg: "50%" }}>{SearchInput}</Box>
                 <Pagination
+                    data-testid="top-pagination"
                     value={activePage}
                     total={totalPages}
                     siblings={isSmallDevice ? 0 : 1}
