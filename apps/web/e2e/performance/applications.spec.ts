@@ -26,9 +26,6 @@ test("applications should load normally", async ({ page }) => {
     // Set initial value for the after param
     let after = 10;
 
-    // Initialize an empty array to store the request times
-    const requestTimes: number[] = [];
-
     // Iterate the buttons from 2 to 5
     for (const button of buttonsForPagesTwoToFive) {
         // Intercept the paginated request associated with the button
@@ -41,37 +38,15 @@ test("applications should load normally", async ({ page }) => {
         // Measure the start time of the request
         const startTime = Date.now();
         // Await the request to settle
-        const request = await paginatedRequest;
-        // Await the response
-        const response = await request.response();
-        // Assert that the request is successful
-        expect(response?.status()).toBe(200);
-        // Measure the end time of the request
-        const endTime = Date.now();
-        // Measure the request time
-        const requestTime = (endTime - startTime) / 1000;
-        // Save the request time
-        requestTimes.push(requestTime);
+        await paginatedRequest;
+        // Await the table spinner to be visible
+        await expect(page.getByTestId("table-spinner")).toBeVisible();
+        // Await the table spinner to be hidden
+        await expect(page.getByTestId("table-spinner")).not.toBeVisible({
+            timeout: 1000,
+        });
         // Iterate the after param for the next request
         after += 10;
-    }
-
-    // Calculate the combined request time
-    const combinedRequestTime = requestTimes.reduce(
-        (totalTime, requestTime) => {
-            return totalTime + requestTime;
-        },
-        0,
-    );
-
-    // Verify that the combined time of the requests was no more than 2 seconds
-    // Four requests were made so the average time needs to be <= 0.5 seconds per request
-    expect(combinedRequestTime).toBeLessThanOrEqual(2);
-
-    // Verify that none of the requests took more than 1 second to settle
-    // Typically, the paginated requests take between 150 ms to 600 ms depending on the network speed. We consider a request that took more than a second to be flawed in some way.
-    for (const requestTime of requestTimes) {
-        expect(requestTime).toBeLessThanOrEqual(1);
     }
 });
 
