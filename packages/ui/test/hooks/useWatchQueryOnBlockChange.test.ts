@@ -37,7 +37,7 @@ describe("useWatchQueryOnBlockChange hook", () => {
         );
     });
 
-    it('should not reinvoke "invalidateQueries" function if query key and block number are the same', async () => {
+    it('should not invoke "invalidateQueries" function if query key and block number are the same', async () => {
         const queryKey = ["query-key"];
         let invalidateQueriesMock = vi.fn(() => Promise.resolve());
         useQueryClientMock.mockReturnValue({
@@ -63,7 +63,7 @@ describe("useWatchQueryOnBlockChange hook", () => {
         );
     });
 
-    it('should not reinvoke "invalidateQueries" function if query key has changed but block number is the same', async () => {
+    it('should not invoke "invalidateQueries" function if query key has changed but block number is the same', async () => {
         const queryKey = ["query-key"];
         let invalidateQueriesMock = vi.fn(() => Promise.resolve());
         useQueryClientMock.mockReturnValue({
@@ -89,7 +89,7 @@ describe("useWatchQueryOnBlockChange hook", () => {
         );
     });
 
-    it('should reinvoke "invalidateQueries" function if block number has changed', async () => {
+    it('should invoke "invalidateQueries" function if block number has changed', async () => {
         const queryKey = ["query-key"];
         let invalidateQueriesMock = vi.fn(() => Promise.resolve());
         useQueryClientMock.mockReturnValue({
