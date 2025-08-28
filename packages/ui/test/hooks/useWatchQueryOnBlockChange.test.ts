@@ -24,7 +24,7 @@ describe("useWatchQueryOnBlockChange hook", () => {
         vi.clearAllMocks();
     });
 
-    it('should invoke "invalidateQueries" function on block number change', async () => {
+    it('should not initially invoke "invalidateQueries" function when block has not changed', async () => {
         const queryKey = ["query-key"];
         const invalidateQueriesMock = vi.fn(() => Promise.resolve());
         useQueryClientMock.mockReturnValue({
@@ -33,9 +33,88 @@ describe("useWatchQueryOnBlockChange hook", () => {
         renderHook(() => useWatchQueryOnBlockChange(queryKey));
 
         await waitFor(() =>
-            expect(invalidateQueriesMock).toHaveBeenCalledWith({
-                queryKey,
-            }),
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+    });
+
+    it('should not invoke "invalidateQueries" function if query key and block number are the same', async () => {
+        const queryKey = ["query-key"];
+        let invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+        const { rerender } = renderHook(() =>
+            useWatchQueryOnBlockChange(queryKey),
+        );
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+
+        invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+
+        rerender({ queryKey: ["query-key"] });
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+    });
+
+    it('should not invoke "invalidateQueries" function if query key has changed but block number is the same', async () => {
+        const queryKey = ["query-key"];
+        let invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+        const { rerender } = renderHook(() =>
+            useWatchQueryOnBlockChange(queryKey),
+        );
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+
+        invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+
+        rerender({ queryKey: ["next-query-key"] });
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+    });
+
+    it('should invoke "invalidateQueries" function if block number has changed', async () => {
+        const queryKey = ["query-key"];
+        let invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+        const { rerender } = renderHook(() =>
+            useWatchQueryOnBlockChange(queryKey),
+        );
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(0),
+        );
+
+        invalidateQueriesMock = vi.fn(() => Promise.resolve());
+        useQueryClientMock.mockReturnValue({
+            invalidateQueries: invalidateQueriesMock,
+        } as any);
+        useBlockNumberMock.mockReturnValue({
+            data: 1n,
+        } as any);
+
+        rerender({ queryKey: ["query-key"] });
+
+        await waitFor(() =>
+            expect(invalidateQueriesMock).toHaveBeenCalledTimes(1),
         );
     });
 });

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBlockNumber } from "wagmi";
 
@@ -7,8 +7,12 @@ export default function useWatchQueryOnBlockChange(
 ) {
     const queryClient = useQueryClient();
     const { data: blockNumber } = useBlockNumber({ watch: true });
+    const lastBlockNumber = useRef<bigint | undefined>(blockNumber);
 
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey });
+        if (blockNumber !== lastBlockNumber.current) {
+            lastBlockNumber.current = blockNumber;
+            void queryClient.invalidateQueries({ queryKey });
+        }
     }, [blockNumber, queryClient, queryKey]);
 }
