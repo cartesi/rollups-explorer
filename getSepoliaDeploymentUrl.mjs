@@ -21,6 +21,8 @@ async function main() {
         bearerToken: token,
     });
 
+    console.log("env::", process.env.VERCEL_TOKEN, process.env.GITHUB_SHA);
+
     try {
         const teamsResult = await vercel.teams.getTeams({
             limit: 20,
@@ -29,6 +31,8 @@ async function main() {
         cartesiTeamId = teamsResult.teams.find(
             (team) => team.slug === "cartesi",
         ).id;
+
+        console.log("cartesiTeamId::", cartesiTeamId);
 
         const deploymentsResult = await vercel.deployments.getDeployments({
             app: "rollups-explorer",
