@@ -27,6 +27,7 @@ jobs:
         id: get-deployment-url
         run: |
           deployment_url=$(node getSepoliaDeploymentUrl.mjs)
+          echo "Deployment url: " $deployment_url
           echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -38,10 +39,6 @@ jobs:
     env:
       DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
     steps:
-      - name: Output Sepolia deployment url
-        run: |
-          echo "Deployment url: " ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
-
       - uses: UnlyEd/github-action-await-vercel@v1
         id: await-vercel
         env:
