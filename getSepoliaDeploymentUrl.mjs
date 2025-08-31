@@ -10,7 +10,10 @@ import { Vercel } from "@vercel/sdk";
  * @returns {Promise<string>}
  */
 async function main() {
-    const [token, githubSha] = process.argv.slice(2);
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    const token = process.env.VERCEL_TOKEN;
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    const githubSha = process.env.GITHUB_SHA;
     let cartesiTeamId = null;
     let sepoliaDeploymentUrl = null;
 
