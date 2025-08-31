@@ -6,41 +6,59 @@ import { Vercel } from "@vercel/sdk";
  */
 
 /**
- * @description Gets the latest Sepolia deployment url
+ * @description Gets the deployment url for a given environment
+ * @param token
+ * @param githubSha
+ * @param app
  * @returns {Promise<string>}
  */
-async function main() {
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    const token = process.env.VERCEL_TOKEN;
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    const githubSha = process.env.GITHUB_SHA;
-    let cartesiTeamId = null;
-    let sepoliaDeploymentUrl = null;
-
+async function getDeploymentUrl(token, githubSha, app) {
     const vercel = new Vercel({
         bearerToken: token,
     });
 
+    const teamsResult = await vercel.teams.getTeams({
+        limit: 20,
+    });
+
+    const cartesiTeamId = teamsResult.teams.find(
+        (team) => team.slug === "cartesi",
+    )?.id;
+
+    if (!cartesiTeamId) {
+        throw new Error("Could not find team id for Cartesi");
+    }
+
+    const deploymentsResult = await vercel.deployments.getDeployments({
+        app,
+        teamId: cartesiTeamId,
+        sha: githubSha,
+    });
+
+    const [latestDeployment] = deploymentsResult.deployments;
+
+    if (!latestDeployment?.url) {
+        throw new Error(`Could not find deployment url for ${app}`);
+    }
+
+    return latestDeployment.url;
+}
+
+/**
+ * @description Gets the latest Sepolia deployment url
+ * @returns {Promise<string>}
+ */
+async function main() {
+    const token = process.env.VERCEL_TOKEN;
+    const githubSha = process.env.GITHUB_SHA;
+    let sepoliaDeploymentUrl = null;
+
     try {
-        const teamsResult = await vercel.teams.getTeams({
-            limit: 20,
-        });
-
-        cartesiTeamId = teamsResult.teams.find(
-            (team) => team.slug === "cartesi",
-        ).id;
-
-        const deploymentsResult = await vercel.deployments.getDeployments({
-            app: "rollups-explorer",
-            teamId: cartesiTeamId,
-            sha: githubSha,
-        });
-
-        sepoliaDeploymentUrl = deploymentsResult?.url;
-
-        if (!sepoliaDeploymentUrl) {
-            throw new Error("Could not find deployment url for Sepolia");
-        }
+        sepoliaDeploymentUrl = await getDeploymentUrl(
+            token,
+            githubSha,
+            "rollups-explorer-sepolia",
+        );
     } catch (error) {
         console.error("Error while retrieving deployment data:", error);
         process.exit(1);
