@@ -20,10 +20,16 @@ jobs:
           node-version: 22.12.0
           cache: "yarn"
 
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Get Sepolia deployment url
         id: get-deployment-url
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          deployment_url=$(node getSepoliaDeploymentUrl.mjs ${{ secrets.VERCEL_TOKEN }} ${{ github.sha }})
+          deployment_url=$(node getSepoliaDeploymentUrl.mjs)
           echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
 
   wait-for-sepolia-deployment:
