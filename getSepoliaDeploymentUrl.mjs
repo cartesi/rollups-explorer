@@ -1,93 +1,44 @@
+import { Vercel } from "@vercel/sdk";
+
 /**
  * @description The script in this file is used by .github/workflows/e2e.yml
  * to provide the sepolia deployment url
  */
 
 /**
- * @description Fetches data from the Vercel API
- * @param version
- * @param resource
- * @param token
- * @param params
- * @returns {Promise<any>}
- */
-const fetchFromVercelApi = async (
-    version,
-    resource,
-    token,
-    params = undefined,
-) => {
-    const baseUrl = "https://api.vercel.com";
-    const url = `${baseUrl}/${version}/${resource}${params ? `?${params}` : ""}`;
-
-    const request = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return await request.json();
-};
-
-/**
- * @description Gets the available teams
- * @param token
- * @returns {Promise<*>}
- */
-const getTeams = async (token) => {
-    return fetchFromVercelApi("v2", "teams", token);
-};
-
-/**
- * @description Gets the current deployments
- * @param token
- * @param params
- * @returns {Promise<*>}
- */
-const getDeployments = async (token, params) => {
-    return fetchFromVercelApi("v6", "deployments", token, params);
-};
-
-/**
  * @description Gets the latest Sepolia deployment url
  * @returns {Promise<string>}
  */
 async function main() {
-    const [token, githubSha] = process.argv.slice(2);
-    let cartesiTeamId = null;
+    const token = process.env.VERCEL_TOKEN;
+    const githubSha = process.env.GITHUB_SHA;
     let sepoliaDeploymentUrl = null;
 
     try {
-        const response = await getTeams(token);
+        const vercel = new Vercel({
+            bearerToken: token,
+        });
 
-        cartesiTeamId = response.teams.find(
+        const teamsResult = await vercel.teams.getTeams({
+            limit: 20,
+        });
+
+        const cartesiTeamId = teamsResult.teams.find(
             (team) => team.slug === "cartesi",
-        ).id;
-    } catch (error) {
-        console.log("Error while retrieving teams data:", error);
-    }
+        )?.id;
 
-    try {
-        const params = new URLSearchParams({
+        const deploymentsResult = await vercel.deployments.getDeployments({
+            app: "rollups-explorer-sepolia",
             teamId: cartesiTeamId,
-        }).toString();
-        const response = await getDeployments(token, params);
+            sha: githubSha,
+        });
 
-        const [latestDeployment] = response.deployments
-            .filter(
-                (deployment) =>
-                    deployment.name === "rollups-explorer-sepolia" &&
-                    deployment.meta.githubCommitSha === githubSha,
-            )
-            .sort((a, b) => b.created - a.created);
+        const [latestDeployment] = deploymentsResult.deployments;
 
-        sepoliaDeploymentUrl = latestDeployment?.url;
+        return latestDeployment.url;
     } catch (error) {
-        console.log("Error while retrieving deployments data:", error);
-    }
-
-    if (!sepoliaDeploymentUrl) {
-        throw new Error("Could not find deployment url for Sepolia");
+        console.error("Error while retrieving deployment data:", error);
+        process.exit(1);
     }
 
     return `https://${sepoliaDeploymentUrl}`;
