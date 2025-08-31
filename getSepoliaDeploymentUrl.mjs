@@ -17,11 +17,15 @@ async function main() {
     let cartesiTeamId = null;
     let sepoliaDeploymentUrl = null;
 
+    return console.log(
+        "env::",
+        process.env.VERCEL_TOKEN,
+        process.env.GITHUB_SHA,
+    );
+
     const vercel = new Vercel({
         bearerToken: token,
     });
-
-    console.log("env::", process.env.VERCEL_TOKEN, process.env.GITHUB_SHA);
 
     try {
         const teamsResult = await vercel.teams.getTeams({
