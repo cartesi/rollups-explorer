@@ -54,11 +54,42 @@ async function main() {
     let sepoliaDeploymentUrl = null;
 
     try {
-        sepoliaDeploymentUrl = await getDeploymentUrl(
-            token,
-            githubSha,
-            "rollups-explorer-sepolia",
-        );
+        // sepoliaDeploymentUrl = await getDeploymentUrl(
+        //     token,
+        //     githubSha,
+        //     "rollups-explorer-sepolia",
+        // );
+        const vercel = new Vercel({
+            bearerToken: token,
+        });
+
+        const teamsResult = await vercel.teams.getTeams({
+            limit: 20,
+        });
+
+        const cartesiTeamId = teamsResult.teams.find(
+            (team) => team.slug === "cartesi",
+        )?.id;
+
+        if (!cartesiTeamId) {
+            throw new Error("Could not find team id for Cartesi");
+        }
+
+        const deploymentsResult = await vercel.deployments.getDeployments({
+            app: "rollups-explorer-sepolia",
+            teamId: cartesiTeamId,
+            sha: githubSha,
+        });
+
+        const [latestDeployment] = deploymentsResult.deployments;
+
+        if (!latestDeployment?.url) {
+            throw new Error(
+                `Could not find deployment url for "rollups-explorer-sepolia"`,
+            );
+        }
+
+        return latestDeployment.url;
     } catch (error) {
         console.error("Error while retrieving deployment data:", error);
         process.exit(1);
