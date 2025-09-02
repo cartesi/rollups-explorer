@@ -1,38 +1,78 @@
-name: End-to-end testing
-on:
-    deployment_status:
+name: Run e2e tests
+on: [push]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
-    e2e:
-        if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && contains(github.event.deployment_status.environment_url, 'rollups-explorer-sepolia')
-        timeout-minutes: 30
-        runs-on: ubuntu-latest
-        container:
-            image: mcr.microsoft.com/playwright:v1.53.2-jammy
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4
+  get-sepolia-deployment-url:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-url: ${{ steps.get-deployment-url.outputs.DEPLOYMENT_URL }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22.12.0
-                  cache: "yarn"
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.12.0
+          cache: "yarn"
 
-            - name: Install dependencies
-              run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-            - name: Install Playwright
-              run: yarn playwright install --with-deps
+      - name: Get Sepolia deployment url
+        id: get-deployment-url
+        run: |
+          deployment_url=$(node getSepoliaDeploymentUrl.mjs)
+          echo "DEPLOYMENT_URL=$deployment_url" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
 
-            - name: Run e2e tests
-              run: yarn test:e2e
-              id: e2e
-              continue-on-error: true
-              env:
-                  E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
-                  HOME: /root
+  wait-for-sepolia-deployment:
+    needs: [get-sepolia-deployment-url]
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
+    steps:
+      - uses: UnlyEd/github-action-await-vercel@v1
+        id: await-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          deployment-url: ${{ env.DEPLOYMENT_URL }}
+          timeout: 1200 # Wait for 1200 seconds (20 minutes) before failing
 
-            - name: Update check status to the outcome
-              run: yarn node reportGitHubCheckStatus.mjs "End-to-end (${{ github.event.deployment_status.environment }})" ${{ github.sha }} ${{ steps.e2e.outcome }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run-e2e-tests-on-sepolia:
+    needs: [ get-sepolia-deployment-url, wait-for-sepolia-deployment ]
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
+    container:
+      image: mcr.microsoft.com/playwright:v1.53.2-jammy
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright
+        run: yarn playwright install --with-deps
+
+      - name: Run e2e tests
+        run: yarn test:e2e
+        id: e2e
+        env:
+          E2E_BASE_URL: ${{ env.DEPLOYMENT_URL }}
+          HOME: /root
