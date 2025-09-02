@@ -12,7 +12,6 @@ import { Vercel } from "@vercel/sdk";
 async function main() {
     const token = process.env.VERCEL_TOKEN;
     const githubSha = process.env.GITHUB_SHA;
-    let sepoliaDeploymentUrl = null;
 
     try {
         const vercel = new Vercel({
@@ -35,13 +34,14 @@ async function main() {
 
         const [latestDeployment] = deploymentsResult.deployments;
 
-        return latestDeployment.url;
+        // The Property is called 'url', but currently it lacks an important part: the protocol.
+        return latestDeployment.url.includes("https://")
+            ? latestDeployment.url
+            : `https://${latestDeployment.url}`;
     } catch (error) {
         console.error("Error while retrieving deployment data:", error);
         process.exit(1);
     }
-
-    return `https://${sepoliaDeploymentUrl}`;
 }
 
 const url = await main();
