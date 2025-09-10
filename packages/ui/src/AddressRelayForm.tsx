@@ -140,6 +140,7 @@ export const AddressRelayForm: FC<AddressRelayFormProps> = (props) => {
                         disabled={disabled || !canSubmit}
                         leftSection={<TbCheck />}
                         loading={loading}
+                        data-testid="send-transaction"
                         onClick={() =>
                             execute.writeContract(prepare.data!.request)
                         }

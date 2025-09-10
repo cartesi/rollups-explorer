@@ -226,7 +226,10 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                     )}
 
                     {appVersion && (
-                        <Collapse in={showInputSection}>
+                        <Collapse
+                            in={showInputSection}
+                            data-testid="generic-input-fields"
+                        >
                             <Stack>
                                 <SegmentedControl
                                     value={mode}
