@@ -309,6 +309,16 @@ describe("SendTransaction component", () => {
             expect(screen.getByTestId("send-transaction")).toBeEnabled(),
         );
 
+        const depositTypeSelect = screen.getByTestId("deposit-type-select");
+
+        fireEvent.click(depositTypeSelect);
+
+        fireEvent.click(screen.getByText("Generic Input"));
+
+        await waitFor(() =>
+            expect(screen.getByTestId("raw-input-form")).toBeInTheDocument(),
+        );
+
         await waitFor(() =>
             expect(() => screen.getByTestId("generic-input-fields")).toThrow(
                 "Unable to find an element",
