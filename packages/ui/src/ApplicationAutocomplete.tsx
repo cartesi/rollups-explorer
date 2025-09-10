@@ -83,11 +83,13 @@ const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (props) => {
                         combobox.updateSelectedOptionIndex();
                     }}
                     rightSection={
-                        <CloseButton
-                            aria-label="Clear input"
-                            onClick={() => setValue("")}
-                            style={{ display: _value ? undefined : "none" }}
-                        />
+                        rest.rightSection || (
+                            <CloseButton
+                                aria-label="Clear input"
+                                onClick={() => setValue("")}
+                                style={{ display: _value ? undefined : "none" }}
+                            />
+                        )
                     }
                 />
             </Combobox.Target>
