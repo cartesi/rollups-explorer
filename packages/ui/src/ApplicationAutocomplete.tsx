@@ -1,5 +1,6 @@
 import {
     AutocompleteProps,
+    CloseButton,
     Combobox,
     InputBase,
     Stack,
@@ -81,6 +82,13 @@ const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (props) => {
                         combobox.openDropdown();
                         combobox.updateSelectedOptionIndex();
                     }}
+                    rightSection={
+                        <CloseButton
+                            aria-label="Clear input"
+                            onClick={() => setValue("")}
+                            style={{ display: _value ? undefined : "none" }}
+                        />
+                    }
                 />
             </Combobox.Target>
 
