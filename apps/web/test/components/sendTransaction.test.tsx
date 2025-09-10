@@ -16,6 +16,10 @@ import {
     useMultiTokensQuery,
 } from "@cartesi/rollups-explorer-domain/explorer-hooks";
 import { useBalance } from "wagmi";
+import {
+    useSimulateDAppAddressRelayRelayDAppAddress,
+    useWriteDAppAddressRelayRelayDAppAddress,
+} from "@cartesi/rollups-wagmi";
 
 vi.mock("@cartesi/rollups-explorer-domain/explorer-hooks");
 const useApplicationsQueryMock = vi.mocked(useApplicationsQuery, {
@@ -25,6 +29,14 @@ const useTokensQueryMock = vi.mocked(useTokensQuery, { partial: true });
 const useMultiTokensQueryMock = vi.mocked(useMultiTokensQuery, {
     partial: true,
 });
+const useWriteDAppAddressRelayRelayDAppAddressMock = vi.mocked(
+    useWriteDAppAddressRelayRelayDAppAddress,
+    { partial: true },
+);
+const useSimulateDAppAddressRelayRelayDAppAddressMock = vi.mocked(
+    useSimulateDAppAddressRelayRelayDAppAddress,
+    { partial: true },
+);
 
 vi.mock("viem", async () => {
     const actual = await vi.importActual("viem");
@@ -156,21 +168,24 @@ describe("SendTransaction component", () => {
             },
         });
 
-        await waitFor(() => expect(mockedFn).toHaveBeenCalledTimes(2), {
-            timeout: 500,
-        });
-
-        expect(mockedFn).toHaveBeenCalledWith({
-            variables: {
-                limit: 10,
-                where: {
-                    address_containsInsensitive: search,
-                    chain: {
-                        id_eq: "11155111",
+        await waitFor(
+            () => {
+                expect(mockedFn).toHaveBeenCalledWith({
+                    variables: {
+                        limit: 10,
+                        where: {
+                            address_containsInsensitive: search,
+                            chain: {
+                                id_eq: "11155111",
+                            },
+                        },
                     },
-                },
+                });
             },
-        });
+            {
+                timeout: 500,
+            },
+        );
     });
 
     it("should initially query 10 tokens with no predefined search", () => {
@@ -192,13 +207,37 @@ describe("SendTransaction component", () => {
         });
     });
 
-    it.skip("should query tokens with given search id, using debouncing", async () => {
+    it("should query tokens with given search id, using debouncing", async () => {
         render(<Component initialDepositType="erc20" />);
         const mockedFn = vi.fn().mockReturnValue([{ data: {} }]);
         useTokensQueryMock.mockImplementation(mockedFn);
 
+        const rawInputForm = screen.queryByTestId(
+            "erc20-deposit-form",
+        ) as HTMLFormElement;
+        const applicationInput = rawInputForm.querySelector(
+            "input",
+        ) as HTMLInputElement;
+
+        const applicationSearch = "0x60a7048c3136293071605a4eaffef49923e981cc";
+
+        fireEvent.change(applicationInput, {
+            target: {
+                value: applicationSearch,
+            },
+        });
+
+        await waitFor(
+            () => expect(screen.getByText("Rollup v1")).toBeInTheDocument(),
+            {
+                timeout: 2000,
+            },
+        );
+
+        fireEvent.click(screen.getByText("Rollup v1"));
+
         const tokenInputForm = screen.queryByTestId(
-            "erc20Address",
+            "erc20address-input",
         ) as HTMLFormElement;
         const search =
             "SIM20 - SimpleERC20 - 0x059c7507b973d1512768c06f32a813bc93d83eb2";
@@ -222,20 +261,58 @@ describe("SendTransaction component", () => {
             },
         });
 
-        await waitFor(() => expect(mockedFn).toHaveBeenCalledTimes(2), {
-            timeout: 500,
-        });
+        await waitFor(() =>
+            expect(
+                screen.getByText("Amount of tokens to deposit"),
+            ).toBeInTheDocument(),
+        );
 
-        expect(mockedFn).toHaveBeenCalledWith({
-            variables: {
-                limit: 10,
-                where: {
-                    address_containsInsensitive: formattedValue,
-                    chain: {
-                        id_eq: "11155111",
+        await waitFor(() => {
+            expect(mockedFn).toHaveBeenCalledWith({
+                variables: {
+                    limit: 10,
+                    where: {
+                        address_containsInsensitive: formattedValue,
+                        chain: {
+                            id_eq: "11155111",
+                        },
                     },
                 },
+            });
+        });
+    });
+
+    it("should reset the form when selecting a new one", async () => {
+        useWriteDAppAddressRelayRelayDAppAddressMock.mockReturnValue({});
+        useSimulateDAppAddressRelayRelayDAppAddressMock.mockReturnValue({
+            error: null,
+        });
+        render(<Component initialDepositType="relay" />);
+
+        const form = screen.queryByTestId(
+            "address-relay-form",
+        ) as HTMLFormElement;
+
+        const applicationInput = form.querySelector(
+            "input",
+        ) as HTMLInputElement;
+
+        const applicationSearch = "0x60a7048c3136293071605a4eaffef49923e981cc";
+
+        fireEvent.change(applicationInput, {
+            target: {
+                value: applicationSearch,
             },
         });
+
+        await waitFor(() =>
+            expect(screen.getByTestId("send-transaction")).toBeEnabled(),
+        );
+
+        await waitFor(() =>
+            expect(() => screen.getByTestId("generic-input-fields")).toThrow(
+                "Unable to find an element",
+            ),
+        );
     });
 });
