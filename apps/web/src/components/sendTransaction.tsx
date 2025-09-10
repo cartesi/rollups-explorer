@@ -50,10 +50,10 @@ const useApplications = (address: string, rollupVersion?: RollupVersion) => {
     );
 
     useEffect(() => {
-        if (!isReset.current) {
-            setApplications(searchedApplications);
-        } else {
+        if (isReset.current) {
             setApplicationsWithDebounce(searchedApplications);
+        } else {
+            setApplications(searchedApplications);
         }
 
         isReset.current = false;
