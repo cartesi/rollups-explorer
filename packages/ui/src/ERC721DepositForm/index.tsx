@@ -275,8 +275,10 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                         </>
                     )}
 
-                <Collapse in={isNotNil(appVersion) && !isLoadingApplications}>
-                    {appVersion && (
+                {appVersion && (
+                    <Collapse
+                        in={isNotNil(appVersion) && !isLoadingApplications}
+                    >
                         <Stack>
                             <TextInput
                                 label="ERC-721"
@@ -434,8 +436,8 @@ export const ERC721DepositForm: FC<ERC721DepositFormProps> = (props) => {
                                 </Button>
                             </Group>
                         </Stack>
-                    )}
-                </Collapse>
+                    </Collapse>
+                )}
             </Stack>
         </form>
     );
