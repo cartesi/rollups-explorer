@@ -346,8 +346,8 @@ const DepositFormBatch: FC<Props> = (props) => {
                         </>
                     )}
 
-                    <Collapse in={showERC1155Section}>
-                        {appVersion && (
+                    {appVersion && (
+                        <Collapse in={showERC1155Section}>
                             <Stack>
                                 <Autocomplete
                                     label="ERC-1155"
@@ -469,8 +469,8 @@ const DepositFormBatch: FC<Props> = (props) => {
                                     </Button>
                                 </Group>
                             </Stack>
-                        )}
-                    </Collapse>
+                        </Collapse>
+                    )}
                 </Stack>
             </form>
         </FormProvider>

@@ -81,6 +81,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 opened={transaction}
                 onClose={closeTransaction}
                 title="Send Transaction"
+                closeOnClickOutside={false}
             >
                 <SendTransaction />
             </Modal>

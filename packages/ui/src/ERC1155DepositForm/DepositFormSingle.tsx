@@ -321,10 +321,10 @@ const DepositFormSingle: FC<Props> = (props) => {
                             </>
                         )}
 
-                    <Collapse
-                        in={isNotNil(appVersion) && !isLoadingApplications}
-                    >
-                        {appVersion && (
+                    {appVersion && (
+                        <Collapse
+                            in={isNotNil(appVersion) && !isLoadingApplications}
+                        >
                             <Stack>
                                 <Autocomplete
                                     label="ERC-1155"
@@ -445,8 +445,8 @@ const DepositFormSingle: FC<Props> = (props) => {
                                     </Button>
                                 </Group>
                             </Stack>
-                        )}
-                    </Collapse>
+                        </Collapse>
+                    )}
                 </Stack>
             </form>
         </FormProvider>

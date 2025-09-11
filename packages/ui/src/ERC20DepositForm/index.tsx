@@ -282,8 +282,10 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                         </>
                     )}
 
-                <Collapse in={isNotNil(appVersion) && !isLoadingApplications}>
-                    {appVersion && (
+                {appVersion && (
+                    <Collapse
+                        in={isNotNil(appVersion) && !isLoadingApplications}
+                    >
                         <Stack>
                             <Autocomplete
                                 label="ERC-20"
@@ -471,8 +473,8 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                                 </Button>
                             </Group>
                         </Stack>
-                    )}
-                </Collapse>
+                    </Collapse>
+                )}
             </Stack>
         </form>
     );

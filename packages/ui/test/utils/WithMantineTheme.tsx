@@ -1,5 +1,5 @@
 import { MantineProvider, createTheme } from "@mantine/core";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 const theme = createTheme({
     fontFamily: "Open Sans, sans-serif",
@@ -8,7 +8,9 @@ const theme = createTheme({
 
 export const withMantineTheme = <T,>(Component: FC<T>): FC<T> => {
     const NewComp: FC<T> = (props: T) => (
-        <MantineProvider theme={theme}>{Component(props)}</MantineProvider>
+        <MantineProvider theme={theme}>
+            {Component(props) as ReactNode}
+        </MantineProvider>
     );
 
     NewComp.displayName = Component.displayName;
