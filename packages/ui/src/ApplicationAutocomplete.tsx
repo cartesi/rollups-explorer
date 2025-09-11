@@ -85,7 +85,7 @@ const ApplicationAutocomplete: FC<ApplicationAutocompleteProps> = (props) => {
                     rightSection={
                         rest.rightSection || (
                             <CloseButton
-                                aria-label="Clear input"
+                                aria-label="Clear application"
                                 data-testid="clear-application-button"
                                 onClick={() => setValue("")}
                                 style={{ display: _value ? undefined : "none" }}
