@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { FC, FunctionComponent } from "react";
+import { FC, FunctionComponent, ReactNode } from "react";
 import { theme } from "../../src/providers/theme";
 
 export const withMantineTheme = <T,>(
@@ -7,8 +7,7 @@ export const withMantineTheme = <T,>(
 ): FC<T> => {
     const NewComp: FC<T> = (props: T) => (
         <MantineProvider defaultColorScheme="dark" theme={theme}>
-            {/* @ts-ignore */}
-            <Component {...props} />
+            {Component(props) as ReactNode}
         </MantineProvider>
     );
 
