@@ -8,6 +8,7 @@ const config: StorybookConfig = {
         getAbsolutePath("@storybook/addon-links"),
         getAbsolutePath("@storybook/addon-themes"),
         getAbsolutePath("@storybook/addon-docs"),
+        getAbsolutePath("@storybook/addon-onboarding")
     ],
 };
 export default config;
