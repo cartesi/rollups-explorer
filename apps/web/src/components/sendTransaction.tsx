@@ -1,5 +1,6 @@
 "use client";
 import { RollupVersion } from "@cartesi/rollups-explorer-domain/explorer-types";
+import { ApplicationsQuery } from "@cartesi/rollups-explorer-domain/explorer-operations";
 import {
     AddressRelayForm,
     ERC1155DepositForm,
@@ -8,13 +9,13 @@ import {
     EtherDepositForm,
     GenericInputForm,
     GenericInputFormSpecification,
-    TransactionFormSuccessData,
     type RollupVersion as RollupVersionUI,
+    TransactionFormSuccessData,
 } from "@cartesi/rollups-explorer-ui";
 import { Select } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedCallback, useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchApplications } from "../hooks/useSearchApplications";
 import { useSearchMultiTokens } from "../hooks/useSearchMultiTokens";
 import { useSearchTokens } from "../hooks/useSearchTokens";
@@ -22,6 +23,51 @@ import { useAppConfig } from "../providers/appConfigProvider";
 import { BlockExplorerLink } from "./BlockExplorerLink";
 import { useSpecification } from "./specification/hooks/useSpecification";
 import { JSON_ABI } from "./specification/types";
+
+const useApplications = (address: string, rollupVersion?: RollupVersion) => {
+    const { chainId } = useAppConfig();
+    const { applications: searchedApplications, fetching } =
+        useSearchApplications({
+            address,
+            rollupVersion,
+            chainId,
+        });
+    const [applications, setApplications] = useState<
+        ApplicationsQuery["applications"]
+    >([]);
+    const isReset = useRef(false);
+
+    const resetApplications = useCallback(() => {
+        isReset.current = true;
+        setApplications([]);
+    }, []);
+
+    const setApplicationsWithDebounce = useDebouncedCallback(
+        (nextApplications: ApplicationsQuery["applications"]) => {
+            setApplications(nextApplications);
+        },
+        500,
+    );
+
+    useEffect(() => {
+        if (isReset.current) {
+            setApplicationsWithDebounce(searchedApplications);
+        } else {
+            setApplications(searchedApplications);
+        }
+
+        isReset.current = false;
+    }, [searchedApplications, applications, setApplicationsWithDebounce]);
+
+    return useMemo(
+        () => ({
+            fetching,
+            applications,
+            resetApplications,
+        }),
+        [applications, fetching, resetApplications],
+    );
+};
 
 export type DepositType =
     | "ether"
@@ -67,11 +113,10 @@ const SendTransaction: FC<DepositProps> = ({
 
     const { chainId } = useAppConfig();
 
-    const { applications, fetching } = useSearchApplications({
-        address: debouncedApplicationSearchableParams.address,
-        rollupVersion: debouncedApplicationSearchableParams.rollupVersion,
-        chainId,
-    });
+    const { applications, fetching, resetApplications } = useApplications(
+        debouncedApplicationSearchableParams.address,
+        debouncedApplicationSearchableParams.rollupVersion,
+    );
 
     const { tokens } = useSearchTokens({
         address: debouncedTokenId,
@@ -128,6 +173,7 @@ const SendTransaction: FC<DepositProps> = ({
                 placeholder="Select transaction type"
                 mb={16}
                 allowDeselect={false}
+                data-testid="deposit-type-select"
                 data={[
                     {
                         group: "Deposit",
@@ -155,6 +201,7 @@ const SendTransaction: FC<DepositProps> = ({
                 ]}
                 value={depositType}
                 onChange={(nextValue) => {
+                    resetApplications();
                     setDepositType(nextValue as DepositType);
                     setApplicationSearchableParams({ address: "" });
                 }}

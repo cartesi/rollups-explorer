@@ -166,15 +166,17 @@ export const EtherDepositForm: FC<EtherDepositFormProps> = (props) => {
                     </>
                 )}
 
-                <Collapse in={isNotNil(appVersion) && !isLoadingApplications}>
-                    {appVersion && (
+                {appVersion && (
+                    <Collapse
+                        in={isNotNil(appVersion) && !isLoadingApplications}
+                    >
                         <EtherDepositSection
                             appVersion={appVersion}
                             form={form}
                             onSuccess={onDepositSuccess}
                         />
-                    )}
-                </Collapse>
+                    </Collapse>
+                )}
             </Stack>
         </form>
     );
