@@ -28,7 +28,6 @@ const useUrlSearchParamsMock = vi.mocked(useUrlSearchParams, true);
 
 const Component = withMantineTheme(FilterVersion);
 const defaultProps = {
-    isLoading: false,
     onChange: () => vi.fn(),
 };
 
@@ -132,17 +131,5 @@ describe("Versions Filter Component", () => {
         await waitFor(() =>
             expect(onChangeSpy).toHaveBeenCalledWith(["v1", "v2"]),
         );
-    });
-
-    it("should display spinner while loading", async () => {
-        const mockedUpdateParams = vi.fn();
-        useUrlSearchParamsMock.mockReturnValue([
-            { limit: 10, page: 1, query: "", version: "" },
-            mockedUpdateParams,
-        ]);
-        render(<Component {...defaultProps} isLoading />);
-
-        const trigger = screen.getByTestId("versions-filter-trigger");
-        expect(trigger.getAttribute("data-loading")).toBe("true");
     });
 });

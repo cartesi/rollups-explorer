@@ -81,10 +81,7 @@ const Inputs: FC<InputsProps> = ({
                             onChange={setQuery}
                         />
                         {!appVersion && (
-                            <VersionsFilter
-                                isLoading={fetching && versions.length > 0}
-                                onChange={setVersions}
-                            />
+                            <VersionsFilter onChange={setVersions} />
                         )}
                     </Flex>
                 }
