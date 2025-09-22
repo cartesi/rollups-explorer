@@ -1,23 +1,23 @@
 import "@mantine/core/styles.css";
 import { useEffect } from "react";
-import { addons } from "@storybook/preview-api";
-import { DARK_MODE_EVENT_NAME } from "storybook-dark-mode";
+import { addons } from "storybook/preview-api";
 import { MantineProvider, useMantineColorScheme } from "@mantine/core";
-
-// import application theme
 import WalletProvider from "./walletProvider";
-import { theme } from "../../web/src/providers/theme";
+import { theme } from "web/src/providers/theme";
+import { Globals } from "storybook/internal/csf";
 
 const channel = addons.getChannel();
 
 function ColorSchemeWrapper({ children }: { children: React.ReactNode }) {
     const { setColorScheme } = useMantineColorScheme();
-    const handleColorScheme = (value: boolean) =>
-        setColorScheme(value ? "dark" : "light");
+    const handleColorScheme = ({ globals }: { globals: Globals }) => {
+        const isDarkMode = globals.backgrounds.value === "dark";
+        setColorScheme(isDarkMode ? "dark" : "light");
+    }
 
     useEffect(() => {
-        channel.on(DARK_MODE_EVENT_NAME, handleColorScheme);
-        return () => channel.off(DARK_MODE_EVENT_NAME, handleColorScheme);
+        channel.on('updateGlobals', handleColorScheme);
+        return () => channel.off('updateGlobals', handleColorScheme);
     }, [channel]);
 
     return <>{children}</>;
