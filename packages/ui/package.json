@@ -19,7 +19,6 @@
         "build": "tsup",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "dev": "tsup --watch",
-        "lint": "eslint \"src/**/*.ts*\"",
         "test": "vitest run",
         "test:watch": "vitest",
         "test:ui": "vitest --ui",

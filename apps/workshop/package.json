@@ -7,7 +7,7 @@
         "dev": "storybook dev -p 6006",
         "build": "storybook build",
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf storybook-static",
-        "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+        "lint": "eslint --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "serve storybook-static"
     },
     "dependencies": {
