@@ -1,10 +1,10 @@
+import { MantineProvider, useMantineColorScheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { useEffect } from "react";
-import { addons } from "storybook/preview-api";
-import { MantineProvider, useMantineColorScheme } from "@mantine/core";
-import WalletProvider from "./walletProvider";
-import { theme } from "web/src/providers/theme";
 import { Globals } from "storybook/internal/csf";
+import { addons } from "storybook/preview-api";
+import { theme } from "../../web/src/providers/theme";
+import WalletProvider from "./walletProvider";
 
 const channel = addons.getChannel();
 
@@ -13,11 +13,11 @@ function ColorSchemeWrapper({ children }: { children: React.ReactNode }) {
     const handleColorScheme = ({ globals }: { globals: Globals }) => {
         const isDarkMode = globals.backgrounds.value === "dark";
         setColorScheme(isDarkMode ? "dark" : "light");
-    }
+    };
 
     useEffect(() => {
-        channel.on('updateGlobals', handleColorScheme);
-        return () => channel.off('updateGlobals', handleColorScheme);
+        channel.on("updateGlobals", handleColorScheme);
+        return () => channel.off("updateGlobals", handleColorScheme);
     }, [channel]);
 
     return <>{children}</>;

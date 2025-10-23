@@ -6,14 +6,13 @@ import {
     lightTheme,
     RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
-import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
     argentWallet,
     ledgerWallet,
     trustWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { foundry, mainnet, sepolia } from "wagmi/chains";
 
@@ -58,11 +57,13 @@ const queryClient = new QueryClient();
 const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     const scheme = useMantineColorScheme();
 
+    console.log("using config...");
+
     // XXX: make this match the mantine theme
-    const themeOptions: ThemeOptions = {
+    const themeOptions = {
         accentColor: "rgb(12, 133, 153)",
         borderRadius: "small",
-    };
+    } as const;
 
     const walletTheme =
         scheme.colorScheme == "dark"

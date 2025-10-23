@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@cartesi/rollups-explorer-ui": "workspace:*",
+        "@cartesi/rollups-explorer-domain": "workspace:*",
         "@mantine/core": "^7.15.3",
         "@mantine/hooks": "^7.15.3",
         "@rainbow-me/rainbowkit": "2",
@@ -20,7 +21,8 @@
         "react-dom": "^19.1.1",
         "react-icons": "^4",
         "serve": "^14.2.1",
-        "wagmi": "^2"
+        "wagmi": "^2",
+        "viem": "^2"
     },
     "devDependencies": {
         "@cartesi/tsconfig": "workspace:*",
@@ -39,6 +41,7 @@
         "eslint": "^8.45.0",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.3",
+        "eslint-config-cartesi": "workspace:*",
         "storybook": "^9.1.7",
         "typescript": "^5.0.2",
         "vite": "^7.1.6"

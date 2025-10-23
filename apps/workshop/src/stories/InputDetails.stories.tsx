@@ -1,3 +1,4 @@
+import { Voucher } from "@cartesi/rollups-explorer-domain/rollups-types";
 import {
     InputContent,
     InputDetails,
@@ -8,8 +9,7 @@ import {
 import { Button, Group, Stack, Title } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useCallback, useEffect, useState } from "react";
-import VoucherExecution from "web/src/components/inputs/voucherExecution.tsx";
-import { Voucher } from "web/src/graphql/rollups/types.ts";
+import VoucherExecution from "../../../web/src/components/inputs/voucherExecution.tsx";
 
 const meta: Meta<typeof InputDetails> = {
     component: InputDetails,
