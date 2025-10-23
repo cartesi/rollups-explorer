@@ -1,12 +1,12 @@
 import CartesiApplicationContract from "@cartesi/rollups-v2/out/Application.sol/Application.json" with { type: "json" };
 import OutputsContract from "@cartesi/rollups-v2/out/Outputs.sol/Outputs.json" with { type: "json" };
+import CartesiDAppContract from "@cartesi/rollups/export/artifacts/contracts/dapp/CartesiDApp.sol/CartesiDApp.json" with { type: "json" };
 import hardhatDeploy from "@sunodo/wagmi-plugin-hardhat-deploy";
 import { ContractConfig, defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Abi, Address, Hex, erc20Abi, erc721Abi } from "viem";
-import CartesiDAppContract from "../../node_modules/@cartesi/rollups/export/artifacts/contracts/dapp/CartesiDApp.sol/CartesiDApp.json" with { type: "json" };
 import { erc1155Abi } from "./abi/ERC1155";
 
 interface Deployment {
@@ -86,7 +86,7 @@ const config: Config = defineConfig({
     ],
     plugins: [
         hardhatDeploy({
-            directory: "../../node_modules/@cartesi/rollups/export/abi",
+            directory: "./node_modules/@cartesi/rollups/export/abi",
         }),
         react(),
     ],
