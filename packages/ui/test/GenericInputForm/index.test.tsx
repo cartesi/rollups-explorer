@@ -887,7 +887,7 @@ describe("GenericInputForm", () => {
             });
             expect(
                 screen.getByText(
-                    "Unknown signature. Details: invalid-value Version: abitype@1.0.7",
+                    "Unknown signature. Details: invalid-value Version: abitype@1.0.8",
                 ),
             ).toBeInTheDocument();
 
@@ -1073,9 +1073,10 @@ describe("GenericInputForm", () => {
             });
             expect(
                 screen.getByText(
-                    "Invalid ABI parameter. Details: invalid-value Version: abitype@1.0.7",
+                    "Invalid ABI parameter. Details: invalid-value Version: abitype@1.0.8",
                 ),
             ).toBeInTheDocument();
+
             fireEvent.change(abiParameterInput, {
                 target: {
                     value: abiParam,
