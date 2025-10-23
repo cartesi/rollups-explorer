@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { useConnectionConfig } from "../../src/providers/connectionConfig/hooks";
 
 type UseConnectionConfigReturn = ReturnType<typeof useConnectionConfig>;
@@ -16,4 +17,7 @@ const connectionStubs: UseConnectionConfigReturn = {
 /**
  * TS helper for intellisense and autocompletion for methods like `mockReturnValue`
  */
-export const useConnectionConfigReturnStub = vi.mocked(connectionStubs, true);
+export const useConnectionConfigReturnStub: UseConnectionConfigReturn =
+    vi.mocked(connectionStubs, {
+        partial: true,
+    });
