@@ -55,6 +55,13 @@ const generateConfig = (configs: CommonConfig[]): Generates => {
                     documents,
                     preset: "import-types",
                     plugins: [
+                        {
+                            add: {
+                                //fix: TS2742 ref: https://github.com/dotansimha/graphql-code-generator/issues/8133
+                                content:
+                                    'import type { DocumentNode } from "graphql/language/ast";',
+                            },
+                        },
                         "typescript-operations",
                         "typescript-urql",
                         "named-operations-object",
