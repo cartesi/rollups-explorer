@@ -24,6 +24,7 @@
         "eslint-config-cartesi": "workspace:*",
         "lcov-result-merger": "4.1.0",
         "prettier": "3.5.3",
+        "@vercel/sdk": "^1.10.6",
         "turbo": "^1.10.13"
     },
     "engines": {
