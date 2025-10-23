@@ -11,7 +11,7 @@
         "preview": "serve storybook-static"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-ui": "*",
+        "@cartesi/rollups-explorer-ui": "workspace:*",
         "@mantine/core": "^7.15.3",
         "@mantine/hooks": "^7.15.3",
         "@rainbow-me/rainbowkit": "2",
@@ -23,7 +23,7 @@
         "wagmi": "^2"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:*",
         "@storybook/addon-docs": "^9.1.7",
         "@storybook/addon-links": "^9.1.7",
         "@storybook/addon-onboarding": "^9.1.7",

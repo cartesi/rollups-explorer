@@ -25,7 +25,7 @@
         "@changesets/cli": "^2.26.2",
         "@octokit/auth-action": "^5.1.1",
         "@octokit/rest": "^21.0.0",
-        "eslint-config-cartesi": "*",
+        "eslint-config-cartesi": "workspace:*",
         "lcov-result-merger": "4.1.0",
         "prettier": "3.5.3",
         "turbo": "^1.10.13"

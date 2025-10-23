@@ -32,7 +32,7 @@
     "devDependencies": {
         "@cartesi/rollups": "^1.2.0",
         "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0",
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:*",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.4.0",
         "@types/node": "^20",
         "@types/react": "^19.1.8",
@@ -40,7 +40,7 @@
         "@usecannon/cli": "^2.24.2",
         "@wagmi/cli": "^2",
         "eslint": "^8",
-        "eslint-config-cartesi": "*",
+        "eslint-config-cartesi": "workspace:*",
         "react": "^19.1.0",
         "tsup": "^8.5.0",
         "tsx": "^4.20.3",

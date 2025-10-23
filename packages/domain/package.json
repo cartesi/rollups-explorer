@@ -59,7 +59,7 @@
         "urql": "^4"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:*",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
