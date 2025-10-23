@@ -1,40 +1,45 @@
 name: CI
 on: [push]
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 env:
-    NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
+  NEXT_PUBLIC_EXPLORER_API_URL: http://localhost:4350/graphql
 jobs:
-    ci:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js environment
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 22.12.0
-                  cache: "yarn"
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: "package.json"
 
-            - name: Install Dependencies
-              run: yarn install --frozen-lockfile
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
 
-            - name: Code format check
-              run: yarn format:check
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: Linting
-              run: yarn lint
+      - name: Code format check
+        run: pnpm format:check
 
-            - name: Run Tests
-              run: yarn test:ci
+      - name: Linting
+        run: pnpm lint
 
-            - name: Merge coveralls reports
-              run: yarn coveralls
+      - name: Run Tests
+        run: pnpm test:ci
 
-            - name: Publish coveralls report
-              uses: coverallsapp/github-action@master
-              with:
-                  path-to-lcov: "coverage/lcov.info"
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge coveralls reports
+        run: pnpm coveralls
+
+      - name: Publish coveralls report
+        uses: coverallsapp/github-action@master
+        with:
+          path-to-lcov: "coverage/lcov.info"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
