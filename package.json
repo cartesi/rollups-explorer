@@ -1,7 +1,7 @@
 {
     "name": "rollups-explorer",
     "version": "0.1.0",
-    "private": true,    
+    "private": true,
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --no-cache --continue",
@@ -25,8 +25,8 @@
         "lcov-result-merger": "4.1.0",
         "prettier": "3.5.3",
         "turbo": "^1.10.13"
-    },    
-     "engines": {
+    },
+    "engines": {
         "node": ">=22.x"
     },
     "packageManager": "pnpm@10.17.1"
