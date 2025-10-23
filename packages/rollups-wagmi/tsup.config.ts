@@ -4,7 +4,8 @@ export default defineConfig({
     entry: ["src/index.tsx"],
     format: ["esm", "cjs"],
     dts: true,
-    external: ["react"],
+    external: ["react", "wagmi", "wagmi/codegen"],
+    clean: true,
     sourcemap: true,
     esbuildOptions(options, context) {
         options.banner = {

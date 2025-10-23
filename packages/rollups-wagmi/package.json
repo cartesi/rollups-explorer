@@ -6,7 +6,7 @@
     "types": "./dist/index.d.ts",
     "type": "module",
     "files": [
-        "dist"
+        "dist/**"
     ],
     "exports": {
         ".": {
@@ -22,9 +22,6 @@
         "codegen": "wagmi generate",
         "cannon:inspect": "cannon inspect cartesi-rollups:2.0.0 --write-deployments ./deployments",
         "dev": "tsup --watch"
-    },
-    "dependencies": {
-        "wagmi": "^2"
     },
     "peerDependencies": {
         "wagmi": "^2"
@@ -45,7 +42,8 @@
         "tsup": "^8.5.0",
         "tsx": "^4.20.3",
         "typescript": "^5",
-        "viem": "^2"
+        "viem": "^2",
+        "wagmi": "^2"
     },
     "publishConfig": {
         "access": "public"
