@@ -1,11 +1,7 @@
 {
     "name": "rollups-explorer",
     "version": "0.1.0",
-    "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
+    "private": true,    
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --no-cache --continue",
@@ -33,5 +29,5 @@
      "engines": {
         "node": ">=22.x"
     },
-    "packageManager": "yarn@1.22.19"
+    "packageManager": "pnpm@10.17.1"
 }
