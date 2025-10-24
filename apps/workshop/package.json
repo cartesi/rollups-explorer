@@ -21,8 +21,8 @@
         "react-dom": "^19.1.1",
         "react-icons": "^4",
         "serve": "^14.2.1",
-        "viem": "^2.38.4",
-        "wagmi": "^2.18.2"
+        "viem": "catalog:",
+        "wagmi": "catalog:"
     },
     "devDependencies": {
         "@cartesi/tsconfig": "workspace:*",
@@ -36,10 +36,10 @@
         "@types/react": "^19.1.13",
         "@types/react-dom": "^19.1.9",
         "@vitejs/plugin-react": "^5.0.3",
-        "eslint": "9.34.0",
+        "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
         "storybook": "^9.1.7",
-        "typescript": "^5.0.2",
+        "typescript": "catalog:",
         "vite": "^7.1.6"
     }
 }

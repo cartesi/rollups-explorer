@@ -25,10 +25,10 @@
         "dev": "tsup --watch"
     },
     "dependencies": {
-        "wagmi": "^2.18.2"
+        "wagmi": "catalog:"
     },
     "peerDependencies": {
-        "wagmi": "^2.18.2"
+        "wagmi": "catalog:"
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.2.0",
@@ -40,13 +40,13 @@
         "@types/react-dom": "^19.1.6",
         "@usecannon/cli": "^2.24.2",
         "@wagmi/cli": "^2",
-        "eslint": "9.34.0",
+        "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
         "react": "^19.1.0",
         "tsup": "^8.5.0",
         "tsx": "^4.20.3",
-        "typescript": "^5",
-        "viem": "^2.38.4"
+        "typescript": "catalog:",
+        "viem": "catalog:"
     },
     "publishConfig": {
         "access": "public"

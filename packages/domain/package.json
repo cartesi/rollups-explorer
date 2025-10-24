@@ -76,7 +76,7 @@
         "@types/node": "^22.18.12",
         "@types/react": "^19.1.8",
         "tsup": "^8.5.0",
-        "typescript": "^5"
+        "typescript": "catalog:"
     },
     "engines": {
         "node": ">=22.x"

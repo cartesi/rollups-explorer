@@ -2,6 +2,12 @@ packages:
     - apps/*
     - packages/*
 
+catalog:
+    viem: ^2.38.4
+    wagmi: ^2.18.2
+    eslint: ^9.34.0
+    typescript: ^5.9.3
+
 onlyBuiltDependencies:
     - "@vercel/speed-insights"
     - bufferutil
