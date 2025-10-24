@@ -2,6 +2,7 @@ packages:
   - apps/*
   - packages/*
 
+shamefullyHoist: true
 onlyBuiltDependencies:
   - '@vercel/speed-insights'
   - bufferutil
