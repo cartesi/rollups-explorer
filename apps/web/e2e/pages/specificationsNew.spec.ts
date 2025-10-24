@@ -88,7 +88,7 @@ test("should validate JSON ABI spec", async ({ page }) => {
 
     await expect(
         page.getByText(
-            `Unknown signature. Details: ${jsonAbiSpec} Version: abitype@1.0.8`,
+            `Unknown signature. Details: ${jsonAbiSpec} Version: abitype@1.1.0`,
         ),
     ).toBeVisible();
 
@@ -137,7 +137,7 @@ test("should validate ABI Parameters spec", async ({ page }) => {
 
     await expect(
         page.getByText(
-            `Invalid ABI parameter. Details: ${abiParametersSpec} Version: abitype@1.0.8`,
+            `Invalid ABI parameter. Details: ${abiParametersSpec} Version: abitype@1.1.0`,
         ),
     ).toBeVisible();
 
