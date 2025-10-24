@@ -88,7 +88,7 @@ test("should validate JSON ABI spec", async ({ page }) => {
 
     await expect(
         page.getByText(
-            `Unknown signature. Details: ${jsonAbiSpec} Version: abitype@1.0.7`,
+            `Unknown signature. Details: ${jsonAbiSpec} Version: abitype@1.0.8`,
         ),
     ).toBeVisible();
 
@@ -137,7 +137,7 @@ test("should validate ABI Parameters spec", async ({ page }) => {
 
     await expect(
         page.getByText(
-            `Invalid ABI parameter. Details: ${abiParametersSpec} Version: abitype@1.0.7`,
+            `Invalid ABI parameter. Details: ${abiParametersSpec} Version: abitype@1.0.8`,
         ),
     ).toBeVisible();
 
@@ -212,7 +212,7 @@ test("should be able to delete JSON ABI spec", async ({ page }) => {
     await page.goto("/specifications");
     await expect(page.getByText(name)).toBeVisible();
 
-    let gridCell = page.getByRole("gridcell");
+    const gridCell = page.getByRole("gridcell");
     const testId = await gridCell.getAttribute("data-testid");
     const specId = testId
         ?.replace("specification", "")
