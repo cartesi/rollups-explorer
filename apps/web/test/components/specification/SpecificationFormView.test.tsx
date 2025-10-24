@@ -712,7 +712,7 @@ describe("Specification Form View", () => {
 
                     expect(
                         screen.getByText(
-                            `Unknown type. Type "bla" is not a valid ABI type. Version: abitype@1.0.8`,
+                            `Unknown type. Type "bla" is not a valid ABI type. Version: abitype@1.1.0`,
                         ),
                     ).toBeInTheDocument();
                 });
@@ -737,7 +737,7 @@ describe("Specification Form View", () => {
 
                     expect(
                         screen.getByText(
-                            `Invalid ABI parameter. "address" is a protected Solidity keyword. More info: https://docs.soliditylang.org/en/latest/cheatsheet.html Details: uint address Version: abitype@1.0.8`,
+                            `Invalid ABI parameter. "address" is a protected Solidity keyword. More info: https://docs.soliditylang.org/en/latest/cheatsheet.html Details: uint address Version: abitype@1.1.0`,
                         ),
                     ).toBeInTheDocument();
                 });
