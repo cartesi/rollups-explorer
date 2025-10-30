@@ -7,7 +7,7 @@
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
         "dev": "next dev --turbopack",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "eslint",
         "test": "vitest run",
         "test:watch": "vitest",
         "test:ui": "vitest --ui",
@@ -17,9 +17,9 @@
         "test:e2e:ui": "playwright test --ui"
     },
     "dependencies": {
-        "@cartesi/rollups-explorer-domain": "*",
-        "@cartesi/rollups-explorer-ui": "*",
-        "@cartesi/rollups-wagmi": "*",
+        "@cartesi/rollups-explorer-domain": "workspace:*",
+        "@cartesi/rollups-explorer-ui": "workspace:*",
+        "@cartesi/rollups-wagmi": "workspace:*",
         "@mantine/code-highlight": "^7.15.3",
         "@mantine/core": "^7.15.3",
         "@mantine/form": "^7.15.3",
@@ -31,6 +31,7 @@
         "@tanstack/react-query": "^5.27.5",
         "@vercel/analytics": "^1.5.0",
         "@vercel/speed-insights": "^1.2.0",
+        "abitype": "1.0.8",
         "dexie": "^4.0.11",
         "encoding": "^0.1",
         "graphql": "^16",
@@ -50,26 +51,26 @@
         "react-jazzicon": "^1",
         "urql": "^4",
         "uuid": "^11.1.0",
-        "viem": "^2",
-        "wagmi": "^2"
+        "viem": "catalog:",
+        "wagmi": "catalog:"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:*",
         "@playwright/test": "^1.51.0",
         "@tenkeylabs/dappwright": "^2.11.2",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
+        "@testing-library/user-event": "^14.6.1",
         "@types/node": "^20",
         "@types/ramda": "^0.30.2",
         "@types/react": "^19.1.13",
         "@types/react-dom": "^19.1.9",
         "@types/uuid": "^10.0.0",
-        "@vercel/sdk": "^1.10.6",
         "@vitejs/plugin-react": "^4.3.1",
         "@vitest/coverage-v8": "^3.2.4",
         "@vitest/ui": "^3.2.4",
-        "eslint": "^8",
-        "eslint-config-cartesi": "*",
+        "eslint": "catalog:",
+        "eslint-config-cartesi": "workspace:*",
         "happy-dom": "^18.0.1",
         "jsdom": "^26.1.0",
         "npm-run-all": "^4",
@@ -78,11 +79,7 @@
         "postcss-preset-mantine": "^1.17.0",
         "postcss-simple-vars": "^7",
         "ts-node": "^10",
-        "typescript": "^5",
+        "typescript": "catalog:",
         "vitest": "^3.2.4"
-    },
-    "resolutions": {
-        "@types/react": "19.1.8",
-        "@types/react-dom": "19.1.6"
     }
 }

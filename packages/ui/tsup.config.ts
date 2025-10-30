@@ -4,7 +4,13 @@ export default defineConfig({
     entry: ["src/index.tsx"],
     format: ["esm", "cjs"],
     dts: true,
-    external: ["react", "@mantine/core", "@mantine/hooks"],
+    external: [
+        "react",
+        "@mantine/core",
+        "@mantine/hooks",
+        "@wagmi/core",
+        "@tanstack/react-query",
+    ],
     sourcemap: true,
     esbuildOptions(options, context) {
         options.banner = {

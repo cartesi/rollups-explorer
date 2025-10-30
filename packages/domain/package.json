@@ -55,24 +55,30 @@
         "codegen": "graphql-codegen"
     },
     "dependencies": {
+        "graphql": "16.8.1",
+        "graphql-tag": "2.12.6",
         "react": "^19.1.0",
         "urql": "^4"
     },
     "devDependencies": {
-        "@cartesi/tsconfig": "*",
+        "@cartesi/tsconfig": "workspace:*",
         "@graphql-codegen/add": "^5",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
         "@graphql-codegen/import-types-preset": "^3.0.0",
         "@graphql-codegen/named-operations-object": "^3.1.1",
+        "@graphql-codegen/plugin-helpers": "^6.0.0",
         "@graphql-codegen/typed-document-node": "^5",
         "@graphql-codegen/typescript": "^4",
         "@graphql-codegen/typescript-operations": "^4",
         "@graphql-codegen/typescript-urql": "^4",
         "@graphql-typed-document-node/core": "^3",
-        "@types/node": "^20",
+        "@types/node": "^22.18.12",
         "@types/react": "^19.1.8",
         "tsup": "^8.5.0",
-        "typescript": "^5"
+        "typescript": "catalog:"
+    },
+    "engines": {
+        "node": ">=22.x"
     }
 }

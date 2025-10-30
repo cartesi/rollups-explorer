@@ -2,10 +2,6 @@
     "name": "rollups-explorer",
     "version": "0.1.0",
     "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
     "scripts": {
         "build": "turbo run build",
         "dev": "turbo run dev --no-cache --continue",
@@ -25,13 +21,15 @@
         "@changesets/cli": "^2.26.2",
         "@octokit/auth-action": "^5.1.1",
         "@octokit/rest": "^21.0.0",
-        "eslint-config-cartesi": "*",
+        "eslint-config-cartesi": "workspace:*",
         "lcov-result-merger": "4.1.0",
         "prettier": "3.5.3",
-        "turbo": "^1.10.13"
-    },    
-     "engines": {
+        "@vercel/sdk": "^1.10.6",
+        "turbo": "^1.10.13",
+        "typescript": "catalog:"
+    },
+    "engines": {
         "node": ">=22.x"
     },
-    "packageManager": "yarn@1.22.19"
+    "packageManager": "pnpm@10.17.1"
 }

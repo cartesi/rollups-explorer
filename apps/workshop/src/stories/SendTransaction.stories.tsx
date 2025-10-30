@@ -1,8 +1,8 @@
 import { InputDetails } from "@cartesi/rollups-explorer-ui";
-import { Select, SegmentedControl } from "@mantine/core";
+import { SegmentedControl, Select } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
-import { DepositType } from "web/src/components/sendTransaction.tsx";
+import { DepositType } from "../../../web/src/components/sendTransaction.tsx";
 
 const meta: Meta<typeof InputDetails> = {
     component: InputDetails,

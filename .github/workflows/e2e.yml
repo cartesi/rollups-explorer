@@ -14,14 +14,18 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: "package.json"
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
           node-version: 22.12.0
-          cache: "yarn"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Get Sepolia deployment url
         id: get-deployment-url
@@ -47,7 +51,7 @@ jobs:
           timeout: 1200 # Wait for 1200 seconds (20 minutes) before failing
 
   run-e2e-tests-on-sepolia:
-    needs: [ get-sepolia-deployment-url, wait-for-sepolia-deployment ]
+    needs: [get-sepolia-deployment-url, wait-for-sepolia-deployment]
     timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
@@ -58,20 +62,24 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: "package.json"
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: 22.12.0
-          cache: "yarn"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        run: yarn playwright install --with-deps
+        run: cd apps/web && pnpm exec playwright install --with-deps
 
       - name: Run e2e tests
-        run: yarn test:e2e
+        run: pnpm test:e2e
         id: e2e
         env:
           E2E_BASE_URL: ${{ env.DEPLOYMENT_URL }}

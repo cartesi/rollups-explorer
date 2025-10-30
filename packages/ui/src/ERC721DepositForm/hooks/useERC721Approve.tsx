@@ -2,8 +2,11 @@ import {
     useSimulateErc721Approve,
     useWriteErc721Approve,
 } from "@cartesi/rollups-wagmi";
-import { Hex } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
+import { Hex, erc721Abi } from "viem";
+import {
+    UseSimulateContractReturnType,
+    useWaitForTransactionReceipt,
+} from "wagmi";
 
 interface Props {
     erc721Address: Hex;
@@ -11,11 +14,17 @@ interface Props {
     isQueryEnabled: boolean;
 }
 
+interface UseERC721ApproveReturn {
+    approvePrepare: UseSimulateContractReturnType<typeof erc721Abi, "approve">;
+    approve: ReturnType<typeof useWriteErc721Approve>;
+    approveWait: ReturnType<typeof useWaitForTransactionReceipt>;
+}
+
 export const useERC721Approve = ({
     erc721Address,
     args,
     isQueryEnabled,
-}: Props) => {
+}: Props): UseERC721ApproveReturn => {
     const approvePrepare = useSimulateErc721Approve({
         address: erc721Address,
         args,

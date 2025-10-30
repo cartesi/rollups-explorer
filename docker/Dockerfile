@@ -1,11 +1,14 @@
 FROM node:22-alpine AS base
 
+RUN corepack enable
+RUN corepack prepare pnpm@10.17.1 --activate
+
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
 WORKDIR /app
-RUN yarn global add turbo@1.13.3
+RUN npm install -g turbo@1.13.3
 COPY . .
 RUN turbo prune --scope=web --docker
 
@@ -19,14 +22,14 @@ WORKDIR /app
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/yarn.lock ./yarn.lock
-RUN yarn install --frozen-lockfile
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
 ARG ENVIRONMENT=localhost
 COPY --from=builder /app/out/full/apps/web/.env.${ENVIRONMENT} ./apps/web/.env
-RUN yarn build --filter=web
+RUN pnpm build --filter=web
 
 FROM base AS runner
 WORKDIR /app

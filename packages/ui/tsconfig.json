@@ -1,6 +1,6 @@
 {
     "extends": "@cartesi/tsconfig/react-library.json",
-    "include": [".", ".eslintrc.js", "./vitest-setup.ts"],
+    "include": [".", "eslint.config.mjs", "./vitest-setup.ts"],
     "exclude": ["dist", "build", "node_modules"],
     "compilerOptions": {
         "types": ["vitest/globals"]

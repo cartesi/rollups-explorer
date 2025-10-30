@@ -2,13 +2,25 @@ import {
     useSimulateErc1155SetApprovalForAll,
     useWriteErc1155SetApprovalForAll,
 } from "@cartesi/rollups-wagmi";
-import { Hex } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
+import { Hex, erc1155Abi } from "viem";
+import {
+    UseSimulateContractReturnType,
+    useWaitForTransactionReceipt,
+} from "wagmi";
 
 interface Props {
     erc1155Address: Hex;
     args: [operator: Hex, allowed: boolean];
     isQueryEnabled: boolean;
+}
+
+interface UseERC1155ApproveForAllReturn {
+    approvePrepare: UseSimulateContractReturnType<
+        typeof erc1155Abi,
+        "setApprovalForAll"
+    >;
+    approve: ReturnType<typeof useWriteErc1155SetApprovalForAll>;
+    approveWait: ReturnType<typeof useWaitForTransactionReceipt>;
 }
 
 /*
@@ -20,7 +32,7 @@ export const useERC1155ApproveForAll = ({
     erc1155Address,
     args,
     isQueryEnabled,
-}: Props) => {
+}: Props): UseERC1155ApproveForAllReturn => {
     const approvePrepare = useSimulateErc1155SetApprovalForAll({
         address: erc1155Address,
         args: args,

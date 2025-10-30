@@ -266,25 +266,6 @@ const setupWagmi = () => {
 const setup = pipe(setupRollupsWagmi, setupWagmi);
 
 const sendTransactionMocks = {
-    useSimulateErc20ApproveMock,
-    useWriteErc20ApproveMock,
-    useSimulateErc20PortalDepositErc20TokensMock,
-    useWriteErc20PortalDepositErc20TokensMock,
-    useSimulateErc721ApproveMock,
-    useWriteErc721ApproveMock,
-    useSimulateErc721PortalDepositErc721TokenMock,
-    useWriteErc721PortalDepositErc721TokenMock,
-    useSimulateEtherPortalDepositEtherMock,
-    useWriteEtherPortalDepositEtherMock,
-    useSimulateInputBoxAddInputMock,
-    useWriteInputBoxAddInputMock,
-    useReadContractsMock,
-    useAccountMock,
-    useSimulateContractMock,
-    useWaitForTransactionReceiptMock,
-    useBlockNumberMock,
-    useWriteContractMock,
-    useConfigMock,
     setup,
 };
 

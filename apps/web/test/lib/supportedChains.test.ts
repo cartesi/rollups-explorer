@@ -24,7 +24,7 @@ describe("SupportedChains functionalities", () => {
 
         expect(chain.id).toStrictEqual(1);
         expect(chain.rpcUrls.default.http[0]).toStrictEqual(
-            "https://cloudflare-eth.com",
+            "https://eth.merkle.io",
         );
     });
 

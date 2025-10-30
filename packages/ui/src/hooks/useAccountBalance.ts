@@ -12,12 +12,20 @@ type DataType =
       }
     | undefined;
 
+export type UseAccountBalanceResult = {
+    value: bigint;
+    decimals: number;
+    symbol: string;
+    formatted: string;
+    refetch: ReturnType<typeof useBalance>["refetch"];
+};
+
 /**
  * Check the ETH balance of the connected account.
  * returns the value, decimals, symbol, formatted value and fn to refresh the information.
  * @returns
  */
-export const useAccountBalance = () => {
+export const useAccountBalance = (): UseAccountBalanceResult => {
     const { address } = useAccount();
     const { data, refetch } = useBalance({
         address,
@@ -40,5 +48,3 @@ export const useAccountBalance = () => {
 
     return result;
 };
-
-export type UseAccountBalanceResult = ReturnType<typeof useAccountBalance>;
