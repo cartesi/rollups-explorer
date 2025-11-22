@@ -1,19 +1,20 @@
 packages:
-    - apps/*
-    - packages/*
+  - apps/*
+  - packages/*
 
 catalog:
-    viem: ^2.38.4
-    wagmi: ^2.18.2
-    eslint: ^9.34.0
-    typescript: ^5.9.3
+  eslint: ^9.34.0
+  typescript: ^5.9.3
+  viem: ^2.38.4
+  wagmi: ^2.18.2
 
 onlyBuiltDependencies:
-    - "@vercel/speed-insights"
-    - bufferutil
-    - esbuild
-    - keccak
-    - protobufjs
-    - secp256k1
-    - sharp
-    - utf-8-validate
+  - '@parcel/watcher'
+  - '@vercel/speed-insights'
+  - bufferutil
+  - esbuild
+  - keccak
+  - protobufjs
+  - secp256k1
+  - sharp
+  - utf-8-validate
