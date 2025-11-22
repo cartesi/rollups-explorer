@@ -1,4 +1,4 @@
-import { reactInternal } from "eslint-config-cartesi/react-internal";
+import { config as reactInternal } from "eslint-config-cartesi/react-internal";
 import reactRefresh from "eslint-plugin-react-refresh";
 import storybook from "eslint-plugin-storybook";
 import globals from "globals";
@@ -26,5 +26,5 @@ export default [
             ],
         },
     },
-    storybook.configs("flat/recommended"),
+    ...storybook.configs["flat/recommended"],
 ];
