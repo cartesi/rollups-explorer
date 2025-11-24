@@ -102,6 +102,7 @@ type IsValidContractInterfaceReturn =
       }
     | {
           isValid: boolean;
+          errorMessage?: string;
       };
 
 type IsValidContractInterface = (
