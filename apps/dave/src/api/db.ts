@@ -6,11 +6,11 @@ import type {
     Match,
     Tournament,
 } from "../components/types";
+import { applications } from "../stories/data";
 import {
-    applications,
     type ApplicationEpochs,
     type EpochWithTournament,
-} from "../stories/data";
+} from "../stories/types";
 
 type MatchId = Hex;
 type ApplicationId = string | Hex;

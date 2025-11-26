@@ -1,16 +1,8 @@
 import { getUnixTime, subMinutes } from "date-fns";
 import { keccak256 } from "viem";
-import type {
-    Application,
-    Epoch,
-    Match,
-    MatchAction,
-    Tournament,
-} from "../components/types";
+import type { Match, MatchAction } from "../components/types";
+import type { ApplicationEpochs } from "./types";
 import { generateMatchID, generateTournamentId } from "./util";
-
-export type EpochWithTournament = Epoch & { tournament?: Tournament };
-export type ApplicationEpochs = Application & { epochs: EpochWithTournament[] };
 
 export const dummyMatch: Match = {
     actions: [],
