@@ -95,16 +95,29 @@ type SupportsInterfaceReturn = ReturnType<
 const notValidContract =
     "This is not an ERC-1155 contract. Check the address." as const;
 
-export const isValidContractInterface = cond<
-    [result: SupportsInterfaceReturn],
-    { isValid: boolean; errorMessage?: typeof notValidContract }
->([
+type IsValidContractInterfaceReturn =
+    | {
+          isValid: boolean;
+          errorMessage: typeof notValidContract;
+      }
+    | {
+          isValid: boolean;
+          errorMessage?: string;
+      };
+
+type IsValidContractInterface = (
+    result: SupportsInterfaceReturn,
+) => IsValidContractInterfaceReturn;
+
+export const isValidContractInterface: IsValidContractInterface = cond([
     [
-        (result) => result.status === "error" && !result.data,
+        (result: SupportsInterfaceReturn) =>
+            result.status === "error" && !result.data,
         () => ({ isValid: false, errorMessage: notValidContract }),
     ],
     [
-        (result) => result.status === "success" && result.data === false,
+        (result: SupportsInterfaceReturn) =>
+            result.status === "success" && result.data === false,
         () => ({ isValid: false, errorMessage: notValidContract }),
     ],
     [T, () => ({ isValid: true })],

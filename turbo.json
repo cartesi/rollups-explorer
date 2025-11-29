@@ -28,6 +28,12 @@
                 "storybook-static/**"
             ]
         },
+        "build-storybook": {
+            "outputs": ["dist/**", "storybook-static/**"]
+        },
+        "storybook": {
+            "outputs": ["dist/**", "storybook-static/**"]
+        },
         "clean": {
             "cache": false
         },
