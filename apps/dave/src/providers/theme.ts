@@ -16,7 +16,7 @@ const theme = createTheme({
             light: "orange",
             dark: "orange",
         }),
-        closed: virtualColor({ name: "closed", light: "cyan", dark: "gray" }),
+        closed: virtualColor({ name: "closed", light: "cyan", dark: "cyan" }),
         finalized: virtualColor({
             name: "finalized",
             light: "dark",

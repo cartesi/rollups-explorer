@@ -11,8 +11,9 @@ export interface Application {
     processedInputs: number;
 }
 
-export type EpochStatus = "OPEN" | "CLOSED" | "FINALIZED";
+type CommonStatus = "OPEN" | "CLOSED" | "FINALIZED";
 
+export type EpochStatus = CommonStatus;
 export interface Epoch {
     index: number;
     status: EpochStatus;
@@ -91,10 +92,12 @@ export interface Match {
     actions: MatchAction[];
 }
 
+export type TournamentStatus = CommonStatus;
 export interface Tournament {
     id: Hex;
     height: number;
     level: "top" | "middle" | "bottom";
+    status: TournamentStatus;
     startCycle: Cycle;
     endCycle: Cycle;
     matches: Match[];

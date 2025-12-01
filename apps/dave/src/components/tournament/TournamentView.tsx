@@ -1,10 +1,20 @@
-import { Group, Stack, Switch, Text, useMantineTheme } from "@mantine/core";
+import {
+    Badge,
+    Group,
+    Stack,
+    Switch,
+    Text,
+    useMantineTheme,
+} from "@mantine/core";
+import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { LongText } from "../LongText";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
 import type { Tournament } from "../types";
+import { TournamentNoClaims } from "./TournamentNoClaims";
+import { TournamentStatusTooltip } from "./TournamentStatusTooltip";
 import { TournamentTable } from "./TournamentTable";
 
 export interface TournamentViewProps {
@@ -22,6 +32,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
 
     const { danglingClaim, endCycle, matches, startCycle, winner } = tournament;
     const [hideWinners, setHideWinners] = useState(false);
+    const hasClaims = danglingClaim !== undefined || !isEmpty(matches);
 
     return (
         <Stack>
@@ -31,6 +42,15 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                     level={tournament.level}
                     variant="filled"
                 />
+            </Group>
+            <Group>
+                <Group gap={3}>
+                    <Text>Status</Text>
+                    <TournamentStatusTooltip status={tournament.status} />
+                </Group>
+                <Badge variant="filled" color={tournament.status.toLowerCase()}>
+                    {tournament.status}
+                </Badge>
             </Group>
             <Group>
                 <Text>Mcycle range</Text>
@@ -55,11 +75,16 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                     setHideWinners(event.currentTarget.checked)
                 }
             />
-            <TournamentTable
-                danglingClaim={danglingClaim}
-                matches={matches}
-                hideWinners={hideWinners}
-            />
+
+            {hasClaims ? (
+                <TournamentTable
+                    danglingClaim={danglingClaim}
+                    matches={matches}
+                    hideWinners={hideWinners}
+                />
+            ) : (
+                <TournamentNoClaims status={tournament.status} />
+            )}
         </Stack>
     );
 };

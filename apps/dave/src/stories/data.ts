@@ -28,6 +28,7 @@ export const applications: ApplicationEpochs[] = [
                 inDispute: false,
                 status: "FINALIZED",
                 tournament: {
+                    status: "FINALIZED",
                     id: generateTournamentId(0, 1_345_972_719),
                     startCycle: 0,
                     endCycle: 1_345_972_719,
@@ -43,6 +44,7 @@ export const applications: ApplicationEpochs[] = [
                 inDispute: false,
                 status: "FINALIZED",
                 tournament: {
+                    status: "FINALIZED",
                     id: generateTournamentId(1_345_972_719, 3_220_829_192),
                     startCycle: 1_345_972_719,
                     endCycle: 3_220_829_192,
@@ -58,6 +60,7 @@ export const applications: ApplicationEpochs[] = [
                 inDispute: false,
                 status: "FINALIZED",
                 tournament: {
+                    status: "FINALIZED",
                     id: generateTournamentId(3_220_829_192, 5_911_918_810),
                     startCycle: 3_220_829_192,
                     endCycle: 5_911_918_810,
@@ -73,6 +76,7 @@ export const applications: ApplicationEpochs[] = [
                 inDispute: true,
                 status: "CLOSED",
                 tournament: {
+                    status: "OPEN",
                     id: generateTournamentId(5_911_918_810, 9_918_817_817),
                     startCycle: 5_911_918_810,
                     endCycle: 9_918_817_817,
@@ -107,6 +111,7 @@ export const applications: ApplicationEpochs[] = [
                             claim2: { hash: keccak256("0x5") },
                             timestamp: 0,
                             tournament: {
+                                status: "OPEN",
                                 id: generateTournamentId(
                                     7_102_817_919,
                                     7_402_918_071,
@@ -151,6 +156,7 @@ export const applications: ApplicationEpochs[] = [
                                         claim2: { hash: keccak256("0x7") },
                                         timestamp: 0,
                                         tournament: {
+                                            status: "FINALIZED",
                                             id: generateTournamentId(
                                                 7_204_918_919,
                                                 7_205_024_571,

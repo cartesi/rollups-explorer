@@ -20,6 +20,7 @@ export const applicationOne: ApplicationEpochs = {
             tournament: {
                 id: generateTournamentId(0, 1_345_972_719),
                 startCycle: 0,
+                status: "OPEN",
                 endCycle: 1_345_972_719,
                 height: 48,
                 level: "top",

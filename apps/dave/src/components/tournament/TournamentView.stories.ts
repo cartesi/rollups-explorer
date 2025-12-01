@@ -26,6 +26,7 @@ const baseId = generateTournamentId(startCycle, endCycle);
 const tournament: Tournament = {
     id: baseId,
     height: 48,
+    status: "OPEN",
     level: "top",
     startCycle,
     endCycle,
@@ -75,6 +76,7 @@ const tournament: Tournament = {
                     Math.floor(startCycle / 1024),
                     Math.floor(endCycle / 1024),
                 ),
+                status: "OPEN",
                 height: 27,
                 level: "middle",
                 startCycle: startCycle / 1024,
@@ -120,6 +122,54 @@ const tournament: Tournament = {
     danglingClaim: claim(0),
 };
 
+export const OpenWithNoClaims: Story = {
+    args: {
+        tournament: {
+            status: "OPEN",
+            id: baseId,
+            height: 48,
+            level: "top",
+            startCycle,
+            endCycle,
+            winner: undefined,
+            matches: [],
+            danglingClaim: undefined,
+        },
+    },
+};
+
+export const ClosedWithNoClaims: Story = {
+    args: {
+        tournament: {
+            status: "CLOSED",
+            id: baseId,
+            height: 48,
+            level: "top",
+            startCycle,
+            endCycle,
+            winner: undefined,
+            matches: [],
+            danglingClaim: undefined,
+        },
+    },
+};
+
+export const FinalizedWithNoClaims: Story = {
+    args: {
+        tournament: {
+            status: "FINALIZED",
+            id: baseId,
+            height: 48,
+            level: "top",
+            startCycle,
+            endCycle,
+            winner: undefined,
+            matches: [],
+            danglingClaim: undefined,
+        },
+    },
+};
+
 export const Ongoing: Story = {
     args: {
         tournament,
@@ -129,6 +179,7 @@ export const Ongoing: Story = {
 export const NoChallengerYet: Story = {
     args: {
         tournament: {
+            status: "OPEN",
             id: baseId,
             height: 48,
             level: "top",
@@ -144,6 +195,7 @@ export const NoChallengerYet: Story = {
 export const Finalized: Story = {
     args: {
         tournament: {
+            status: "FINALIZED",
             id: baseId,
             height: 48,
             level: "top",
