@@ -1,3 +1,4 @@
+import type { Input, InputStatus } from "@cartesi/viem";
 import {
     Badge,
     Button,
@@ -15,7 +16,6 @@ import { TbEyeMinus, TbEyePlus } from "react-icons/tb";
 import useRightColorShade from "../../hooks/useRightColorShade";
 import theme from "../../providers/theme";
 import { LongText } from "../LongText";
-import type { Input, InputStatus } from "../types";
 
 interface Props {
     input: Input;
@@ -47,7 +47,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     )}
                 </Group>
                 <LongText
-                    value={input.sender}
+                    value={input.decodedData.sender}
                     shorten={false}
                     size="sm"
                     c="dimmed"
@@ -69,7 +69,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     </Button>
                 </Group>
                 <Collapse in={displayMeta}>
-                    <Textarea readOnly value={input.payload} />
+                    <Textarea readOnly value={input.decodedData.payload} />
                 </Collapse>
             </Stack>
         </Card>

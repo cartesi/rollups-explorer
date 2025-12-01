@@ -1,7 +1,7 @@
+import { useEpochs } from "@cartesi/wagmi";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { useParams } from "react-router";
-import { useListApplicationEpochs } from "../api/application.queries";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -13,13 +13,13 @@ import { ContainerSkeleton } from "./ContainerSkeleton";
 export const EpochsContainer: FC = () => {
     const params = useParams();
     const appId = params.appId ?? "";
-    const { isLoading, data } = useListApplicationEpochs(appId);
+    const { isLoading, data } = useEpochs({ application: appId });
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
         { title: appId, href: routePathBuilder.appEpochs(params) },
     ];
 
-    const epochs = data?.epochs ?? [];
+    const epochs = data?.data ?? [];
 
     return (
         <Stack pt="lg" gap="lg">

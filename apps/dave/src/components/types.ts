@@ -1,7 +1,5 @@
+import type { ApplicationState, ConsensusType, EpochStatus, InputStatus } from "@cartesi/viem";
 import type { Hash, Hex } from "viem";
-
-export type ApplicationState = "ENABLED" | "DISABLED" | "INOPERABLE";
-export type ConsensusType = "PRT" | "QUORUM" | "AUTHORITY";
 
 export interface Application {
     address: Hex;
@@ -11,24 +9,11 @@ export interface Application {
     processedInputs: number;
 }
 
-export type EpochStatus = "OPEN" | "CLOSED" | "FINALIZED";
-
 export interface Epoch {
     index: number;
     status: EpochStatus;
     inDispute: boolean;
 }
-
-export type InputStatus =
-    | "NONE"
-    | "ACCEPTED"
-    | "REJECTED"
-    | "EXCEPTION"
-    | "MACHINE_HALTED"
-    | "OUTPUTS_LIMIT_EXCEEDED"
-    | "CYCLE_LIMIT_EXCEEDED"
-    | "TIME_LIMIT_EXCEEDED"
-    | "PAYLOAD_LENGTH_LIMIT_EXCEEDED";
 
 export interface Input {
     status: InputStatus;

@@ -33,7 +33,7 @@ export const applications: ApplicationEpochs[] = [
             {
                 index: 0,
                 inDispute: false,
-                status: "FINALIZED",
+                status: "CLAIM_ACCEPTED",
                 tournament: {
                     id: generateTournamentId(0, 1_345_972_719),
                     startCycle: 0,
@@ -48,7 +48,7 @@ export const applications: ApplicationEpochs[] = [
             {
                 index: 1,
                 inDispute: false,
-                status: "FINALIZED",
+                status: "CLAIM_ACCEPTED",
                 tournament: {
                     id: generateTournamentId(1_345_972_719, 3_220_829_192),
                     startCycle: 1_345_972_719,
@@ -63,7 +63,7 @@ export const applications: ApplicationEpochs[] = [
             {
                 index: 2,
                 inDispute: false,
-                status: "FINALIZED",
+                status: "CLAIM_ACCEPTED",
                 tournament: {
                     id: generateTournamentId(3_220_829_192, 5_911_918_810),
                     startCycle: 3_220_829_192,

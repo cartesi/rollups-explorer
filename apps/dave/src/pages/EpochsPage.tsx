@@ -1,3 +1,4 @@
+import type { Epoch } from "@cartesi/viem";
 import { Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { TbClockFilled } from "react-icons/tb";
@@ -5,7 +6,6 @@ import type { Hex } from "viem";
 import { EpochList } from "../components/epoch/EpochList";
 import PageTitle from "../components/layout/PageTitle";
 import { NotFound } from "../components/navigation/NotFound";
-import type { Epoch } from "../components/types";
 
 type Props = {
     epochs: Epoch[];

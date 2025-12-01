@@ -1,7 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import {
+    useCommitments,
+    useEpoch,
+    useMatches,
+    useTournament,
+    useTournaments,
+} from "@cartesi/wagmi";
 import type { Hex } from "viem";
-import { NETWORK_DELAY } from "./constants";
-import { findEpochTournament, getEpoch } from "./epoch.data";
+import type { Tournament } from "../components/types";
 
 interface EpochDetailParam {
     applicationId: string | Hex;
@@ -20,50 +25,73 @@ const queryKeys = {
 
 export const epochQueryKeys = queryKeys;
 
-// FETCHERS
-
-type GetEpochDetailsReturn = ReturnType<typeof getEpoch>;
-
-const getEpochDetails = ({ applicationId, epochIndex }: EpochDetailParam) => {
-    const promise = new Promise<{ epoch: GetEpochDetailsReturn }>((resolve) => {
-        setTimeout(() => {
-            const epoch = getEpoch(applicationId, epochIndex);
-            resolve({ epoch });
-        }, NETWORK_DELAY);
-    });
-
-    return promise;
-};
-
-type GetEpochTournamentReturn = ReturnType<typeof findEpochTournament>;
-const getEpochTournament = (params: EpochDetailParam) => {
-    const promise = new Promise<{ tournament: GetEpochTournamentReturn }>(
-        (resolve) => {
-            setTimeout(() => {
-                const tournament = findEpochTournament(
-                    params.applicationId,
-                    params.epochIndex,
-                );
-                resolve({ tournament });
-            }, NETWORK_DELAY);
-        },
-    );
-
-    return promise;
-};
-
 // CUSTOM HOOKS
 
-export const useGetEpoch = (params: EpochDetailParam) => {
-    return useQuery({
-        queryKey: queryKeys.detail(params),
-        queryFn: () => getEpochDetails(params),
-    });
-};
-
 export const useGetEpochTournament = (params: EpochDetailParam) => {
-    return useQuery({
-        queryKey: queryKeys.tournament(params),
-        queryFn: () => getEpochTournament(params),
+    const epochQuery = useEpoch({
+        application: params.applicationId,
+        epochIndex: BigInt(params.epochIndex),
     });
+
+    const tournamentQuery = useTournament({
+        application: params.applicationId,
+        address: epochQuery.data?.tournamentAddress,
+    });
+
+    const commitmentsQuery = useCommitments({
+        application: params.applicationId,
+        tournamentAddress: epochQuery.data?.tournamentAddress,
+    });
+
+    const matchesQuery = useMatches({
+        application: params.applicationId,
+        tournamentAddress: epochQuery.data?.tournamentAddress,
+    });
+
+    // XXX: get all tournaments of epoch, while there is no way to get mid-tournament of a match
+    const midTournamentQuery = useTournaments({
+        application: params.applicationId,
+        epochIndex: BigInt(params.epochIndex),
+    });
+
+    const tournament: Tournament | null = tournamentQuery.data
+        ? {
+              id: tournamentQuery.data.address,
+              startCycle: 0,
+              endCycle: 0,
+              height: Number(tournamentQuery.data.height),
+              level:
+                  tournamentQuery.data.level === 0n
+                      ? "top"
+                      : tournamentQuery.data.level === 1n
+                        ? "middle"
+                        : "bottom",
+              matches:
+                  matchesQuery.data?.data.map((match) => ({
+                      actions: [], // XXX: comes from advances?
+                      claim1: { hash: match.commitmentOne },
+                      claim2: { hash: match.commitmentTwo },
+                      id: match.idHash,
+                      timestamp: match.updatedAt.getTime() / 1000,
+                      winner: match.winnerCommitment
+                          ? match.winnerCommitment === match.commitmentOne
+                              ? 1
+                              : 2
+                          : undefined,
+                  })) ?? [],
+              danglingClaim: undefined,
+              winner: tournamentQuery.data?.winnerCommitment
+                  ? { hash: tournamentQuery.data.winnerCommitment }
+                  : undefined,
+          }
+        : null;
+
+    return {
+        isLoading:
+            epochQuery.isLoading ||
+            tournamentQuery.isLoading ||
+            commitmentsQuery.isLoading ||
+            matchesQuery.isLoading,
+        data: { tournament },
+    };
 };
