@@ -5,6 +5,7 @@ import { applicationOne } from "./cases/1.application";
 import { applicationTwo } from "./cases/2.application";
 import { applicationThree } from "./cases/3.application";
 import { applicationFour } from "./cases/4.application";
+import { applicationFive } from "./cases/5.application";
 import type { ApplicationEpochs } from "./types";
 import { generateMatchID, generateTournamentId } from "./util";
 
@@ -215,5 +216,11 @@ export const applications: ApplicationEpochs[] = [
 ];
 
 export const getDemoApplications = (): ApplicationEpochs[] => {
-    return [applicationOne];
+    return [
+        applicationOne,
+        applicationTwo,
+        applicationThree,
+        applicationFour,
+        applicationFive,
+    ];
 };

@@ -22,7 +22,7 @@ export const HomePage: FC<Props> = (props) => {
     const { applications } = props;
 
     return (
-        <Stack>
+        <Stack my="sm">
             <PageTitle Icon={TbCpu} title="Applications" />
             {applications?.length > 0 ? (
                 <ApplicationList applications={applications} />

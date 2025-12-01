@@ -8,8 +8,7 @@ type Props = { status: TournamentStatus };
 const wording = {
     OPEN: "The tournament is open to receive claims.",
     CLOSED: "The tournament is still ongoing but is closed to receive new claims.",
-    FINALIZED:
-        "The tournament has finished. If no disputes happen, then there is no winner.",
+    FINALIZED: "The tournament has finished.",
 } as const;
 
 export const TournamentStatusTooltip: FC<Props> = ({ status }) => {
