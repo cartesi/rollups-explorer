@@ -1,8 +1,9 @@
 import type { Hex } from "viem";
 import type { Input, InputStatus } from "../components/types";
-import { findApplication } from "./application.data";
+import type { ApplicationEpochs } from "../stories/types";
+import { findAllApplications } from "./application.data";
 
-const application = findApplication("honeypot")!;
+const applications = findAllApplications();
 const inputs: Input[] = [
     {
         index: 0,
@@ -42,8 +43,8 @@ const inputs: Input[] = [
     },
 ];
 
-let globalIndexCounter = 0;
 const generateInputsForEpoch = (
+    globalIndexCounter: number,
     epochIndex: number,
     withStatus?: InputStatus,
 ) => {
@@ -67,13 +68,24 @@ const dataMap = new Map<string, Input[]>();
 const createKey = (appId: string | Hex, epochIndex: number) =>
     `${appId}:${epochIndex}`;
 
-application.epochs.forEach((epoch) => {
-    const inputStatuses = epoch.inDispute ? "ACCEPTED" : undefined;
-    dataMap.set(
-        createKey(application.name, epoch.index),
-        generateInputsForEpoch(epoch.index, inputStatuses),
-    );
-});
+const generateInputs = (application: ApplicationEpochs) => {
+    const globalIndexCounter = 0;
+    let inputs: Input[] = [];
+    application.epochs.forEach((epoch) => {
+        const inputStatuses = epoch.inDispute ? "ACCEPTED" : undefined;
+        inputs = generateInputsForEpoch(
+            globalIndexCounter,
+            epoch.index,
+            inputStatuses,
+        );
+        dataMap.set(createKey(application.name, epoch.index), inputs);
+    });
+
+    return inputs;
+};
+
+// PRE CREATE INPUTS FOR EACH APP EPOCH.
+applications.forEach(generateInputs);
 
 interface FindInputsParams {
     applicationId: string | Hex;

@@ -1,6 +1,7 @@
 import { getUnixTime, subMinutes } from "date-fns";
 import { keccak256 } from "viem";
 import type { Match, MatchAction } from "../components/types";
+import { applicationOne } from "./cases/1.application";
 import type { ApplicationEpochs } from "./types";
 import { generateMatchID, generateTournamentId } from "./util";
 
@@ -203,3 +204,7 @@ export const applications: ApplicationEpochs[] = [
         epochs: [],
     },
 ];
+
+export const getDemoApplications = (): ApplicationEpochs[] => {
+    return [applicationOne];
+};

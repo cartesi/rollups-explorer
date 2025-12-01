@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Hex } from "viem";
 import type { Application, Epoch } from "../components/types";
-import { findApplication } from "./application.data";
+import { findAllApplications, findApplication } from "./application.data";
 import { NETWORK_DELAY } from "./constants";
 
 export const applicationKeys = {
@@ -20,8 +20,8 @@ export const applicationKeys = {
 const listApplications = () => {
     const promise = new Promise<{ applications: Application[] }>((resolve) => {
         setTimeout(() => {
-            const app = findApplication("honeypot") as Application;
-            resolve({ applications: [app] });
+            const apps = findAllApplications() as Application[];
+            resolve({ applications: apps });
         }, NETWORK_DELAY);
     });
 

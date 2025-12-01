@@ -6,7 +6,7 @@ import type {
     Match,
     Tournament,
 } from "../components/types";
-import { applications } from "../stories/data";
+import { getDemoApplications } from "../stories/data";
 import {
     type ApplicationEpochs,
     type EpochWithTournament,
@@ -44,11 +44,12 @@ class SyntheticDatabase {
     private epochs = new Map<string, Epoch[]>();
 
     constructor() {
-        // limit to only mocked honeypot
+        // limit to demo mocked apps
         console.info(`DB initiating...`);
-        const application = applications.find((a) => a.name === "honeypot")!;
-        this.applications.push(omit(["epochs"], application));
-        this.init(application);
+        for (const application of getDemoApplications()) {
+            this.applications.push(omit(["epochs"], application));
+            this.init(application);
+        }
         console.info(`DB initiated.`);
     }
 
@@ -59,6 +60,16 @@ class SyntheticDatabase {
                     application.address === id || application.name === id,
             ) ?? null
         );
+    }
+
+    public listApplications(): ApplicationEpochs[] {
+        return this.applications.map((app) => {
+            const epochs = this.listEpochs(app.address) ?? [];
+            return {
+                ...app,
+                epochs,
+            };
+        });
     }
 
     public listEpochs(id: ApplicationId) {

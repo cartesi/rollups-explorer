@@ -17,3 +17,7 @@ export const findApplication = (
         epochs,
     };
 };
+
+export const findAllApplications = (): ApplicationEpochs[] => {
+    return syntheticDbInstance.listApplications();
+};
