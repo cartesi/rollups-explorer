@@ -21,16 +21,16 @@ export const BottomMatch: Story = {
     args: {
         matches: [
             {
-                claim1: claim(0),
-                claim2: claim(1),
+                commitmentOne: claim(0).hash,
+                commitmentTwo: claim(1).hash,
             },
             {
-                claim1: claim(2),
-                claim2: claim(3),
+                commitmentOne: claim(2).hash,
+                commitmentTwo: claim(3).hash,
             },
             {
-                claim1: claim(4),
-                claim2: claim(5),
+                commitmentOne: claim(4).hash,
+                commitmentTwo: claim(5).hash,
             },
         ],
         separatorMargin: 5,
@@ -44,12 +44,12 @@ export const MidMatch: Story = {
     args: {
         matches: [
             {
-                claim1: claim(0),
-                claim2: claim(1),
+                commitmentOne: claim(0).hash,
+                commitmentTwo: claim(1).hash,
             },
             {
-                claim1: claim(2),
-                claim2: claim(3),
+                commitmentOne: claim(2).hash,
+                commitmentTwo: claim(3).hash,
             },
         ],
     },
@@ -62,8 +62,8 @@ export const TopMatch: Story = {
     args: {
         matches: [
             {
-                claim1: claim(0),
-                claim2: claim(1),
+                commitmentOne: claim(0).hash,
+                commitmentTwo: claim(1).hash,
             },
         ],
     },

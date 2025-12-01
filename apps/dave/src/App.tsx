@@ -1,24 +1,13 @@
 import { MantineProvider, Stack, Text, Title } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { useColorScheme } from "@mantine/hooks";
-import type { FC } from "react";
-import {
-    Link,
-    Outlet,
-    Route,
-    Routes,
-    useLocation,
-    useParams,
-} from "react-router";
+import { Link, Outlet, Route, Routes, useLocation } from "react-router";
 import Layout from "./components/layout/Layout";
 import { Redirect } from "./components/navigation/Redirect";
-import type { Tournament } from "./components/types";
-import { EpochDetailsContainer } from "./containers/EpochDetailsContainer";
+import { EpochContainer } from "./containers/EpochContainer";
 import { EpochsContainer } from "./containers/EpochsContainer";
 import { HomeContainer } from "./containers/Home";
-import { MatchDetailContainer } from "./containers/MatchDetailContainer";
-import { SubMatchDetailContainer } from "./containers/SubMatchDetailContainer";
-import { SubTournamentContainer } from "./containers/SubTournamentContainer";
+import { MatchContainer } from "./containers/MatchContainer";
 import { TournamentContainer } from "./containers/TournamentContainer";
 import DataProvider from "./providers/DataProvider";
 import theme from "./providers/theme";
@@ -38,25 +27,11 @@ const RouteNotFound = () => {
             <Title order={1}>Oops</Title>
             <Title order={2}>Can't find the following path</Title>
             <Text c="orange">{location.pathname}</Text>
-            <Link to={routePathBuilder.apps()}>
+            <Link to={routePathBuilder.applications()}>
                 Check the applications page
             </Link>
         </Stack>
     );
-};
-
-type Props = { level: Tournament["level"] };
-
-const RedirectToTournament: FC<Props> = ({ level }) => {
-    const params = useParams();
-    const tournamentUrl =
-        level === "top"
-            ? routePathBuilder.topTournament(params)
-            : level === "middle"
-              ? routePathBuilder.middleTournament(params)
-              : routePathBuilder.bottomTournament(params);
-
-    return <Redirect to={tournamentUrl} />;
 };
 
 function App() {
@@ -71,72 +46,45 @@ function App() {
                     <Route element={<LayoutWithOutlet />}>
                         <Route
                             path={routePathBuilder.base}
-                            element={<Redirect to={routePathBuilder.apps()} />}
+                            element={
+                                <Redirect
+                                    to={routePathBuilder.applications()}
+                                />
+                            }
                         />
 
                         <Route
-                            path={routePathBuilder.apps()}
+                            path={routePathBuilder.applications()}
                             element={<HomeContainer />}
                         />
 
                         <Route
-                            path={routePathBuilder.appDetail()}
-                            element={<Redirect to={routePathBuilder.apps()} />}
+                            path={routePathBuilder.application()}
+                            element={
+                                <Redirect
+                                    to={routePathBuilder.applications()}
+                                />
+                            }
                         />
 
                         <Route
-                            path={routePathBuilder.appEpochs()}
+                            path={routePathBuilder.epochs()}
                             element={<EpochsContainer />}
                         />
 
                         <Route
-                            path={routePathBuilder.appEpochDetails()}
-                            element={<EpochDetailsContainer />}
+                            path={routePathBuilder.epoch()}
+                            element={<EpochContainer />}
                         />
 
                         <Route
-                            path={routePathBuilder.topTournament()}
+                            path={routePathBuilder.tournament()}
                             element={<TournamentContainer />}
                         />
 
                         <Route
-                            path={routePathBuilder.topTournamentMatches()}
-                            element={<RedirectToTournament level="top" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.matchDetail()}
-                            element={<MatchDetailContainer />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.middleTournament()}
-                            element={<SubTournamentContainer level="middle" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.middleTournamentMatches()}
-                            element={<RedirectToTournament level="middle" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.midMatchDetail()}
-                            element={<SubMatchDetailContainer level="middle" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.bottomTournament()}
-                            element={<SubTournamentContainer level="bottom" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.bottomTournamentMatches()}
-                            element={<RedirectToTournament level="bottom" />}
-                        />
-
-                        <Route
-                            path={routePathBuilder.btMatchDetail()}
-                            element={<SubMatchDetailContainer level="bottom" />}
+                            path={routePathBuilder.match()}
+                            element={<MatchContainer />}
                         />
 
                         <Route path="*" element={<RouteNotFound />} />

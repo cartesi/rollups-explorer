@@ -1,6 +1,6 @@
+import { useApplications } from "@cartesi/wagmi";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
-import { useListApplications } from "../api/application.queries";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -9,9 +9,9 @@ import { HomePage } from "../pages/HomePage";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const HomeContainer: FC = () => {
-    const { data, isLoading } = useListApplications();
+    const { data, isLoading } = useApplications();
     const hierarchyConfig: HierarchyConfig[] = [{ title: "Home", href: "/" }];
-    const applications = data?.applications ?? [];
+    const applications = data?.data ?? [];
 
     return (
         <Stack pt="lg" gap="lg">

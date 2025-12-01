@@ -1,3 +1,4 @@
+import type { Match, MatchAdvanced } from "@cartesi/viem";
 import {
     Button,
     Group,
@@ -14,7 +15,7 @@ import {
 } from "@mantine/hooks";
 import { useEffect, useMemo, useState, type FC } from "react";
 import { TbArrowUp } from "react-icons/tb";
-import type { Claim, CycleRange, MatchAction } from "../types";
+import type { CycleRange } from "../types";
 import { BisectionItem } from "./BisectionItem";
 import { EliminationTimeoutItem } from "./EliminationTimeoutItem";
 import { LoserItem } from "./LoserItem";
@@ -24,9 +25,9 @@ import { WinnerTimeoutItem } from "./WinnerTimeoutItem";
 
 interface MatchActionsProps {
     /**
-     * List of actions to display
+     * List of advances (bisections) of the match
      */
-    actions: MatchAction[];
+    advances: MatchAdvanced[];
 
     /**
      * Whether to auto-adjust the ranges of the bisection items as user scrolls
@@ -34,19 +35,15 @@ interface MatchActionsProps {
     autoAdjustRanges?: boolean;
 
     /**
-     * First claim
-     */
-    claim1: Claim;
-
-    /**
-     * Second claim
-     */
-    claim2: Claim;
-
-    /**
      * Maximum number of bisections to reach the target subdivision
+     * height = 48 means 47 bisections
      */
-    height: number;
+    height: bigint;
+
+    /**
+     * The match to display actions for
+     */
+    match: Match;
 
     /**
      * Current timestamp
@@ -56,14 +53,24 @@ interface MatchActionsProps {
     /**
      * Next inner-tournament level.
      */
-    nextLevel: "middle" | "bottom" | "none";
+    nextLevel: bigint;
 }
 
 export const MatchActions: FC<MatchActionsProps> = (props) => {
-    const { actions, claim1, claim2, height, now, nextLevel } = props;
+    const { advances, height, match, now, nextLevel } = props;
+    const claim1 = { hash: match.commitmentOne };
+    const claim2 = { hash: match.commitmentTwo };
 
     // filter the bisection items
-    const bisections = actions.filter((a) => a.type === "advance");
+    const bisections = advances.map((matchAdvanced, index, array) => {
+        // direction is defined whether the parent of the advance is the left node of the previous advance, otherwise it's the right node
+        const left = index === 0 ? match.leftOfTwo : array[index - 1].leftNode;
+        const direction = matchAdvanced.otherParent === left ? 0 : 1;
+        return {
+            direction,
+            timestamp: matchAdvanced.updatedAt.getTime(),
+        };
+    });
 
     // track the width of the timeline, so we can adjust the number of bars before size reset
     const { width: bisectionWidth, ref: bisectionWidthRef } = useElementSize();
@@ -80,10 +87,10 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     }, [bisectionWidth]);
 
     // dynamic domain, based on first visible item
-    const maxRange: CycleRange = [0, 2 ** height];
+    const maxRange: CycleRange = [0, 2 ** Number(height - 1n)];
 
     // progress bar, based on last visible item
-    const progress = (bisections.length / height) * 100;
+    const progress = (bisections.length / Number(height - 1n)) * 100;
 
     // create ranges for each bisection
     const ranges = useMemo(
@@ -133,96 +140,121 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                 </Timeline.Item>
             </Timeline>
             <Timeline bulletSize={24} lineWidth={2}>
-                {actions.map((action, i) => {
-                    const { timestamp } = action;
-                    switch (action.type) {
-                        case "advance":
-                            return (
-                                <BisectionItem
-                                    key={i}
-                                    claim={i % 2 === 0 ? claim1 : claim2}
-                                    color={theme.colors.gray[6]}
-                                    domain={ranges[Math.floor(i / bars) * bars]}
-                                    expand={
-                                        i % bars === bars - 1 &&
-                                        i < bisections.length - 1
-                                    }
-                                    index={i + 1}
-                                    now={now}
-                                    range={ranges[i + 1]}
-                                    timestamp={timestamp}
-                                    total={height}
-                                />
-                            );
-
-                        case "timeout":
-                            return (
-                                <WinnerTimeoutItem
-                                    key={i}
-                                    loser={i % 2 === 0 ? claim1 : claim2}
-                                    now={now}
-                                    timestamp={timestamp}
-                                    winner={i % 2 === 0 ? claim2 : claim1}
-                                />
-                            );
-
-                        case "match_eliminated_by_timeout":
-                            return (
-                                <EliminationTimeoutItem
-                                    key={i}
-                                    claim1={i % 2 === 0 ? claim1 : claim2}
-                                    claim2={i % 2 === 0 ? claim2 : claim1}
-                                    now={now}
-                                    timestamp={timestamp}
-                                />
-                            );
-
-                        case "match_sealed_inner_tournament_created":
-                            return (
-                                <SubTournamentItem
-                                    claim={i % 2 === 0 ? claim1 : claim2}
-                                    key={i}
-                                    level={nextLevel}
-                                    now={now}
-                                    range={action.range}
-                                    timestamp={timestamp}
-                                />
-                            );
-
-                        case "leaf_match_sealed": {
-                            const winner = (
+                {bisections.map((value, i) => (
+                    <BisectionItem
+                        key={i}
+                        claim={i % 2 === 0 ? claim1 : claim2}
+                        color={theme.colors.gray[6]}
+                        domain={ranges[Math.floor(i / bars) * bars]}
+                        expand={
+                            i % bars === bars - 1 && i < bisections.length - 1
+                        }
+                        index={i + 1}
+                        now={now}
+                        range={ranges[i + 1]}
+                        timestamp={value.timestamp}
+                        total={Number(height - 1n)}
+                    />
+                ))}
+                {match.deletionReason === "TIMEOUT" &&
+                    match.winnerCommitment === "NONE" && (
+                        <EliminationTimeoutItem
+                            key="elimination-timeout"
+                            claim1={
+                                bisections.length % 2 === 0 ? claim1 : claim2
+                            }
+                            claim2={
+                                bisections.length % 2 === 0 ? claim2 : claim1
+                            }
+                            now={now}
+                            timestamp={match.updatedAt.getTime()}
+                        />
+                    )}
+                {match.deletionReason === "TIMEOUT" &&
+                    match.winnerCommitment !== "NONE" && (
+                        <WinnerTimeoutItem
+                            key="timeout"
+                            loser={
+                                match.winnerCommitment === "ONE"
+                                    ? claim2
+                                    : claim1
+                            }
+                            now={now}
+                            timestamp={match.updatedAt.getTime()}
+                            winner={{
+                                hash:
+                                    match.winnerCommitment === "ONE"
+                                        ? claim1.hash
+                                        : claim2.hash,
+                            }}
+                        />
+                    )}
+                {match.deletionReason === "CHILD_TOURNAMENT" && (
+                    <>
+                        <SubTournamentItem
+                            claim={
+                                bisections.length % 2 === 0 ? claim1 : claim2
+                            }
+                            key="sub-tournament"
+                            level={nextLevel}
+                            now={now}
+                            range={[0, 0]} // XXX: need to get range from somewhere
+                            timestamp={match.updatedAt.getTime()}
+                        />
+                        {match.winnerCommitment !== "NONE" && (
+                            <>
                                 <WinnerItem
-                                    key={i}
-                                    claim={
-                                        action.winner === 1 ? claim1 : claim2
-                                    }
+                                    key="winner"
+                                    claim={{
+                                        hash:
+                                            match.winnerCommitment === "ONE"
+                                                ? claim1.hash
+                                                : claim2.hash,
+                                    }}
                                     now={now}
-                                    timestamp={timestamp}
-                                    proof={action.proof}
+                                    timestamp={match.updatedAt.getTime()}
+                                    proof={"0x0"} // XXX: need to get proof from somewhere
                                 />
-                            );
-                            const loser = (
                                 <LoserItem
                                     claim={
-                                        action.winner === 1 ? claim2 : claim1
+                                        match.winnerCommitment === "ONE"
+                                            ? claim2
+                                            : claim1
                                     }
                                     now={now}
                                 />
-                            );
-                            return i % 2 === 0 ? (
-                                <>
-                                    {winner}
-                                    {loser}
-                                </>
-                            ) : (
-                                <>
-                                    {loser}
-                                    {winner}
-                                </>
-                            );
-                        }
-                    }
-                })}
+                            </>
+                        )}
+                    </>
+                )}
+                {match.deletionReason === "STEP" && (
+                    <>
+                        {match.winnerCommitment !== "NONE" && (
+                            <>
+                                <WinnerItem
+                                    key="winner"
+                                    claim={{
+                                        hash:
+                                            match.winnerCommitment === "ONE"
+                                                ? claim1.hash
+                                                : claim2.hash,
+                                    }}
+                                    now={now}
+                                    timestamp={match.updatedAt.getTime()}
+                                    proof={"0x0"} // XXX: need to get proof from somewhere
+                                />
+                                <LoserItem
+                                    claim={
+                                        match.winnerCommitment === "ONE"
+                                            ? claim2
+                                            : claim1
+                                    }
+                                    now={now}
+                                />
+                            </>
+                        )}
+                    </>
+                )}
             </Timeline>
             <Group justify="flex-end" ref={bottomRef}>
                 {!topInViewport && (

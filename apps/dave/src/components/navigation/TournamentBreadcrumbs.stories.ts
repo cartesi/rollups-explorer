@@ -21,12 +21,12 @@ export const BottomTournament: Story = {
     args: {
         parentMatches: [
             {
-                claim1: claim(0),
-                claim2: claim(1),
+                commitmentOne: claim(0).hash,
+                commitmentTwo: claim(1).hash,
             },
             {
-                claim1: claim(2),
-                claim2: claim(3),
+                commitmentOne: claim(2).hash,
+                commitmentTwo: claim(3).hash,
             },
         ],
     },
@@ -39,8 +39,8 @@ export const MidTournament: Story = {
     args: {
         parentMatches: [
             {
-                claim1: claim(0),
-                claim2: claim(1),
+                commitmentOne: claim(0).hash,
+                commitmentTwo: claim(1).hash,
             },
         ],
     },
