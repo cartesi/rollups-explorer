@@ -1,6 +1,7 @@
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import type { Preview, StoryContext, StoryFn } from "@storybook/react-vite";
+import React from "react";
 import { MemoryRouter } from "react-router";
 import Layout from "../src/components/layout/Layout";
 import theme from "../src/providers/theme";

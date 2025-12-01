@@ -1,3 +1,4 @@
+import type { Match } from "@cartesi/viem";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 import { claim, generateMatchID } from "../../stories/util";
@@ -17,33 +18,43 @@ type Story = StoryObj<typeof meta>;
 
 const timestamp = Math.floor(Date.now() / 1000);
 
+const match: Match = {
+    blockNumber: 1n,
+    commitmentOne: claim(0).hash,
+    commitmentTwo: claim(1).hash,
+    createdAt: new Date(timestamp),
+    deletionBlockNumber: null,
+    deletionReason: "NOT_DELETED",
+    deletionTxHash: null,
+    epochIndex: 0n,
+    idHash: generateMatchID(claim(0).hash, claim(1).hash),
+    leftOfTwo:
+        "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+    tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+    updatedAt: new Date(timestamp),
+    winnerCommitment: "NONE",
+};
 /**
  * A match that is ongoing, which means that both claims are still in dispute, with no winner yet.
  */
 export const Ongoing: Story = {
     args: {
-        match: {
-            id: generateMatchID(claim(0).hash, claim(1).hash),
-            claim1: claim(0),
-            claim2: claim(1),
-            timestamp,
-            actions: [],
-        },
+        match,
         onClick: fn(),
     },
 };
 
 /**
  * A match of a mid-level tournament, where claims have parent claims.
+ * XXX: not implemented yet
  */
 export const MidLevel: Story = {
     args: {
         match: {
-            id: generateMatchID(claim(0, 2).hash, claim(1, 3).hash),
-            claim1: claim(0, 2),
-            claim2: claim(1, 3),
-            timestamp,
-            actions: [],
+            ...match,
+            commitmentOne: claim(0, 2).hash,
+            commitmentTwo: claim(1, 3).hash,
         },
         onClick: fn(),
     },
@@ -51,15 +62,14 @@ export const MidLevel: Story = {
 
 /**
  * A match of a bottom-level tournament, where claims have parent claims.
+ * XXX: not implemented yet
  */
 export const BottomLevel: Story = {
     args: {
         match: {
-            id: generateMatchID(claim(0, 2, 4).hash, claim(1, 3, 5).hash),
-            claim1: claim(0, 2, 4),
-            claim2: claim(1, 3, 5),
-            timestamp,
-            actions: [],
+            ...match,
+            commitmentOne: claim(0, 2, 4).hash,
+            commitmentTwo: claim(1, 3, 5).hash,
         },
         onClick: fn(),
     },
@@ -71,13 +81,8 @@ export const BottomLevel: Story = {
 export const Winner1: Story = {
     args: {
         match: {
-            id: generateMatchID(claim(0).hash, claim(1).hash),
-            claim1: claim(0),
-            claim2: claim(1),
-            winner: 1,
-            timestamp,
-            winnerTimestamp: timestamp + 1,
-            actions: [],
+            ...match,
+            winnerCommitment: "ONE",
         },
         onClick: fn(),
     },
@@ -89,13 +94,8 @@ export const Winner1: Story = {
 export const Winner2: Story = {
     args: {
         match: {
-            id: generateMatchID(claim(0).hash, claim(1).hash),
-            claim1: claim(0),
-            claim2: claim(1),
-            winner: 2,
-            timestamp,
-            winnerTimestamp: timestamp + 1,
-            actions: [],
+            ...match,
+            winnerCommitment: "TWO",
         },
         onClick: fn(),
     },
@@ -106,12 +106,6 @@ export const Winner2: Story = {
  */
 export const NoClickEventHandler: Story = {
     args: {
-        match: {
-            id: generateMatchID(claim(0).hash, claim(1).hash),
-            claim1: claim(0),
-            claim2: claim(1),
-            timestamp,
-            actions: [],
-        },
+        match,
     },
 };

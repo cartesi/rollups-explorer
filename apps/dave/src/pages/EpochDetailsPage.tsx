@@ -1,3 +1,4 @@
+import type { Epoch, Input } from "@cartesi/viem";
 import {
     Anchor,
     Badge,
@@ -14,21 +15,29 @@ import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
 import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
-import type { Epoch, Input, Tournament } from "../components/types";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import { routePathBuilder, type EpochParams } from "../routes/routePathBuilder";
 
 type Props = {
-    tournament?: Tournament | null;
     epoch: Epoch;
     inputs: Input[];
 };
 
-export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
+export const EpochDetailsPage: FC<Props> = ({ epoch, inputs }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
-    const params = useParams();
-    const tournamentUrl = routePathBuilder.topTournament(params);
-    const tournamentColor = epoch.inDispute ? epochStatusColor : "";
+    const params = useParams<EpochParams>();
+    const tournamentAddress = epoch.tournamentAddress;
+    const tournamentUrl = tournamentAddress
+        ? routePathBuilder.tournament({
+              application: params.application ?? "",
+              epochIndex: epoch.index.toString(),
+              tournamentAddress: tournamentAddress,
+          })
+        : undefined;
+    const inDispute = false; // XXX: how to know if an epoch is in dispute?
+    const tournamentColor = inDispute ? epochStatusColor : "";
+    const startCycle = 0; // XXX: how to know the startCycle?
+    const endCycle = 0; // XXX: how to know the endCycle?
 
     return (
         <Stack>
@@ -36,14 +45,14 @@ export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
             <Group>
                 <Text>Status</Text>
                 <Badge color={epochStatusColor}>{epoch.status}</Badge>
-                {epoch.inDispute && (
+                {inDispute && (
                     <Badge variant="outline" color={epochStatusColor}>
                         disputed
                     </Badge>
                 )}
             </Group>
 
-            {tournament && (
+            {tournamentUrl && (
                 <Anchor
                     component={Link}
                     to={tournamentUrl}
@@ -60,7 +69,7 @@ export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
                         </Group>
                         <CycleRangeFormatted
                             size="md"
-                            range={[tournament.startCycle, tournament.endCycle]}
+                            range={[startCycle, endCycle]}
                         />
                     </Group>
                 </Anchor>

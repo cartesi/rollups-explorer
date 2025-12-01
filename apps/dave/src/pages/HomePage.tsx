@@ -1,10 +1,10 @@
+import type { Application } from "@cartesi/viem";
 import { Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { TbCpu } from "react-icons/tb";
 import { ApplicationList } from "../components/application/ApplicationList";
 import PageTitle from "../components/layout/PageTitle";
 import { NotFound } from "../components/navigation/NotFound";
-import type { Application } from "../components/types";
 
 type Props = {
     applications: Application[];

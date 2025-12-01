@@ -18,7 +18,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const BottomTournament: Story = {
     args: {
-        level: "bottom",
+        level: 2n,
     },
 };
 
@@ -27,7 +27,7 @@ export const BottomTournament: Story = {
  */
 export const MidTournament: Story = {
     args: {
-        level: "middle",
+        level: 1n,
     },
 };
 
@@ -36,13 +36,13 @@ export const MidTournament: Story = {
  */
 export const TopTournament: Story = {
     args: {
-        level: "top",
+        level: 0n,
     },
 };
 
 export const TopTournamentVariant: Story = {
     args: {
-        level: "top",
+        level: 0n,
         variant: "outline",
     },
 };
