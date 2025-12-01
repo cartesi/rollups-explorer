@@ -36,7 +36,7 @@ export const Inoperable: Story = {
  * Card for applications with no inputs
  */
 export const NoInputs: Story = {
-    args: { application: { ...applications[0], processedInputs: 0 } },
+    args: { application: { ...applications[0], processedInputs: 0n } },
 };
 
 /**

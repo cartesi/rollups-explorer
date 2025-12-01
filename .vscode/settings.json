@@ -9,5 +9,8 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     "[terraform]": {
         "editor.defaultFormatter": "hashicorp.terraform"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }

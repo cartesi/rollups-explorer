@@ -1,12 +1,18 @@
+import type { Epoch, EpochStatus } from "@cartesi/viem";
 import useRightColorShade from "../../hooks/useRightColorShade";
-import type { Epoch, EpochStatus } from "../types";
 
 export const getEpochStatusColor = (state: EpochStatus) => {
     switch (state) {
         case "OPEN":
+        case "INPUTS_PROCESSED":
+            return "open";
+        case "CLAIM_COMPUTED":
+        case "CLAIM_REJECTED":
+        case "CLAIM_SUBMITTED":
         case "CLOSED":
-        case "FINALIZED":
-            return state.toLowerCase();
+            return "closed";
+        case "CLAIM_ACCEPTED":
+            return "finalized";
         default:
             return "gray";
     }
@@ -15,5 +21,5 @@ export const getEpochStatusColor = (state: EpochStatus) => {
 export const useEpochStatusColor = (epoch: Epoch) => {
     const statusColor = useRightColorShade(getEpochStatusColor(epoch.status));
     const disputeColor = useRightColorShade("disputed");
-    return epoch.inDispute ? disputeColor : statusColor;
+    return false ? disputeColor : statusColor;
 };

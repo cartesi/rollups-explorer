@@ -29,7 +29,7 @@ const range = [1837880065, 2453987565] as CycleRange;
 export const Middle: Story = {
     args: {
         claim: claim(0),
-        level: "middle",
+        level: 1n,
         now,
         range,
         timestamp: now,
@@ -42,7 +42,7 @@ export const Middle: Story = {
 export const Bottom: Story = {
     args: {
         claim: claim(0),
-        level: "bottom",
+        level: 2n,
         now,
         range,
         timestamp: now,

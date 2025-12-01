@@ -1,10 +1,10 @@
+import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import type { FC } from "react";
 import { Link } from "react-router";
 import { routePathBuilder } from "../../routes/routePathBuilder";
-import type { Application, ApplicationState } from "../types";
 
-type Props = { application: Application };
+type ApplicationCardProps = { application: Application };
 
 const getStateColour = (state: ApplicationState) => {
     switch (state) {
@@ -19,16 +19,16 @@ const getStateColour = (state: ApplicationState) => {
     }
 };
 
-export const ApplicationCard: FC<Props> = ({ application }) => {
-    const { address, consensusType, name, processedInputs, state } =
+export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
+    const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
     const stateColour = getStateColour(state);
-    const appId = application.name ?? application.address;
-    const url = routePathBuilder.appEpochs({ appId });
+    const appId = application.name ?? applicationAddress;
+    const url = routePathBuilder.epochs({ application: appId });
     const inputsLabel =
-        processedInputs === 0
+        processedInputs === 0n
             ? "no inputs"
-            : processedInputs === 1
+            : processedInputs === 1n
               ? `${processedInputs} input`
               : `${processedInputs} inputs`;
 
@@ -40,7 +40,7 @@ export const ApplicationCard: FC<Props> = ({ application }) => {
                         <Text size="xl">{name}</Text>
                     </Group>
                     <Text c="dimmed" size="xs">
-                        {address}
+                        {applicationAddress}
                     </Text>
                 </Stack>
                 <Group justify="space-between">
