@@ -4,6 +4,7 @@ import type { Match, MatchAction } from "../components/types";
 import { applicationOne } from "./cases/1.application";
 import { applicationTwo } from "./cases/2.application";
 import { applicationThree } from "./cases/3.application";
+import { applicationFour } from "./cases/4.application";
 import type { ApplicationEpochs } from "./types";
 import { generateMatchID, generateTournamentId } from "./util";
 
