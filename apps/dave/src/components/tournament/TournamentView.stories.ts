@@ -179,6 +179,15 @@ export const Ongoing: Story = {
     },
 };
 
+export const ClosedWithOngoingMatches: Story = {
+    args: {
+        tournament: {
+            ...tournament,
+            status: "CLOSED",
+        },
+    },
+};
+
 export const NoChallengerYet: Story = {
     args: {
         tournament: {
