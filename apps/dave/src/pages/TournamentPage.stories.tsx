@@ -79,6 +79,7 @@ const endCycle = 2453987565;
 
 const randomTournament: Tournament = {
     id: generateTournamentId(startCycle, endCycle),
+    status: "OPEN",
     startCycle,
     endCycle,
     height: 48,

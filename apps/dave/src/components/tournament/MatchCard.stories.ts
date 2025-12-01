@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { getUnixTime, subMinutes } from "date-fns";
 import { fn } from "storybook/test";
 import { claim, generateMatchID } from "../../stories/util";
 import { MatchCard } from "./MatchCard";
@@ -62,6 +63,26 @@ export const BottomLevel: Story = {
             actions: [],
         },
         onClick: fn(),
+    },
+};
+
+const claim1 = claim(0);
+const claim2 = claim(1);
+
+export const MatchEliminatedByTimeout: Story = {
+    args: {
+        match: {
+            id: generateMatchID(claim1.hash, claim2.hash),
+            claim1,
+            claim2,
+            timestamp,
+            actions: [
+                {
+                    type: "match_eliminated_by_timeout",
+                    timestamp: getUnixTime(subMinutes(new Date(), 30)),
+                },
+            ],
+        },
     },
 };
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { getUnixTime } from "date-fns";
+import { getUnixTime, subMinutes } from "date-fns";
 import {
     claim,
     generateMatchID,
@@ -106,10 +106,13 @@ const tournament: Tournament = {
             id: generateMatchID(claim(4).hash, claim(5).hash),
             claim1: claim(4),
             claim2: claim(5),
-            winner: 1,
             timestamp: timestamp + 5,
-            winnerTimestamp: timestamp + 6,
-            actions: [],
+            actions: [
+                {
+                    type: "match_eliminated_by_timeout",
+                    timestamp: getUnixTime(subMinutes(new Date(), 30)),
+                },
+            ],
         },
         {
             id: generateMatchID(claim(6).hash, claim(4).hash),
