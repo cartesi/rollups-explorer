@@ -1,15 +1,4 @@
-import type { InputStatus } from "@cartesi/viem";
 import type { Hash, Hex } from "viem";
-
-export interface Input {
-    status: InputStatus;
-    index: number;
-    epochIndex: number;
-    sender: Hex;
-    machineHash: Hex;
-    outputHash: Hex;
-    payload: Hex;
-}
 
 export interface Claim {
     hash: Hash;
