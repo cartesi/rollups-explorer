@@ -30,7 +30,7 @@ export const TournamentContainer: FC = () => {
             href: routePathBuilder.appEpochDetails(params),
         },
         {
-            title: <TournamentBreadcrumbSegment level="top" variant="filled" />,
+            title: <TournamentBreadcrumbSegment level={0n} variant="filled" />,
             href: routePathBuilder.topTournament(params),
         },
     ];

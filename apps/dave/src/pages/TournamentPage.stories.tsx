@@ -38,7 +38,7 @@ const WithBreadcrumb = (props: Props) => {
                         href: routePathBuilder.appEpochDetails(params),
                     },
                     {
-                        title: <TournamentBreadcrumbSegment level="top" />,
+                        title: <TournamentBreadcrumbSegment level={0n} />,
                         href: "#",
                     },
                 ]}

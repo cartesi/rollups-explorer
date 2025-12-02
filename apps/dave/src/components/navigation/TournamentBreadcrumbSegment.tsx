@@ -1,9 +1,8 @@
 import { Button, type ButtonVariant } from "@mantine/core";
 import type { FC } from "react";
-import type { Tournament } from "../types";
 
 type TournamentBreadcrumbSegmentProps = {
-    level: Tournament["level"];
+    level: bigint;
     variant?: ButtonVariant;
 };
 

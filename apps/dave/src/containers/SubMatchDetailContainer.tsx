@@ -26,7 +26,7 @@ import { ContainerSkeleton } from "./ContainerSkeleton";
 
 interface BuildHierarchyProps {
     params: RoutePathParams;
-    level: "middle" | "bottom";
+    level: 1n | 2n;
     match: Match | null;
     midMatch: Match | null;
     btMatch: Match | null;
@@ -47,9 +47,7 @@ const buildHierarchy = ({
             href: routePathBuilder.appEpochDetails(params),
         },
         {
-            title: (
-                <TournamentBreadcrumbSegment level="top" variant="default" />
-            ),
+            title: <TournamentBreadcrumbSegment level={0n} variant="default" />,
             href: routePathBuilder.topTournament(params),
         },
         {
@@ -62,31 +60,26 @@ const buildHierarchy = ({
             href: routePathBuilder.matchDetail(params),
         },
         {
-            title: (
-                <TournamentBreadcrumbSegment level="middle" variant="default" />
-            ),
+            title: <TournamentBreadcrumbSegment level={1n} variant="default" />,
             href: routePathBuilder.middleTournament(params),
         },
         {
             title: (
                 <MatchBreadcrumbSegment
                     match={midMatch ?? dummyMatch}
-                    variant={level === "middle" ? "filled" : "default"}
+                    variant={level === 1n ? "filled" : "default"}
                 />
             ),
             href: routePathBuilder.midMatchDetail(params),
         },
     ];
 
-    if (level === "bottom") {
+    if (level === 2n) {
         return [
             ...base,
             {
                 title: (
-                    <TournamentBreadcrumbSegment
-                        level="bottom"
-                        variant="default"
-                    />
+                    <TournamentBreadcrumbSegment level={2n} variant="default" />
                 ),
                 href: routePathBuilder.bottomTournament(params),
             },
@@ -106,10 +99,10 @@ const buildHierarchy = ({
 };
 
 interface Props {
-    level?: "middle" | "bottom";
+    level?: 1n | 2n;
 }
 
-export const SubMatchDetailContainer: FC<Props> = ({ level = "middle" }) => {
+export const SubMatchDetailContainer: FC<Props> = ({ level = 1n }) => {
     const params = useParams<RoutePathParams>();
     const applicationId = params.appId ?? "";
     const parsedIndex = parseInt(params.epochIndex ?? "");
@@ -168,8 +161,8 @@ export const SubMatchDetailContainer: FC<Props> = ({ level = "middle" }) => {
     const match = matchQuery.data?.match ?? null;
     const midMatch = midMatchQuery.data?.match ?? null;
     const btMatch = btMatchQuery.data?.match ?? null;
-    const targetMatch = level === "middle" ? midMatch : btMatch;
-    const targetTournament = level === "middle" ? midTournament : btTournament;
+    const targetMatch = level === 1n ? midMatch : btMatch;
+    const targetTournament = level === 1n ? midTournament : btTournament;
 
     const hierarchyConfig: HierarchyConfig[] = buildHierarchy({
         level,
@@ -197,7 +190,7 @@ export const SubMatchDetailContainer: FC<Props> = ({ level = "middle" }) => {
                         <Title c="dimmed" fw="bold" order={3} ta="center">
                             We're not able to find details about match{" "}
                             <Text c="orange" inherit component="span">
-                                {level === "middle"
+                                {level === 1n
                                     ? params.midMatchId
                                     : params.btMatchId}
                             </Text>

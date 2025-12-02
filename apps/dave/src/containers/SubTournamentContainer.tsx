@@ -48,9 +48,7 @@ const buildHierarchy = ({
             href: routePathBuilder.appEpochDetails(params),
         },
         {
-            title: (
-                <TournamentBreadcrumbSegment level="top" variant="default" />
-            ),
+            title: <TournamentBreadcrumbSegment level={0n} variant="default" />,
             href: routePathBuilder.topTournament(params),
         },
         {
@@ -65,7 +63,7 @@ const buildHierarchy = ({
         {
             title: (
                 <TournamentBreadcrumbSegment
-                    level="middle"
+                    level={1n}
                     variant={level === "middle" ? "filled" : "default"}
                 />
             ),
@@ -87,10 +85,7 @@ const buildHierarchy = ({
             },
             {
                 title: (
-                    <TournamentBreadcrumbSegment
-                        level="bottom"
-                        variant="filled"
-                    />
+                    <TournamentBreadcrumbSegment level={2n} variant="filled" />
                 ),
                 href: routePathBuilder.bottomTournament(params),
             },

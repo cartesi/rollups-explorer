@@ -21,16 +21,19 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
     const gold = theme.colors.yellow[5];
 
     const { danglingClaim, endCycle, matches, startCycle, winner } = tournament;
+    const level =
+        tournament.level === "top"
+            ? 0n
+            : tournament.level === "middle"
+              ? 1n
+              : 2n;
     const [hideWinners, setHideWinners] = useState(false);
 
     return (
         <Stack>
             <Group>
                 <Text>Level</Text>
-                <TournamentBreadcrumbSegment
-                    level={tournament.level}
-                    variant="filled"
-                />
+                <TournamentBreadcrumbSegment level={level} variant="filled" />
             </Group>
             <Group>
                 <Text>Mcycle range</Text>

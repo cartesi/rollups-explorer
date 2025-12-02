@@ -12,7 +12,6 @@ import {
 } from "react-router";
 import Layout from "./components/layout/Layout";
 import { Redirect } from "./components/navigation/Redirect";
-import type { Tournament } from "./components/types";
 import { EpochDetailsContainer } from "./containers/EpochDetailsContainer";
 import { EpochsContainer } from "./containers/EpochsContainer";
 import { HomeContainer } from "./containers/Home";
@@ -45,14 +44,14 @@ const RouteNotFound = () => {
     );
 };
 
-type Props = { level: Tournament["level"] };
+type Props = { level: bigint };
 
 const RedirectToTournament: FC<Props> = ({ level }) => {
     const params = useParams();
     const tournamentUrl =
-        level === "top"
+        level === 0n
             ? routePathBuilder.topTournament(params)
-            : level === "middle"
+            : level === 1n
               ? routePathBuilder.middleTournament(params)
               : routePathBuilder.bottomTournament(params);
 
@@ -101,7 +100,7 @@ function App() {
 
                         <Route
                             path={routePathBuilder.topTournamentMatches()}
-                            element={<RedirectToTournament level="top" />}
+                            element={<RedirectToTournament level={0n} />}
                         />
 
                         <Route
@@ -116,12 +115,12 @@ function App() {
 
                         <Route
                             path={routePathBuilder.middleTournamentMatches()}
-                            element={<RedirectToTournament level="middle" />}
+                            element={<RedirectToTournament level={1n} />}
                         />
 
                         <Route
                             path={routePathBuilder.midMatchDetail()}
-                            element={<SubMatchDetailContainer level="middle" />}
+                            element={<SubMatchDetailContainer level={1n} />}
                         />
 
                         <Route
@@ -131,12 +130,12 @@ function App() {
 
                         <Route
                             path={routePathBuilder.bottomTournamentMatches()}
-                            element={<RedirectToTournament level="bottom" />}
+                            element={<RedirectToTournament level={2n} />}
                         />
 
                         <Route
                             path={routePathBuilder.btMatchDetail()}
-                            element={<SubMatchDetailContainer level="bottom" />}
+                            element={<SubMatchDetailContainer level={2n} />}
                         />
 
                         <Route path="*" element={<RouteNotFound />} />
