@@ -1,9 +1,8 @@
-import type { Application } from "@cartesi/viem";
+import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import type { FC } from "react";
 import { Link } from "react-router";
 import { routePathBuilder } from "../../routes/routePathBuilder";
-import type { ApplicationState } from "../types";
 
 type Props = { application: Application };
 
