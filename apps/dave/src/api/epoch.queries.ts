@@ -35,17 +35,17 @@ export const useGetEpochTournament = (params: EpochDetailParam) => {
 
     const tournamentQuery = useTournament({
         application: params.applicationId,
-        address: epochQuery.data?.tournamentAddress,
+        address: epochQuery.data?.tournamentAddress ?? undefined,
     });
 
     const commitmentsQuery = useCommitments({
         application: params.applicationId,
-        tournamentAddress: epochQuery.data?.tournamentAddress,
+        tournamentAddress: epochQuery.data?.tournamentAddress ?? undefined,
     });
 
     const matchesQuery = useMatches({
         application: params.applicationId,
-        tournamentAddress: epochQuery.data?.tournamentAddress,
+        tournamentAddress: epochQuery.data?.tournamentAddress ?? undefined,
     });
 
     // XXX: get all tournaments of epoch, while there is no way to get mid-tournament of a match

@@ -92,6 +92,10 @@ const getMatchTournament = async (
         epochIndex: BigInt(params.epochIndex),
     });
 
+    if (!epoch.tournamentAddress) {
+        return { tournament: null };
+    }
+    
     // get top tournament
     const top = await client.getTournament({
         address: epoch.tournamentAddress,
@@ -138,7 +142,7 @@ const createActions = (
     return advances.map((matchAdvanced, index, array) => {
         // direction is defined whether the parent of the advance is the left node of the previous advance, otherwise it's the right node
         const left = index === 0 ? match.leftOfTwo : array[index - 1].leftNode;
-        const direction = matchAdvanced.parent === left ? 0 : 1;
+        const direction = matchAdvanced.otherParent === left ? 0 : 1;
         return {
             type: "advance",
             direction,
@@ -271,7 +275,7 @@ export const useGetMatch = (params: MatchDetailParam) => {
     const matchQuery = useMatch({
         application: params.applicationId,
         epochIndex: BigInt(params.epochIndex),
-        tournamentAddress: epochQuery.data?.tournamentAddress,
+        tournamentAddress: epochQuery.data?.tournamentAddress ?? undefined,
         idHash: params.matchId,
     });
 

@@ -1,7 +1,7 @@
 import type { Hex } from "viem";
 import { syntheticDbInstance } from "./db";
 
-export const getEpoch = (applicationId: string | Hex, epochIndex: number) => {
+export const getEpoch = (applicationId: string | Hex, epochIndex: bigint) => {
     return syntheticDbInstance.getEpoch(applicationId, epochIndex);
 };
 
