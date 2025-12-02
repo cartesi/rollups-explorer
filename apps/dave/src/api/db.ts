@@ -1,8 +1,7 @@
+import type { Application, Epoch } from "@cartesi/viem";
 import { omit } from "ramda";
 import type { Hex } from "viem";
 import type {
-    Application,
-    Epoch,
     Match,
     Tournament,
 } from "../components/types";
@@ -56,7 +55,7 @@ class SyntheticDatabase {
         return (
             this.applications.find(
                 (application) =>
-                    application.address === id || application.name === id,
+                    application.applicationAddress === id || application.name === id,
             ) ?? null
         );
     }
@@ -65,8 +64,8 @@ class SyntheticDatabase {
         return this.epochs.get(this.generateKey([id])) ?? null;
     }
 
-    public getEpoch(id: ApplicationId, epochIndex: number) {
-        if (isNaN(epochIndex)) return null;
+    public getEpoch(id: ApplicationId, epochIndex: bigint) {
+        if (typeof epochIndex !== "bigint") return null;
         const epochs = this.epochs.get(this.generateKey([id])) ?? [];
         return epochs.find((e) => e.index === epochIndex) ?? null;
     }
@@ -131,7 +130,7 @@ class SyntheticDatabase {
 
     private init(application: ApplicationEpochs): void {
         for (const epoch of application.epochs) {
-            const keyOne = this.generateKey([application.address]);
+            const keyOne = this.generateKey([application.applicationAddress]);
             const keyTwo = this.generateKey([application.name]);
             const epochs =
                 this.epochs.get(keyOne) ?? this.epochs.get(keyTwo) ?? [];
@@ -151,7 +150,7 @@ class SyntheticDatabase {
     ): void {
         const matchKey = match ? [match.id] : [];
         const epochIndex = epoch.index.toString();
-        const baseOne = this.generateKey([app.address, epochIndex]);
+        const baseOne = this.generateKey([app.applicationAddress, epochIndex]);
         const baseTwo = this.generateKey([app.name, epochIndex]);
         const keyOne = this.generateKey([baseOne, ...matchKey]);
         const keyTwo = this.generateKey([baseTwo, ...matchKey]);

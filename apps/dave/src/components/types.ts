@@ -1,19 +1,5 @@
-import type { ApplicationState, ConsensusType, EpochStatus, InputStatus } from "@cartesi/viem";
+import type { InputStatus } from "@cartesi/viem";
 import type { Hash, Hex } from "viem";
-
-export interface Application {
-    address: Hex;
-    name: string;
-    consensusType: ConsensusType;
-    state: ApplicationState;
-    processedInputs: number;
-}
-
-export interface Epoch {
-    index: number;
-    status: EpochStatus;
-    inDispute: boolean;
-}
 
 export interface Input {
     status: InputStatus;
