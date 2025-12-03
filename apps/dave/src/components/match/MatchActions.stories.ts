@@ -173,227 +173,247 @@ export const Timeout: Story = {
 /**
  * A match where first claimer has advanced, second claimer has not taken action, and then first claimer has claimed victory..
  */
-/*
 export const TimeoutSecond: Story = {
     args: {
-        actions: [
+        advances: [
             {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 2000,
-            },
-            {
-                type: "timeout",
-                timestamp: now - 1000,
-            },
+                blockNumber: 1n,
+                createdAt: new Date(now - 3453),
+                epochIndex: 0n,
+                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+                leftNode: "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
+                otherParent: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                tournamentAddress,
+                txHash: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                updatedAt: new Date(now - 3453),
+            }            
         ],
-        claim1: claim(0),
-        claim2: claim(1),
+        match: {
+            blockNumber: 2n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "TIMEOUT",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: claim(0).hash,
+        },
         height: 48,
         now,
         nextLevel: "middle",
     },
 };
-*/
 
 /**
  * A match that has been eliminated by timeout with no action from both claimers.
  */
-/*
 export const Elimination: Story = {
     args: {
-        actions: [
-            {
-                type: "match_eliminated_by_timeout",
-                timestamp: now - 1000,
-            },
-        ],
-        claim1: claim(0),
-        claim2: claim(1),
+        advances: [],
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "TIMEOUT",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: null,
+        },
         height: 48,
         now,
         nextLevel: "middle",
     },
 };
-*/
+
 /**
  * A match that has been eliminated by timeout with no action from both claimers after a few bisections.
  */
-/*
 export const EliminationAfterBisections: Story = {
     args: {
-        actions: [
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 3453,
-            },
-            {
-                type: "advance",
-                direction: 1,
-                timestamp: now - 2134,
-            },
-            {
-                type: "advance",
-                direction: 1,
-                timestamp: now - 1452,
-            },
-            {
-                type: "match_eliminated_by_timeout",
-                timestamp: now - 1000,
-            },
-        ],
-        claim1: claim(0),
-        claim2: claim(1),
+        advances: Array.from<number>({ length: 3 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
+            blockNumber: BigInt(i),
+            createdAt: new Date(now - 7966 + i * 60),
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftNode: keccak256(numberToHex(i)),
+            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            tournamentAddress,
+            txHash: keccak256(numberToHex(i)),
+            updatedAt: new Date(now - 7966 + i * 60),
+        }]), []),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "TIMEOUT",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: null,
+        },
         height: 48,
         now,
         nextLevel: "middle",
     },
 };
-*/
 
 /**
  * A match that has reached the leaf level and will go to a sub-tournament.
  */
-/*
 export const SubTournament: Story = {
     args: {
-        actions: [
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 4032,
-            },
-            {
-                type: "advance",
-                direction: 1,
-                timestamp: now - 3021,
-            },
-            {
-                type: "advance",
-                direction: 1,
-                timestamp: now - 2101,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 1023,
-            },
-            {
-                type: "match_sealed_inner_tournament_created",
-                range: [1837880065, 2453987565],
-                timestamp: now - 224,
-            },
-        ],
-        claim1: claim(0),
-        claim2: claim(1),
+        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
+            blockNumber: BigInt(i),
+            createdAt: new Date(now - 7966 + i * 60),
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftNode: keccak256(numberToHex(i)),
+            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            tournamentAddress,
+            txHash: keccak256(numberToHex(i)),
+            updatedAt: new Date(now - 7966 + i * 60),
+        }]), []),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "CHILD_TOURNAMENT",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: null,
+        },
         height: 4,
         now,
         nextLevel: "none",
     },
 };
-*/
+
 /**
  * A bottom match that has reached the leaf level and has a winner.
  */
-/*
 export const WinnerBottom: Story = {
     args: {
-        actions: [
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 4032,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 3021,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 2101,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 1023,
-            },
-            {
-                type: "leaf_match_sealed",
-                proof,
-                timestamp: now - 224,
-                winner: 1,
-            },
-        ],
+        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
+            blockNumber: BigInt(i),
+            createdAt: new Date(now - 7966 + i * 60),
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftNode: keccak256(numberToHex(i)),
+            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            tournamentAddress,
+            txHash: keccak256(numberToHex(i)),
+            updatedAt: new Date(now - 7966 + i * 60),
+        }]), []),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "STEP",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: claim(0).hash,
+        },
         height: 5,
-        claim1: claim(0),
-        claim2: claim(1),
         now,
         nextLevel: "none",
     },
 };
-*/
+
 /**
  * A top match that has reached the leaf level and the middle level has a winner.
  */
-/*
 export const WinnerTop: Story = {
     args: {
-        actions: [
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 4032,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 3021,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 2101,
-            },
-            {
-                type: "advance",
-                direction: 0,
-                timestamp: now - 1023,
-            },
-            {
-                type: "match_sealed_inner_tournament_created",
-                range: [1837880065, 2453987565],
-                timestamp: now - 224,
-            },
-            {
-                type: "leaf_match_sealed",
-                proof,
-                timestamp: now - 224,
-                winner: 1,
-            },
-        ],
+        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
+            blockNumber: BigInt(i),
+            createdAt: new Date(now - 7966 + i * 60),
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftNode: keccak256(numberToHex(i)),
+            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            tournamentAddress,
+            txHash: keccak256(numberToHex(i)),
+            updatedAt: new Date(now - 7966 + i * 60),
+        }]), []),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 2n,
+            deletionReason: "CHILD_TOURNAMENT",
+            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: claim(0).hash,
+        },
         height: 5,
-        claim1: claim(0),
-        claim2: claim(1),
         now,
         nextLevel: "middle",
     },
 };
-*/
+
 /**
  * A match that no claimer has taken action yet.
  */
-/*
 export const NoActions: Story = {
     args: {
-        actions: [],
-        claim1: claim(0),
-        claim2: claim(1),
+        advances: [],
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: null,
+            deletionReason: "NOT_DELETED",
+            deletionTxHash: null,
+            epochIndex: 0n,
+            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
+            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: null,
+        },
         height: 48,
         now,
         nextLevel: "middle",
     },
 };
-*/

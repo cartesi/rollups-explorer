@@ -193,7 +193,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         timestamp={match.updatedAt.getTime()}
                     />
                 )}
-                {match.deletionReason === "STEP" && match.winnerCommitment && (
+                {match.winnerCommitment && (
                     <>
                         <WinnerItem
                             key="winner"
