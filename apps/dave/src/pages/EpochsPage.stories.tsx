@@ -33,20 +33,20 @@ const WithBreadcrumb = (props: Props) => {
 export const Default: Story = {
     render: WithBreadcrumb,
     args: {
+        application: applications[0].name,
         epochs: applications[0].epochs,
-        appId: applications[0].name,
     },
 };
 
 export const NoDispute: Story = {
     render: WithBreadcrumb,
     args: {
-        appId: applications[0].name,
+        application: applications[0].name,
         epochs: [
             applications[0].epochs[0],
             applications[0].epochs[1],
             applications[0].epochs[2],
-            { ...applications[0].epochs[3], inDispute: false },
+            { ...applications[0].epochs[3] },
             applications[0].epochs[4],
         ],
     },

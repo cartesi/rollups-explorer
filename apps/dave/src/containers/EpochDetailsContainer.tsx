@@ -36,10 +36,16 @@ export const EpochDetailsContainer: FC = () => {
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
-        { title: applicationId, href: routePathBuilder.appEpochs(params) },
+        {
+            title: applicationId,
+            href: routePathBuilder.epochs({ application: applicationId }),
+        },
         {
             title: `Epoch #${params.epochIndex}`,
-            href: routePathBuilder.appEpochDetails(params),
+            href: routePathBuilder.epoch({
+                application: applicationId,
+                epochIndex: epochIndex.toString(),
+            }),
         },
     ];
 

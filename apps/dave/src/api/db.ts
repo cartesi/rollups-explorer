@@ -1,10 +1,7 @@
-import type { Application, Epoch } from "@cartesi/viem";
+import type { Application, Epoch, Match } from "@cartesi/viem";
 import { omit } from "ramda";
 import type { Hex } from "viem";
-import type {
-    Match,
-    Tournament,
-} from "../components/types";
+import type { Tournament } from "../components/types";
 import {
     applications,
     type ApplicationEpochs,

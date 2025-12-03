@@ -9,9 +9,10 @@ type TournamentBreadcrumbSegmentProps = {
 export const TournamentBreadcrumbSegment: FC<
     TournamentBreadcrumbSegmentProps
 > = ({ level, variant }) => {
+    const labels = ["top", "middle", "bottom"];
     return (
         <Button variant={variant} size="compact-xs" radius="xl">
-            {level}
+            {labels[Number(level)] ?? level}
         </Button>
     );
 };

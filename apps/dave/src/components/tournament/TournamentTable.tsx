@@ -1,7 +1,7 @@
+import type { Commitment, Match } from "@cartesi/viem";
 import { Flex } from "@mantine/core";
 import { useMemo, type FC } from "react";
 import type { Hash } from "viem";
-import type { Claim, Match } from "../types";
 import { TournamentRound } from "./TournamentRound";
 import style from "./TournamentTable.module.css";
 
@@ -21,9 +21,9 @@ export interface TournamentTableProps {
     matches: Match[];
 
     /**
-     * The claim that was not matched with another claim yet.
+     * The list of all commitments.
      */
-    danglingClaim?: Claim;
+    commitments: Commitment[];
 }
 
 function lazyArray<T>(factory: () => T): T[] {
@@ -50,11 +50,11 @@ function lazyArray<T>(factory: () => T): T[] {
  */
 type Round = {
     matches: Match[];
-    danglingClaim?: Claim;
+    danglingClaim?: Commitment;
 };
 const roundify = (
     matches: Match[],
-    danglingClaim?: Claim,
+    danglingClaim?: Commitment,
     now?: number,
 ): Round[] => {
     const sets = lazyArray(() => new Set<Hash>());
@@ -65,11 +65,11 @@ const roundify = (
     for (const match of matches) {
         for (let i = 0; i < matches.length; i++) {
             if (
-                !sets[i].has(match.claim1.hash) &&
-                !sets[i].has(match.claim2.hash)
+                !sets[i].has(match.commitmentOne) &&
+                !sets[i].has(match.commitmentTwo)
             ) {
-                sets[i].add(match.claim1.hash);
-                sets[i].add(match.claim2.hash);
+                sets[i].add(match.commitmentOne);
+                sets[i].add(match.commitmentTwo);
                 rounds[i].matches.push(match);
                 break;
             }
@@ -86,16 +86,30 @@ const roundify = (
 };
 
 export const TournamentTable: FC<TournamentTableProps> = (props) => {
-    const { danglingClaim, hideWinners, now } = props;
+    const { commitments, hideWinners, now } = props;
 
     const rounds = useMemo(() => {
+        // create a unique set of commitments in matches
+        const commitmentsInMatches = new Set(
+            ...props.matches
+                .map((match) => [match.commitmentOne, match.commitmentTwo])
+                .flat(),
+        );
+
+        // among all commitments, find the one that is not part of any matches
+        // that one is the dangling claim
+        // XXX: there should be only one. do what if there are more?
+        const danglingClaim = commitments.filter(
+            ({ commitment }) => !commitmentsInMatches.has(commitment),
+        );
+
         // sort matches by timestamp
         // XXX: maybe we should assume that the matches are already sorted by timestamp?
         const matches = [...props.matches].sort(
-            (a, b) => a.timestamp - b.timestamp,
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
         );
-        return roundify(matches, danglingClaim, now);
-    }, [props.matches, danglingClaim, now]);
+        return roundify(matches, danglingClaim[0], now);
+    }, [props.matches, commitments, now]);
 
     return (
         <Flex gap="md" className={style.container} px="xs" py="sm">

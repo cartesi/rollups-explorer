@@ -3,22 +3,13 @@ import { inputBoxAddress } from "@cartesi/viem/abi";
 import { getUnixTime, subMinutes } from "date-fns";
 import { keccak256 } from "viem";
 import type {
-    Match,
     MatchAction,
-    Tournament,
+    Tournament
 } from "../components/types";
 import { generateMatchID, generateTournamentId } from "./util";
 
 export type EpochWithTournament = Epoch & { tournament?: Tournament };
 export type ApplicationEpochs = Application & { epochs: EpochWithTournament[] };
-
-export const dummyMatch: Match = {
-    actions: [],
-    id: keccak256("0x1"),
-    claim1: { hash: keccak256("0x2") },
-    claim2: { hash: keccak256("0x3") },
-    timestamp: 0,
-};
 
 const currentDate = new Date();
 const executionParameters = {

@@ -37,7 +37,7 @@ interface MatchActionsProps {
     /**
      * Maximum number of bisections to reach the target subdivision
      */
-    height: number;
+    height: bigint;
 
     /**
      * The match to display actions for
@@ -52,7 +52,7 @@ interface MatchActionsProps {
     /**
      * Next inner-tournament level.
      */
-    nextLevel: "middle" | "bottom" | "none";
+    nextLevel: bigint;
 }
 
 export const MatchActions: FC<MatchActionsProps> = (props) => {
@@ -86,10 +86,10 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     }, [bisectionWidth]);
 
     // dynamic domain, based on first visible item
-    const maxRange: CycleRange = [0, 2 ** height];
+    const maxRange: CycleRange = [0, 2 ** Number(height)];
 
     // progress bar, based on last visible item
-    const progress = (bisections.length / height) * 100;
+    const progress = (bisections.length / Number(height)) * 100;
 
     // create ranges for each bisection
     const ranges = useMemo(
@@ -152,7 +152,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         now={now}
                         range={ranges[i + 1]}
                         timestamp={value.timestamp}
-                        total={height}
+                        total={Number(height)}
                     />
                 ))}
                 {match.deletionReason === "TIMEOUT" &&

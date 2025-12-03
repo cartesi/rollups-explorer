@@ -1,13 +1,24 @@
+import type { Commitment, Match, Tournament } from "@cartesi/viem";
 import { Group, Stack, Switch, Text, useMantineTheme } from "@mantine/core";
 import { useState, type FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { LongText } from "../LongText";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
-import type { Tournament } from "../types";
+import type { CycleRange } from "../types";
 import { TournamentTable } from "./TournamentTable";
 
 export interface TournamentViewProps {
+    /**
+     * The list of all commitments.
+     */
+    commitments: Commitment[];
+
+    /**
+     * The matches to display.
+     */
+    matches: Match[];
+
     /**
      * The tournament to display.
      */
@@ -15,29 +26,30 @@ export interface TournamentViewProps {
 }
 
 export const TournamentView: FC<TournamentViewProps> = (props) => {
-    const { tournament } = props;
+    const { commitments, matches, tournament } = props;
 
     const theme = useMantineTheme();
     const gold = theme.colors.yellow[5];
 
-    const { danglingClaim, endCycle, matches, startCycle, winner } = tournament;
-    const level =
-        tournament.level === "top"
-            ? 0n
-            : tournament.level === "middle"
-              ? 1n
-              : 2n;
+    // XXX: where the range is coming from?
+    const range = [0, 0] as CycleRange;
+    const winner = tournament.winnerCommitment
+        ? { hash: tournament.winnerCommitment }
+        : undefined;
     const [hideWinners, setHideWinners] = useState(false);
 
     return (
         <Stack>
             <Group>
                 <Text>Level</Text>
-                <TournamentBreadcrumbSegment level={level} variant="filled" />
+                <TournamentBreadcrumbSegment
+                    level={tournament.level}
+                    variant="filled"
+                />
             </Group>
             <Group>
                 <Text>Mcycle range</Text>
-                <CycleRangeFormatted range={[startCycle, endCycle]} />
+                <CycleRangeFormatted range={range} />
             </Group>
             <Group>
                 <Text>Winner</Text>
@@ -59,8 +71,8 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 }
             />
             <TournamentTable
-                danglingClaim={danglingClaim}
                 matches={matches}
+                commitments={commitments}
                 hideWinners={hideWinners}
             />
         </Stack>

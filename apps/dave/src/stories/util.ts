@@ -6,6 +6,7 @@ import {
     numberToHex,
     slice,
     toBytes,
+    type Address,
     type Hex,
 } from "viem";
 import type { Claim, Tournament } from "../components/types";
@@ -101,12 +102,12 @@ export const generateMatchID = (claimOne: Hex, claimTwo: Hex) => {
     return keccak256(abiEncodedClaims);
 };
 
-export const generateTournamentId = (n1: number, n2: number) => {
+export const generateTournamentId = (n1: number, n2: number): Address => {
     //xxx handy cheat here...
-    return generateMatchID(
+    return slice(generateMatchID(
         numberToHex(n1, { size: 32 }),
         numberToHex(n2, { size: 32 }),
-    );
+    ), 0, 20);
 };
 
 /**

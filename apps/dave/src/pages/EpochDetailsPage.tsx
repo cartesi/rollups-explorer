@@ -15,7 +15,7 @@ import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
 import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import { routePathBuilder, type EpochParams } from "../routes/routePathBuilder";
 
 type Props = {
     tournament?: Tournament | null;
@@ -26,8 +26,12 @@ type Props = {
 export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
-    const params = useParams();
-    const tournamentUrl = routePathBuilder.topTournament(params);
+    const params = useParams<EpochParams>();
+    const tournamentUrl = routePathBuilder.tournament({
+        application: params.application ?? "",
+        epochIndex: epoch.index.toString(),
+        tournamentAddress: tournament?.address ?? "0x",
+    });
     const inDispute = false; // XXX: how to know if an epoch is in dispute?
     const tournamentColor = inDispute ? epochStatusColor : "";
     const startCycle = 0; // XXX: how to know the startCycle?

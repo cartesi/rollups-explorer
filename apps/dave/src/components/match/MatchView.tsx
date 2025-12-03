@@ -1,9 +1,9 @@
-import type { Match, MatchAdvanced } from "@cartesi/viem";
+import type { Match, MatchAdvanced, Tournament } from "@cartesi/viem";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import type { CycleRange, Tournament } from "../types";
+import type { CycleRange } from "../types";
 import { MatchActions } from "./MatchActions";
 
 export interface MatchViewProps {
@@ -39,7 +39,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     const claim2 = { hash: match.commitmentTwo };
     const { height } = tournament;
 
-    const nextInnerLevel = tournament.level === "top" ? "middle" : "bottom";
+    const nextLevel = tournament.level + 1n;
 
     return (
         <Stack>
@@ -60,7 +60,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 advances={advances}
                 height={height}
                 match={match}
-                nextLevel={nextInnerLevel}
+                nextLevel={nextLevel}
                 now={now}
             />
         </Stack>

@@ -24,7 +24,7 @@ export const ApplicationCard: FC<Props> = ({ application }) => {
         application;
     const stateColour = getStateColour(state as ApplicationState); // XXX: fix this in @cartesi/viem
     const appId = application.name ?? applicationAddress;
-    const url = routePathBuilder.appEpochs({ appId });
+    const url = routePathBuilder.epochs({ application: appId });
     const inputsLabel =
         processedInputs === 0n
             ? "no inputs"

@@ -7,16 +7,23 @@ import {
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { EpochsPage } from "../pages/EpochsPage";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import {
+    routePathBuilder,
+    type ApplicationParams,
+} from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const EpochsContainer: FC = () => {
-    const params = useParams();
-    const appId = params.appId ?? "";
-    const { isLoading, data } = useEpochs({ application: appId });
+    const params = useParams<ApplicationParams>();
+    const { isLoading, data } = useEpochs(params);
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
-        { title: appId, href: routePathBuilder.appEpochs(params) },
+        {
+            title: params.application,
+            href: routePathBuilder.epochs({
+                application: params.application ?? "",
+            }),
+        },
     ];
 
     const epochs = data?.data ?? [];
@@ -24,11 +31,9 @@ export const EpochsContainer: FC = () => {
     return (
         <Stack pt="lg" gap="lg">
             <Hierarchy hierarchyConfig={hierarchyConfig} />
-
-            {isLoading ? (
-                <ContainerSkeleton />
-            ) : (
-                <EpochsPage epochs={epochs} appId={appId} />
+            {isLoading && <ContainerSkeleton />}
+            {params.application && (
+                <EpochsPage application={params.application} epochs={epochs} />
             )}
         </Stack>
     );
