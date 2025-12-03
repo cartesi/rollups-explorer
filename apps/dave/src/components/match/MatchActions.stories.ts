@@ -25,7 +25,7 @@ const now = Math.floor(Date.now() / 1000);
 const rng = mulberry32(0);
 export const CompleteTop: Story = {
     args: {
-        advances: Array.from<number>({ length: 47 }).reduce<MatchAdvanced[]>((array, i) => ([...array, {
+        advances: Array.from<number>({ length: 47 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
             blockNumber: BigInt(i),
             createdAt: new Date(now - 7966 + i * 60),
             epochIndex: 0n,
