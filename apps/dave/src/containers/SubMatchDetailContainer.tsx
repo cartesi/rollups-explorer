@@ -1,3 +1,4 @@
+import { useMatchAdvances } from "@cartesi/wagmi";
 import { Group, Stack, Text, Title } from "@mantine/core";
 import { getUnixTime } from "date-fns";
 import type { FC } from "react";
@@ -164,6 +165,13 @@ export const SubMatchDetailContainer: FC<Props> = ({ level = 1n }) => {
     const targetMatch = level === 1n ? midMatch : btMatch;
     const targetTournament = level === 1n ? midTournament : btTournament;
 
+    const { data: advances } = useMatchAdvances({
+        application: applicationId,
+        epochIndex: BigInt(epochIndex),
+        tournamentAddress: targetTournament?.id,
+        idHash: targetMatch?.id,
+    });
+
     const hierarchyConfig: HierarchyConfig[] = buildHierarchy({
         level,
         match,
@@ -180,6 +188,7 @@ export const SubMatchDetailContainer: FC<Props> = ({ level = 1n }) => {
                 <ContainerSkeleton />
             ) : targetTournament !== null && targetMatch !== null ? (
                 <MatchPage
+                    advances={advances?.data ?? []}
                     tournament={targetTournament}
                     match={targetMatch}
                     now={nowUnixtime}

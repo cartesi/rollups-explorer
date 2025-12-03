@@ -1,3 +1,4 @@
+import { useMatchAdvances } from "@cartesi/wagmi";
 import { Group, Stack, Text, Title } from "@mantine/core";
 import { getUnixTime } from "date-fns";
 import type { FC } from "react";
@@ -42,6 +43,13 @@ export const MatchDetailContainer: FC = () => {
     const match = matchQuery.data?.match ?? null;
     const tournament = appQuery.data?.tournament ?? null;
 
+    const { data: advances } = useMatchAdvances({
+        application: applicationId,
+        epochIndex: BigInt(epochIndex),
+        tournamentAddress: tournament?.id,
+        idHash: matchId,
+    });
+
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
         { title: applicationId, href: routePathBuilder.appEpochs(params) },
@@ -72,6 +80,7 @@ export const MatchDetailContainer: FC = () => {
                 <ContainerSkeleton />
             ) : tournament !== null && match !== null ? (
                 <MatchPage
+                    advances={advances?.data ?? []}
                     tournament={tournament}
                     match={match}
                     now={nowUnixtime}
