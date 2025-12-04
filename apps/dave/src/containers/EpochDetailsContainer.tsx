@@ -1,8 +1,7 @@
+import { useEpoch, useInputs, useTournament } from "@cartesi/wagmi";
 import { Group, Stack, Text } from "@mantine/core";
 import type { FC } from "react";
 import { useParams } from "react-router";
-import { useGetEpoch, useGetEpochTournament } from "../api/epoch.queries";
-import { useListInputs } from "../api/inputs.queries";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -16,17 +15,20 @@ export const EpochDetailsContainer: FC = () => {
     const params = useParams();
     const applicationId = params.appId ?? "";
     const parsedIndex = parseInt(params.epochIndex ?? "");
-    const epochIndex = isNaN(parsedIndex) ? -1 : parsedIndex;
-    const epochQuery = useGetEpoch({ applicationId, epochIndex });
-    const tournamentQuery = useGetEpochTournament({
-        applicationId,
-        epochIndex,
+    const epochIndex = isNaN(parsedIndex) ? -1n : BigInt(parsedIndex);
+    const epochQuery = useEpoch({
+        application: applicationId,
+        epochIndex: epochIndex,
     });
-    const inputsQuery = useListInputs({ applicationId, epochIndex });
+    const tournamentQuery = useTournament({
+        application: applicationId,
+        address: epochQuery.data?.tournamentAddress ?? undefined,
+    });
+    const inputsQuery = useInputs({ application: applicationId, epochIndex });
 
-    const epoch = epochQuery.data?.epoch ?? null;
-    const tournament = tournamentQuery.data?.tournament ?? null;
-    const inputs = inputsQuery.data?.inputs ?? [];
+    const epoch = epochQuery.data ?? null;
+    const tournament = tournamentQuery.data ?? null;
+    const inputs = inputsQuery.data?.data ?? [];
     const isLoading =
         epochQuery.isLoading ||
         tournamentQuery.isLoading ||
@@ -34,10 +36,16 @@ export const EpochDetailsContainer: FC = () => {
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
-        { title: applicationId, href: routePathBuilder.appEpochs(params) },
+        {
+            title: applicationId,
+            href: routePathBuilder.epochs({ application: applicationId }),
+        },
         {
             title: `Epoch #${params.epochIndex}`,
-            href: routePathBuilder.appEpochDetails(params),
+            href: routePathBuilder.epoch({
+                application: applicationId,
+                epochIndex: epochIndex.toString(),
+            }),
         },
     ];
 

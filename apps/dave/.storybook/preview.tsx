@@ -5,6 +5,11 @@ import { MemoryRouter } from "react-router";
 import Layout from "../src/components/layout/Layout";
 import theme from "../src/providers/theme";
 
+// @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const withRouter = (StoryFn: StoryFn, context: StoryContext) => (
     <MemoryRouter>{StoryFn(context.args, context)}</MemoryRouter>
 );
