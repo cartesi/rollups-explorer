@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@cartesi/viem": "2.0.0-alpha.21",
-        "@cartesi/wagmi": "2.0.0-alpha.21",
+        "@cartesi/wagmi": "2.0.0-alpha.22",
         "@mantine/core": "^8.3.2",
         "@mantine/hooks": "^8.3.2",
         "@raugfer/jazzicon": "^1.0.6",

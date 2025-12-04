@@ -1,4 +1,4 @@
-import type { Epoch, Input, Tournament } from "@cartesi/viem";
+import type { Epoch, Input } from "@cartesi/viem";
 import {
     Anchor,
     Badge,
@@ -18,20 +18,22 @@ import PageTitle from "../components/layout/PageTitle";
 import { routePathBuilder, type EpochParams } from "../routes/routePathBuilder";
 
 type Props = {
-    tournament?: Tournament | null;
     epoch: Epoch;
     inputs: Input[];
 };
 
-export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
+export const EpochDetailsPage: FC<Props> = ({ epoch, inputs }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
     const params = useParams<EpochParams>();
-    const tournamentUrl = routePathBuilder.tournament({
-        application: params.application ?? "",
-        epochIndex: epoch.index.toString(),
-        tournamentAddress: tournament?.address ?? "0x",
-    });
+    const tournamentAddress = epoch.tournamentAddress;
+    const tournamentUrl = tournamentAddress
+        ? routePathBuilder.tournament({
+              application: params.application ?? "",
+              epochIndex: epoch.index.toString(),
+              tournamentAddress: tournamentAddress,
+          })
+        : undefined;
     const inDispute = false; // XXX: how to know if an epoch is in dispute?
     const tournamentColor = inDispute ? epochStatusColor : "";
     const startCycle = 0; // XXX: how to know the startCycle?
@@ -50,7 +52,7 @@ export const EpochDetailsPage: FC<Props> = ({ tournament, epoch, inputs }) => {
                 )}
             </Group>
 
-            {tournament && (
+            {tournamentUrl && (
                 <Anchor
                     component={Link}
                     to={tournamentUrl}

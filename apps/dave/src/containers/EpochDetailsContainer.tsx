@@ -1,6 +1,6 @@
-import { useEpoch, useInputs, useTournament } from "@cartesi/wagmi";
+import { useEpoch, useInputs } from "@cartesi/wagmi";
 import { Group, Stack, Text } from "@mantine/core";
-import type { FC } from "react";
+import { type FC } from "react";
 import { useParams } from "react-router";
 import {
     Hierarchy,
@@ -8,43 +8,38 @@ import {
 } from "../components/navigation/Hierarchy";
 import { NotFound } from "../components/navigation/NotFound";
 import { EpochDetailsPage } from "../pages/EpochDetailsPage";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import { routePathBuilder, type EpochParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const EpochDetailsContainer: FC = () => {
-    const params = useParams();
-    const applicationId = params.appId ?? "";
-    const parsedIndex = parseInt(params.epochIndex ?? "");
-    const epochIndex = isNaN(parsedIndex) ? -1n : BigInt(parsedIndex);
-    const epochQuery = useEpoch({
-        application: applicationId,
+    const params = useParams<EpochParams>();
+    const epochIndex = BigInt(params.epochIndex ?? "0");
+
+    const { data: epoch, isLoading: isEpochLoading } = useEpoch({
+        application: params.application,
         epochIndex: epochIndex,
     });
-    const tournamentQuery = useTournament({
-        application: applicationId,
-        address: epochQuery.data?.tournamentAddress ?? undefined,
-    });
-    const inputsQuery = useInputs({ application: applicationId, epochIndex });
 
-    const epoch = epochQuery.data ?? null;
-    const tournament = tournamentQuery.data ?? null;
-    const inputs = inputsQuery.data?.data ?? [];
-    const isLoading =
-        epochQuery.isLoading ||
-        tournamentQuery.isLoading ||
-        inputsQuery.isLoading;
+    const { data: inputs, isLoading: isInputsLoading } = useInputs({
+        application: params.application,
+        epochIndex,
+    });
+
+    const isLoading = isEpochLoading || isInputsLoading;
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
         {
-            title: applicationId,
-            href: routePathBuilder.epochs({ application: applicationId }),
+            title: params.application,
+            href: routePathBuilder.epochs({
+                application: params.application ?? "",
+            }),
         },
         {
             title: `Epoch #${params.epochIndex}`,
             href: routePathBuilder.epoch({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
+                application: params.application ?? "",
+                epochIndex: params.epochIndex ?? "",
             }),
         },
     ];
@@ -53,21 +48,17 @@ export const EpochDetailsContainer: FC = () => {
         <Stack pt="lg" gap="lg">
             <Hierarchy hierarchyConfig={hierarchyConfig} />
 
-            {isLoading ? (
-                <ContainerSkeleton />
-            ) : epoch !== null ? (
-                <EpochDetailsPage
-                    tournament={tournament}
-                    epoch={epoch}
-                    inputs={inputs}
-                />
-            ) : (
+            {isLoading && <ContainerSkeleton />}
+            {!!epoch && (
+                <EpochDetailsPage epoch={epoch} inputs={inputs?.data ?? []} />
+            )}
+            {!isLoading && !epoch && (
                 <NotFound>
                     <Group gap={3}>
                         <Text c="dimmed">We're not able to find the epoch</Text>
                         <Text c="orange">{params.epochIndex}</Text>
                         <Text c="dimmed">for application</Text>
-                        <Text c="orange">{applicationId}</Text>
+                        <Text c="orange">{params.application}</Text>
                     </Group>
                 </NotFound>
             )}
