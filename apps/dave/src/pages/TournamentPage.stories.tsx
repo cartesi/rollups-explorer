@@ -8,7 +8,11 @@ import * as TournamentViewStories from "../components/tournament/TournamentView.
 import type { Claim } from "../components/types";
 import { routePathBuilder } from "../routes/routePathBuilder";
 import { applications } from "../stories/data";
-import { claim, generateTournamentId, randomMatches } from "../stories/util";
+import {
+    claim,
+    generateTournamentAddress,
+    randomMatches,
+} from "../stories/util";
 import { TournamentPage } from "./TournamentPage";
 
 const meta = {
@@ -86,7 +90,7 @@ const startCycle = 1837880065;
 const endCycle = 2453987565;
 
 const randomTournament: Tournament = {
-    address: generateTournamentId(startCycle, endCycle),
+    address: generateTournamentAddress(startCycle, endCycle),
     createdAt: new Date(now),
     epochIndex: 0n,
     finalStateHash: null,

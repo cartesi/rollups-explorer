@@ -103,7 +103,7 @@ export const generateMatchID = (claimOne: Hex, claimTwo: Hex) => {
     return keccak256(abiEncodedClaims);
 };
 
-export const generateTournamentId = (n1: number, n2: number): Address => {
+export const generateTournamentAddress = (n1: number, n2: number): Address => {
     //xxx handy cheat here...
     return slice(generateMatchID(
         numberToHex(n1, { size: 32 }),

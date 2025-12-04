@@ -1,14 +1,13 @@
-import type { Application, Epoch, SnapshotPolicy } from "@cartesi/viem";
+import type { Application, Commitment, Epoch, Match, MatchAdvanced, SnapshotPolicy, Tournament } from "@cartesi/viem";
 import { inputBoxAddress } from "@cartesi/viem/abi";
-import { getUnixTime, subMinutes } from "date-fns";
-import { keccak256 } from "viem";
-import type {
-    MatchAction,
-    Tournament
-} from "../components/types";
-import { generateMatchID, generateTournamentId } from "./util";
+import { keccak256, numberToHex, zeroHash, type Address } from "viem";
+import { generateMatchID, generateTournamentAddress } from "./util";
 
-export type EpochWithTournament = Epoch & { tournament?: Tournament };
+// the following are types for a top down hierarchy
+// Application -> Epoch -> Tournament -> [Match, Commitment] -> [MatchAdvanced, Tournament]
+type MatchWithAdvancesAndTournament = Match & { advances?: MatchAdvanced[]; tournament?: TournamentWithMatchesAndCommitments };
+type TournamentWithMatchesAndCommitments = Tournament & { commitments?: Commitment[]; matches?: MatchWithAdvancesAndTournament[]; };
+export type EpochWithTournament = Epoch & { tournament?: TournamentWithMatchesAndCommitments };
 export type ApplicationEpochs = Application & { epochs: EpochWithTournament[] };
 
 const currentDate = new Date();
@@ -28,6 +27,26 @@ const executionParameters = {
     maxConcurrentInspects: 10,
     createdAt: currentDate,
     updatedAt: currentDate,
+};
+
+export const randomAdvances = (options: {
+    count: number;
+    epochIndex?: bigint;
+    now: number;
+    tournamentAddress: Address
+}) => {
+    const { count, epochIndex, now, tournamentAddress } = options;
+    return Array.from<number>({ length: count }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
+            blockNumber: BigInt(i),
+            createdAt: new Date(now + i * 60),
+            epochIndex: epochIndex ?? 0n,
+            idHash: keccak256(numberToHex(i)),
+            leftNode: keccak256(numberToHex(i)),
+            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            tournamentAddress,
+            txHash: keccak256(numberToHex(i)),
+            updatedAt: new Date(now + i * 60),
+        }]), [])
 };
 
 export const applications: ApplicationEpochs[] = [
@@ -70,14 +89,19 @@ export const applications: ApplicationEpochs[] = [
                 createdAt: currentDate,
                 updatedAt: currentDate,
                 tournament: {
-                    id: generateTournamentId(0, 1_345_972_719),
-                    startCycle: 0,
-                    endCycle: 1_345_972_719,
-                    height: 48,
-                    level: "top",
-                    matches: [],
-                    danglingClaim: { hash: keccak256("0x1") },
-                    winner: { hash: keccak256("0x1") },
+                    address: generateTournamentAddress(0, 1_345_972_719),
+                    createdAt: currentDate,
+                    epochIndex: 0n,
+                    finalStateHash: null,
+                    finishedAtBlock: 0n,
+                    height: 48n,
+                    log2step: 1n,
+                    maxLevel: 3n,
+                    parentMatchIdHash: null,
+                    parentTournamentAddress: null,
+                    updatedAt: currentDate,
+                    winnerCommitment: keccak256("0x1"),
+                    level: 0n,
                 },
             },
             {
@@ -96,14 +120,19 @@ export const applications: ApplicationEpochs[] = [
                 createdAt: currentDate,
                 updatedAt: currentDate,
                 tournament: {
-                    id: generateTournamentId(1_345_972_719, 3_220_829_192),
-                    startCycle: 1_345_972_719,
-                    endCycle: 3_220_829_192,
-                    height: 48,
-                    level: "top",
-                    matches: [],
-                    danglingClaim: { hash: keccak256("0x2") },
-                    winner: { hash: keccak256("0x2") },
+                    address: generateTournamentAddress(1_345_972_719, 3_220_829_192),
+                    createdAt: currentDate,
+                    epochIndex: 1n,
+                    finalStateHash: null,
+                    finishedAtBlock: 0n,
+                    height: 48n,
+                    level: 0n,
+                    log2step: 1n,
+                    maxLevel: 3n,
+                    parentMatchIdHash: null,
+                    parentTournamentAddress: null,
+                    updatedAt: currentDate,
+                    winnerCommitment: keccak256("0x2"),
                 },
             },
             {
@@ -122,14 +151,19 @@ export const applications: ApplicationEpochs[] = [
                 createdAt: currentDate,
                 updatedAt: currentDate,
                 tournament: {
-                    id: generateTournamentId(3_220_829_192, 5_911_918_810),
-                    startCycle: 3_220_829_192,
-                    endCycle: 5_911_918_810,
-                    height: 48,
-                    level: "top",
-                    matches: [],
-                    danglingClaim: { hash: keccak256("0x3") },
-                    winner: { hash: keccak256("0x3") },
+                    address: generateTournamentAddress(3_220_829_192, 5_911_918_810),
+                    createdAt: currentDate,
+                    epochIndex: 2n,
+                    finalStateHash: null,
+                    finishedAtBlock: 0n,
+                    height: 48n,
+                    level: 0n,
+                    log2step: 1n,
+                    maxLevel: 3n,
+                    parentMatchIdHash: null,
+                    parentTournamentAddress: null,
+                    updatedAt: currentDate,
+                    winnerCommitment: keccak256("0x3"),
                 },
             },
             {
@@ -148,97 +182,114 @@ export const applications: ApplicationEpochs[] = [
                 createdAt: currentDate,
                 updatedAt: currentDate,
                 tournament: {
-                    id: generateTournamentId(5_911_918_810, 9_918_817_817),
-                    startCycle: 5_911_918_810,
-                    endCycle: 9_918_817_817,
-                    height: 48,
-                    level: "top",
+                    address: generateTournamentAddress(5_911_918_810, 9_918_817_817),
+                    createdAt: currentDate,
+                    epochIndex: 3n,
+                    finalStateHash: null,
+                    finishedAtBlock: 1n,
+                    height: 48n,
+                    log2step: 1n,
+                    maxLevel: 3n,
+                    parentMatchIdHash: null,
+                    parentTournamentAddress: null,
+                    updatedAt: currentDate,
+                    level: 0n,
+                    winnerCommitment: null,
                     matches: [
                         {
-                            actions: [
-                                ...Array.from<number, MatchAction>(
-                                    { length: 48 },
-                                    (_, i) => ({
-                                        type: "advance",
-                                        timestamp: getUnixTime(
-                                            subMinutes(currentDate, 120 - i),
-                                        ),
-                                        direction: i % 2 === 0 ? 0 : 1,
-                                    }),
-                                ),
-                                {
-                                    type: "match_sealed_inner_tournament_created",
-                                    range: [7_102_817_919, 7_402_918_071],
-                                    timestamp: getUnixTime(
-                                        subMinutes(currentDate, 50),
-                                    ),
-                                },
-                            ],
-                            id: generateMatchID(
-                                keccak256("0x4"),
-                                keccak256("0x5"),
-                            ),
-                            claim1: { hash: keccak256("0x4") },
-                            claim2: { hash: keccak256("0x5") },
-                            timestamp: 0,
+                            blockNumber: 1n,
+                            commitmentOne: keccak256("0x4"),
+                            commitmentTwo: keccak256("0x5"),
+                            createdAt: currentDate,
+                            deletionBlockNumber: null,
+                            deletionReason: "NOT_DELETED",
+                            deletionTxHash: null,
+                            epochIndex: 0n,
+                            idHash: generateMatchID(keccak256("0x4"), keccak256("0x5")),
+                            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                            advances: randomAdvances({
+                                count: 47,
+                                now: currentDate.getTime(),
+                                tournamentAddress: generateTournamentAddress(5_911_918_810, 9_918_817_817),
+                                epochIndex: 3n,
+                            }),
+                            tournamentAddress: generateTournamentAddress(5_911_918_810, 9_918_817_817),
+                            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                            updatedAt: currentDate,
+                            winnerCommitment: null,
                             tournament: {
-                                id: generateTournamentId(
+                                address: generateTournamentAddress(
                                     7_102_817_919,
                                     7_402_918_071,
                                 ),
-                                startCycle: 7_102_817_919,
-                                endCycle: 7_402_918_071,
-                                height: 27,
-                                level: "middle",
+                                createdAt: currentDate,
+                                epochIndex: 3n,
+                                finalStateHash: null,
+                                finishedAtBlock: 1n,
+                                height: 27n,
+                                log2step: 1n,
+                                level: 1n,
+                                maxLevel: 3n,
+                                parentMatchIdHash: generateMatchID(keccak256("0x4"), keccak256("0x5")),
+                                parentTournamentAddress: generateTournamentAddress(5_911_918_810, 9_918_817_817),
+                                updatedAt: currentDate,
+                                winnerCommitment: null,
                                 matches: [
                                     {
-                                        actions: [
-                                            ...Array.from<number, MatchAction>(
-                                                { length: 27 },
-                                                (_, i) => ({
-                                                    type: "advance",
-                                                    timestamp: getUnixTime(
-                                                        subMinutes(
-                                                            currentDate,
-                                                            30 - i,
-                                                        ),
-                                                    ),
-                                                    direction:
-                                                        i % 2 === 0 ? 0 : 1,
-                                                }),
-                                            ),
-                                            {
-                                                type: "match_sealed_inner_tournament_created",
-                                                range: [
-                                                    7_204_918_919,
-                                                    7_205_024_571,
-                                                ],
-                                                timestamp: getUnixTime(
-                                                    subMinutes(currentDate, 2),
-                                                ),
-                                            },
-                                        ],
-                                        id: generateMatchID(
+                                        advances: randomAdvances({
+                                            count: 27,
+                                            now: currentDate.getTime(),
+                                            tournamentAddress: generateTournamentAddress(7_102_817_919, 7_402_918_071),
+                                            epochIndex: 4n,
+                                        }),
+                                        blockNumber: 1n,
+                                        createdAt: currentDate,
+                                        deletionBlockNumber: null,
+                                        deletionReason: "NOT_DELETED",
+                                        deletionTxHash: null,
+                                        epochIndex: 3n,
+                                        leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                                        tournamentAddress: generateTournamentAddress(7_102_817_919, 7_402_918_071),
+                                        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                                        updatedAt: currentDate,
+                                        winnerCommitment: null,
+                                        idHash: generateMatchID(
                                             keccak256("0x6"),
                                             keccak256("0x7"),
                                         ),
-                                        claim1: { hash: keccak256("0x6") },
-                                        claim2: { hash: keccak256("0x7") },
-                                        timestamp: 0,
+                                        commitmentOne: keccak256("0x6"),
+                                        commitmentTwo: keccak256("0x7"),
                                         tournament: {
-                                            id: generateTournamentId(
+                                            address: generateTournamentAddress(
                                                 7_204_918_919,
                                                 7_205_024_571,
                                             ),
-                                            startCycle: 7_204_918_919,
-                                            endCycle: 7_205_024_571,
-                                            height: 17,
-                                            level: "bottom",
+                                            createdAt: currentDate,
+                                            epochIndex: 3n,
+                                            finalStateHash: null,
+                                            finishedAtBlock: 1n,
+                                            log2step: 1n,
+                                            maxLevel: 3n,
+                                            parentMatchIdHash: generateMatchID(keccak256("0x6"), keccak256("0x7")),
+                                            parentTournamentAddress: generateTournamentAddress(7_204_918_919, 7_205_024_571),
+                                            updatedAt: currentDate,
+                                            height: 17n,
+                                            level: 2n,
                                             matches: [],
-                                            danglingClaim: {
-                                                hash: keccak256("0x8"),
-                                            },
-                                            winner: { hash: keccak256("0x8") },
+                                            commitments: [
+                                                {
+                                                    blockNumber: 1n,
+                                                    commitment: keccak256("0x8"),
+                                                    createdAt: currentDate,
+                                                    epochIndex: 0n,
+                                                    finalStateHash: zeroHash,
+                                                    submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                                                    tournamentAddress: generateTournamentAddress(7_204_918_919, 7_205_024_571),
+                                                    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                                                    updatedAt: currentDate,
+                                                }
+                                            ],
+                                            winnerCommitment: keccak256("0x8"),
                                         },
                                     },
                                 ],

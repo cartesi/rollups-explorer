@@ -52,9 +52,9 @@ export const CompleteTop: Story = {
             updatedAt: new Date(now),
             winnerCommitment: claim(0).hash,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -136,9 +136,9 @@ export const Bisections: Story = {
             updatedAt: new Date(now),
             winnerCommitment: null,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -164,9 +164,9 @@ export const Timeout: Story = {
             updatedAt: new Date(now),
             winnerCommitment: claim(1).hash,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -204,9 +204,9 @@ export const TimeoutSecond: Story = {
             updatedAt: new Date(now),
             winnerCommitment: claim(0).hash,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -232,9 +232,9 @@ export const Elimination: Story = {
             updatedAt: new Date(now),
             winnerCommitment: null,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -270,9 +270,9 @@ export const EliminationAfterBisections: Story = {
             updatedAt: new Date(now),
             winnerCommitment: null,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -308,9 +308,9 @@ export const SubTournament: Story = {
             updatedAt: new Date(now),
             winnerCommitment: null,
         },
-        height: 4,
+        height: 4n,
         now,
-        nextLevel: "none",
+        nextLevel: 4n,
     },
 };
 
@@ -346,9 +346,9 @@ export const WinnerBottom: Story = {
             updatedAt: new Date(now),
             winnerCommitment: claim(0).hash,
         },
-        height: 5,
+        height: 5n,
         now,
-        nextLevel: "none",
+        nextLevel: 3n,
     },
 };
 
@@ -384,9 +384,9 @@ export const WinnerTop: Story = {
             updatedAt: new Date(now),
             winnerCommitment: claim(0).hash,
         },
-        height: 5,
+        height: 5n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };
 
@@ -412,8 +412,8 @@ export const NoActions: Story = {
             updatedAt: new Date(now),
             winnerCommitment: null,
         },
-        height: 48,
+        height: 48n,
         now,
-        nextLevel: "middle",
+        nextLevel: 1n,
     },
 };

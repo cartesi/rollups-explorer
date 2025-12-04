@@ -4,7 +4,7 @@ import type { FC } from "react";
 import { Link } from "react-router";
 import { routePathBuilder } from "../../routes/routePathBuilder";
 
-type Props = { application: Application };
+type ApplicationCardProps = { application: Application };
 
 const getStateColour = (state: ApplicationState) => {
     switch (state) {
@@ -19,7 +19,7 @@ const getStateColour = (state: ApplicationState) => {
     }
 };
 
-export const ApplicationCard: FC<Props> = ({ application }) => {
+export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
     const stateColour = getStateColour(state as ApplicationState); // XXX: fix this in @cartesi/viem
