@@ -174,7 +174,7 @@ export const randomMatches = (
     }
 
     // define tournament winner
-    const pending = matches.filter((match) => !match.winnerCommitment);
+    const pending = matches.filter((match) => match.winnerCommitment === "NONE");
     if (pending.length === 0) {
         // all matches are resolved, the winner is the last surviving claim
         const lastMatch = matches[matches.length - 1];
