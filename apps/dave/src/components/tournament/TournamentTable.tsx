@@ -91,9 +91,10 @@ export const TournamentTable: FC<TournamentTableProps> = (props) => {
     const rounds = useMemo(() => {
         // create a unique set of commitments in matches
         const commitmentsInMatches = new Set(
-            ...props.matches
-                .map((match) => [match.commitmentOne, match.commitmentTwo])
-                .flat(),
+            props.matches.flatMap((match) => [
+                match.commitmentOne,
+                match.commitmentTwo,
+            ]),
         );
 
         // among all commitments, find the one that is not part of any matches

@@ -8,6 +8,7 @@ import {
     slice,
     toBytes,
     type Address,
+    type Hash,
     type Hex,
 } from "viem";
 import type { Claim } from "../components/types";
@@ -120,21 +121,21 @@ export const generateTournamentAddress = (n1: number, n2: number): Address => {
 export const randomMatches = (
     timestamp: number,
     tournament: Tournament,
-    claims: Claim[],
+    claims: Hash[],
 ): Match[] => {
     const rng = mulberry32(0);
 
     const matches: Match[] = [];
-    let danglingClaim: Claim | undefined = undefined;
+    let danglingClaim: Hash | undefined = undefined;
     let claim = claims.shift();
     while (claim) {
         if (danglingClaim) {
             // create a match with the dangling claim
             const claim1 = danglingClaim;
             matches.push({
-                idHash: generateMatchID(claim1.hash, claim.hash),
-                commitmentOne: claim1.hash,
-                commitmentTwo: claim.hash,
+                idHash: generateMatchID(claim1, claim),
+                commitmentOne: claim1,
+                commitmentTwo: claim,
                 blockNumber: 1n,
                 createdAt: new Date(timestamp),
                 deletionBlockNumber: null,
@@ -165,7 +166,7 @@ export const randomMatches = (
                 // assign the winner, and put the claim back to the list
                 match.updatedAt = new Date(timestamp);
                 timestamp++; // XXX: improve this timestamp incrementation
-                claims.unshift(winner === "ONE" ? { hash: match.commitmentOne } : { hash: match.commitmentTwo });
+                claims.unshift(winner === "ONE" ? match.commitmentOne : match.commitmentTwo);
             }
         }
 

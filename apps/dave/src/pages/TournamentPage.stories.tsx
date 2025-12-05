@@ -117,7 +117,11 @@ const commitments: Commitment[] = claims.map((claim, i) => ({
     updatedAt: new Date(now + i),
 }));
 
-const matches = randomMatches(now, randomTournament, claims);
+const matches = randomMatches(
+    now,
+    randomTournament,
+    claims.map(({ hash }) => hash),
+);
 
 // XXX: this is not correct yet, compare with published version
 export const TopLevelLargeDispute: Story = {
