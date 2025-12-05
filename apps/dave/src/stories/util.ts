@@ -54,8 +54,8 @@ const hexToFraction = (value: Hex): number => {
  * Generate a random winner for a match, 20% chance of undefined, 40% chance of 1, 40% chance of 2
  * @returns
  */
-const randomWinner = (claim1: Claim, claim2: Claim): WinnerCommitment => {
-    const r = hexToFraction(keccak256(concat([claim1.hash, claim2.hash])));
+const randomWinner = (claim1: Hash, claim2: Hash): WinnerCommitment => {
+    const r = hexToFraction(keccak256(concat([claim1, claim2])));
     if (r < 0.2) return "NONE";
     if (r < 0.6) return "ONE";
     return "TWO";
@@ -156,11 +156,11 @@ export const randomMatches = (
         }
 
         // get pending matches (without a winner) and pick one randomlly
-        const pending = matches.filter((match) => !match.winnerCommitment);
+        const pending = matches.filter((match) => match.winnerCommitment === "NONE");
         const match = pending[Math.floor(rng() * pending.length)];
         if (match) {
             // resolve a winner randomly
-            const winner = randomWinner({ hash: match.commitmentOne }, { hash: match.commitmentTwo });
+            const winner = randomWinner(match.commitmentOne, match.commitmentTwo);
             match.winnerCommitment = winner;
             if (winner !== "NONE") {
                 // assign the winner, and put the claim back to the list
