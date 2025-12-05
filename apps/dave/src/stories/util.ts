@@ -1,4 +1,4 @@
-import type { Match, Tournament } from "@cartesi/viem";
+import type { Match, Tournament, WinnerCommitment } from "@cartesi/viem";
 import {
     concat,
     encodeAbiParameters,
@@ -53,11 +53,11 @@ const hexToFraction = (value: Hex): number => {
  * Generate a random winner for a match, 20% chance of undefined, 40% chance of 1, 40% chance of 2
  * @returns
  */
-const randomWinner = (claim1: Claim, claim2: Claim): Claim | undefined => {
+const randomWinner = (claim1: Claim, claim2: Claim): WinnerCommitment => {
     const r = hexToFraction(keccak256(concat([claim1.hash, claim2.hash])));
-    if (r < 0.2) return undefined;
-    if (r < 0.6) return claim1;
-    return claim2;
+    if (r < 0.2) return "NONE";
+    if (r < 0.6) return "ONE";
+    return "TWO";
 };
 
 /**
@@ -145,7 +145,7 @@ export const randomMatches = (
                 tournamentAddress: tournament.address,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-                winnerCommitment: null,
+                winnerCommitment: "NONE",
             });
             danglingClaim = undefined;
             timestamp++; // XXX: improve this timestamp increment
@@ -160,12 +160,12 @@ export const randomMatches = (
         if (match) {
             // resolve a winner randomly
             const winner = randomWinner({ hash: match.commitmentOne }, { hash: match.commitmentTwo });
-            if (winner) {
+            match.winnerCommitment = winner;
+            if (winner !== "NONE") {
                 // assign the winner, and put the claim back to the list
-                match.winnerCommitment = winner.hash;
                 match.updatedAt = new Date(timestamp);
                 timestamp++; // XXX: improve this timestamp incrementation
-                claims.unshift(winner);
+                claims.unshift(winner === "ONE" ? { hash: match.commitmentOne } : { hash: match.commitmentTwo });
             }
         }
 
@@ -177,7 +177,7 @@ export const randomMatches = (
     if (pending.length === 0) {
         // all matches are resolved, the winner is the last surviving claim
         const lastMatch = matches[matches.length - 1];
-        tournament.winnerCommitment = lastMatch.winnerCommitment;
+        tournament.winnerCommitment = lastMatch.winnerCommitment === "ONE" ? lastMatch.commitmentOne : lastMatch.commitmentTwo;
     }
 
     return matches;

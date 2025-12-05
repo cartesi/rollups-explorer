@@ -33,7 +33,7 @@ const matches: Match[] = [
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 1),
-        winnerCommitment: claim(0).hash,
+        winnerCommitment: "ONE",
     },
     {
         blockNumber: 2n,
@@ -49,7 +49,7 @@ const matches: Match[] = [
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 2),
-        winnerCommitment: null,
+        winnerCommitment: "NONE",
     },
     {
         blockNumber: 3n,
@@ -65,7 +65,7 @@ const matches: Match[] = [
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 3),
-        winnerCommitment: claim(4).hash,
+        winnerCommitment: "ONE",
     },
     {
         blockNumber: 4n,
@@ -81,7 +81,7 @@ const matches: Match[] = [
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 4),
-        winnerCommitment: null,
+        winnerCommitment: "NONE",
     },
 ];
 
@@ -220,7 +220,7 @@ export const MidLevelDispute: Story = {
                 tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-                winnerCommitment: null,
+                winnerCommitment: "NONE",
             },
             {
                 idHash: generateMatchID(claim(9, 5).hash, claim(10, 4).hash),
@@ -236,7 +236,7 @@ export const MidLevelDispute: Story = {
                 tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-                winnerCommitment: null,                
+                winnerCommitment: "NONE",
             },
         ],
     },

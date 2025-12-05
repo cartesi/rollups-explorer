@@ -216,7 +216,7 @@ export const applications: ApplicationEpochs[] = [
                             tournamentAddress: generateTournamentAddress(5_911_918_810, 9_918_817_817),
                             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                             updatedAt: currentDate,
-                            winnerCommitment: null,
+                            winnerCommitment: "NONE",
                             tournament: {
                                 address: generateTournamentAddress(
                                     7_102_817_919,
@@ -252,7 +252,7 @@ export const applications: ApplicationEpochs[] = [
                                         tournamentAddress: generateTournamentAddress(7_102_817_919, 7_402_918_071),
                                         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                                         updatedAt: currentDate,
-                                        winnerCommitment: null,
+                                        winnerCommitment: "NONE",
                                         idHash: generateMatchID(
                                             keccak256("0x6"),
                                             keccak256("0x7"),

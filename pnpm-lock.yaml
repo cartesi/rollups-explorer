@@ -57,11 +57,11 @@ importers:
   apps/dave:
     dependencies:
       '@cartesi/viem':
-        specifier: 2.0.0-alpha.21
-        version: 2.0.0-alpha.21(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
-      '@cartesi/wagmi':
         specifier: 2.0.0-alpha.22
-        version: 2.0.0-alpha.22(@tanstack/react-query@5.90.11(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.5(@tanstack/query-core@5.90.11)(@tanstack/react-query@5.90.11(react@19.2.0))(@types/react@19.2.7)(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(react@19.2.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76))(zod@3.25.76)
+        version: 2.0.0-alpha.22(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+      '@cartesi/wagmi':
+        specifier: 2.0.0-alpha.23
+        version: 2.0.0-alpha.23(@tanstack/react-query@5.90.11(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.5(@tanstack/query-core@5.90.11)(@tanstack/react-query@5.90.11(react@19.2.0))(@types/react@19.2.7)(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(react@19.2.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76))(zod@3.25.76)
       '@mantine/core':
         specifier: ^8.3.2
         version: 8.3.9(@mantine/hooks@8.3.9(react@19.2.0))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1092,19 +1092,19 @@ packages:
   '@cartesi/rollups@2.0.0':
     resolution: {integrity: sha512-41Dtq73wD5JTepuryUiXumjMNx/e5AlOROKlao4/A0rG34R8emblnTGwvMaMpzKd+USDk2M/aLtIPZ6tnDXD/g==}
 
-  '@cartesi/rpc@2.0.0-alpha.16':
-    resolution: {integrity: sha512-MYldvGf+jLXme3lye86xWn/T6piiMdab/TaBK3UcTAwPR7oyJYaPgUviR6TRspMN16x3nJWdyoLEq5TY0aN6IQ==}
+  '@cartesi/rpc@2.0.0-alpha.17':
+    resolution: {integrity: sha512-hD+ROXq0YMBZwNp6FlR5gYpzU6Am7Ug3lhIyD7OrP6/SVzmJC5u6Q7PY5kSPf6xrGGoE9U0tVAWl0tQWWYMv5w==}
 
   '@cartesi/util@6.3.0':
     resolution: {integrity: sha512-UgsyTklI4mf3ZbnPHQTuYJcMyldM3y9Xm+ib9xBgDzDq6TxMO81xkrPv/gwA23seHL2/bkJ5flXJEhCE8poW8Q==}
 
-  '@cartesi/viem@2.0.0-alpha.21':
-    resolution: {integrity: sha512-WKCiSOgwO0HlrRmn6yc+GFSt8jeWn1c0eZ1Q2YdlOOTTv/Rpdw7kGbcgQPgxOrtyXTxHoLZjCdFSiX22QFxtiQ==}
+  '@cartesi/viem@2.0.0-alpha.22':
+    resolution: {integrity: sha512-e4q+51snsm2LW0fn9UC4Q03uTYattzRPzMkteMRqDVkkWVRWm/llb9A3iEKDVPOiJ0mY6EM8gdUamMEIx4zPVQ==}
     peerDependencies:
       viem: ^2.0.0
 
-  '@cartesi/wagmi@2.0.0-alpha.22':
-    resolution: {integrity: sha512-5nLfb2/GFq63zghhHU0R6+40twPlAJenPH+yXaQ9NHQiq/tmjQnlmiOBdR325V4KDjXEIGvKXAqLNSSryiQe3g==}
+  '@cartesi/wagmi@2.0.0-alpha.23':
+    resolution: {integrity: sha512-g7DrA9lMZLGJ6cwgGynJ5znHaH8e+OfB3Fgawlif/AJnq29g/O5/KAkHs0THbmyKkvbFHoWVPIgqBubDmU91Ig==}
     peerDependencies:
       '@tanstack/react-query': ^5.0.0
       react: ^19.0.0
@@ -9400,15 +9400,15 @@ snapshots:
 
   '@cartesi/rollups@2.0.0': {}
 
-  '@cartesi/rpc@2.0.0-alpha.16':
+  '@cartesi/rpc@2.0.0-alpha.17':
     dependencies:
       json-rpc-2.0: 1.7.1
 
   '@cartesi/util@6.3.0': {}
 
-  '@cartesi/viem@2.0.0-alpha.21(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)':
+  '@cartesi/viem@2.0.0-alpha.22(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)':
     dependencies:
-      '@cartesi/rpc': 2.0.0-alpha.16
+      '@cartesi/rpc': 2.0.0-alpha.17
       abitype: 1.2.0(typescript@5.9.3)(zod@3.25.76)
       p-retry: 7.1.0
       viem: 2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -9416,9 +9416,9 @@ snapshots:
       - typescript
       - zod
 
-  '@cartesi/wagmi@2.0.0-alpha.22(@tanstack/react-query@5.90.11(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.5(@tanstack/query-core@5.90.11)(@tanstack/react-query@5.90.11(react@19.2.0))(@types/react@19.2.7)(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(react@19.2.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76))(zod@3.25.76)':
+  '@cartesi/wagmi@2.0.0-alpha.23(@tanstack/react-query@5.90.11(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.5(@tanstack/query-core@5.90.11)(@tanstack/react-query@5.90.11(react@19.2.0))(@types/react@19.2.7)(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(react@19.2.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76))(zod@3.25.76)':
     dependencies:
-      '@cartesi/viem': 2.0.0-alpha.21(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+      '@cartesi/viem': 2.0.0-alpha.22(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
       '@tanstack/react-query': 5.90.11(react@19.2.0)
       react: 19.2.0
       viem: 2.41.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -15860,7 +15860,7 @@ snapshots:
 
   extension-port-stream@3.0.0:
     dependencies:
-      readable-stream: 3.6.2
+      readable-stream: 4.7.0
       webextension-polyfill: 0.10.0
 
   eyes@0.1.8: {}

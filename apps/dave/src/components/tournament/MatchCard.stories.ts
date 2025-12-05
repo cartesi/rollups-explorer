@@ -33,7 +33,7 @@ const match: Match = {
     tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
     txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
     updatedAt: new Date(timestamp),
-    winnerCommitment: null,
+    winnerCommitment: "NONE",
 };
 /**
  * A match that is ongoing, which means that both claims are still in dispute, with no winner yet.
@@ -82,7 +82,7 @@ export const Winner1: Story = {
     args: {
         match: {
             ...match,
-            winnerCommitment: claim(0).hash,
+            winnerCommitment: "ONE",
         },
         onClick: fn(),
     },
@@ -95,7 +95,7 @@ export const Winner2: Story = {
     args: {
         match: {
             ...match,
-            winnerCommitment: claim(1).hash,
+            winnerCommitment: "TWO",
         },
         onClick: fn(),
     },

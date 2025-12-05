@@ -29,16 +29,12 @@ export const MatchLoserCard: FC<MatchLoserCardProps> = ({
 }) => {
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
-    const winner =
-        match.winnerCommitment === match.commitmentOne
-            ? 1
-            : match.winnerCommitment === match.commitmentTwo
-              ? 2
-              : undefined;
+    const winner = match.winnerCommitment;
     const theme = useMantineTheme();
     const gold = theme.colors.yellow[5];
 
-    const loser = winner === 1 ? claim2 : winner === 2 ? claim1 : undefined;
+    const loser =
+        winner === "ONE" ? claim2 : winner === "TWO" ? claim1 : undefined;
     if (!loser) {
         return;
     }

@@ -31,15 +31,10 @@ export const MatchCard: FC<MatchCardProps> = ({
 }) => {
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
-    const winner =
-        match.winnerCommitment === match.commitmentOne
-            ? 1
-            : match.winnerCommitment === match.commitmentTwo
-              ? 2
-              : undefined;
+    const winner = match.winnerCommitment;
     const theme = useMantineTheme();
     const gold = theme.colors.yellow[5];
-    const showWinner = !!winner;
+    const showWinner = winner !== "NONE";
 
     return (
         <Card
@@ -53,7 +48,7 @@ export const MatchCard: FC<MatchCardProps> = ({
         >
             <Overlay
                 bg={gold}
-                opacity={showWinner && winner === 1 ? 0.1 : 0}
+                opacity={showWinner && winner === "ONE" ? 0.1 : 0}
                 style={{
                     height: claim2 ? "50%" : "100%",
                     pointerEvents: "none",
@@ -61,7 +56,7 @@ export const MatchCard: FC<MatchCardProps> = ({
             />
             <Overlay
                 bg={gold}
-                opacity={showWinner && winner === 2 ? 0.1 : 0}
+                opacity={showWinner && winner === "TWO" ? 0.1 : 0}
                 style={{ top: "50%", height: "50%", pointerEvents: "none" }}
             />
             <Stack gap={0}>
@@ -69,15 +64,15 @@ export const MatchCard: FC<MatchCardProps> = ({
                     <TbTrophyFilled
                         size={24}
                         color={gold}
-                        opacity={showWinner && winner === 1 ? 1 : 0}
+                        opacity={showWinner && winner === "ONE" ? 1 : 0}
                     />
                     <ClaimText
                         claim={claim1}
-                        c={showWinner && winner === 1 ? gold : undefined}
-                        fw={showWinner && winner === 1 ? 700 : undefined}
+                        c={showWinner && winner === "ONE" ? gold : undefined}
+                        fw={showWinner && winner === "ONE" ? 700 : undefined}
                         style={{
                             textDecoration:
-                                winner === 2 && showWinner
+                                winner === "TWO" && showWinner
                                     ? "line-through"
                                     : undefined,
                         }}
@@ -89,15 +84,15 @@ export const MatchCard: FC<MatchCardProps> = ({
                     <TbTrophyFilled
                         size={24}
                         color={gold}
-                        opacity={showWinner && winner === 2 ? 1 : 0}
+                        opacity={showWinner && winner === "TWO" ? 1 : 0}
                     />
                     <ClaimText
                         claim={claim2}
-                        c={showWinner && winner === 2 ? gold : undefined}
-                        fw={showWinner && winner === 2 ? 700 : undefined}
+                        c={showWinner && winner === "TWO" ? gold : undefined}
+                        fw={showWinner && winner === "TWO" ? 700 : undefined}
                         style={{
                             textDecoration:
-                                winner === 1 && showWinner
+                                winner === "ONE" && showWinner
                                     ? "line-through"
                                     : undefined,
                         }}
