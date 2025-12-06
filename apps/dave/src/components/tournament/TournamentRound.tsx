@@ -1,7 +1,8 @@
-import type { Commitment, Match } from "@cartesi/viem";
+import type { Match } from "@cartesi/viem";
 import { Divider, Stack } from "@mantine/core";
 import type { FC } from "react";
 import { useNavigate, useParams } from "react-router";
+import type { Hash } from "viem";
 import {
     routePathBuilder,
     type TournamentParams,
@@ -14,7 +15,7 @@ export interface TournamentRoundProps {
     /**
      * The claim that was not matched with another claim yet.
      */
-    danglingClaim?: Commitment;
+    dangling?: Hash;
 
     /**
      * Whether to hide the winners.
@@ -35,7 +36,7 @@ export interface TournamentRoundProps {
 export const TournamentRound: FC<TournamentRoundProps> = (props) => {
     const params = useParams<TournamentParams>();
     const navigate = useNavigate();
-    const { danglingClaim, hideWinners, index, matches } = props;
+    const { dangling, hideWinners, index, matches } = props;
     const onMatchClick = (match: Match) => {
         const url = routePathBuilder.match({
             application: params.application ?? "",
@@ -71,9 +72,7 @@ export const TournamentRound: FC<TournamentRoundProps> = (props) => {
                     />
                 ),
             )}
-            {danglingClaim && (
-                <ClaimCard claim={{ hash: danglingClaim.commitment }} />
-            )}
+            {dangling && <ClaimCard claim={{ hash: dangling }} />}
         </Stack>
     );
 };

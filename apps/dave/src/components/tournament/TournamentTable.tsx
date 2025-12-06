@@ -50,7 +50,7 @@ function lazyArray<T>(factory: () => T): T[] {
  */
 type Round = {
     matches: Match[];
-    danglingClaim?: Commitment;
+    dangling?: Hash;
 };
 const roundify = (
     matches: Match[],
@@ -62,6 +62,9 @@ const roundify = (
         matches: [],
         now,
     }));
+    const dangling: Set<Hash> = new Set(
+        danglingClaim ? [danglingClaim.commitment] : [],
+    );
     for (const match of matches) {
         for (let i = 0; i < matches.length; i++) {
             if (
@@ -71,16 +74,32 @@ const roundify = (
                 sets[i].add(match.commitmentOne);
                 sets[i].add(match.commitmentTwo);
                 rounds[i].matches.push(match);
+
+                if (match.winnerCommitment !== "NONE") {
+                    // add winner to dangling set
+                    dangling.add(
+                        match.winnerCommitment === "ONE"
+                            ? match.commitmentOne
+                            : match.commitmentTwo,
+                    );
+                } else {
+                    // remove both from dangling set
+                    dangling.delete(match.commitmentOne);
+                    dangling.delete(match.commitmentTwo);
+                }
                 break;
             }
         }
     }
-    if (rounds.length === 0 && danglingClaim) {
+    if (rounds.length === 0 && dangling.size > 0) {
         // add a round for the dangling claim
-        rounds.push({ matches: [], danglingClaim });
+        rounds.push({
+            matches: [],
+            dangling: dangling.values().next().value,
+        });
     } else {
         // put dangling claim into last round
-        rounds[rounds.length - 1].danglingClaim = danglingClaim;
+        rounds[rounds.length - 1].dangling = dangling.values().next().value;
     }
     return rounds;
 };
@@ -120,7 +139,7 @@ export const TournamentTable: FC<TournamentTableProps> = (props) => {
                     index={index}
                     matches={round.matches}
                     hideWinners={hideWinners}
-                    danglingClaim={round.danglingClaim}
+                    dangling={round.dangling}
                 />
             ))}
         </Flex>

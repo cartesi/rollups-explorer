@@ -14,6 +14,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const timestamp = Date.now();
+const epochIndex = 0n;
+const tournamentAddress = "0x61bcab9d0d8b554009824292d2d6855dfa3aab86";
 
 const matches: Match[] = [
     {
@@ -25,11 +27,11 @@ const matches: Match[] = [
         deletionReason: "CHILD_TOURNAMENT",
         deletionTxHash:
             "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-        epochIndex: 0n,
+        epochIndex,
         idHash: generateMatchID(claim(0).hash, claim(1).hash),
         leftOfTwo:
             "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-        tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+        tournamentAddress,
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 1),
         winnerCommitment: "ONE",
@@ -42,11 +44,11 @@ const matches: Match[] = [
         deletionBlockNumber: null,
         deletionReason: "NOT_DELETED",
         deletionTxHash: null,
-        epochIndex: 0n,
+        epochIndex,
         idHash: generateMatchID(claim(2).hash, claim(3).hash),
         leftOfTwo:
             "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-        tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+        tournamentAddress,
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 2),
         winnerCommitment: "NONE",
@@ -59,11 +61,11 @@ const matches: Match[] = [
         deletionBlockNumber: null,
         deletionReason: "CHILD_TOURNAMENT",
         deletionTxHash: null,
-        epochIndex: 0n,
+        epochIndex,
         idHash: generateMatchID(claim(4).hash, claim(5).hash),
         leftOfTwo:
             "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-        tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+        tournamentAddress,
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 3),
         winnerCommitment: "ONE",
@@ -76,11 +78,11 @@ const matches: Match[] = [
         deletionBlockNumber: null,
         deletionReason: "CHILD_TOURNAMENT",
         deletionTxHash: null,
-        epochIndex: 0n,
+        epochIndex,
         idHash: generateMatchID(claim(6).hash, claim(4).hash),
         leftOfTwo:
             "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-        tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+        tournamentAddress,
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 4),
         winnerCommitment: "NONE",
@@ -90,7 +92,7 @@ const matches: Match[] = [
 const tournament: Tournament = {
     address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
     createdAt: new Date(timestamp),
-    epochIndex: 0n,
+    epochIndex,
     finalStateHash: null,
     finishedAtBlock: 2n,
     height: 48n,
@@ -106,13 +108,13 @@ const tournament: Tournament = {
 const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) => ({
     blockNumber: BigInt(i + 1),
     commitment: claim(i).hash,
-    createdAt: new Date(timestamp + i + 1),
-    epochIndex: 0n,
+    createdAt: new Date(timestamp + i),
+    epochIndex,
     finalStateHash: zeroHash,
     submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+    tournamentAddress,
     txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-    updatedAt: new Date(timestamp + i + 1),
+    updatedAt: new Date(timestamp + i),
 }));
 
 export const Ongoing: Story = {
@@ -128,7 +130,7 @@ export const NoChallengerYet: Story = {
         tournament: {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
-            epochIndex: 0n,
+            epochIndex,
             finalStateHash: null,
             finishedAtBlock: 2n,
             log2step: 0x2cn,
@@ -146,10 +148,10 @@ export const NoChallengerYet: Story = {
                 blockNumber: 1n,
                 commitment: claim(0).hash,
                 createdAt: new Date(timestamp),
-                epochIndex: 0n,
+                epochIndex,
                 finalStateHash: zeroHash,
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+                tournamentAddress,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
             },
@@ -162,7 +164,7 @@ export const Finalized: Story = {
         tournament: {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
-            epochIndex: 0n,
+            epochIndex,
             finalStateHash: zeroHash,
             finishedAtBlock: 2n,
             log2step: 0x2cn,
@@ -180,8 +182,8 @@ export const Finalized: Story = {
                 blockNumber: 1n,
                 commitment: claim(0).hash,
                 createdAt: new Date(timestamp),
-                epochIndex: 0n,
-                tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+                epochIndex,
+                tournamentAddress,
                 finalStateHash: zeroHash,
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
@@ -197,7 +199,7 @@ export const MidLevelDispute: Story = {
         tournament: {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
-            epochIndex: 0n,
+            epochIndex,
             finalStateHash: null,
             finishedAtBlock: 2n,
             log2step: 0x2cn,
@@ -219,10 +221,10 @@ export const MidLevelDispute: Story = {
                 deletionBlockNumber: null,
                 deletionReason: "NOT_DELETED",
                 deletionTxHash: null,
-                epochIndex: 0n,
+                epochIndex,
                 leftOfTwo:
                     "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-                tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+                tournamentAddress,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
                 winnerCommitment: "NONE",
@@ -236,10 +238,10 @@ export const MidLevelDispute: Story = {
                 deletionBlockNumber: null,
                 deletionReason: "NOT_DELETED",
                 deletionTxHash: null,
-                epochIndex: 0n,
+                epochIndex,
                 leftOfTwo:
                     "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-                tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+                tournamentAddress,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
                 winnerCommitment: "NONE",
