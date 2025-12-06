@@ -9,7 +9,10 @@ export const ApplicationList: FC<Props> = ({ applications }) => {
     return (
         <Stack gap={5}>
             {applications.map((app) => (
-                <ApplicationCard key={app.applicationAddress} application={app} />
+                <ApplicationCard
+                    key={app.applicationAddress}
+                    application={app}
+                />
             ))}
         </Stack>
     );

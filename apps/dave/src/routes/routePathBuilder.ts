@@ -6,15 +6,15 @@ export type ApplicationParams = {
 
 export type EpochParams = ApplicationParams & {
     epochIndex: string; // XXX: does react-router support automatic number conversion?
-}
+};
 
 export type TournamentParams = EpochParams & {
     tournamentAddress: Address;
-}
+};
 
 export type MatchParams = TournamentParams & {
     matchId: Hex;
-}
+};
 
 export const routePathBuilder = {
     base: "/" as const,

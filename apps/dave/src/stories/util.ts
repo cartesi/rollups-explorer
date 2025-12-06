@@ -106,10 +106,14 @@ export const generateMatchID = (claimOne: Hex, claimTwo: Hex) => {
 
 export const generateTournamentAddress = (n1: number, n2: number): Address => {
     //xxx handy cheat here...
-    return slice(generateMatchID(
-        numberToHex(n1, { size: 32 }),
-        numberToHex(n2, { size: 32 }),
-    ), 0, 20);
+    return slice(
+        generateMatchID(
+            numberToHex(n1, { size: 32 }),
+            numberToHex(n2, { size: 32 }),
+        ),
+        0,
+        20,
+    );
 };
 
 /**
@@ -142,7 +146,8 @@ export const randomMatches = (
                 deletionReason: "NOT_DELETED",
                 deletionTxHash: null,
                 epochIndex: 0n,
-                leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                leftOfTwo:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 tournamentAddress: tournament.address,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
@@ -156,17 +161,26 @@ export const randomMatches = (
         }
 
         // get pending matches (without a winner) and pick one randomlly
-        const pending = matches.filter((match) => match.winnerCommitment === "NONE");
+        const pending = matches.filter(
+            (match) => match.winnerCommitment === "NONE",
+        );
         const match = pending[Math.floor(rng() * pending.length)];
         if (match) {
             // resolve a winner randomly
-            const winner = randomWinner(match.commitmentOne, match.commitmentTwo);
+            const winner = randomWinner(
+                match.commitmentOne,
+                match.commitmentTwo,
+            );
             match.winnerCommitment = winner;
             if (winner !== "NONE") {
                 // assign the winner, and put the claim back to the list
                 match.updatedAt = new Date(timestamp);
                 timestamp++; // XXX: improve this timestamp incrementation
-                claims.unshift(winner === "ONE" ? match.commitmentOne : match.commitmentTwo);
+                claims.unshift(
+                    winner === "ONE"
+                        ? match.commitmentOne
+                        : match.commitmentTwo,
+                );
             }
         }
 
@@ -174,11 +188,16 @@ export const randomMatches = (
     }
 
     // define tournament winner
-    const pending = matches.filter((match) => match.winnerCommitment === "NONE");
+    const pending = matches.filter(
+        (match) => match.winnerCommitment === "NONE",
+    );
     if (pending.length === 0) {
         // all matches are resolved, the winner is the last surviving claim
         const lastMatch = matches[matches.length - 1];
-        tournament.winnerCommitment = lastMatch.winnerCommitment === "ONE" ? lastMatch.commitmentOne : lastMatch.commitmentTwo;
+        tournament.winnerCommitment =
+            lastMatch.winnerCommitment === "ONE"
+                ? lastMatch.commitmentOne
+                : lastMatch.commitmentTwo;
     }
 
     return matches;
