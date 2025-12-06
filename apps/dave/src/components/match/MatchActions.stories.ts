@@ -1,7 +1,6 @@
-import type { MatchAdvanced } from "@cartesi/viem";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { keccak256, numberToHex } from "viem";
-import { claim, mulberry32 } from "../../stories/util";
+import { randomAdvances } from "../../stories/data";
+import { claim } from "../../stories/util";
 import { MatchActions } from "./MatchActions";
 
 const meta = {
@@ -13,7 +12,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const epochIndex = 0n;
 const tournamentAddress = "0x61bcab9d0d8b554009824292d2d6855dfa3aab86";
+const idHash =
+    "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6";
+const leftOfTwo =
+    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002";
 const now = Math.floor(Date.now() / 1000);
 
 // large 40kb proof
@@ -22,20 +26,17 @@ const now = Math.floor(Date.now() / 1000);
 /**
  * Complete scenario for a top match with a winner.
  */
-const rng = mulberry32(0);
+
 export const CompleteTop: Story = {
     args: {
-        advances: Array.from<number>({ length: 47 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
-            blockNumber: BigInt(i),
-            createdAt: new Date(now - 7966 + i * 60),
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+        advances: randomAdvances({
+            count: 47,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
             tournamentAddress,
-            txHash: keccak256(numberToHex(i)),
-            updatedAt: new Date(now - 7966 + i * 60),
-        }]), []),
+        }),
         match: {
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
@@ -43,10 +44,11 @@ export const CompleteTop: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 10n,
             deletionReason: "CHILD_TOURNAMENT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
@@ -67,10 +69,12 @@ export const Bisections: Story = {
             {
                 blockNumber: 1n,
                 createdAt: new Date(now - 3453),
-                epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
-                otherParent: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                epochIndex,
+                idHash,
+                leftNode:
+                    "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
+                otherParent:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 tournamentAddress,
                 txHash: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 updatedAt: new Date(now - 3453),
@@ -78,10 +82,12 @@ export const Bisections: Story = {
             {
                 blockNumber: 2n,
                 createdAt: new Date(now - 2134),
-                epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0xaa5945bb1c145a6ddde89bacffbda841a4049af4f20bb32f79dad4a14eef6bf3",
-                otherParent: "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
+                epochIndex,
+                idHash,
+                leftNode:
+                    "0xaa5945bb1c145a6ddde89bacffbda841a4049af4f20bb32f79dad4a14eef6bf3",
+                otherParent:
+                    "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
                 tournamentAddress,
                 txHash: "0x89f986df6290a9157862849a6a0b92df8b170bcaca15a7c4ac8ba15886d53bd3",
                 updatedAt: new Date(now - 2134),
@@ -89,10 +95,12 @@ export const Bisections: Story = {
             {
                 blockNumber: 3n,
                 createdAt: new Date(now - 1452),
-                epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0x96e1b82f2632d0b5ce9d406f26db76a3e9a7aef1cff0c29ffcbd3d193c508919",
-                otherParent: "0xaa5945bb1c145a6ddde89bacffbda841a4049af4f20bb32f79dad4a14eef6bf3",
+                epochIndex,
+                idHash,
+                leftNode:
+                    "0x96e1b82f2632d0b5ce9d406f26db76a3e9a7aef1cff0c29ffcbd3d193c508919",
+                otherParent:
+                    "0xaa5945bb1c145a6ddde89bacffbda841a4049af4f20bb32f79dad4a14eef6bf3",
                 tournamentAddress,
                 txHash: "0x75ea44f31192dd174cb1834ca1f41deea2d33f22cfd3841f6ad799099ed76d96",
                 updatedAt: new Date(now - 1452),
@@ -100,10 +108,12 @@ export const Bisections: Story = {
             {
                 blockNumber: 4n,
                 createdAt: new Date(now - 345),
-                epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0xe4b843f41c3228fdff3c9db457d895ba444be689f42d58902e56b3eb5b05c6d1",
-                otherParent: "0x96e1b82f2632d0b5ce9d406f26db76a3e9a7aef1cff0c29ffcbd3d193c508919",
+                epochIndex,
+                idHash,
+                leftNode:
+                    "0xe4b843f41c3228fdff3c9db457d895ba444be689f42d58902e56b3eb5b05c6d1",
+                otherParent:
+                    "0x96e1b82f2632d0b5ce9d406f26db76a3e9a7aef1cff0c29ffcbd3d193c508919",
                 tournamentAddress,
                 txHash: "0x7adac1a62f3e5fd04f096f7c6fb233a6e8dd2a96bcc3463e16ff2927431d623a",
                 updatedAt: new Date(now - 345),
@@ -111,14 +121,16 @@ export const Bisections: Story = {
             {
                 blockNumber: 5n,
                 createdAt: new Date(now - 28),
-                epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0x27224e3bfb947cd11ec0432ca19ecf6590f6b81973a0d4e4f147ebca84767112",
-                otherParent: "0xe4b843f41c3228fdff3c9db457d895ba444be689f42d58902e56b3eb5b05c6d1",
+                epochIndex,
+                idHash,
+                leftNode:
+                    "0x27224e3bfb947cd11ec0432ca19ecf6590f6b81973a0d4e4f147ebca84767112",
+                otherParent:
+                    "0xe4b843f41c3228fdff3c9db457d895ba444be689f42d58902e56b3eb5b05c6d1",
                 tournamentAddress,
                 txHash: "0xb8df76d2cfad6edbea139ea38afce747fff297fa8172ff33d0facfdb07319aaf",
                 updatedAt: new Date(now - 28),
-            }
+            },
         ],
         match: {
             blockNumber: 1n,
@@ -128,9 +140,9 @@ export const Bisections: Story = {
             deletionBlockNumber: null,
             deletionReason: "NOT_DELETED",
             deletionTxHash: null,
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
@@ -155,13 +167,14 @@ export const Timeout: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "TIMEOUT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "TWO",
         },
         height: 48n,
@@ -180,13 +193,15 @@ export const TimeoutSecond: Story = {
                 blockNumber: 1n,
                 createdAt: new Date(now - 3453),
                 epochIndex: 0n,
-                idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-                leftNode: "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
-                otherParent: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                idHash,
+                leftNode:
+                    "0xc2a1e4406e117170e1539376ae0b2bf8a8ba65dd241ac4cc6a19efb376041f54",
+                otherParent:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 tournamentAddress,
                 txHash: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 updatedAt: new Date(now - 3453),
-            }            
+            },
         ],
         match: {
             blockNumber: 2n,
@@ -195,13 +210,14 @@ export const TimeoutSecond: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "TIMEOUT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         },
         height: 48n,
@@ -223,13 +239,14 @@ export const Elimination: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "TIMEOUT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         },
         height: 48n,
@@ -243,17 +260,14 @@ export const Elimination: Story = {
  */
 export const EliminationAfterBisections: Story = {
     args: {
-        advances: Array.from<number>({ length: 3 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
-            blockNumber: BigInt(i),
-            createdAt: new Date(now - 7966 + i * 60),
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+        advances: randomAdvances({
+            count: 3,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
             tournamentAddress,
-            txHash: keccak256(numberToHex(i)),
-            updatedAt: new Date(now - 7966 + i * 60),
-        }]), []),
+        }),
         match: {
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
@@ -261,13 +275,14 @@ export const EliminationAfterBisections: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "TIMEOUT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         },
         height: 48n,
@@ -281,17 +296,14 @@ export const EliminationAfterBisections: Story = {
  */
 export const SubTournament: Story = {
     args: {
-        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
-            blockNumber: BigInt(i),
-            createdAt: new Date(now - 7966 + i * 60),
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+        advances: randomAdvances({
+            count: 4,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
             tournamentAddress,
-            txHash: keccak256(numberToHex(i)),
-            updatedAt: new Date(now - 7966 + i * 60),
-        }]), []),
+        }),
         match: {
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
@@ -299,18 +311,19 @@ export const SubTournament: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "CHILD_TOURNAMENT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         },
-        height: 4n,
+        height: 5n,
         now,
-        nextLevel: 4n,
+        nextLevel: 1n,
     },
 };
 
@@ -319,17 +332,14 @@ export const SubTournament: Story = {
  */
 export const WinnerBottom: Story = {
     args: {
-        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
-            blockNumber: BigInt(i),
-            createdAt: new Date(now - 7966 + i * 60),
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+        advances: randomAdvances({
+            count: 4,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
             tournamentAddress,
-            txHash: keccak256(numberToHex(i)),
-            updatedAt: new Date(now - 7966 + i * 60),
-        }]), []),
+        }),
         match: {
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
@@ -337,13 +347,14 @@ export const WinnerBottom: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "STEP",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         },
         height: 5n,
@@ -357,17 +368,14 @@ export const WinnerBottom: Story = {
  */
 export const WinnerTop: Story = {
     args: {
-        advances: Array.from<number>({ length: 4 }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
-            blockNumber: BigInt(i),
-            createdAt: new Date(now - 7966 + i * 60),
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+        advances: randomAdvances({
+            count: 4,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
             tournamentAddress,
-            txHash: keccak256(numberToHex(i)),
-            updatedAt: new Date(now - 7966 + i * 60),
-        }]), []),
+        }),
         match: {
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
@@ -375,13 +383,14 @@ export const WinnerTop: Story = {
             createdAt: new Date(now),
             deletionBlockNumber: 2n,
             deletionReason: "CHILD_TOURNAMENT",
-            deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            epochIndex: 0n,
-            idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex,
+            idHash,
+            leftOfTwo,
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(now),
+            updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         },
         height: 5n,
@@ -406,7 +415,8 @@ export const NoActions: Story = {
             deletionTxHash: null,
             epochIndex: 0n,
             idHash: "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6",
-            leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+            leftOfTwo:
+                "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
             tournamentAddress,
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),

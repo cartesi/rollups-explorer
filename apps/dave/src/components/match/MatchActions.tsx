@@ -36,6 +36,7 @@ interface MatchActionsProps {
 
     /**
      * Maximum number of bisections to reach the target subdivision
+     * height = 48 means 47 bisections
      */
     height: bigint;
 
@@ -86,10 +87,10 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     }, [bisectionWidth]);
 
     // dynamic domain, based on first visible item
-    const maxRange: CycleRange = [0, 2 ** Number(height)];
+    const maxRange: CycleRange = [0, 2 ** Number(height - 1n)];
 
     // progress bar, based on last visible item
-    const progress = (bisections.length / Number(height)) * 100;
+    const progress = (bisections.length / Number(height - 1n)) * 100;
 
     // create ranges for each bisection
     const ranges = useMemo(
@@ -152,7 +153,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         now={now}
                         range={ranges[i + 1]}
                         timestamp={value.timestamp}
-                        total={Number(height)}
+                        total={Number(height - 1n)}
                     />
                 ))}
                 {match.deletionReason === "TIMEOUT" &&
@@ -170,7 +171,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         />
                     )}
                 {match.deletionReason === "TIMEOUT" &&
-                    match.winnerCommitment && (
+                    match.winnerCommitment !== "NONE" && (
                         <WinnerTimeoutItem
                             key="timeout"
                             loser={
@@ -189,37 +190,69 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         />
                     )}
                 {match.deletionReason === "CHILD_TOURNAMENT" && (
-                    <SubTournamentItem
-                        claim={bisections.length % 2 === 0 ? claim1 : claim2}
-                        key="sub-tournament"
-                        level={nextLevel}
-                        now={now}
-                        range={[0, 0]} // XXX: need to get range from somewhere
-                        timestamp={match.updatedAt.getTime()}
-                    />
-                )}
-                {match.winnerCommitment && (
                     <>
-                        <WinnerItem
-                            key="winner"
-                            claim={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
-                        />
-                        <LoserItem
+                        <SubTournamentItem
                             claim={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
+                                bisections.length % 2 === 0 ? claim1 : claim2
                             }
+                            key="sub-tournament"
+                            level={nextLevel}
                             now={now}
+                            range={[0, 0]} // XXX: need to get range from somewhere
+                            timestamp={match.updatedAt.getTime()}
                         />
+                        {match.winnerCommitment !== "NONE" && (
+                            <>
+                                <WinnerItem
+                                    key="winner"
+                                    claim={{
+                                        hash:
+                                            match.winnerCommitment === "ONE"
+                                                ? claim1.hash
+                                                : claim2.hash,
+                                    }}
+                                    now={now}
+                                    timestamp={match.updatedAt.getTime()}
+                                    proof={"0x0"} // XXX: need to get proof from somewhere
+                                />
+                                <LoserItem
+                                    claim={
+                                        match.winnerCommitment === "ONE"
+                                            ? claim2
+                                            : claim1
+                                    }
+                                    now={now}
+                                />
+                            </>
+                        )}
+                    </>
+                )}
+                {match.deletionReason === "STEP" && (
+                    <>
+                        {match.winnerCommitment !== "NONE" && (
+                            <>
+                                <WinnerItem
+                                    key="winner"
+                                    claim={{
+                                        hash:
+                                            match.winnerCommitment === "ONE"
+                                                ? claim1.hash
+                                                : claim2.hash,
+                                    }}
+                                    now={now}
+                                    timestamp={match.updatedAt.getTime()}
+                                    proof={"0x0"} // XXX: need to get proof from somewhere
+                                />
+                                <LoserItem
+                                    claim={
+                                        match.winnerCommitment === "ONE"
+                                            ? claim2
+                                            : claim1
+                                    }
+                                    now={now}
+                                />
+                            </>
+                        )}
                     </>
                 )}
             </Timeline>

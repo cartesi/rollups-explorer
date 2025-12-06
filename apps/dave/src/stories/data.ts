@@ -1,7 +1,7 @@
 import type { Application, Commitment, Epoch, Match, MatchAdvanced, SnapshotPolicy, Tournament } from "@cartesi/viem";
 import { inputBoxAddress } from "@cartesi/viem/abi";
-import { keccak256, numberToHex, zeroHash, type Address } from "viem";
-import { generateMatchID, generateTournamentAddress } from "./util";
+import { keccak256, numberToHex, zeroHash, type Address, type Hash } from "viem";
+import { generateMatchID, generateTournamentAddress, mulberry32 } from "./util";
 
 // the following are types for a top down hierarchy
 // Application -> Epoch -> Tournament -> [Match, Commitment] -> [MatchAdvanced, Tournament]
@@ -32,17 +32,23 @@ const executionParameters = {
 export const randomAdvances = (options: {
     count: number;
     epochIndex?: bigint;
+    idHash?: Hash;
+    leftOfTwo?: Hash;
     now: number;
-    tournamentAddress: Address
+    seed?: number;
+    tournamentAddress: Address;
 }) => {
+    const rng = mulberry32(options.seed ?? 0);
     const { count, epochIndex, now, tournamentAddress } = options;
+    const idHash = options.idHash ?? "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6";
+    const leftOfTwo = options.leftOfTwo ?? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002";
     return Array.from<number>({ length: count }).reduce<MatchAdvanced[]>((array, _, i) => ([...array, {
             blockNumber: BigInt(i),
             createdAt: new Date(now + i * 60),
             epochIndex: epochIndex ?? 0n,
-            idHash: keccak256(numberToHex(i)),
+            idHash,
             leftNode: keccak256(numberToHex(i)),
-            otherParent: i === 0 ? "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002" : array[i - 1].leftNode, // XXX: always left, need to randomize
+            otherParent: i === 0 ? leftOfTwo : rng() < 0.5 ? array[i - 1].leftNode : zeroHash, // XXX: always left, need to randomize
             tournamentAddress,
             txHash: keccak256(numberToHex(i)),
             updatedAt: new Date(now + i * 60),
