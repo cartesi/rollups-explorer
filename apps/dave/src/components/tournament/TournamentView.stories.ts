@@ -1,10 +1,7 @@
 import type { Commitment, Match, Tournament } from "@cartesi/viem";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { zeroHash } from "viem";
-import {
-    claim,
-    generateMatchID
-} from "../../stories/util";
+import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";
 
 const meta = {
@@ -26,10 +23,12 @@ const matches: Match[] = [
         createdAt: new Date(timestamp + 1),
         deletionBlockNumber: 1n,
         deletionReason: "CHILD_TOURNAMENT",
-        deletionTxHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        deletionTxHash:
+            "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         epochIndex: 0n,
         idHash: generateMatchID(claim(0).hash, claim(1).hash),
-        leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+        leftOfTwo:
+            "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 1),
@@ -45,7 +44,8 @@ const matches: Match[] = [
         deletionTxHash: null,
         epochIndex: 0n,
         idHash: generateMatchID(claim(2).hash, claim(3).hash),
-        leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+        leftOfTwo:
+            "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 2),
@@ -61,7 +61,8 @@ const matches: Match[] = [
         deletionTxHash: null,
         epochIndex: 0n,
         idHash: generateMatchID(claim(4).hash, claim(5).hash),
-        leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+        leftOfTwo:
+            "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 3),
@@ -77,7 +78,8 @@ const matches: Match[] = [
         deletionTxHash: null,
         epochIndex: 0n,
         idHash: generateMatchID(claim(6).hash, claim(4).hash),
-        leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+        leftOfTwo:
+            "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
         tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 4),
@@ -139,17 +141,19 @@ export const NoChallengerYet: Story = {
             winnerCommitment: null,
         },
         matches: [],
-        commitments: [{
-            blockNumber: 1n,
-            commitment: claim(0).hash,
-            createdAt: new Date(timestamp),
-            epochIndex: 0n,
-            finalStateHash: zeroHash,
-            submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-            tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
-            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-            updatedAt: new Date(timestamp),
-        }],
+        commitments: [
+            {
+                blockNumber: 1n,
+                commitment: claim(0).hash,
+                createdAt: new Date(timestamp),
+                epochIndex: 0n,
+                finalStateHash: zeroHash,
+                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+            },
+        ],
     },
 };
 
@@ -216,7 +220,8 @@ export const MidLevelDispute: Story = {
                 deletionReason: "NOT_DELETED",
                 deletionTxHash: null,
                 epochIndex: 0n,
-                leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                leftOfTwo:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
@@ -232,7 +237,8 @@ export const MidLevelDispute: Story = {
                 deletionReason: "NOT_DELETED",
                 deletionTxHash: null,
                 epochIndex: 0n,
-                leftOfTwo: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                leftOfTwo:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 tournamentAddress: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
