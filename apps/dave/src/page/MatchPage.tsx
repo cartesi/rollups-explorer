@@ -13,14 +13,19 @@ export interface MatchPageProps {
     advances: MatchAdvanced[];
 
     /**
-     * The tournament to display.
-     */
-    tournament: Tournament;
-
-    /**
      * The match to display.
      */
     match: Match;
+
+    /**
+     * The sub tournament to display.
+     */
+    subTournament?: Tournament;
+
+    /**
+     * The tournament to display.
+     */
+    tournament: Tournament;
 
     /**
      * The current timestamp.
@@ -29,7 +34,7 @@ export interface MatchPageProps {
 }
 
 export const MatchPage: FC<MatchPageProps> = (props) => {
-    const { advances, tournament, match, now } = props;
+    const { advances, tournament, match, subTournament, now } = props;
     // XXX: where the range is coming from?
     // const range = [tournament.startCycle, tournament.endCycle] as CycleRange;
     const range = [0, 0] as CycleRange;
@@ -39,10 +44,11 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
             <PageTitle Icon={TbSwords} title="Match" />
             <MatchView
                 advances={advances}
-                tournament={tournament}
-                range={range}
                 match={match}
                 now={now}
+                range={range}
+                subTournament={subTournament}
+                tournament={tournament}
             />
         </Stack>
     );

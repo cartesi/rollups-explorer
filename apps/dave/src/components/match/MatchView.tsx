@@ -18,6 +18,11 @@ export interface MatchViewProps {
     match: Match;
 
     /**
+     * The sub tournament to display.
+     */
+    subTournament?: Tournament;
+
+    /**
      * The parent Tournament
      */
     tournament: Tournament;
@@ -34,12 +39,10 @@ export interface MatchViewProps {
 }
 
 export const MatchView: FC<MatchViewProps> = (props) => {
-    const { advances, tournament, match, now, range } = props;
+    const { advances, tournament, match, subTournament, now, range } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
     const { height } = tournament;
-
-    const nextLevel = tournament.level + 1n;
 
     return (
         <Stack>
@@ -60,8 +63,8 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 advances={advances}
                 height={height}
                 match={match}
-                nextLevel={nextLevel}
                 now={now}
+                subTournament={subTournament}
             />
         </Stack>
     );

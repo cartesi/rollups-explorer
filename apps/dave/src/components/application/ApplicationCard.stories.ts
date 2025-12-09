@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { applications } from "../../stories/data";
 import { ApplicationCard } from "./ApplicationCard";
 

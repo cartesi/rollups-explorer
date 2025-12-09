@@ -1,3 +1,4 @@
+import type { Tournament } from "@cartesi/viem";
 import {
     Button,
     Group,
@@ -6,13 +7,11 @@ import {
     useComputedColorScheme,
     useMantineTheme,
 } from "@mantine/core";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { type FC } from "react";
 import { TbTrendingDown } from "react-icons/tb";
-import { Link, useParams } from "react-router";
-import {
-    routePathBuilder,
-    type MatchParams,
-} from "../../routes/routePathBuilder";
+import type { ParamsOf } from "../../../.next/types/routes";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import type { Claim, CycleRange } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
@@ -22,11 +21,6 @@ export interface SubTournamentItemProps {
      * Claim that took action.
      */
     claim: Claim;
-
-    /**
-     * Level of the sub tournament
-     */
-    level: bigint;
 
     /**
      * Current timestamp
@@ -42,16 +36,18 @@ export interface SubTournamentItemProps {
      * Timestamp
      */
     timestamp: number;
+
+    /**
+     * Level of the sub tournament
+     */
+    tournament: Tournament;
 }
 
 export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
-    const { claim, level, now, range, timestamp } = props;
-    const params = useParams<MatchParams>();
-    const tournamentUrl = routePathBuilder.tournament({
-        application: params.application ?? "",
-        epochIndex: params.epochIndex ?? "",
-        tournamentAddress: params.tournamentAddress ?? "0x",
-    });
+    const { claim, now, range, timestamp, tournament } = props;
+    const params =
+        useParams<ParamsOf<"/apps/[application]/epochs/[epochIndex]">>();
+    const url = `/apps/${params.application}/epochs/${params.epochIndex}/tournaments/${tournament.address}`;
     const theme = useMantineTheme();
     const scheme = useComputedColorScheme();
     const bg = scheme === "light" ? theme.colors.gray[0] : undefined;
@@ -66,10 +62,10 @@ export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
                     </Stack>
                     <Button
                         component={Link}
-                        to={tournamentUrl}
+                        href={url}
                         rightSection={<TbTrendingDown />}
                     >
-                        {labels[Number(level)] ?? "none"}
+                        {labels[Number(tournament.level)] ?? "none"}
                     </Button>
                 </Group>
             </Paper>

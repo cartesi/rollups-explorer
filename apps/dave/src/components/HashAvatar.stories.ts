@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { HashAvatar } from "./HashAvatar";
 

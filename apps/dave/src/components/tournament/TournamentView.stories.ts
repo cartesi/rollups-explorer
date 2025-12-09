@@ -1,5 +1,5 @@
 import type { Commitment, Match, Tournament } from "@cartesi/viem";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";

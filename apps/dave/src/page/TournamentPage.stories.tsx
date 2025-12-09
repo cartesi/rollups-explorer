@@ -1,6 +1,6 @@
 import type { Commitment, Tournament } from "@cartesi/viem";
 import { Stack } from "@mantine/core";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
@@ -28,7 +28,7 @@ type Props = Parameters<typeof TournamentPage>[0];
 
 const WithBreadcrumb = (props: Props) => {
     const app = applications[0];
-    const params = { application: app.name, epochIndex: "4" };
+    const params = { application: app.name, epochIndex: 4n };
 
     return (
         <Stack gap="lg">

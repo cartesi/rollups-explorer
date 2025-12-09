@@ -48,7 +48,6 @@ export const InputCard: FC<Props> = ({ input }) => {
                 </Group>
                 <LongText
                     value={input.decodedData.sender}
-                    shorten={false}
                     size="sm"
                     c="dimmed"
                 />
@@ -59,9 +58,9 @@ export const InputCard: FC<Props> = ({ input }) => {
                         onClick={toggleDisplayMeta}
                         leftSection={
                             displayMeta ? (
-                                <TbEyeMinus size={theme.other.mdIconSize} />
+                                <TbEyeMinus size={theme.other?.mdIconSize} />
                             ) : (
-                                <TbEyePlus size={theme.other.mdIconSize} />
+                                <TbEyePlus size={theme.other?.mdIconSize} />
                             )
                         }
                     >

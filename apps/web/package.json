@@ -41,7 +41,6 @@
         "jotai": "^2.12.5",
         "lokijs": "^1",
         "next": "^15.5.9",
-        "pino-pretty": "^10",
         "pretty-ms": "^8",
         "ramda": "^0.31.3",
         "ramda-adjunct": "^5.1.0",

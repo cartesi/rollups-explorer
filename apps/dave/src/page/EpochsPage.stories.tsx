@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { applications } from "../stories/data";
 import { EpochsPage } from "./EpochsPage";
@@ -33,7 +33,6 @@ const WithBreadcrumb = (props: Props) => {
 export const Default: Story = {
     render: WithBreadcrumb,
     args: {
-        application: applications[0].name,
         epochs: applications[0].epochs,
     },
 };
@@ -41,7 +40,6 @@ export const Default: Story = {
 export const NoDispute: Story = {
     render: WithBreadcrumb,
     args: {
-        application: applications[0].name,
         epochs: [
             applications[0].epochs[0],
             applications[0].epochs[1],
