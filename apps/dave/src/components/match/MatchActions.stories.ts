@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { randomAdvances } from "../../stories/data";
 import { claim } from "../../stories/util";
 import { MatchActions } from "./MatchActions";

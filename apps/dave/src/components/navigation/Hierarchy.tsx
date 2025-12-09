@@ -12,9 +12,9 @@ import {
     useMantineTheme,
     type BreadcrumbsProps,
 } from "@mantine/core";
+import Link from "next/link";
 import { slice } from "ramda";
 import type { FC, ReactNode } from "react";
-import { Link } from "react-router";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 
 export type HierarchyConfig = {
@@ -63,7 +63,7 @@ const ShortFormat: FC<ShortFormatProps> = ({
                     {configsAsMenu.map((config, index) => (
                         <MenuItem key={`menu-item-${index}`}>
                             <Group justify="center">
-                                <Anchor component={Link} to={config.href}>
+                                <Anchor component={Link} href={config.href}>
                                     {config.title}
                                 </Anchor>
                             </Group>
@@ -76,7 +76,7 @@ const ShortFormat: FC<ShortFormatProps> = ({
                     return <Text c="dimmed"> {c.title}</Text>;
 
                 return (
-                    <Anchor key={index} to={c.href} component={Link}>
+                    <Anchor key={index} href={c.href} component={Link}>
                         {c.title}
                     </Anchor>
                 );
@@ -99,7 +99,7 @@ const FullForm: FC<HierarchyProps> = ({
                     return <Text c="dimmed"> {c.title}</Text>;
 
                 return (
-                    <Anchor key={index} to={c.href} component={Link}>
+                    <Anchor key={index} href={c.href} component={Link}>
                         {c.title}
                     </Anchor>
                 );

@@ -5,7 +5,7 @@ export type ApplicationParams = {
 };
 
 export type EpochParams = ApplicationParams & {
-    epochIndex: string;
+    epochIndex: bigint;
 };
 
 export type TournamentParams = EpochParams & {
@@ -13,7 +13,7 @@ export type TournamentParams = EpochParams & {
 };
 
 export type MatchParams = TournamentParams & {
-    matchId: Hex;
+    idHash: Hex;
 };
 
 export const routePathBuilder = {
@@ -29,5 +29,5 @@ export const routePathBuilder = {
     tournament: (params?: TournamentParams) =>
         `${routePathBuilder.epoch(params)}/tournaments/${params?.tournamentAddress ?? ":tournamentAddress"}` as const,
     match: (params?: MatchParams) =>
-        `${routePathBuilder.tournament(params)}/matches/${params?.matchId ?? ":matchId"}` as const,
+        `${routePathBuilder.tournament(params)}/matches/${params?.idHash ?? ":matchId"}` as const,
 };
