@@ -1,12 +1,8 @@
 import type { Match } from "@cartesi/viem";
 import { Divider, Stack } from "@mantine/core";
+import { usePathname, useRouter } from "next/navigation";
 import type { FC } from "react";
-import { useNavigate, useParams } from "react-router";
 import type { Hash } from "viem";
-import {
-    routePathBuilder,
-    type TournamentParams,
-} from "../../routes/routePathBuilder";
 import { ClaimCard } from "./ClaimCard";
 import { MatchCard } from "./MatchCard";
 import { MatchLoserCard } from "./MatchLoserCard";
@@ -34,23 +30,13 @@ export interface TournamentRoundProps {
 }
 
 export const TournamentRound: FC<TournamentRoundProps> = (props) => {
-    const params = useParams<TournamentParams>();
-    const navigate = useNavigate();
+    const pathname = usePathname();
+    const router = useRouter();
+
     const { dangling, hideWinners, index, matches } = props;
     const onMatchClick = (match: Match) => {
-        const url = routePathBuilder.match({
-            application: params.application ?? "",
-            epochIndex: params.epochIndex ?? "",
-            tournamentAddress: params.tournamentAddress ?? "0x",
-            matchId: match.idHash,
-        });
-
-        if (!url)
-            throw new Error(
-                `A match needs to be in a tournament or sub-tournament...`,
-            );
-
-        navigate(url);
+        const url = `${pathname}/matches/${match.idHash}`;
+        router.push(url);
     };
 
     return (

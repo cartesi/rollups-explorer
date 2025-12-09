@@ -3,11 +3,12 @@ packages:
     - packages/*
 
 catalog:
-    eslint: ^9.34.0
+    eslint: ^9.39.1
+    prettier: ^3.7.4
     typescript: ^5.9.3
-    viem: ^2.38.4
+    viem: ^2.41.2
     wagmi: ^2.18.2
-    "@tanstack/react-query": ^5.90.10
+    "@tanstack/react-query": ^5.90.12
     react: "^19.2.3"
     "react-dom": "^19.2.3"
 

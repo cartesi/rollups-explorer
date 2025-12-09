@@ -1,4 +1,4 @@
-import type { Match, MatchAdvanced } from "@cartesi/viem";
+import type { Match, MatchAdvanced, Tournament } from "@cartesi/viem";
 import {
     Button,
     Group,
@@ -51,13 +51,13 @@ interface MatchActionsProps {
     now: number;
 
     /**
-     * Next inner-tournament level.
+     * The sub tournament to display.
      */
-    nextLevel: bigint;
+    subTournament?: Tournament;
 }
 
 export const MatchActions: FC<MatchActionsProps> = (props) => {
-    const { advances, height, match, now, nextLevel } = props;
+    const { advances, height, match, now, subTournament } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
 
@@ -189,44 +189,41 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                             }}
                         />
                     )}
-                {match.deletionReason === "CHILD_TOURNAMENT" && (
-                    <>
-                        <SubTournamentItem
-                            claim={
-                                bisections.length % 2 === 0 ? claim1 : claim2
-                            }
-                            key="sub-tournament"
-                            level={nextLevel}
-                            now={now}
-                            range={[0, 0]} // XXX: need to get range from somewhere
-                            timestamp={match.updatedAt.getTime()}
-                        />
-                        {match.winnerCommitment !== "NONE" && (
-                            <>
-                                <WinnerItem
-                                    key="winner"
-                                    claim={{
-                                        hash:
-                                            match.winnerCommitment === "ONE"
-                                                ? claim1.hash
-                                                : claim2.hash,
-                                    }}
-                                    now={now}
-                                    timestamp={match.updatedAt.getTime()}
-                                    proof={"0x0"} // XXX: need to get proof from somewhere
-                                />
-                                <LoserItem
-                                    claim={
-                                        match.winnerCommitment === "ONE"
-                                            ? claim2
-                                            : claim1
-                                    }
-                                    now={now}
-                                />
-                            </>
-                        )}
-                    </>
+                {subTournament && (
+                    <SubTournamentItem
+                        claim={bisections.length % 2 === 0 ? claim1 : claim2}
+                        key="sub-tournament"
+                        tournament={subTournament}
+                        now={now}
+                        range={[0, 0]} // XXX: need to get range from somewhere
+                        timestamp={match.updatedAt.getTime()}
+                    />
                 )}
+                {match.deletionReason === "CHILD_TOURNAMENT" &&
+                    match.winnerCommitment !== "NONE" && (
+                        <>
+                            <WinnerItem
+                                key="winner"
+                                claim={{
+                                    hash:
+                                        match.winnerCommitment === "ONE"
+                                            ? claim1.hash
+                                            : claim2.hash,
+                                }}
+                                now={now}
+                                timestamp={match.updatedAt.getTime()}
+                                proof={"0x0"} // XXX: need to get proof from somewhere
+                            />
+                            <LoserItem
+                                claim={
+                                    match.winnerCommitment === "ONE"
+                                        ? claim2
+                                        : claim1
+                                }
+                                now={now}
+                            />
+                        </>
+                    )}
                 {match.deletionReason === "STEP" && (
                     <>
                         {match.winnerCommitment !== "NONE" && (

@@ -1,8 +1,7 @@
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-import type { Preview, StoryContext, StoryFn } from "@storybook/react-vite";
+import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
 import React from "react";
-import { MemoryRouter } from "react-router";
 import Layout from "../src/components/layout/Layout";
 import theme from "../src/providers/theme";
 
@@ -10,10 +9,6 @@ import theme from "../src/providers/theme";
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
-
-const withRouter = (StoryFn: StoryFn, context: StoryContext) => (
-    <MemoryRouter>{StoryFn(context.args, context)}</MemoryRouter>
-);
 
 const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     const { title } = context;
@@ -39,6 +34,9 @@ const preview: Preview = {
         backgrounds: { value: "light" },
     },
     parameters: {
+        nextjs: {
+            appDirectory: true,
+        },
         backgrounds: {
             options: {
                 light: { name: "light", value: "#ffffffff" },
@@ -56,7 +54,6 @@ const preview: Preview = {
         // Order matters. So layout decorator first. Fn calling is router(mantine(layout))
         withLayout,
         withMantine,
-        withRouter,
     ],
 };
 

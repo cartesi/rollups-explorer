@@ -1,117 +1,129 @@
-import { useMatch, useMatchAdvances, useTournament } from "@cartesi/wagmi";
-import { Group, Stack, Text, Title } from "@mantine/core";
+"use client";
+import {
+    useMatch,
+    useMatchAdvances,
+    useTournament,
+    useTournaments,
+} from "@cartesi/wagmi";
+import { Stack } from "@mantine/core";
 import { getUnixTime } from "date-fns";
+import { notFound } from "next/navigation";
 import type { FC } from "react";
-import { useParams } from "react-router";
-import { type Hex } from "viem";
 import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
-import { NotFound } from "../components/navigation/NotFound";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
-import { MatchPage } from "../pages/MatchPage";
+import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { MatchPage } from "../page/MatchPage";
 import { routePathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
-export const MatchContainer: FC = () => {
-    const params = useParams<MatchParams>();
-    const applicationId = params.application ?? "";
-    const parsedIndex = parseInt(params.epochIndex ?? "");
-    const epochIndex = isNaN(parsedIndex) ? -1 : parsedIndex;
-    const matchId = (params.matchId ?? "0x") as Hex;
+export const MatchContainer: FC<MatchParams> = (params) => {
     const nowUnixtime = getUnixTime(new Date());
 
     const tournamentQuery = useTournament({
-        application: applicationId,
+        application: params.application,
         address: params.tournamentAddress,
     });
 
-    const matchQuery = useMatch({
-        application: applicationId,
-        epochIndex: BigInt(epochIndex),
-        tournamentAddress: params.tournamentAddress,
-        idHash: matchId,
-    });
-
-    const advancesQuery = useMatchAdvances({
-        application: applicationId,
-        epochIndex: BigInt(epochIndex),
-        tournamentAddress: params.tournamentAddress,
-        idHash: matchId,
+    const matchQuery = useMatch(params);
+    const advancesQuery = useMatchAdvances(params);
+    const subTournamentQuery = useTournaments({
+        ...params,
+        parentTournamentAddress: params.tournamentAddress,
+        parentMatchIdHash: params.idHash,
     });
 
     const isLoading =
         tournamentQuery.isLoading ||
         matchQuery.isLoading ||
-        advancesQuery.isLoading;
+        advancesQuery.isLoading ||
+        subTournamentQuery.isLoading;
     const match = matchQuery.data ?? null;
     const tournament = tournamentQuery.data ?? null;
+    const subTournament = subTournamentQuery.data?.data[0];
+
+    const { matches: parentMatches, tournaments: parentTournaments } =
+        useTournamentHierarchy({
+            application: params.application,
+            epochIndex: params.epochIndex,
+            tournament: tournamentQuery?.data,
+        });
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
         {
-            title: applicationId,
-            href: routePathBuilder.epochs({ application: applicationId }),
+            title: params.application,
+            href: routePathBuilder.epochs(params),
         },
         {
             title: `Epoch #${params.epochIndex}`,
-            href: routePathBuilder.epoch({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
-            }),
+            href: routePathBuilder.epoch(params),
         },
+        ...parentTournaments.flatMap((tournament, index) => {
+            return [
+                {
+                    title: (
+                        <TournamentBreadcrumbSegment
+                            level={tournament.level}
+                            variant="default"
+                        />
+                    ),
+                    href: routePathBuilder.tournament({
+                        application: params.application,
+                        epochIndex: params.epochIndex,
+                        tournamentAddress: tournament.address,
+                    }),
+                },
+                {
+                    title: (
+                        <MatchBreadcrumbSegment
+                            match={parentMatches[index]}
+                            variant="default"
+                        />
+                    ),
+                    href: routePathBuilder.match({
+                        application: params.application,
+                        epochIndex: params.epochIndex,
+                        tournamentAddress: tournament.address,
+                        idHash: parentMatches[index].idHash,
+                    }),
+                },
+            ];
+        }),
         {
-            title: <TournamentBreadcrumbSegment level={0n} variant="default" />,
-            href: routePathBuilder.tournament({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
-                tournamentAddress: params.tournamentAddress ?? "0x",
-            }),
+            title: (
+                <TournamentBreadcrumbSegment
+                    level={tournament?.level ?? 0n}
+                    variant="default"
+                />
+            ),
+            href: routePathBuilder.tournament(params),
         },
         {
             title: <MatchBreadcrumbSegment match={match} variant="filled" />,
-            href: routePathBuilder.match({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
-                tournamentAddress: params.tournamentAddress ?? "0x",
-                matchId,
-            }),
+            href: routePathBuilder.match(params),
         },
     ];
+
+    if (!isLoading && !tournament && !match) {
+        return notFound();
+    }
 
     return (
         <Stack pt="lg" gap="lg">
             <Hierarchy hierarchyConfig={hierarchyConfig} />
-
-            {isLoading ? (
-                <ContainerSkeleton />
-            ) : tournament !== null && match !== null ? (
+            {isLoading && <ContainerSkeleton />}
+            {tournament !== null && match !== null && (
                 <MatchPage
                     advances={advancesQuery.data?.data ?? []}
                     tournament={tournament}
+                    subTournament={subTournament}
                     match={match}
                     now={nowUnixtime}
                 />
-            ) : (
-                <NotFound>
-                    <Stack gap={2} align="center">
-                        <Title c="dimmed" fw="bold" order={3}>
-                            We're not able to find details about match{" "}
-                            <Text c="orange" inherit component="span">
-                                {params.matchId}
-                            </Text>
-                        </Title>
-
-                        <Group gap={3}>
-                            <Text c="dimmed">in application</Text>
-                            <Text c="orange">{params.application}</Text>
-                            <Text c="dimmed">at epoch</Text>
-                            <Text c="orange">{params.epochIndex}</Text>
-                        </Group>
-                    </Stack>
-                </NotFound>
             )}
         </Stack>
     );

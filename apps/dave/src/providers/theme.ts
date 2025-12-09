@@ -1,12 +1,4 @@
-import {
-    AppShell,
-    Card,
-    createTheme,
-    DEFAULT_THEME,
-    mergeMantineTheme,
-    Modal,
-    virtualColor,
-} from "@mantine/core";
+import { createTheme, virtualColor } from "@mantine/core";
 
 const theme = createTheme({
     colors: {
@@ -38,7 +30,7 @@ const theme = createTheme({
         zIndexXL: 500,
     },
     components: {
-        Modal: Modal.extend({
+        Modal: {
             defaultProps: {
                 size: "lg",
                 centered: true,
@@ -47,8 +39,8 @@ const theme = createTheme({
                     blur: 3,
                 },
             },
-        }),
-        AppShell: AppShell.extend({
+        },
+        AppShell: {
             defaultProps: {
                 header: { height: 60 },
                 aside: {
@@ -56,14 +48,14 @@ const theme = createTheme({
                     breakpoint: "sm",
                 },
             },
-        }),
-        Card: Card.extend({
+        },
+        Card: {
             defaultProps: {
                 shadow: "sm",
                 withBorder: true,
             },
-        }),
+        },
     },
 });
 
-export default mergeMantineTheme(DEFAULT_THEME, theme);
+export default theme;

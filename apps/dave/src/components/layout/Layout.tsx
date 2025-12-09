@@ -1,3 +1,5 @@
+"use client";
+
 import {
     AppShell,
     AppShellHeader,
@@ -6,8 +8,8 @@ import {
     Group,
     useMantineTheme,
 } from "@mantine/core";
+import Link from "next/link";
 import type { FC, PropsWithChildren } from "react";
-import { Link } from "react-router";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import CartesiLogo from "../icons/CartesiLogo";
 
@@ -25,7 +27,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                     align="center"
                     px={isSmallDevice ? "xs" : "lg"}
                 >
-                    <Link to="/" aria-label="Home">
+                    <Link href="/" aria-label="Home">
                         <CartesiLogo height={isSmallDevice ? 30 : 40} />
                     </Link>
                 </Group>

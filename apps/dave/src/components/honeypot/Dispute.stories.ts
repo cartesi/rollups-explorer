@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { keccak256, toBytes } from "viem";
 import { claim } from "../../stories/util";
 import { Dispute } from "./Dispute";

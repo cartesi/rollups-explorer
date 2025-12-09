@@ -1,94 +1,116 @@
+"use client";
 import { useCommitments, useMatches, useTournament } from "@cartesi/wagmi";
-import { Group, Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
+import { notFound } from "next/navigation";
 import type { FC } from "react";
-import { useParams } from "react-router";
 import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
-import { NotFound } from "../components/navigation/NotFound";
+import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
-import { TournamentPage } from "../pages/TournamentPage";
+import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { TournamentPage } from "../page/TournamentPage";
 import {
     routePathBuilder,
     type TournamentParams,
 } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
-export const TournamentContainer: FC = () => {
-    const params = useParams<TournamentParams>();
-    const applicationId = params.application ?? "";
-    const parsedIndex = parseInt(params.epochIndex ?? "");
-    const epochIndex = isNaN(parsedIndex) ? -1 : parsedIndex;
-
+export const TournamentContainer: FC<TournamentParams> = (params) => {
     const { data: tournament, isLoading } = useTournament({
-        application: applicationId,
+        application: params.application,
         address: params.tournamentAddress,
     });
 
     // fetch tournament matches
-    const { data: matches } = useMatches({
-        application: applicationId,
-        epochIndex: BigInt(epochIndex),
-        tournamentAddress: params.tournamentAddress,
-    });
+    const { data: matches } = useMatches(params);
 
     // fetch tournament commitments
-    const { data: commitments } = useCommitments({
-        application: applicationId,
-        epochIndex: BigInt(epochIndex),
-        tournamentAddress: params.tournamentAddress,
+    const { data: commitments } = useCommitments(params);
+
+    // tournament hierarchy
+    const { matches: parentMatches, tournaments: parentTournaments } =
+        useTournamentHierarchy({
+            application: params.application,
+            epochIndex: params.epochIndex,
+            tournament: tournament,
+        });
+    const h = parentTournaments.flatMap((tournament, index) => {
+        return [
+            {
+                title: (
+                    <TournamentBreadcrumbSegment
+                        level={tournament.level}
+                        variant="default"
+                    />
+                ),
+                href: routePathBuilder.tournament({
+                    application: params.application,
+                    epochIndex: params.epochIndex,
+                    tournamentAddress: tournament.address,
+                }),
+            },
+            {
+                title: (
+                    <MatchBreadcrumbSegment
+                        match={parentMatches[index]}
+                        variant="default"
+                    />
+                ),
+                href: routePathBuilder.match({
+                    application: params.application,
+                    epochIndex: params.epochIndex,
+                    tournamentAddress: tournament.address,
+                    idHash: parentMatches[index].idHash,
+                }),
+            },
+        ];
     });
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
         {
             title: params.application,
-            href: routePathBuilder.epochs({ application: applicationId }),
+            href: routePathBuilder.epochs({ application: params.application }),
         },
         {
             title: `Epoch #${params.epochIndex}`,
             href: routePathBuilder.epoch({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
+                application: params.application,
+                epochIndex: params.epochIndex,
             }),
         },
+        ...h,
         {
-            title: <TournamentBreadcrumbSegment level={0n} variant="filled" />,
+            title: (
+                <TournamentBreadcrumbSegment
+                    level={tournament?.level ?? 0n}
+                    variant="filled"
+                />
+            ),
             href: routePathBuilder.tournament({
-                application: applicationId,
-                epochIndex: epochIndex.toString(),
-                tournamentAddress: params.tournamentAddress ?? "0x",
+                application: params.application,
+                epochIndex: params.epochIndex,
+                tournamentAddress: tournament?.address ?? "0x",
             }),
         },
     ];
 
+    if (!isLoading && !tournament) {
+        return notFound();
+    }
+
     return (
         <Stack pt="lg" gap="lg">
             <Hierarchy hierarchyConfig={hierarchyConfig} />
-
-            {isLoading ? (
-                <ContainerSkeleton />
-            ) : !!tournament ? (
+            {isLoading && <ContainerSkeleton />}
+            {!!tournament && (
                 <TournamentPage
                     commitments={commitments?.data ?? []}
                     matches={matches?.data ?? []}
                     tournament={tournament}
                 />
-            ) : (
-                <NotFound>
-                    <Stack gap={2}>
-                        <Text c="dimmed" fw="bold">
-                            We're not able to find the tournament
-                        </Text>
-                        <Group gap={3}>
-                            <Text c="dimmed">for application</Text>
-                            <Text c="orange">{applicationId}</Text>
-                            <Text c="dimmed">at epoch</Text>
-                            <Text c="orange">{params.epochIndex}</Text>
-                        </Group>
-                    </Stack>
-                </NotFound>
             )}
         </Stack>
     );

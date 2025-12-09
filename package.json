@@ -20,18 +20,18 @@
         "coveralls": "mkdir coverage && ./node_modules/.bin/lcov-result-merger './!(node_modules)**/**/coverage/lcov.info' './coverage/lcov.info' --prepend-source-files"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.26.2",
-        "@octokit/auth-action": "^5.1.1",
-        "@octokit/rest": "^21.0.0",
+        "@changesets/cli": "^2.29.8",
+        "@octokit/auth-action": "^6.0.2",
+        "@octokit/rest": "^22.0.1",
         "eslint-config-cartesi": "workspace:*",
-        "lcov-result-merger": "4.1.0",
-        "prettier": "3.5.3",
-        "@vercel/sdk": "^1.10.6",
-        "turbo": "^1.10.13",
+        "lcov-result-merger": "5.0.1",
+        "prettier": "catalog:",
+        "@vercel/sdk": "^1.18.1",
+        "turbo": "^2.6.3",
         "typescript": "catalog:"
     },
     "engines": {
         "node": ">=22.x"
     },
-    "packageManager": "pnpm@10.17.1"
+    "packageManager": "pnpm@10.25.0"
 }

@@ -1,4 +1,4 @@
-import type { Epoch, Input } from "@cartesi/viem";
+import type { Epoch, Input, Pagination } from "@cartesi/viem";
 import {
     Anchor,
     Badge,
@@ -8,32 +8,26 @@ import {
     Title,
     useMantineTheme,
 } from "@mantine/core";
+import Link from "next/link";
 import type { FC } from "react";
 import { TbClockFilled, TbInbox, TbTrophy } from "react-icons/tb";
-import { Link, useParams } from "react-router";
 import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
 import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
-import { routePathBuilder, type EpochParams } from "../routes/routePathBuilder";
+import { NextPagination } from "../components/navigation/NextPagination";
 
 type Props = {
     epoch: Epoch;
     inputs: Input[];
+    pagination?: Pagination;
 };
 
-export const EpochDetailsPage: FC<Props> = ({ epoch, inputs }) => {
+export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
-    const params = useParams<EpochParams>();
     const tournamentAddress = epoch.tournamentAddress;
-    const tournamentUrl = tournamentAddress
-        ? routePathBuilder.tournament({
-              application: params.application ?? "",
-              epochIndex: epoch.index.toString(),
-              tournamentAddress: tournamentAddress,
-          })
-        : undefined;
+    const tournamentUrl = `${epoch.index}/tournaments/${tournamentAddress}`;
     const inDispute = false; // XXX: how to know if an epoch is in dispute?
     const tournamentColor = inDispute ? epochStatusColor : "";
     const startCycle = 0; // XXX: how to know the startCycle?
@@ -55,7 +49,7 @@ export const EpochDetailsPage: FC<Props> = ({ epoch, inputs }) => {
             {tournamentUrl && (
                 <Anchor
                     component={Link}
-                    to={tournamentUrl}
+                    href={tournamentUrl}
                     variant="text"
                     c={tournamentColor}
                 >
@@ -80,6 +74,7 @@ export const EpochDetailsPage: FC<Props> = ({ epoch, inputs }) => {
                 <Title order={3}>Inputs</Title>
             </Group>
             <InputList inputs={inputs} />
+            {pagination && <NextPagination pagination={pagination} />}
         </Stack>
     );
 };
