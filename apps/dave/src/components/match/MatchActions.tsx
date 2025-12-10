@@ -201,57 +201,56 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                 )}
                 {match.deletionReason === "CHILD_TOURNAMENT" &&
                     match.winnerCommitment !== "NONE" && (
-                        <>
-                            <WinnerItem
-                                key="winner"
-                                claim={{
-                                    hash:
-                                        match.winnerCommitment === "ONE"
-                                            ? claim1.hash
-                                            : claim2.hash,
-                                }}
-                                now={now}
-                                timestamp={match.updatedAt.getTime()}
-                                proof={"0x0"} // XXX: need to get proof from somewhere
-                            />
-                            <LoserItem
-                                claim={
+                        <WinnerItem
+                            key="winner"
+                            claim={{
+                                hash:
                                     match.winnerCommitment === "ONE"
-                                        ? claim2
-                                        : claim1
-                                }
-                                now={now}
-                            />
-                        </>
+                                        ? claim1.hash
+                                        : claim2.hash,
+                            }}
+                            now={now}
+                            timestamp={match.updatedAt.getTime()}
+                            proof={"0x0"} // XXX: need to get proof from somewhere
+                        />
                     )}
-                {match.deletionReason === "STEP" && (
-                    <>
-                        {match.winnerCommitment !== "NONE" && (
-                            <>
-                                <WinnerItem
-                                    key="winner"
-                                    claim={{
-                                        hash:
-                                            match.winnerCommitment === "ONE"
-                                                ? claim1.hash
-                                                : claim2.hash,
-                                    }}
-                                    now={now}
-                                    timestamp={match.updatedAt.getTime()}
-                                    proof={"0x0"} // XXX: need to get proof from somewhere
-                                />
-                                <LoserItem
-                                    claim={
-                                        match.winnerCommitment === "ONE"
-                                            ? claim2
-                                            : claim1
-                                    }
-                                    now={now}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
+                {match.deletionReason === "CHILD_TOURNAMENT" &&
+                    match.winnerCommitment !== "NONE" && (
+                        <LoserItem
+                            claim={
+                                match.winnerCommitment === "ONE"
+                                    ? claim2
+                                    : claim1
+                            }
+                            now={now}
+                        />
+                    )}
+                {match.deletionReason === "STEP" &&
+                    match.winnerCommitment !== "NONE" && (
+                        <WinnerItem
+                            key="winner"
+                            claim={{
+                                hash:
+                                    match.winnerCommitment === "ONE"
+                                        ? claim1.hash
+                                        : claim2.hash,
+                            }}
+                            now={now}
+                            timestamp={match.updatedAt.getTime()}
+                            proof={"0x0"} // XXX: need to get proof from somewhere
+                        />
+                    )}
+                {match.deletionReason === "STEP" &&
+                    match.winnerCommitment !== "NONE" && (
+                        <LoserItem
+                            claim={
+                                match.winnerCommitment === "ONE"
+                                    ? claim2
+                                    : claim1
+                            }
+                            now={now}
+                        />
+                    )}
             </Timeline>
             <Group justify="flex-end" ref={bottomRef}>
                 {!topInViewport && (
