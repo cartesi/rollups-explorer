@@ -1,4 +1,4 @@
-import { HomeContainer } from "../containers/HomeContainer";
+import { ApplicationsContainer } from "../containers/ApplicationsContainer";
 import { toBoolean, toNumber } from "../util";
 
 export default async function Page(props: PageProps<"/">) {
@@ -7,6 +7,10 @@ export default async function Page(props: PageProps<"/">) {
     const limit = toNumber(searchParams.limit);
     const offset = toNumber(searchParams.offset);
     return (
-        <HomeContainer descending={descending} limit={limit} offset={offset} />
+        <ApplicationsContainer
+            descending={descending}
+            limit={limit}
+            offset={offset}
+        />
     );
 }

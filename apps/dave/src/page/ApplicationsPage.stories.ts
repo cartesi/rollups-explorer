@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { applications } from "../stories/data";
-import { HomePage } from "./HomePage";
+import { ApplicationsPage } from "./ApplicationsPage";
 
 const meta = {
-    title: "Pages/Home",
-    component: HomePage,
+    title: "Pages/Applications",
+    component: ApplicationsPage,
     tags: ["autodocs"],
-} satisfies Meta<typeof HomePage>;
+} satisfies Meta<typeof ApplicationsPage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
