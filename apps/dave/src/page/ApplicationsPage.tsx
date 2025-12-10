@@ -21,7 +21,7 @@ const NoApplications = () => (
     </Card>
 );
 
-export const HomePage: FC<Props> = (props) => {
+export const ApplicationsPage: FC<Props> = (props) => {
     const { applications, pagination } = props;
 
     return (
