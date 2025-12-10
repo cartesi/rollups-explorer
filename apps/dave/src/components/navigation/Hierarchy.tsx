@@ -90,13 +90,12 @@ const FullForm: FC<HierarchyProps> = ({
     breadcrumbOpts,
     separator,
 }) => {
-    const lastConfigIndex = hierarchyConfig.length - 1;
-
     return (
         <Breadcrumbs separator={separator} {...breadcrumbOpts}>
-            {hierarchyConfig.map((c, index) => {
-                if (lastConfigIndex === index)
-                    return <Text c="dimmed"> {c.title}</Text>;
+            {hierarchyConfig.map((c, index, array) => {
+                if (index === array.length - 1) {
+                    return c.title;
+                }
 
                 return (
                     <Anchor key={index} href={c.href} component={Link}>
