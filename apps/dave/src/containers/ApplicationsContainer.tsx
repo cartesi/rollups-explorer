@@ -7,7 +7,7 @@ import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
-import { HomePage } from "../page/HomePage";
+import { ApplicationsPage } from "../page/ApplicationsPage";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export type HomeContainerProps = {
@@ -16,7 +16,7 @@ export type HomeContainerProps = {
     offset?: number;
 };
 
-export const HomeContainer: FC<HomeContainerProps> = (props) => {
+export const ApplicationsContainer: FC<HomeContainerProps> = (props) => {
     const { data, isLoading } = useApplications(props);
     const hierarchyConfig: HierarchyConfig[] = [{ title: "Home", href: "/" }];
     const applications = data?.data ?? [];
@@ -28,7 +28,10 @@ export const HomeContainer: FC<HomeContainerProps> = (props) => {
             {isLoading ? (
                 <ContainerSkeleton />
             ) : (
-                <HomePage applications={applications} />
+                <ApplicationsPage
+                    applications={applications}
+                    pagination={data?.pagination}
+                />
             )}
         </Stack>
     );
