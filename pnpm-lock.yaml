@@ -305,8 +305,8 @@ importers:
         specifier: ^1.51.0
         version: 1.54.1
       '@tenkeylabs/dappwright':
-        specifier: ^2.11.2
-        version: 2.11.2(playwright-core@1.54.1)
+        specifier: ^2.11.4
+        version: 2.12.0(playwright-core@1.54.1)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -3083,8 +3083,8 @@ packages:
     peerDependencies:
       react: ^18 || ^19
 
-  '@tenkeylabs/dappwright@2.11.2':
-    resolution: {integrity: sha512-ITIY1yKqSMoupuu3kKvUMdXOWUg4+T5O5NZLQKIuAf84zk7oxoIjIAgV2Go5QGynQTpSZhKK7o7YmE93PKPWtQ==}
+  '@tenkeylabs/dappwright@2.12.0':
+    resolution: {integrity: sha512-AVGT827BFjNWqz6epsXeAy6Tref8K0iviuogIrAdokPXaVj/8te6Pf+F9dKF0Xy6eE3oXEbqD5+SCZyvb0FQSQ==}
     engines: {node: '>=20'}
     peerDependencies:
       playwright-core: '>1.0'
@@ -12154,7 +12154,7 @@ snapshots:
       '@tanstack/query-core': 5.90.10
       react: 19.2.3
 
-  '@tenkeylabs/dappwright@2.11.2(playwright-core@1.54.1)':
+  '@tenkeylabs/dappwright@2.12.0(playwright-core@1.54.1)':
     dependencies:
       node-stream-zip: 1.15.0
       playwright-core: 1.54.1
