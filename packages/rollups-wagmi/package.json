@@ -42,7 +42,7 @@
         "@wagmi/cli": "^2",
         "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
-        "react": "^19.2.1",
+        "react": "catalog:",
         "tsup": "^8.5.0",
         "tsx": "^4.20.3",
         "typescript": "catalog:",
