@@ -58,7 +58,7 @@
         "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
         "jsdom": "^26.1.0",
-        "react": "^19.2.1",
+        "react": "catalog:",
         "tsup": "^8.5.0",
         "typescript": "catalog:",
         "vitest": "^3.2.4"
