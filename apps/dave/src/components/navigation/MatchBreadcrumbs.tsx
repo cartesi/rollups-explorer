@@ -1,11 +1,11 @@
+import type { Match } from "@cartesi/viem";
 import { Breadcrumbs, Button, type BreadcrumbsProps } from "@mantine/core";
 import type { FC } from "react";
-import type { Match } from "../types";
 import { MatchBadge } from "./MatchBadge";
 
 export interface MatchBreadcrumbsProps
     extends Omit<BreadcrumbsProps, "children"> {
-    matches: Pick<Match, "claim1" | "claim2">[];
+    matches: Pick<Match, "commitmentOne" | "commitmentTwo">[];
 }
 
 export const MatchBreadcrumbs: FC<MatchBreadcrumbsProps> = (props) => {
@@ -26,8 +26,8 @@ export const MatchBreadcrumbs: FC<MatchBreadcrumbsProps> = (props) => {
             </Button>,
             <MatchBadge
                 key={index}
-                claim1={match.claim1}
-                claim2={match.claim2}
+                claim1={{ hash: match.commitmentOne }}
+                claim2={{ hash: match.commitmentTwo }}
                 size="compact-xs"
                 variant={index === matches.length - 1 ? undefined : "default"}
             />,

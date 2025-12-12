@@ -1,37 +1,33 @@
-export type RoutePathParams = {
-    appId?: string;
-    epochIndex?: string;
-    matchId?: string;
-    midMatchId?: string;
-    btMatchId?: string;
+import type { Address, Hex } from "viem";
+
+export type ApplicationParams = {
+    application: string | Address;
+};
+
+export type EpochParams = ApplicationParams & {
+    epochIndex: string;
+};
+
+export type TournamentParams = EpochParams & {
+    tournamentAddress: Address;
+};
+
+export type MatchParams = TournamentParams & {
+    matchId: Hex;
 };
 
 export const routePathBuilder = {
     base: "/" as const,
     home: () => routePathBuilder.base,
-    apps: () => `${routePathBuilder.home()}apps` as const,
-    appDetail: (params?: RoutePathParams) =>
-        `${routePathBuilder.apps()}/${params?.appId ?? ":appId"}` as const,
-    appEpochs: (params?: RoutePathParams) =>
-        `${routePathBuilder.appDetail(params)}/epochs` as const,
-    appEpochDetails: (params?: RoutePathParams) =>
-        `${routePathBuilder.appEpochs(params)}/${params?.epochIndex ?? ":epochIndex"}` as const,
-    topTournament: (params?: RoutePathParams) =>
-        `${routePathBuilder.appEpochDetails(params)}/tt` as const,
-    topTournamentMatches: (params?: RoutePathParams) =>
-        `${routePathBuilder.topTournament(params)}/matches` as const,
-    matchDetail: (params?: RoutePathParams) =>
-        `${routePathBuilder.topTournamentMatches(params)}/${params?.matchId ?? ":matchId"}` as const,
-    middleTournament: (params?: RoutePathParams) =>
-        `${routePathBuilder.matchDetail(params)}/mt` as const,
-    middleTournamentMatches: (params?: RoutePathParams) =>
-        `${routePathBuilder.middleTournament(params)}/matches` as const,
-    midMatchDetail: (params?: RoutePathParams) =>
-        `${routePathBuilder.middleTournamentMatches(params)}/${params?.midMatchId ?? ":midMatchId"}` as const,
-    bottomTournament: (params?: RoutePathParams) =>
-        `${routePathBuilder.midMatchDetail(params)}/bt` as const,
-    bottomTournamentMatches: (params?: RoutePathParams) =>
-        `${routePathBuilder.bottomTournament(params)}/matches` as const,
-    btMatchDetail: (params?: RoutePathParams) =>
-        `${routePathBuilder.bottomTournamentMatches(params)}/${params?.btMatchId ?? ":btMatchId"}` as const,
+    applications: () => `${routePathBuilder.home()}apps` as const,
+    application: (params?: ApplicationParams) =>
+        `${routePathBuilder.applications()}/${params?.application ?? ":application"}` as const,
+    epochs: (params?: ApplicationParams) =>
+        `${routePathBuilder.application(params)}/epochs` as const,
+    epoch: (params?: EpochParams) =>
+        `${routePathBuilder.epochs(params)}/${params?.epochIndex ?? ":epochIndex"}` as const,
+    tournament: (params?: TournamentParams) =>
+        `${routePathBuilder.epoch(params)}/tournaments/${params?.tournamentAddress ?? ":tournamentAddress"}` as const,
+    match: (params?: MatchParams) =>
+        `${routePathBuilder.tournament(params)}/matches/${params?.matchId ?? ":matchId"}` as const,
 };

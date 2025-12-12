@@ -1,6 +1,6 @@
+import type { Input } from "@cartesi/viem";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
-import type { Input } from "../types";
 import { InputCard } from "./InputCard";
 
 interface Props {

@@ -22,7 +22,7 @@ export const Open: Story = {
  * Card for a closed epoch
  */
 export const Closed: Story = {
-    args: { epoch: { ...applications[0].epochs[3], inDispute: false } },
+    args: { epoch: { ...applications[0].epochs[3] } },
 };
 
 /**

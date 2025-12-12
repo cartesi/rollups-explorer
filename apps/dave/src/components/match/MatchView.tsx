@@ -1,11 +1,17 @@
+import type { Match, MatchAdvanced, Tournament } from "@cartesi/viem";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import type { CycleRange, Match, Tournament } from "../types";
+import type { CycleRange } from "../types";
 import { MatchActions } from "./MatchActions";
 
 export interface MatchViewProps {
+    /**
+     * List of advances (bisections) of the match
+     */
+    advances: MatchAdvanced[];
+
     /**
      * The match to display.
      */
@@ -28,11 +34,12 @@ export interface MatchViewProps {
 }
 
 export const MatchView: FC<MatchViewProps> = (props) => {
-    const { tournament, match, now, range } = props;
-    const { claim1, claim2 } = match;
+    const { advances, tournament, match, now, range } = props;
+    const claim1 = { hash: match.commitmentOne };
+    const claim2 = { hash: match.commitmentTwo };
     const { height } = tournament;
 
-    const nextInnerLevel = tournament.level === "top" ? "middle" : "bottom";
+    const nextLevel = tournament.level + 1n;
 
     return (
         <Stack>
@@ -43,18 +50,17 @@ export const MatchView: FC<MatchViewProps> = (props) => {
             <Group>
                 <Text>Claims</Text>
                 <Group gap="xs">
-                    <ClaimText claim={match.claim1} />
+                    <ClaimText claim={claim1} />
                     <Text>vs</Text>
-                    <ClaimText claim={match.claim2} />
+                    <ClaimText claim={claim2} />
                 </Group>
             </Group>
             <Divider label="Actions" />
             <MatchActions
-                actions={match.actions}
-                claim1={claim1}
-                claim2={claim2}
+                advances={advances}
                 height={height}
-                nextLevel={nextInnerLevel}
+                match={match}
+                nextLevel={nextLevel}
                 now={now}
             />
         </Stack>

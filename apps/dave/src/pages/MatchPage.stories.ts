@@ -15,8 +15,9 @@ const now = Math.floor(Date.now() / 1000);
 
 export const TopLevelMatch: Story = {
     args: {
-        tournament: Ongoing.args.tournament,
-        match: Ongoing.args.tournament.matches[1],
+        advances: [],
+        match: Ongoing.args.matches[1],
         now,
+        tournament: Ongoing.args.tournament,
     },
 };

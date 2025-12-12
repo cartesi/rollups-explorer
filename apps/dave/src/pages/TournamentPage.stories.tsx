@@ -1,12 +1,18 @@
+import type { Commitment, Tournament } from "@cartesi/viem";
 import { Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { zeroHash } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import * as TournamentViewStories from "../components/tournament/TournamentView.stories";
-import type { Claim, Tournament } from "../components/types";
+import type { Claim } from "../components/types";
 import { routePathBuilder } from "../routes/routePathBuilder";
 import { applications } from "../stories/data";
-import { claim, generateTournamentId, randomMatches } from "../stories/util";
+import {
+    claim,
+    generateTournamentAddress,
+    randomMatches,
+} from "../stories/util";
 import { TournamentPage } from "./TournamentPage";
 
 const meta = {
@@ -22,7 +28,7 @@ type Props = Parameters<typeof TournamentPage>[0];
 
 const WithBreadcrumb = (props: Props) => {
     const app = applications[0];
-    const params = { appId: app.name, epochIndex: "4" };
+    const params = { application: app.name, epochIndex: "4" };
 
     return (
         <Stack gap="lg">
@@ -31,14 +37,14 @@ const WithBreadcrumb = (props: Props) => {
                     { title: "Home", href: "/" },
                     {
                         title: app.name,
-                        href: routePathBuilder.appEpochs(params),
+                        href: routePathBuilder.epochs(params),
                     },
                     {
                         title: `Epoch #4`,
-                        href: routePathBuilder.appEpochDetails(params),
+                        href: routePathBuilder.epoch(params),
                     },
                     {
-                        title: <TournamentBreadcrumbSegment level="top" />,
+                        title: <TournamentBreadcrumbSegment level={0n} />,
                         href: "#",
                     },
                 ]}
@@ -51,6 +57,8 @@ const WithBreadcrumb = (props: Props) => {
 export const TopLevelClosed: Story = {
     render: WithBreadcrumb,
     args: {
+        commitments: TournamentViewStories.NoChallengerYet.args.commitments,
+        matches: TournamentViewStories.NoChallengerYet.args.matches,
         tournament: TournamentViewStories.NoChallengerYet.args.tournament,
     },
 };
@@ -58,6 +66,8 @@ export const TopLevelClosed: Story = {
 export const TopLevelFinalized: Story = {
     render: WithBreadcrumb,
     args: {
+        commitments: TournamentViewStories.Finalized.args.commitments,
+        matches: TournamentViewStories.Finalized.args.matches,
         tournament: TournamentViewStories.Finalized.args.tournament,
     },
 };
@@ -65,6 +75,8 @@ export const TopLevelFinalized: Story = {
 export const TopLevelDispute: Story = {
     render: WithBreadcrumb,
     args: {
+        commitments: TournamentViewStories.Ongoing.args.commitments,
+        matches: TournamentViewStories.Ongoing.args.matches,
         tournament: TournamentViewStories.Ongoing.args.tournament,
     },
 };
@@ -78,19 +90,44 @@ const startCycle = 1837880065;
 const endCycle = 2453987565;
 
 const randomTournament: Tournament = {
-    id: generateTournamentId(startCycle, endCycle),
-    startCycle,
-    endCycle,
-    height: 48,
-    level: "top",
-    matches: [],
-    danglingClaim: undefined,
+    address: generateTournamentAddress(startCycle, endCycle),
+    createdAt: new Date(now),
+    epochIndex: 0n,
+    finalStateHash: null,
+    finishedAtBlock: 1n,
+    height: 48n,
+    level: 0n,
+    log2step: 1n,
+    maxLevel: 3n,
+    parentMatchIdHash: null,
+    parentTournamentAddress: null,
+    updatedAt: new Date(now),
+    winnerCommitment: null,
 };
-randomMatches(now, randomTournament, claims);
+
+const commitments: Commitment[] = claims.map((claim, i) => ({
+    blockNumber: BigInt(i),
+    commitment: claim.hash,
+    createdAt: new Date(now + i),
+    epochIndex: 0n,
+    finalStateHash: zeroHash,
+    submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    tournamentAddress: randomTournament.address,
+    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+    updatedAt: new Date(now + i),
+}));
+
+const matches = randomMatches(
+    now,
+    randomTournament,
+    claims.map(({ hash }) => hash),
+);
 
 export const TopLevelLargeDispute: Story = {
     render: WithBreadcrumb,
     args: {
+        commitments,
+        matches,
         tournament: randomTournament,
     },
 };
@@ -98,6 +135,8 @@ export const TopLevelLargeDispute: Story = {
 export const MidLevelDispute: Story = {
     render: WithBreadcrumb,
     args: {
+        commitments: TournamentViewStories.MidLevelDispute.args.commitments,
+        matches: TournamentViewStories.MidLevelDispute.args.matches,
         tournament: TournamentViewStories.MidLevelDispute.args.tournament,
     },
 };

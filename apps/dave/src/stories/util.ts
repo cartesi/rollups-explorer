@@ -1,3 +1,4 @@
+import type { Match, Tournament, WinnerCommitment } from "@cartesi/viem";
 import {
     concat,
     encodeAbiParameters,
@@ -6,9 +7,11 @@ import {
     numberToHex,
     slice,
     toBytes,
+    type Address,
+    type Hash,
     type Hex,
 } from "viem";
-import type { Claim, Tournament } from "../components/types";
+import type { Claim } from "../components/types";
 
 /**
  * Create a pseudo-random number generator from a seed
@@ -51,11 +54,11 @@ const hexToFraction = (value: Hex): number => {
  * Generate a random winner for a match, 20% chance of undefined, 40% chance of 1, 40% chance of 2
  * @returns
  */
-const randomWinner = (claim1: Claim, claim2: Claim): 1 | 2 | undefined => {
-    const r = hexToFraction(keccak256(concat([claim1.hash, claim2.hash])));
-    if (r < 0.2) return undefined;
-    if (r < 0.6) return 1;
-    return 2;
+const randomWinner = (claim1: Hash, claim2: Hash): WinnerCommitment => {
+    const r = hexToFraction(keccak256(concat([claim1, claim2])));
+    if (r < 0.2) return "NONE";
+    if (r < 0.6) return "ONE";
+    return "TWO";
 };
 
 /**
@@ -101,11 +104,15 @@ export const generateMatchID = (claimOne: Hex, claimTwo: Hex) => {
     return keccak256(abiEncodedClaims);
 };
 
-export const generateTournamentId = (n1: number, n2: number) => {
+export const generateTournamentAddress = (n1: number, n2: number): Address => {
     //xxx handy cheat here...
-    return generateMatchID(
-        numberToHex(n1, { size: 32 }),
-        numberToHex(n2, { size: 32 }),
+    return slice(
+        generateMatchID(
+            numberToHex(n1, { size: 32 }),
+            numberToHex(n2, { size: 32 }),
+        ),
+        0,
+        20,
     );
 };
 
@@ -118,42 +125,62 @@ export const generateTournamentId = (n1: number, n2: number) => {
 export const randomMatches = (
     timestamp: number,
     tournament: Tournament,
-    claims: Claim[],
-): Tournament => {
+    claims: Hash[],
+): Match[] => {
     const rng = mulberry32(0);
 
+    const matches: Match[] = [];
+    let danglingClaim: Hash | undefined = undefined;
     let claim = claims.shift();
     while (claim) {
-        if (tournament.danglingClaim) {
+        if (danglingClaim) {
             // create a match with the dangling claim
-            const claim1 = tournament.danglingClaim;
-            tournament.matches.push({
-                id: generateMatchID(claim1.hash, claim.hash),
-                actions: [],
-                claim1,
-                claim2: claim,
-                timestamp,
+            const claim1 = danglingClaim;
+            matches.push({
+                idHash: generateMatchID(claim1, claim),
+                commitmentOne: claim1,
+                commitmentTwo: claim,
+                blockNumber: 1n,
+                createdAt: new Date(timestamp),
+                deletionBlockNumber: null,
+                deletionReason: "NOT_DELETED",
+                deletionTxHash: null,
+                epochIndex: 0n,
+                leftOfTwo:
+                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                tournamentAddress: tournament.address,
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+                winnerCommitment: "NONE",
             });
-            tournament.danglingClaim = undefined;
-            timestamp++; // XXX: improve this timestamp incrementation
+            danglingClaim = undefined;
+            timestamp++; // XXX: improve this timestamp increment
         } else {
             // assign the claim to the dangling slot
-            tournament.danglingClaim = claim;
+            danglingClaim = claim;
         }
 
         // get pending matches (without a winner) and pick one randomlly
-        const pending = tournament.matches.filter((match) => !match.winner);
+        const pending = matches.filter(
+            (match) => match.winnerCommitment === "NONE",
+        );
         const match = pending[Math.floor(rng() * pending.length)];
         if (match) {
             // resolve a winner randomly
-            const winner = randomWinner(match.claim1, match.claim2);
-            if (winner) {
+            const winner = randomWinner(
+                match.commitmentOne,
+                match.commitmentTwo,
+            );
+            match.winnerCommitment = winner;
+            if (winner !== "NONE") {
                 // assign the winner, and put the claim back to the list
-                match.winner = winner;
-                match.winnerTimestamp = timestamp;
+                match.updatedAt = new Date(timestamp);
                 timestamp++; // XXX: improve this timestamp incrementation
-                const winnerClaim = winner === 1 ? match.claim1 : match.claim2;
-                claims.unshift(winnerClaim);
+                claims.unshift(
+                    winner === "ONE"
+                        ? match.commitmentOne
+                        : match.commitmentTwo,
+                );
             }
         }
 
@@ -161,13 +188,17 @@ export const randomMatches = (
     }
 
     // define tournament winner
-    const pending = tournament.matches.filter((match) => !match.winner);
+    const pending = matches.filter(
+        (match) => match.winnerCommitment === "NONE",
+    );
     if (pending.length === 0) {
         // all matches are resolved, the winner is the last surviving claim
-        const lastMatch = tournament.matches[tournament.matches.length - 1];
-        tournament.winner =
-            lastMatch.winner === 1 ? lastMatch.claim1 : lastMatch.claim2;
+        const lastMatch = matches[matches.length - 1];
+        tournament.winnerCommitment =
+            lastMatch.winnerCommitment === "ONE"
+                ? lastMatch.commitmentOne
+                : lastMatch.commitmentTwo;
     }
 
-    return tournament;
+    return matches;
 };

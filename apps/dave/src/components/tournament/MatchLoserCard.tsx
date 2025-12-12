@@ -1,3 +1,4 @@
+import type { Match } from "@cartesi/viem";
 import {
     Card,
     Group,
@@ -8,7 +9,6 @@ import {
 import type { FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";
 import { ClaimText } from "../ClaimText";
-import type { Match } from "../types";
 
 export interface MatchLoserCardProps extends CardProps {
     /**
@@ -27,11 +27,14 @@ export const MatchLoserCard: FC<MatchLoserCardProps> = ({
     onClick,
     ...cardProps
 }) => {
-    const { claim1, claim2, winner } = match;
+    const claim1 = { hash: match.commitmentOne };
+    const claim2 = { hash: match.commitmentTwo };
+    const winner = match.winnerCommitment;
     const theme = useMantineTheme();
     const gold = theme.colors.yellow[5];
 
-    const loser = winner === 1 ? claim2 : winner === 2 ? claim1 : undefined;
+    const loser =
+        winner === "ONE" ? claim2 : winner === "TWO" ? claim1 : undefined;
     if (!loser) {
         return;
     }

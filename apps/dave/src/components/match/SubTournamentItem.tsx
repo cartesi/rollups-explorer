@@ -11,7 +11,7 @@ import { TbTrendingDown } from "react-icons/tb";
 import { Link, useParams } from "react-router";
 import {
     routePathBuilder,
-    type RoutePathParams,
+    type MatchParams,
 } from "../../routes/routePathBuilder";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import type { Claim, CycleRange } from "../types";
@@ -26,7 +26,7 @@ export interface SubTournamentItemProps {
     /**
      * Level of the sub tournament
      */
-    level: "middle" | "bottom" | "none";
+    level: bigint;
 
     /**
      * Current timestamp
@@ -46,14 +46,16 @@ export interface SubTournamentItemProps {
 
 export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
     const { claim, level, now, range, timestamp } = props;
-    const params = useParams<RoutePathParams>();
-    const subTournamentUrl =
-        level === "middle"
-            ? routePathBuilder.middleTournament(params)
-            : routePathBuilder.bottomTournament(params);
+    const params = useParams<MatchParams>();
+    const tournamentUrl = routePathBuilder.tournament({
+        application: params.application ?? "",
+        epochIndex: params.epochIndex ?? "",
+        tournamentAddress: params.tournamentAddress ?? "0x",
+    });
     const theme = useMantineTheme();
     const scheme = useComputedColorScheme();
     const bg = scheme === "light" ? theme.colors.gray[0] : undefined;
+    const labels = ["none", "middle", "bottom"];
 
     return (
         <ClaimTimelineItem claim={claim} now={now} timestamp={timestamp}>
@@ -64,10 +66,10 @@ export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
                     </Stack>
                     <Button
                         component={Link}
-                        to={subTournamentUrl}
+                        to={tournamentUrl}
                         rightSection={<TbTrendingDown />}
                     >
-                        {level}
+                        {labels[Number(level)] ?? "none"}
                     </Button>
                 </Group>
             </Paper>
