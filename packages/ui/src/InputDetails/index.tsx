@@ -35,8 +35,7 @@ interface InputDetailsProps {
 }
 
 interface InputDetailsType
-    extends FC<InputDetailsProps>,
-        StaticContentComponents {}
+    extends FC<InputDetailsProps>, StaticContentComponents {}
 
 interface MemoTabsProps {
     isSmallDevice?: boolean;

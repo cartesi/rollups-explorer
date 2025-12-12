@@ -1,7 +1,7 @@
 import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
+import Link from "next/link";
 import type { FC } from "react";
-import { Link } from "react-router";
 import { routePathBuilder } from "../../routes/routePathBuilder";
 
 type ApplicationCardProps = { application: Application };
@@ -33,7 +33,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
               : `${processedInputs} inputs`;
 
     return (
-        <Card shadow="md" component={Link} to={url}>
+        <Card shadow="md" component={Link} href={url}>
             <Stack>
                 <Stack gap="0">
                     <Group justify="space-between">

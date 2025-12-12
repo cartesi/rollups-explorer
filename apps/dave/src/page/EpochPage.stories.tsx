@@ -1,20 +1,20 @@
 import { Stack } from "@mantine/core";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { keccak256 } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { applications } from "../stories/data";
-import { EpochDetailsPage } from "./EpochDetailsPage";
+import { EpochPage } from "./EpochPage";
 
 const meta = {
     title: "Pages/Epoch Details",
-    component: EpochDetailsPage,
+    component: EpochPage,
     tags: ["autodocs"],
-} satisfies Meta<typeof EpochDetailsPage>;
+} satisfies Meta<typeof EpochPage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-type Props = Parameters<typeof EpochDetailsPage>[0];
+type Props = Parameters<typeof EpochPage>[0];
 
 const WithBreadcrumb = (props: Props) => {
     const app = applications[0];
@@ -27,7 +27,7 @@ const WithBreadcrumb = (props: Props) => {
                     { title: `Epoch #${props.epoch.index}`, href: "#" },
                 ]}
             />
-            <EpochDetailsPage {...props} />
+            <EpochPage {...props} />
         </Stack>
     );
 };

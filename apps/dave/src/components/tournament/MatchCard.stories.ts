@@ -1,5 +1,5 @@
 import type { Match } from "@cartesi/viem";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { fn } from "storybook/test";
 import { claim, generateMatchID } from "../../stories/util";
 import { MatchCard } from "./MatchCard";

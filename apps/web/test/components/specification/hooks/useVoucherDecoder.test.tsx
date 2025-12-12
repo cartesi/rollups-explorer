@@ -40,14 +40,14 @@ describe("useVoucherDecoder hook", () => {
     it("should change status to loading when fetching starts", async () => {
         const promise = new Promise<whatsabi.AutoloadResult>(
             (resolve, reject) => {
-                setTimeout(() =>
+                (setTimeout(() =>
                     resolve({
                         abi: validABIByDestination[destination],
                         address: destination,
                         proxies: [],
                     }),
                 ),
-                    500;
+                    500);
             },
         );
 

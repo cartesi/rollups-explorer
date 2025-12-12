@@ -1,5 +1,5 @@
 import { Timeline } from "@mantine/core";
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { claim } from "../../stories/util";
 import type { CycleRange } from "../types";
 import { BisectionItem } from "./BisectionItem";

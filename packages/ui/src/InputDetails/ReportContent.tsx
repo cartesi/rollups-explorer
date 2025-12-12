@@ -2,8 +2,10 @@
 import { FC } from "react";
 import { PageableContent, PageableContentProps } from "./PageableContent";
 
-export interface ReportContentType
-    extends Omit<PageableContentProps, "outputType"> {}
+export interface ReportContentType extends Omit<
+    PageableContentProps,
+    "outputType"
+> {}
 
 const DISPLAY_NAME = "ReportContent" as const;
 
