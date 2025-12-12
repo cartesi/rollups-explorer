@@ -9,8 +9,10 @@ import { useUncontrolled } from "@mantine/hooks";
 import { FC, useEffect } from "react";
 import { RollupVersion } from "./commons/interfaces";
 
-export interface RollupVersionSegmentProps
-    extends Omit<SegmentedControlProps, "onChange" | "data"> {
+export interface RollupVersionSegmentProps extends Omit<
+    SegmentedControlProps,
+    "onChange" | "data"
+> {
     gap?: MantineSpacing;
     label?: string;
     description?: string;

@@ -133,8 +133,10 @@ const decodeOutput = (
     return { payload };
 };
 
-interface FetchDestinationABIAndDecodeParams
-    extends Omit<UseVoucherDecoderProps, "appVersion"> {
+interface FetchDestinationABIAndDecodeParams extends Omit<
+    UseVoucherDecoderProps,
+    "appVersion"
+> {
     nodeRpcUrl?: string;
 }
 
