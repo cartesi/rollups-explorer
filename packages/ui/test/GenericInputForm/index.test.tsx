@@ -316,8 +316,8 @@ describe("GenericInputForm", () => {
 
             fireEvent.click(buttonLabel);
 
-            expect(buttonLabel.closest("button")).not.toBeDisabled(),
-                expect(mockedWrite).toHaveBeenCalled();
+            (expect(buttonLabel.closest("button")).not.toBeDisabled(),
+                expect(mockedWrite).toHaveBeenCalled());
         });
 
         it("should invoke onSearchApplications function after successful submission", async () => {

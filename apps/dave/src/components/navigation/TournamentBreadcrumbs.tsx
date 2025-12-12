@@ -3,8 +3,10 @@ import { Breadcrumbs, Button, type BreadcrumbsProps } from "@mantine/core";
 import type { FC } from "react";
 import { MatchBadge } from "./MatchBadge";
 
-export interface TournamentBreadcrumbsProps
-    extends Omit<BreadcrumbsProps, "children"> {
+export interface TournamentBreadcrumbsProps extends Omit<
+    BreadcrumbsProps,
+    "children"
+> {
     parentMatches: Pick<Match, "commitmentOne" | "commitmentTwo">[];
 }
 
