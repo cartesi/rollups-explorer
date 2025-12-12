@@ -794,12 +794,12 @@ describe("ERC20 Portal Deposit", () => {
 
             await fillFormValues(app, token, "2");
 
-            expect(
+            (expect(
                 screen.getByText("Approve").closest("button"),
             ).toBeDisabled(),
                 expect(
                     screen.getByText("Deposit").closest("button"),
-                ).toBeDisabled();
+                ).toBeDisabled());
 
             expect(screen.getByText("Check wallet...")).toBeVisible();
         });

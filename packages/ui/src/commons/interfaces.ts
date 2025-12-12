@@ -5,7 +5,9 @@ import {
 
 export type RollupVersion = `${ExplorerRollupVersion}`;
 
-export interface Application
-    extends Pick<ExplorerApplication, "id" | "address"> {
+export interface Application extends Pick<
+    ExplorerApplication,
+    "id" | "address"
+> {
     rollupVersion: RollupVersion;
 }

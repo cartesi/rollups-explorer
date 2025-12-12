@@ -2,8 +2,10 @@
 import type { FC, ReactNode } from "react";
 import { PageableContent, PageableContentProps } from "./PageableContent";
 
-export interface VoucherContentType
-    extends Omit<PageableContentProps, "outputType"> {
+export interface VoucherContentType extends Omit<
+    PageableContentProps,
+    "outputType"
+> {
     children?: ReactNode;
 }
 
