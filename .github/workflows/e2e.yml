@@ -57,15 +57,14 @@ jobs:
     env:
       DEPLOYMENT_URL: ${{ needs.get-sepolia-deployment-url.outputs.deployment-url }}
     container:
-      image: mcr.microsoft.com/playwright:v1.53.2-jammy
+      image: mcr.microsoft.com/playwright:v1.57.0-jammy
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          package_json_file: "package.json"
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
@@ -74,10 +73,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Install Playwright
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: /root/.cache/ms-playwright
         run: cd apps/web && pnpm exec playwright install --with-deps
-
       - name: Run e2e tests
         run: pnpm test:e2e
         id: e2e
