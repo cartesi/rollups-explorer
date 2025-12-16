@@ -11,10 +11,7 @@ import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumb
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { TournamentPage } from "../page/TournamentPage";
-import {
-    routePathBuilder,
-    type TournamentParams,
-} from "../routes/routePathBuilder";
+import { pathBuilder, type TournamentParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const TournamentContainer: FC<TournamentParams> = (params) => {
@@ -45,7 +42,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                         variant="default"
                     />
                 ),
-                href: routePathBuilder.tournament({
+                href: pathBuilder.tournament({
                     application: params.application,
                     epochIndex: params.epochIndex,
                     tournamentAddress: tournament.address,
@@ -58,7 +55,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                         variant="default"
                     />
                 ),
-                href: routePathBuilder.match({
+                href: pathBuilder.match({
                     application: params.application,
                     epochIndex: params.epochIndex,
                     tournamentAddress: tournament.address,
@@ -72,11 +69,11 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
         { title: "Home", href: "/" },
         {
             title: params.application,
-            href: routePathBuilder.epochs({ application: params.application }),
+            href: pathBuilder.epochs({ application: params.application }),
         },
         {
             title: `Epoch #${params.epochIndex}`,
-            href: routePathBuilder.epoch({
+            href: pathBuilder.epoch({
                 application: params.application,
                 epochIndex: params.epochIndex,
             }),
@@ -89,7 +86,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                     variant="filled"
                 />
             ),
-            href: routePathBuilder.tournament({
+            href: pathBuilder.tournament({
                 application: params.application,
                 epochIndex: params.epochIndex,
                 tournamentAddress: tournament?.address ?? "0x",

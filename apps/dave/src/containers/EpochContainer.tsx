@@ -8,7 +8,7 @@ import {
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { EpochPage } from "../page/EpochPage";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import { pathBuilder } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export type EpochContainerProps = {
@@ -29,11 +29,11 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
         { title: "Home", href: "/" },
         {
             title: props.application,
-            href: routePathBuilder.epochs(props),
+            href: pathBuilder.epochs(props),
         },
         {
             title: `Epoch #${props.epochIndex}`,
-            href: routePathBuilder.epoch(props),
+            href: pathBuilder.epoch(props),
         },
     ];
 

@@ -2,7 +2,7 @@ import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import type { FC } from "react";
-import { routePathBuilder } from "../../routes/routePathBuilder";
+import { pathBuilder } from "../../routes/routePathBuilder";
 
 type ApplicationCardProps = { application: Application };
 
@@ -23,8 +23,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
     const stateColour = getStateColour(state);
-    const appId = application.name ?? applicationAddress;
-    const url = routePathBuilder.epochs({ application: appId });
+    const url = pathBuilder.epochs({ application: application.name });
     const inputsLabel =
         processedInputs === 0n
             ? "no inputs"
