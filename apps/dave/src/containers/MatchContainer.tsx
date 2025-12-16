@@ -17,7 +17,7 @@ import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumb
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { MatchPage } from "../page/MatchPage";
-import { routePathBuilder, type MatchParams } from "../routes/routePathBuilder";
+import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const MatchContainer: FC<MatchParams> = (params) => {
@@ -56,11 +56,11 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         { title: "Home", href: "/" },
         {
             title: params.application,
-            href: routePathBuilder.epochs(params),
+            href: pathBuilder.epochs(params),
         },
         {
             title: `Epoch #${params.epochIndex}`,
-            href: routePathBuilder.epoch(params),
+            href: pathBuilder.epoch(params),
         },
         ...parentTournaments.flatMap((tournament, index) => {
             return [
@@ -71,7 +71,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                             variant="default"
                         />
                     ),
-                    href: routePathBuilder.tournament({
+                    href: pathBuilder.tournament({
                         application: params.application,
                         epochIndex: params.epochIndex,
                         tournamentAddress: tournament.address,
@@ -84,7 +84,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                             variant="default"
                         />
                     ),
-                    href: routePathBuilder.match({
+                    href: pathBuilder.match({
                         application: params.application,
                         epochIndex: params.epochIndex,
                         tournamentAddress: tournament.address,
@@ -100,11 +100,11 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     variant="default"
                 />
             ),
-            href: routePathBuilder.tournament(params),
+            href: pathBuilder.tournament(params),
         },
         {
             title: <MatchBreadcrumbSegment match={match} variant="filled" />,
-            href: routePathBuilder.match(params),
+            href: pathBuilder.match(params),
         },
     ];
 

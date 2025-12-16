@@ -6,7 +6,7 @@ import { Hierarchy } from "../components/navigation/Hierarchy";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import * as TournamentViewStories from "../components/tournament/TournamentView.stories";
 import type { Claim } from "../components/types";
-import { routePathBuilder } from "../routes/routePathBuilder";
+import { pathBuilder } from "../routes/routePathBuilder";
 import { applications } from "../stories/data";
 import {
     claim,
@@ -37,11 +37,11 @@ const WithBreadcrumb = (props: Props) => {
                     { title: "Home", href: "/" },
                     {
                         title: app.name,
-                        href: routePathBuilder.epochs(params),
+                        href: pathBuilder.epochs(params),
                     },
                     {
                         title: `Epoch #4`,
-                        href: routePathBuilder.epoch(params),
+                        href: pathBuilder.epoch(params),
                     },
                     {
                         title: <TournamentBreadcrumbSegment level={0n} />,
