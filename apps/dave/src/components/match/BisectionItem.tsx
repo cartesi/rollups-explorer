@@ -58,9 +58,9 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
     const p = useMemo(() => {
         const [start, end] = range;
         const [domainStart, domainEnd] = domain;
-        return (
-            (start + end - 2 * domainStart) / (2 * (domainEnd - domainStart))
-        );
+        const numerator = start + end - 2 * domainStart;
+        const denominator = Math.max(2 * (domainEnd - domainStart), 1);
+        return numerator / denominator;
     }, [domain, range]);
 
     return (
