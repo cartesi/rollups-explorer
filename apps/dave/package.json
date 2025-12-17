@@ -18,6 +18,7 @@
         "@cartesi/wagmi": "2.0.0-alpha.27",
         "@mantine/core": "^8.3.10",
         "@mantine/hooks": "^8.3.10",
+        "@mantine/notifications": "^8.3.10",
         "@raugfer/jazzicon": "^1.0.6",
         "@tabler/icons-react": "^3.35.0",
         "@tanstack/react-query": "catalog:",
