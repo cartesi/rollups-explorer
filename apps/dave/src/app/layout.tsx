@@ -1,6 +1,7 @@
 "use client";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { FC, ReactNode } from "react";
 import { StrictMode } from "react";
