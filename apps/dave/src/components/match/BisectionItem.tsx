@@ -47,7 +47,7 @@ export interface BisectionItemProps extends TimelineItemProps {
     total: number;
 }
 
-export const BisectionItem: FC<BisectionItemProps> = forwardRef<
+const BisectionItem: FC<BisectionItemProps> = forwardRef<
     HTMLDivElement,
     BisectionItemProps
 >((props, ref) => {
@@ -102,3 +102,7 @@ export const BisectionItem: FC<BisectionItemProps> = forwardRef<
         </ClaimTimelineItem>
     );
 });
+
+BisectionItem.displayName = "BisectionItem";
+
+export { BisectionItem };
