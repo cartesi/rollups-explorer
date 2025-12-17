@@ -145,7 +145,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         key={i}
                         claim={i % 2 === 0 ? claim1 : claim2}
                         color={theme.colors.gray[6]}
-                        domain={ranges[Math.floor(i / bars) * bars]}
+                        domain={ranges[Math.floor(i / bars) * bars] ?? [0, 1]} //xxx : a default to avoid unstable undefined error and division by zero.
                         expand={
                             i % bars === bars - 1 && i < bisections.length - 1
                         }

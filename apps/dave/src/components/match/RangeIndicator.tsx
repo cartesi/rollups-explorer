@@ -35,8 +35,9 @@ export const RangeIndicator: FC<RangeIndicatorProps> = (props) => {
 
     useEffect(() => {
         // box percentage calculation
-        setWidth((end - start) / (domainEnd - domainStart));
-        setLeft((start - domainStart) / (domainEnd - domainStart));
+        const denominator = Math.max(domainEnd - domainStart, 1);
+        setWidth((end - start) / denominator);
+        setLeft((start - domainStart) / denominator);
     }, [domain, value]);
 
     return (
