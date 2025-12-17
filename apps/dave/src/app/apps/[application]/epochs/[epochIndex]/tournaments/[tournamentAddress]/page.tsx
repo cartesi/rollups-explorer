@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getAddress } from "viem";
 import { TournamentContainer } from "../../../../../../../containers/TournamentContainer";
 
@@ -6,8 +7,16 @@ export default async function Page(
 ) {
     const params = await props.params;
     const application = params.application;
-    const epochIndex = BigInt(params.epochIndex);
-    const tournamentAddress = getAddress(params.tournamentAddress);
+    let epochIndex, tournamentAddress;
+
+    try {
+        epochIndex = BigInt(params.epochIndex);
+        tournamentAddress = getAddress(params.tournamentAddress);
+    } catch (err: unknown) {
+        const error = err as Error;
+        console.error(error.message);
+        return notFound();
+    }
 
     return (
         <TournamentContainer
