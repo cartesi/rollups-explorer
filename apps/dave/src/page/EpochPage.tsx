@@ -2,6 +2,8 @@ import type { Epoch, Input, Pagination } from "@cartesi/viem";
 import {
     Anchor,
     Badge,
+    Card,
+    Center,
     Group,
     Stack,
     Text,
@@ -9,7 +11,8 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import Link from "next/link";
-import type { FC } from "react";
+import { isEmpty, isNil, isNotNil } from "ramda";
+import { Activity, type FC } from "react";
 import { TbClockFilled, TbInbox, TbTrophy } from "react-icons/tb";
 import { isAddress } from "viem";
 import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
@@ -23,6 +26,16 @@ type Props = {
     inputs: Input[];
     pagination?: Pagination;
 };
+
+const NoInputs = () => (
+    <Card shadow="md">
+        <Center>
+            <Text c="dimmed" size="xl" tt="uppercase">
+                no inputs.
+            </Text>
+        </Center>
+    </Card>
+);
 
 export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
     const theme = useMantineTheme();
@@ -83,7 +96,8 @@ export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
                 <TbInbox size={theme.other.mdIconSize} />
                 <Title order={3}>Inputs</Title>
             </Group>
-            <InputList inputs={inputs} />
+            {inputs.length > 0 && <InputList inputs={inputs} />}
+            {isEmpty(inputs) && <NoInputs />}
             {pagination && <NextPagination pagination={pagination} />}
         </Stack>
     );
