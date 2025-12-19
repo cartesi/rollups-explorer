@@ -5,7 +5,7 @@ import theme from "./theme";
 
 export const StyleProvider: FC<PropsWithChildren> = ({ children }) => {
     return (
-        <MantineProvider theme={theme} forceColorScheme="dark">
+        <MantineProvider theme={theme}>
             <Notifications />
             {children}
         </MantineProvider>

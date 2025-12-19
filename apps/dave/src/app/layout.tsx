@@ -17,16 +17,16 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
     return (
         <html lang="en" {...mantineHtmlProps}>
             <head>
-                <ColorSchemeScript defaultColorScheme="auto" />
+                <ColorSchemeScript />
             </head>
             <body>
                 <StrictMode>
-                    <DataProvider>
-                        <StyleProvider>
+                    <StyleProvider>
+                        <DataProvider>
                             <Layout>{children}</Layout>
-                        </StyleProvider>
-                        <Analytics />
-                    </DataProvider>
+                            <Analytics />
+                        </DataProvider>
+                    </StyleProvider>
                 </StrictMode>
             </body>
         </html>
