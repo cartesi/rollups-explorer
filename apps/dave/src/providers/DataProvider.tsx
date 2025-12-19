@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { defaultTo, pipe } from "ramda";
 import type { FC, PropsWithChildren } from "react";
-import honeypotData from "./localdata/honeypot";
+import addTestCaseData from "./localdata/cases";
 
 const mockEnabled = defaultTo(
     false,
@@ -17,7 +17,7 @@ const nodeRpcUrl =
     process.env.NEXT_PUBLIC_CARTESI_NODE_RPC_URL ??
     "http://127.0.0.1:10011/rpc";
 
-const injectData = pipe(honeypotData);
+const injectData = pipe(addTestCaseData);
 
 const queryClientConfig: QueryClientConfig = mockEnabled
     ? {
