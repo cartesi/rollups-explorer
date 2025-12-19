@@ -16,6 +16,7 @@ import { defaultTo } from "ramda";
 import { Activity, type FC, type PropsWithChildren } from "react";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import CartesiLogo from "../icons/CartesiLogo";
+import { ThemeToggle } from "../ThemeToggle";
 
 const debugEnabled = defaultTo(
     false,
@@ -82,12 +83,13 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                         <CartesiLogo height={isSmallDevice ? 30 : 40} />
                     </Link>
 
-                    <Activity mode={debugEnabled ? "visible" : "hidden"}>
-                        <Group>
+                    <Group>
+                        <ThemeToggle />
+                        <Activity mode={debugEnabled ? "visible" : "hidden"}>
                             <Button onClick={printQueryInfo}>Show cache</Button>
                             <Button onClick={logQueries}>Export queries</Button>
-                        </Group>
-                    </Activity>
+                        </Activity>
+                    </Group>
                 </Group>
             </AppShellHeader>
             <AppShellMain>
