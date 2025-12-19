@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import type { FC } from "react";
 import { TbClockFilled, TbInbox, TbTrophy } from "react-icons/tb";
+import { isAddress } from "viem";
 import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
 import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
@@ -27,7 +28,9 @@ export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
     const tournamentAddress = epoch.tournamentAddress;
-    const tournamentUrl = `${epoch.index}/tournaments/${tournamentAddress}`;
+    const tournamentUrl = isAddress(tournamentAddress ?? "0x")
+        ? `${epoch.index}/tournaments/${tournamentAddress}`
+        : null;
     const inDispute = false; // XXX: how to know if an epoch is in dispute?
     const tournamentColor = inDispute ? epochStatusColor : "";
     const startCycle = 0; // XXX: how to know the startCycle?
@@ -46,10 +49,10 @@ export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
                 )}
             </Group>
 
-            {tournamentUrl && (
+            <Activity mode={isNotNil(tournamentUrl) ? "visible" : "hidden"}>
                 <Anchor
                     component={Link}
-                    href={tournamentUrl}
+                    href={tournamentUrl!}
                     variant="text"
                     c={tournamentColor}
                 >
@@ -67,7 +70,14 @@ export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
                         />
                     </Group>
                 </Anchor>
-            )}
+            </Activity>
+
+            <Activity mode={isNil(tournamentUrl) ? "visible" : "hidden"}>
+                <Group gap="sm">
+                    <TbTrophy size={theme.other.mdIconSize} />
+                    <Text>No Tournament Yet</Text>
+                </Group>
+            </Activity>
 
             <Group gap="xs">
                 <TbInbox size={theme.other.mdIconSize} />
