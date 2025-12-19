@@ -1,6 +1,7 @@
 "use client";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { FC, ReactNode } from "react";
 import { StrictMode } from "react";
@@ -16,16 +17,16 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
     return (
         <html lang="en" {...mantineHtmlProps}>
             <head>
-                <ColorSchemeScript defaultColorScheme="auto" />
+                <ColorSchemeScript />
             </head>
             <body>
                 <StrictMode>
-                    <DataProvider>
-                        <StyleProvider>
+                    <StyleProvider>
+                        <DataProvider>
                             <Layout>{children}</Layout>
-                        </StyleProvider>
-                        <Analytics />
-                    </DataProvider>
+                            <Analytics />
+                        </DataProvider>
+                    </StyleProvider>
                 </StrictMode>
             </body>
         </html>
