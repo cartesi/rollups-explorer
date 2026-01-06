@@ -11,7 +11,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const now = Math.floor(Date.now() / 1000);
+const now = Date.now();
 
 export const Ongoing: Story = {
     args: {
