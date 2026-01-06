@@ -33,7 +33,7 @@ export interface ClaimTimelineItemProps extends TimelineItemProps {
 }
 
 const formatTime = (now: number, timestamp: number) => {
-    return `${humanizeDuration((now - timestamp) * 1000, { units: ["h", "m", "s"] })} ago`;
+    return `${humanizeDuration(now - timestamp, { units: ["h", "m", "s"], round: true })} ago`;
 };
 
 export const ClaimTimelineItem = forwardRef<
