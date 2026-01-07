@@ -1,5 +1,5 @@
 {
-  "address": "0xc700d52F5290e978e9CAe7D1E092935263b60051",
+  "address": "0x9E8851dadb2b77103928518846c4678d48b5e371",
   "abi": [
     {
       "type": "constructor",
@@ -60,15 +60,15 @@
     }
   ],
   "constructorArgs": [
-    "0xc70074BDD26d8cF983Ca6A5b89b8db52D5850051"
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
   ],
   "linkedLibraries": {},
-  "deployTxnHash": "0x41cd6b2726b240a9e6a00990a260e578e142c9ec1ec429a35fd2b2a9a3e3a25d",
+  "deployTxnHash": "0xe7b46a2e3d7b1ef3b560adc010ae55abb1319b39e2a4914f8988307eca3268f3",
   "deployTxnBlockNumber": "6",
-  "deployTimestamp": "1748610367",
+  "deployTimestamp": "1762263203",
   "sourceName": "src/portals/ERC721Portal.sol",
   "contractName": "ERC721Portal",
   "deployedOn": "deploy.ERC721Portal",
-  "gasUsed": 253126,
-  "gasCost": "1517833487"
+  "gasUsed": 253006,
+  "gasCost": "1517831127"
 }

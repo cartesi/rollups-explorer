@@ -1,5 +1,5 @@
 {
-  "address": "0xc700285Ab555eeB5201BC00CFD4b2CC8DED90051",
+  "address": "0x870240e83b1181b419f18303D4ccC56574De2931",
   "abi": [
     {
       "type": "constructor",
@@ -143,16 +143,16 @@
     }
   ],
   "constructorArgs": [
-    "0xC7003566dD09Aa0fC0Ce201aC2769aFAe3BF0051",
-    "0xc7006f70875BaDe89032001262A846D3Ee160051"
+    "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
+    "0x26E758238CB6eC5aB70ce0dd52aF2d7b82e1972E"
   ],
   "linkedLibraries": {},
-  "deployTxnHash": "0x0efd61480362fb377d6689fb29fe9fd88edf03c9e8a579ca7bb86f3b70051aa6",
+  "deployTxnHash": "0x03775318aa6f36b45fe4536924777e5da98fd41047e72d5e01cf00d4a793ac47",
   "deployTxnBlockNumber": "3",
-  "deployTimestamp": "1748610367",
+  "deployTimestamp": "1762263203",
   "sourceName": "src/dapp/SelfHostedApplicationFactory.sol",
   "contractName": "SelfHostedApplicationFactory",
   "deployedOn": "deploy.SelfHostedApplicationFactory",
-  "gasUsed": 350222,
-  "gasCost": "1183172451"
+  "gasUsed": 350138,
+  "gasCost": "1209427757"
 }
