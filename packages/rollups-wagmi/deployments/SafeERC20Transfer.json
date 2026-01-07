@@ -1,5 +1,5 @@
 {
-  "address": "0xc700903d822E108a93B21F69A0a6475F42930051",
+  "address": "0xb7C2bcAA4437425cfcE9d233bFf15EF461273D63",
   "abi": [
     {
       "type": "function",
@@ -38,12 +38,12 @@
   ],
   "constructorArgs": [],
   "linkedLibraries": {},
-  "deployTxnHash": "0xd5e15e94f4b4c0c979fa77ee305b943179e809103b9f09d4e95aab23631a8467",
+  "deployTxnHash": "0x8b4d952ac758f40901638f2589a44466c95d59e6f8995f64f2cd250454f342fa",
   "deployTxnBlockNumber": "1",
-  "deployTimestamp": "1748610367",
+  "deployTimestamp": "1762263203",
   "sourceName": "src/delegatecall/SafeERC20Transfer.sol",
   "contractName": "SafeERC20Transfer",
   "deployedOn": "deploy.SafeERC20Transfer",
-  "gasUsed": 116606,
-  "gasCost": "1350788402"
+  "gasUsed": 116474,
+  "gasCost": "1350825759"
 }

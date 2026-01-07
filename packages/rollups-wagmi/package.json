@@ -21,7 +21,7 @@
         "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
         "codegen": "wagmi generate",
         "lint": "eslint",
-        "cannon:inspect": "cannon inspect cartesi-rollups:2.0.0 --write-deployments ./deployments",
+        "cannon:inspect": "cannon inspect cartesi-rollups:2.1.0 --write-deployments ./deployments",
         "dev": "tsup --watch"
     },
     "dependencies": {
@@ -32,7 +32,7 @@
     },
     "devDependencies": {
         "@cartesi/rollups": "^1.2.0",
-        "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0",
+        "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.1.1",
         "@cartesi/tsconfig": "workspace:*",
         "@sunodo/wagmi-plugin-hardhat-deploy": "^0.4.0",
         "@types/node": "^20",

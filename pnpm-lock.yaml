@@ -569,8 +569,8 @@ importers:
         specifier: ^1.2.0
         version: 1.4.0
       '@cartesi/rollups-v2':
-        specifier: npm:@cartesi/rollups@2.0.0
-        version: '@cartesi/rollups@2.0.0'
+        specifier: npm:@cartesi/rollups@2.1.1
+        version: '@cartesi/rollups@2.1.1'
       '@cartesi/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1636,8 +1636,8 @@ packages:
   '@cartesi/rollups@1.4.0':
     resolution: {integrity: sha512-remwnm4Rgkhzoc3F2YQw4nXJk0ggvmwdgGQxF5Gps7Ej3zY2qLCUS7OscMX5P9RFjpWnJ7mtlEXydVaUR4XXrQ==}
 
-  '@cartesi/rollups@2.0.0':
-    resolution: {integrity: sha512-41Dtq73wD5JTepuryUiXumjMNx/e5AlOROKlao4/A0rG34R8emblnTGwvMaMpzKd+USDk2M/aLtIPZ6tnDXD/g==}
+  '@cartesi/rollups@2.1.1':
+    resolution: {integrity: sha512-1k+8gEp6VL6pGr0hlUTqK1hEIvBmRKUBodU3259e7rpR7ECaTLUV08C+P4efnXrz5Zj2SYWF8QZuFUVMxsMBVA==}
 
   '@cartesi/rpc@2.0.0-alpha.17':
     resolution: {integrity: sha512-hD+ROXq0YMBZwNp6FlR5gYpzU6Am7Ug3lhIyD7OrP6/SVzmJC5u6Q7PY5kSPf6xrGGoE9U0tVAWl0tQWWYMv5w==}
@@ -11449,7 +11449,7 @@ snapshots:
       '@cartesi/util': 6.3.0
       '@openzeppelin/contracts': 4.9.2
 
-  '@cartesi/rollups@2.0.0': {}
+  '@cartesi/rollups@2.1.1': {}
 
   '@cartesi/rpc@2.0.0-alpha.17':
     dependencies:

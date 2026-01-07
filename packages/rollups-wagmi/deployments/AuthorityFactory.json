@@ -1,5 +1,5 @@
 {
-  "address": "0xC7003566dD09Aa0fC0Ce201aC2769aFAe3BF0051",
+  "address": "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
   "abi": [
     {
       "type": "function",
@@ -99,12 +99,12 @@
   ],
   "constructorArgs": [],
   "linkedLibraries": {},
-  "deployTxnHash": "0x932b4010ea2dc99c79a2f7e462965ee451c346047a107796793d159a4380c5ae",
+  "deployTxnHash": "0xede56fb5c146bf29f43be527ad8926f4626204a4df2f9e2a651e0253733ef8d1",
   "deployTxnBlockNumber": "1",
-  "deployTimestamp": "1748610367",
+  "deployTimestamp": "1762263203",
   "sourceName": "src/consensus/authority/AuthorityFactory.sol",
   "contractName": "AuthorityFactory",
   "deployedOn": "deploy.AuthorityFactory",
-  "gasUsed": 529911,
-  "gasCost": "1272050621"
+  "gasUsed": 542096,
+  "gasCost": "1272133318"
 }
