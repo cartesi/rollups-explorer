@@ -101,6 +101,16 @@ export const Winner2: Story = {
     },
 };
 
+export const MatchEliminated: Story = {
+    args: {
+        match: {
+            ...match,
+            winnerCommitment: "NONE",
+            deletionReason: "TIMEOUT",
+        },
+    },
+};
+
 /**
  * A match without a onClick event handler, which should change the cursor feedback.
  */

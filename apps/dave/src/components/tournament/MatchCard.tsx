@@ -1,15 +1,18 @@
 import type { Match } from "@cartesi/viem";
 import {
+    Button,
     Card,
     Group,
     Overlay,
     Stack,
     Text,
+    Tooltip,
     useMantineTheme,
     type CardProps,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import type { FC } from "react";
-import { TbTrophyFilled } from "react-icons/tb";
+import { TbInfoCircle, TbTrophyFilled } from "react-icons/tb";
 import { ClaimText } from "../ClaimText";
 
 export interface MatchCardProps extends CardProps {
@@ -24,11 +27,66 @@ export interface MatchCardProps extends CardProps {
     onClick?: () => void;
 }
 
-export const MatchCard: FC<MatchCardProps> = ({
-    match,
-    onClick,
-    ...cardProps
-}) => {
+const wording = {
+    matchEliminated:
+        "Match was eliminated due to both commitments failure to act on time.",
+} as const;
+
+const MatchEliminated: FC<MatchCardProps> = ({ match }) => {
+    const [opened, handlers] = useDisclosure(false);
+    const claim1 = { hash: match.commitmentOne };
+    const claim2 = { hash: match.commitmentTwo };
+
+    return (
+        <>
+            <Group gap={0} align="stretch" pe="md">
+                <Tooltip
+                    label={
+                        <Text fw="bold" size="sm">
+                            {wording["matchEliminated"]}
+                        </Text>
+                    }
+                    opened={opened}
+                    multiline
+                    withArrow
+                    arrowSize={8}
+                >
+                    <Button
+                        component="div"
+                        px="5"
+                        h="auto"
+                        variant="light"
+                        onClick={(evt) => {
+                            evt.stopPropagation();
+                            handlers.toggle();
+                        }}
+                    >
+                        <TbInfoCircle size={24} />
+                    </Button>
+                </Tooltip>
+                <Stack gap={0} py="md" pl="sm">
+                    <Group gap="xs" wrap="nowrap">
+                        <ClaimText
+                            claim={claim1}
+                            td="line-through"
+                            copyButton={false}
+                        />
+                    </Group>
+                    <Text style={{ textAlign: "center" }}>vs</Text>
+                    <Group gap="xs" wrap="nowrap">
+                        <ClaimText
+                            claim={claim2}
+                            td="line-through"
+                            copyButton={false}
+                        />
+                    </Group>
+                </Stack>
+            </Group>
+        </>
+    );
+};
+
+const Match: FC<MatchCardProps> = ({ match }) => {
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
     const winner = match.winnerCommitment;
@@ -37,15 +95,7 @@ export const MatchCard: FC<MatchCardProps> = ({
     const showWinner = winner !== "NONE";
 
     return (
-        <Card
-            component="button"
-            withBorder
-            shadow="sm"
-            radius="lg"
-            {...cardProps}
-            onClick={onClick}
-            style={{ cursor: onClick ? "pointer" : undefined }}
-        >
+        <>
             <Overlay
                 bg={gold}
                 opacity={showWinner && winner === "ONE" ? 0.1 : 0}
@@ -100,6 +150,39 @@ export const MatchCard: FC<MatchCardProps> = ({
                     />
                 </Group>
             </Stack>
+        </>
+    );
+};
+
+export const MatchCard: FC<MatchCardProps> = ({
+    match,
+    onClick,
+    ...cardProps
+}) => {
+    const isMatchEliminated =
+        match.deletionReason === "TIMEOUT" && match.winnerCommitment === "NONE";
+    const cardPadding = isMatchEliminated ? "0" : "";
+
+    return (
+        <Card
+            component="button"
+            withBorder
+            shadow="sm"
+            radius="lg"
+            {...cardProps}
+            onClick={onClick}
+            style={{ cursor: onClick ? "pointer" : undefined }}
+            p={cardPadding}
+        >
+            {isMatchEliminated ? (
+                <MatchEliminated
+                    match={match}
+                    onClick={onClick}
+                    {...cardProps}
+                />
+            ) : (
+                <Match match={match} />
+            )}
         </Card>
     );
 };
