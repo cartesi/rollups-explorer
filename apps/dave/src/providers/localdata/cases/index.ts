@@ -5,6 +5,8 @@ import appOne from "./app1";
 import appTwo from "./app2";
 import appThree from "./app3";
 import appFour from "./app4";
+import appFive from "./app5";
+import appSix from "./app6";
 
 const listApplicationQuery = {
     queryKey: [
@@ -23,7 +25,7 @@ const listApplicationQuery = {
     },
 };
 
-const mockApplications = [appOne, appTwo, appThree, appFour];
+const mockApplications = [appOne, appTwo, appThree, appFour, appFive, appSix];
 
 mockApplications.forEach((app) => {
     listApplicationQuery.data.data.push(
