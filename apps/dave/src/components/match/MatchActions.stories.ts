@@ -18,7 +18,7 @@ const idHash =
     "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6";
 const leftOfTwo =
     "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002";
-const now = Math.floor(Date.now() / 1000);
+const now = Date.now();
 
 // large 40kb proof
 // const proof = `0x${"00".repeat(1024 * 40)}` as Hex;
@@ -56,7 +56,6 @@ export const CompleteTop: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -150,7 +149,6 @@ export const Bisections: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -179,7 +177,6 @@ export const Timeout: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -222,7 +219,6 @@ export const TimeoutSecond: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -251,7 +247,6 @@ export const Elimination: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -287,7 +282,6 @@ export const EliminationAfterBisections: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -323,7 +317,6 @@ export const SubTournament: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -359,7 +352,6 @@ export const WinnerBottom: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 3n,
     },
 };
 
@@ -395,7 +387,6 @@ export const WinnerTop: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -424,6 +415,5 @@ export const NoActions: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
