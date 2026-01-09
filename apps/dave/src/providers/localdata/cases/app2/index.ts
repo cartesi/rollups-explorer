@@ -1,7 +1,7 @@
 import type { Hex } from "viem";
 import { parseQueries } from "../../helpers";
-import type { DataInjector } from "../../types";
-import queries from "./queries.json";
+import type { DataInjector, UseCaseApplication } from "../../types";
+import queries from "./queries";
 
 export const appName = "AppTwo";
 export const appAddress = "0x245216ec64bef3a84d040cc9aba864763434f29d" as Hex;
@@ -16,8 +16,10 @@ const setData: DataInjector = (queryClient) => {
     return queryClient;
 };
 
-export default {
-    appName,
+const useCaseApp: UseCaseApplication = {
     appAddress,
+    appName,
     setData,
 };
+
+export default useCaseApp;
