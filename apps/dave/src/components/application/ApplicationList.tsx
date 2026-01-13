@@ -7,7 +7,7 @@ type Props = { applications: Application[] };
 
 export const ApplicationList: FC<Props> = ({ applications }) => {
     return (
-        <Stack gap={5}>
+        <Stack gap={5} pb="xl">
             {applications.map((app) => (
                 <ApplicationCard
                     key={app.applicationAddress}
