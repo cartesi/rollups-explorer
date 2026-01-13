@@ -417,3 +417,54 @@ export const NoActions: Story = {
         now,
     },
 };
+
+/**
+ * No winners after sub-tournament completion.
+ */
+
+export const NoWinnerAfterSubTournamentDispute: Story = {
+    args: {
+        advances: randomAdvances({
+            count: 47,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
+            tournamentAddress,
+        }),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 10n,
+            deletionReason: "CHILD_TOURNAMENT",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash,
+            leftOfTwo,
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: "NONE",
+        },
+        height: 48n,
+        now,
+        subTournament: {
+            epochIndex: 0n,
+            address: "0x61bCAb9d0D8b554009824292d2d6855DfA3AAB86",
+            parentTournamentAddress: null,
+            parentMatchIdHash: null,
+            maxLevel: 3n,
+            level: 1n,
+            log2step: 44n,
+            height: 48n,
+            winnerCommitment: null,
+            finalStateHash: null,
+            finishedAtBlock: 1504n,
+            createdAt: new Date(now - 7966),
+            updatedAt: new Date(now - 4000),
+        },
+    },
+};

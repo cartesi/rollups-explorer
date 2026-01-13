@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState, type FC } from "react";
 import { TbArrowUp } from "react-icons/tb";
 import type { CycleRange } from "../types";
 import { BisectionItem } from "./BisectionItem";
+import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
 import { EliminationTimeoutItem } from "./EliminationTimeoutItem";
 import { LoserItem } from "./LoserItem";
 import { SubTournamentItem } from "./SubTournamentItem";
@@ -196,7 +197,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         tournament={subTournament}
                         now={now}
                         range={[0, 0]} // XXX: need to get range from somewhere
-                        timestamp={match.updatedAt.getTime()}
+                        timestamp={subTournament.updatedAt.getTime()}
                     />
                 )}
                 {match.deletionReason === "CHILD_TOURNAMENT" &&
@@ -225,6 +226,15 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                             now={now}
                         />
                     )}
+
+                {match.deletionReason === "CHILD_TOURNAMENT" &&
+                    match.winnerCommitment === "NONE" && (
+                        <ClaimsEliminatedItem
+                            now={now}
+                            timestamp={match.updatedAt.getTime()}
+                        />
+                    )}
+
                 {match.deletionReason === "STEP" &&
                     match.winnerCommitment !== "NONE" && (
                         <WinnerItem
