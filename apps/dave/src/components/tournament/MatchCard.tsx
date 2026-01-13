@@ -27,15 +27,23 @@ export interface MatchCardProps extends CardProps {
     onClick?: () => void;
 }
 
-const wording = {
-    matchEliminated:
+type EliminationReasons = Extract<
+    Match["deletionReason"],
+    "TIMEOUT" | "CHILD_TOURNAMENT"
+>;
+
+const eliminationWording: Record<EliminationReasons, string> = {
+    TIMEOUT:
         "Match was eliminated due to both commitments failure to act on time.",
-} as const;
+    CHILD_TOURNAMENT:
+        "Match was eliminated due to a subsequent match result. Click the match for more details.",
+};
 
 const MatchEliminated: FC<MatchCardProps> = ({ match }) => {
     const [opened, handlers] = useDisclosure(false);
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
+    const reason = match.deletionReason as EliminationReasons;
 
     return (
         <>
@@ -43,7 +51,7 @@ const MatchEliminated: FC<MatchCardProps> = ({ match }) => {
                 <Tooltip
                     label={
                         <Text fw="bold" size="sm">
-                            {wording["matchEliminated"]}
+                            {eliminationWording[reason]}
                         </Text>
                     }
                     opened={opened}
@@ -160,7 +168,8 @@ export const MatchCard: FC<MatchCardProps> = ({
     ...cardProps
 }) => {
     const isMatchEliminated =
-        match.deletionReason === "TIMEOUT" && match.winnerCommitment === "NONE";
+        match.deletionReason !== "NOT_DELETED" &&
+        match.winnerCommitment === "NONE";
     const cardPadding = isMatchEliminated ? "0" : "";
 
     return (
