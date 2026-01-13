@@ -2,12 +2,18 @@ import { pipe } from "ramda";
 import { createApplication, parseQueries } from "../helpers";
 import type { DataInjector } from "../types";
 import appOne from "./app1";
+import appTen from "./app10";
+import appEleven from "./app11";
+import appTwelve from "./app12";
+import appThirteen from "./app13";
 import appTwo from "./app2";
 import appThree from "./app3";
 import appFour from "./app4";
 import appFive from "./app5";
 import appSix from "./app6";
 import appSeven from "./app7";
+import appEight from "./app8";
+import appNine from "./app9";
 
 const listApplicationQuery = {
     queryKey: [
@@ -34,6 +40,12 @@ const mockApplications = [
     appFive,
     appSix,
     appSeven,
+    appEight,
+    appNine,
+    appTen,
+    appEleven,
+    appTwelve,
+    appThirteen,
 ];
 
 mockApplications.forEach((app) => {
