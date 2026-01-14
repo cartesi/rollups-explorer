@@ -6,6 +6,7 @@ import appTen from "./app10";
 import appEleven from "./app11";
 import appTwelve from "./app12";
 import appThirteen from "./app13";
+import appFourteen from "./app14";
 import appTwo from "./app2";
 import appThree from "./app3";
 import appFour from "./app4";
@@ -46,6 +47,7 @@ const mockApplications = [
     appEleven,
     appTwelve,
     appThirteen,
+    appFourteen,
 ];
 
 mockApplications.forEach((app) => {
