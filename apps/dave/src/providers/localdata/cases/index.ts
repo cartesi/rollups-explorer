@@ -61,6 +61,8 @@ mockApplications.forEach((app) => {
     );
 });
 
+listApplicationQuery.data.pagination.totalCount = mockApplications.length;
+
 const addListApplicationData: DataInjector = (queryClient) => {
     const queries = parseQueries([listApplicationQuery]);
     queries.forEach((query) => {
