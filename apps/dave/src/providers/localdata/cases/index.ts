@@ -7,6 +7,7 @@ import appEleven from "./app11";
 import appTwelve from "./app12";
 import appThirteen from "./app13";
 import appFourteen from "./app14";
+import appFifteen from "./app15";
 import appTwo from "./app2";
 import appThree from "./app3";
 import appFour from "./app4";
@@ -48,6 +49,7 @@ const mockApplications = [
     appTwelve,
     appThirteen,
     appFourteen,
+    appFifteen,
 ];
 
 mockApplications.forEach((app) => {
