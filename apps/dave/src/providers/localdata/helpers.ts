@@ -1,6 +1,6 @@
 import type { Application } from "@cartesi/viem";
 
-type QueryValue = { queryKey: unknown[]; data: unknown };
+export type QueryValue = { queryKey: unknown[]; data: unknown };
 
 const reviver = (_: string, value: unknown) => {
     const dateReg = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/;
