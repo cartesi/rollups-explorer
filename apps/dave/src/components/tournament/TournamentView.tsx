@@ -1,5 +1,15 @@
 import type { Commitment, Match, Tournament } from "@cartesi/viem";
-import { Group, Stack, Switch, Text, useMantineTheme } from "@mantine/core";
+import {
+    Card,
+    Center,
+    Group,
+    Stack,
+    Switch,
+    Text,
+    Title,
+    useMantineTheme,
+} from "@mantine/core";
+import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
@@ -37,6 +47,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
         ? { hash: tournament.winnerCommitment }
         : undefined;
     const [hideWinners, setHideWinners] = useState(false);
+    const noCommitments = isEmpty(commitments);
 
     return (
         <Stack>
@@ -75,6 +86,13 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 commitments={commitments}
                 hideWinners={hideWinners}
             />
+            {noCommitments && (
+                <Card>
+                    <Center>
+                        <Title order={3}>No claims submitted</Title>
+                    </Center>
+                </Card>
+            )}
         </Stack>
     );
 };

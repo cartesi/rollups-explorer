@@ -1,14 +1,14 @@
 import {
     Group,
-    Paper,
     Text,
     useComputedColorScheme,
     useMantineTheme,
 } from "@mantine/core";
 import { type FC } from "react";
-import { TbClockCancel, TbSwordOff } from "react-icons/tb";
+import { TbClockCancel } from "react-icons/tb";
 import type { Claim } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
+import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
 
 interface EliminationTimeoutItemProps {
     /**
@@ -55,14 +55,7 @@ export const EliminationTimeoutItem: FC<EliminationTimeoutItemProps> = (
                     <Text c="dimmed">no action taken</Text>
                 </Group>
             </ClaimTimelineItem>
-            <ClaimTimelineItem now={now} timestamp={timestamp}>
-                <Paper withBorder p={16} radius="lg" bg={bg}>
-                    <Group gap="xs">
-                        <TbSwordOff size={24} />
-                        <Text>both claims eliminated</Text>
-                    </Group>
-                </Paper>
-            </ClaimTimelineItem>
+            <ClaimsEliminatedItem now={now} timestamp={timestamp} />
         </>
     );
 };

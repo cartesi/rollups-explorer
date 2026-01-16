@@ -6,7 +6,6 @@ import {
     useTournaments,
 } from "@cartesi/wagmi";
 import { Stack } from "@mantine/core";
-import { getUnixTime } from "date-fns";
 import { notFound } from "next/navigation";
 import type { FC } from "react";
 import {
@@ -21,7 +20,7 @@ import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 
 export const MatchContainer: FC<MatchParams> = (params) => {
-    const nowUnixtime = getUnixTime(new Date());
+    const now = Date.now();
 
     const tournamentQuery = useTournament({
         application: params.application,
@@ -122,7 +121,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     tournament={tournament}
                     subTournament={subTournament}
                     match={match}
-                    now={nowUnixtime}
+                    now={now}
                 />
             )}
         </Stack>

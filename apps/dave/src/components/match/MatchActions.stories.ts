@@ -18,7 +18,7 @@ const idHash =
     "0x0e1f5cbd6cc4dd9de0b940594e13f24a4065c2651d9fc70fee961ed191278ac6";
 const leftOfTwo =
     "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002";
-const now = Math.floor(Date.now() / 1000);
+const now = Date.now();
 
 // large 40kb proof
 // const proof = `0x${"00".repeat(1024 * 40)}` as Hex;
@@ -56,7 +56,6 @@ export const CompleteTop: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -150,7 +149,6 @@ export const Bisections: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -179,7 +177,6 @@ export const Timeout: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -222,7 +219,6 @@ export const TimeoutSecond: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -251,7 +247,6 @@ export const Elimination: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -287,7 +282,6 @@ export const EliminationAfterBisections: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -323,7 +317,6 @@ export const SubTournament: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -359,7 +352,6 @@ export const WinnerBottom: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 3n,
     },
 };
 
@@ -395,7 +387,6 @@ export const WinnerTop: Story = {
         },
         height: 5n,
         now,
-        nextLevel: 1n,
     },
 };
 
@@ -424,6 +415,56 @@ export const NoActions: Story = {
         },
         height: 48n,
         now,
-        nextLevel: 1n,
+    },
+};
+
+/**
+ * No winners after sub-tournament completion.
+ */
+
+export const NoWinnerAfterSubTournamentDispute: Story = {
+    args: {
+        advances: randomAdvances({
+            count: 47,
+            epochIndex,
+            idHash,
+            leftOfTwo,
+            now: now - 7966,
+            tournamentAddress,
+        }),
+        match: {
+            blockNumber: 1n,
+            commitmentOne: claim(0).hash,
+            commitmentTwo: claim(1).hash,
+            createdAt: new Date(now),
+            deletionBlockNumber: 10n,
+            deletionReason: "CHILD_TOURNAMENT",
+            deletionTxHash:
+                "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            epochIndex: 0n,
+            idHash,
+            leftOfTwo,
+            tournamentAddress,
+            txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+            updatedAt: new Date(now),
+            winnerCommitment: "NONE",
+        },
+        height: 48n,
+        now,
+        subTournament: {
+            epochIndex: 0n,
+            address: "0x61bCAb9d0D8b554009824292d2d6855DfA3AAB86",
+            parentTournamentAddress: null,
+            parentMatchIdHash: null,
+            maxLevel: 3n,
+            level: 1n,
+            log2step: 44n,
+            height: 48n,
+            winnerCommitment: null,
+            finalStateHash: null,
+            finishedAtBlock: 1504n,
+            createdAt: new Date(now - 7966),
+            updatedAt: new Date(now - 4000),
+        },
     },
 };
