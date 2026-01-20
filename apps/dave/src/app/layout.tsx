@@ -5,9 +5,7 @@ import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { FC, ReactNode } from "react";
 import { StrictMode } from "react";
-import Layout from "../components/layout/Layout";
-import DataProvider from "../providers/DataProvider";
-import { StyleProvider } from "../providers/StyleProvider";
+import { Providers } from "../providers/Providers";
 
 interface RootLayoutProps {
     children: ReactNode;
@@ -21,12 +19,8 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
             </head>
             <body>
                 <StrictMode>
-                    <StyleProvider>
-                        <DataProvider>
-                            <Layout>{children}</Layout>
-                            <Analytics />
-                        </DataProvider>
-                    </StyleProvider>
+                    <Providers>{children}</Providers>
+                    <Analytics />
                 </StrictMode>
             </body>
         </html>
