@@ -17,6 +17,11 @@ import appSeven from "./app7";
 import appEight from "./app8";
 import appNine from "./app9";
 
+const getChainIdQuery = {
+    queryKey: ["chainId"],
+    data: 13370,
+};
+
 const listApplicationQuery = {
     queryKey: [
         "applications",
@@ -64,7 +69,7 @@ mockApplications.forEach((app) => {
 listApplicationQuery.data.pagination.totalCount = mockApplications.length;
 
 const addListApplicationData: DataInjector = (queryClient) => {
-    const queries = parseQueries([listApplicationQuery]);
+    const queries = parseQueries([listApplicationQuery, getChainIdQuery]);
     queries.forEach((query) => {
         queryClient.setQueryData(query.queryKey, query.data);
     });
