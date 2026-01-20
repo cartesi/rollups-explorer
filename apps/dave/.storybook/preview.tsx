@@ -3,6 +3,7 @@ import "@mantine/core/styles.css";
 import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
 import Layout from "../src/components/layout/Layout";
 import DataProvider from '../src/providers/DataProvider';
+import WalletProvider from '../src/providers/WalletProvider';
 import theme from "../src/providers/theme";
 
 // @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
@@ -15,7 +16,7 @@ const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     const [sectionType] = title.split("/");
 
     if (sectionType.toLowerCase().includes("pages"))
-        return <DataProvider><Layout>{StoryFn(context.args, context)}</Layout></DataProvider>;
+        return <DataProvider><WalletProvider><Layout>{StoryFn(context.args, context)}</Layout></WalletProvider></DataProvider>;
 
     return <>{StoryFn(context.args, context)}</>;
 };
