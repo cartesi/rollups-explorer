@@ -16,7 +16,10 @@
         "E2E_BASE_URL",
         "VERCEL_AUTOMATION_BYPASS_SECRET",
         "VERCEL_TOKEN",
-        "GITHUB_SHA"
+        "GITHUB_SHA",
+        "CARTESI_NODE_RPC_URL",
+        "MOCK_ENABLED",
+        "DEBUG_ENABLED"
     ],
     "tasks": {
         "build": {
