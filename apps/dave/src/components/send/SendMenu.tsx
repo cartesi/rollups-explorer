@@ -2,7 +2,8 @@
 import type { Application } from "@cartesi/viem";
 import { Button, Group, Menu, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
+import { isNil } from "ramda";
 import type { FC } from "react";
 import { TbCoins, TbCurrencyEthereum, TbInbox, TbSend } from "react-icons/tb";
 import { useAccount } from "wagmi";
@@ -17,6 +18,9 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const actions = useSendAction();
     const account = useAccount();
     const connectModal = useConnectModal();
+    const chainModal = useChainModal();
+    const needSwitchNetwork = account.isConnected && isNil(account.chain);
+    const canSend = !needSwitchNetwork && account.isConnected;
 
     if (appConfig.isMockEnabled) return null;
 
@@ -32,7 +36,11 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     onClick={(evt) => {
                         evt.stopPropagation();
                         evt.preventDefault();
-                        if (account.isConnected) {
+
+                        if (needSwitchNetwork)
+                            return chainModal.openChainModal?.();
+
+                        if (canSend) {
                             handlers.toggle();
                         } else {
                             connectModal.openConnectModal?.();
