@@ -87,7 +87,12 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                             <Activity
                                 mode={isMockEnabled ? "hidden" : "visible"}
                             >
-                                <ConnectButton />
+                                <ConnectButton
+                                    showBalance={{
+                                        smallScreen: false,
+                                        largeScreen: true,
+                                    }}
+                                />
                             </Activity>
                             <ThemeToggle />
                             <Activity
