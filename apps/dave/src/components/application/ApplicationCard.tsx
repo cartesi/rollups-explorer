@@ -1,8 +1,10 @@
 import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import Link from "next/link";
-import type { FC } from "react";
+import { Activity, type FC } from "react";
+import { useAppConfig } from "../../providers/AppConfigProvider";
 import { pathBuilder } from "../../routes/routePathBuilder";
+import SendMenu from "../send/SendMenu";
 
 type ApplicationCardProps = { application: Application };
 
@@ -23,6 +25,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
     const stateColour = getStateColour(state);
+    const appConfig = useAppConfig();
     const url = pathBuilder.epochs({ application: application.name });
     const inputsLabel =
         processedInputs === 0n
@@ -34,14 +37,21 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     return (
         <Card shadow="md" component={Link} href={url}>
             <Stack>
-                <Stack gap="0">
-                    <Group justify="space-between">
-                        <Text size="xl">{name}</Text>
-                    </Group>
-                    <Text c="dimmed" size="xs">
-                        {applicationAddress}
-                    </Text>
-                </Stack>
+                <Group justify="space-between">
+                    <Stack gap="0">
+                        <Group justify="space-between">
+                            <Text size="xl">{name}</Text>
+                        </Group>
+                        <Text c="dimmed" size="xs">
+                            {applicationAddress}
+                        </Text>
+                    </Stack>
+                    <Activity
+                        mode={appConfig.isMockEnabled ? "hidden" : "visible"}
+                    >
+                        <SendMenu application={application} />
+                    </Activity>
+                </Group>
                 <Group justify="space-between">
                     <Badge variant="default">{inputsLabel}</Badge>
                     <Group gap="xs">
