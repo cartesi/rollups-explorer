@@ -5,6 +5,7 @@ import Layout from "../src/components/layout/Layout";
 import DataProvider from '../src/providers/DataProvider';
 import WalletProvider from '../src/providers/WalletProvider';
 import theme from "../src/providers/theme";
+import './global.css';
 
 // @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
 BigInt.prototype.toJSON = function () {
