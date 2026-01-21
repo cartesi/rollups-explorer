@@ -9,7 +9,6 @@ import {
     Group,
     useMantineTheme,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
@@ -18,6 +17,8 @@ import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
 import CartesiLogo from "../icons/CartesiLogo";
+import SendModal from "../send/SendModal";
+import { SendProvider } from "../send/SendProvider";
 import { ThemeToggle } from "../ThemeToggle";
 
 const printQueryInfo = () => {
@@ -65,46 +66,54 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     const theme = useMantineTheme();
     const { isSmallDevice, viewport } = useIsSmallDevice();
     const { height } = viewport;
-    const hideBalanceViewport = useMediaQuery(
-        `(min-width:${theme.breakpoints.sm}) and (max-width:${50}em)`,
-    );
     const { isMockEnabled, isDebugEnabled } = useAppConfig();
 
     return (
-        <AppShell>
-            <AppShellHeader style={{ zIndex: theme.other.zIndexLG }}>
-                <Group
-                    h="100%"
-                    justify="space-between"
-                    align="center"
-                    px={isSmallDevice ? "xs" : "lg"}
-                >
-                    <Link href="/" aria-label="Home">
-                        <CartesiLogo height={isSmallDevice ? 30 : 40} />
-                    </Link>
+        <SendProvider>
+            <AppShell>
+                <SendModal />
+                <AppShellHeader style={{ zIndex: theme.other.zIndexLG }}>
+                    <Group
+                        h="100%"
+                        justify="space-between"
+                        align="center"
+                        px={isSmallDevice ? "xs" : "lg"}
+                    >
+                        <Link href="/" aria-label="Home">
+                            <CartesiLogo height={isSmallDevice ? 30 : 40} />
+                        </Link>
 
-                    <Group>
-                        {!isMockEnabled && (
-                            <ConnectButton showBalance={!hideBalanceViewport} />
-                        )}
-                        <ThemeToggle />
-                        <Activity mode={isDebugEnabled ? "visible" : "hidden"}>
-                            <Button onClick={printQueryInfo}>Show cache</Button>
-                            <Button onClick={logQueries}>Export queries</Button>
-                        </Activity>
+                        <Group>
+                            <Activity
+                                mode={isMockEnabled ? "hidden" : "visible"}
+                            >
+                                <ConnectButton />
+                            </Activity>
+                            <ThemeToggle />
+                            <Activity
+                                mode={isDebugEnabled ? "visible" : "hidden"}
+                            >
+                                <Button onClick={printQueryInfo}>
+                                    Show cache
+                                </Button>
+                                <Button onClick={logQueries}>
+                                    Export queries
+                                </Button>
+                            </Activity>
+                        </Group>
                     </Group>
-                </Group>
-            </AppShellHeader>
-            <AppShellMain>
-                <Container
-                    px={isSmallDevice ? "lg" : "sm"}
-                    mih={`calc(${height}px - var(--app-shell-header-height))`}
-                    strategy="grid"
-                >
-                    {children}
-                </Container>
-            </AppShellMain>
-        </AppShell>
+                </AppShellHeader>
+                <AppShellMain>
+                    <Container
+                        px={isSmallDevice ? "lg" : "sm"}
+                        mih={`calc(${height}px - var(--app-shell-header-height))`}
+                        strategy="grid"
+                    >
+                        {children}
+                    </Container>
+                </AppShellMain>
+            </AppShell>
+        </SendProvider>
     );
 };
 

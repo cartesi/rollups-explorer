@@ -17,10 +17,14 @@ const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     const [sectionType] = title.split("/");
 
     if (sectionType.toLowerCase().includes("pages"))
-        return <DataProvider><WalletProvider><Layout>{StoryFn(context.args, context)}</Layout></WalletProvider></DataProvider>;
+        return <Layout>{StoryFn(context.args, context)}</Layout>;
 
     return <>{StoryFn(context.args, context)}</>;
 };
+
+const withWallet = (StoryFn: StoryFn, context: StoryContext) => {
+    return <DataProvider><WalletProvider>{StoryFn(context.args, context)}</WalletProvider></DataProvider>
+}
 const withMantine = (StoryFn: StoryFn, context: StoryContext) => {
     const currentBg = context.globals.backgrounds?.value ?? "light";
 
@@ -55,6 +59,7 @@ const preview: Preview = {
     decorators: [
         // Order matters. So layout decorator first. Fn calling is router(mantine(layout))
         withLayout,
+        withWallet,
         withMantine,
     ],
 };
