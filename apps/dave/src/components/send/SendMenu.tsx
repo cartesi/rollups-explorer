@@ -54,6 +54,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
 
             <Menu.Dropdown>
                 <Menu.Item
+                    disabled
                     leftSection={<TbInbox size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
@@ -81,6 +82,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">Ethereum</Text>
                 </Menu.Item>
                 <Menu.Item
+                    disabled
                     leftSection={<TbCurrencyEthereum size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
@@ -91,6 +93,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-20</Text>
                 </Menu.Item>
                 <Menu.Item
+                    disabled
                     leftSection={<TbCurrencyEthereum size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
@@ -101,6 +104,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-721</Text>
                 </Menu.Item>
                 <Menu.Item
+                    disabled
                     leftSection={<TbCurrencyEthereum size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
@@ -111,6 +115,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-1155 (Single)</Text>
                 </Menu.Item>
                 <Menu.Item
+                    disabled
                     leftSection={<TbCurrencyEthereum size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();

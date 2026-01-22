@@ -1,7 +1,6 @@
 "use client";
-
 import { useEffect, useState, type ReactNode } from "react";
-import Layout from "../components/layout/Layout";
+import { SendProvider } from "../components/send/SendProvider";
 import { getConfiguredDebugEnabled } from "../lib/getConfigDebugEnabled";
 import { getConfiguredIsContainer } from "../lib/getConfigIsContainer";
 import { getConfiguredMockEnabled } from "../lib/getConfigMockEnabled";
@@ -53,7 +52,7 @@ export function Providers({ children }: ProviderProps) {
             <AppConfigProvider value={value}>
                 <DataProvider>
                     <WalletProvider>
-                        <Layout>{children}</Layout>
+                        <SendProvider>{children}</SendProvider>
                     </WalletProvider>
                 </DataProvider>
             </AppConfigProvider>
