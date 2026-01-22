@@ -1,3 +1,4 @@
+"use client";
 import type { Application } from "@cartesi/viem";
 import { useContext } from "react";
 import { SendActionContext, SendStateContext } from "./SendContexts";

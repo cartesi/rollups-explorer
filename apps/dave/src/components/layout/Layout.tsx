@@ -1,5 +1,4 @@
 "use client";
-
 import {
     AppShell,
     AppShellHeader,
@@ -18,7 +17,6 @@ import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
 import CartesiLogo from "../icons/CartesiLogo";
 import SendModal from "../send/SendModal";
-import { SendProvider } from "../send/SendProvider";
 import { ThemeToggle } from "../ThemeToggle";
 
 const printQueryInfo = () => {
@@ -69,10 +67,10 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     const { isMockEnabled, isDebugEnabled } = useAppConfig();
 
     return (
-        <SendProvider>
+        <>
+            <SendModal />
             <AppShell>
-                <SendModal />
-                <AppShellHeader style={{ zIndex: theme.other.zIndexLG }}>
+                <AppShellHeader style={{ zIndex: theme.other.zIndexXS }}>
                     <Group
                         h="100%"
                         justify="space-between"
@@ -118,7 +116,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                     </Container>
                 </AppShellMain>
             </AppShell>
-        </SendProvider>
+        </>
     );
 };
 
