@@ -69,7 +69,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
     const isMounted = useMounted();
     const appConfig = useAppConfig();
     const nodeRpcUrl = appConfig.nodeRpcUrl;
-    const { data, isLoading } = useChainId({});
+    const { data } = useChainId({});
     const chainId = data?.toString() ?? defaultSupportedChain.id.toString();
 
     const themeOptions = {
@@ -86,7 +86,7 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
             ? darkTheme(themeOptions)
             : lightTheme(themeOptions);
 
-    return isMounted && !isLoading ? (
+    return isMounted ? (
         <WagmiProvider config={wagmiConfig}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider
