@@ -1,9 +1,9 @@
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+import { Notifications } from "@mantine/notifications";
 import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
 import Layout from "../src/components/layout/Layout";
-import DataProvider from '../src/providers/DataProvider';
-import WalletProvider from '../src/providers/WalletProvider';
+import { Providers } from '../src/providers/Providers';
 import theme from "../src/providers/theme";
 import './global.css';
 
@@ -22,14 +22,16 @@ const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     return <>{StoryFn(context.args, context)}</>;
 };
 
-const withWallet = (StoryFn: StoryFn, context: StoryContext) => {
-    return <DataProvider><WalletProvider>{StoryFn(context.args, context)}</WalletProvider></DataProvider>
+const withProviders = (StoryFn: StoryFn, context: StoryContext) => {
+    return <Providers>{StoryFn(context.args, context)}</Providers>
 }
+
 const withMantine = (StoryFn: StoryFn, context: StoryContext) => {
     const currentBg = context.globals.backgrounds?.value ?? "light";
 
     return (
         <MantineProvider forceColorScheme={currentBg} theme={theme}>
+            <Notifications />
             {StoryFn(context.args, context)}
         </MantineProvider>
     );
@@ -57,9 +59,9 @@ const preview: Preview = {
         },
     },
     decorators: [
-        // Order matters. So layout decorator first. Fn calling is router(mantine(layout))
+        // Order matters. So layout decorator first. Fn calling is router(mantine(layout))        
         withLayout,
-        withWallet,
+        withProviders,
         withMantine,
     ],
 };
