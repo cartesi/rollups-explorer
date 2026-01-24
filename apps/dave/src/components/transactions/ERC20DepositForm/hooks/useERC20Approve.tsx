@@ -33,7 +33,6 @@ export const useERC20Approve = ({
         },
     });
 
-    // const approve = useWriteErc20Approve();
     const approve = useWriteContract();
     const approveWait = useWaitForTransactionReceipt({
         hash: approve.data,

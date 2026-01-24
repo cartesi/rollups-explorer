@@ -16,7 +16,7 @@ import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { isEmpty } from "ramda";
 import { isNotNil, isNotNilOrEmpty } from "ramda-adjunct";
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useMemo } from "react";
 import {
     TbCheck,
     TbChevronDown,
@@ -36,6 +36,7 @@ import { useAccount } from "wagmi";
 import { type TransactionFormSuccessData } from "../DepositFormTypes";
 
 import { erc20PortalAddress } from "@cartesi/wagmi";
+import TransactionDetails from "../TransactionDetails";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
 import { useERC20Approve } from "./hooks/useERC20Approve";
@@ -170,6 +171,24 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
         transactionState(approvePrepare, approve, approveWait, false);
     const { disabled: depositDisabled, loading: depositLoading } =
         transactionState(depositPrepare, deposit, depositWait, true);
+    const transactionDetails = useMemo(
+        () => [
+            {
+                legend: "Application Address",
+                text: application.applicationAddress,
+            },
+            { legend: "Portal Address", text: erc20PortalAddress },
+        ],
+        [application.applicationAddress],
+    );
+
+    useEffect(() => {
+        const { decimals: formDecimal } = form.getValues();
+        if (decimals !== formDecimal) {
+            form.setFieldValue("decimals", decimals);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [decimals]);
 
     useEffect(() => {
         if (depositWait.isSuccess) {
@@ -184,6 +203,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
     return (
         <form data-testid="erc20-deposit-form">
             <Stack>
+                <TransactionDetails details={transactionDetails} />
                 <Autocomplete
                     label="ERC-20"
                     description="The ERC-20 smart contract address"
