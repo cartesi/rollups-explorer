@@ -1,19 +1,9 @@
 "use client";
 import { type Application } from "@cartesi/viem";
 import { etherPortalAddress } from "@cartesi/wagmi";
-import {
-    Badge,
-    Collapse,
-    Fieldset,
-    Stack,
-    Switch,
-    Text,
-    VisuallyHidden,
-} from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
-import { type FC, useEffect } from "react";
-import { TbEye, TbEyeClosed } from "react-icons/tb";
+import { type FC, useEffect, useMemo } from "react";
 import {
     type Hex,
     getAddress,
@@ -25,6 +15,7 @@ import {
 import { useAccount } from "wagmi";
 import { type TransactionFormSuccessData } from "../DepositFormTypes";
 import { useAccountBalance } from "../hooks/useAccountBalance";
+import TransactionDetails from "../TransactionDetails";
 import EtherDepositSection from "./EtherDepositSection";
 import { type FormValues, type TransformValues } from "./types";
 
@@ -36,7 +27,6 @@ interface EthDepositFormProps {
 export const EtherDepositForm: FC<EthDepositFormProps> = (props) => {
     const { application, onSuccess } = props;
     const { chain } = useAccount();
-    const [showDetails, handlers] = useDisclosure(false);
     const accountBalance = useAccountBalance();
 
     const form = useForm<FormValues, TransformValues>({
@@ -88,6 +78,17 @@ export const EtherDepositForm: FC<EthDepositFormProps> = (props) => {
         }),
     });
 
+    const details = useMemo(
+        () => [
+            {
+                legend: "Application Address",
+                text: application.applicationAddress,
+            },
+            { legend: "Portal Address", text: etherPortalAddress },
+        ],
+        [application.applicationAddress],
+    );
+
     const onDepositSuccess = (data: TransactionFormSuccessData) => {
         onSuccess(data);
         form.reset();
@@ -107,38 +108,7 @@ export const EtherDepositForm: FC<EthDepositFormProps> = (props) => {
     return (
         <form data-testid="ether-deposit-form">
             <Stack>
-                <Switch
-                    size="md"
-                    label="Tx details"
-                    labelPosition="left"
-                    checked={showDetails}
-                    onChange={handlers.toggle}
-                    onLabel={
-                        <>
-                            <VisuallyHidden>Tx Details Visible</VisuallyHidden>
-                            <TbEye size="1rem" />
-                        </>
-                    }
-                    offLabel={
-                        <>
-                            <VisuallyHidden>Tx Details Hidden</VisuallyHidden>
-
-                            <TbEyeClosed size="1rem" />
-                        </>
-                    }
-                />
-                <Collapse in={showDetails}>
-                    <Stack gap="xs" style={{ overflowWrap: "break-word" }}>
-                        <Fieldset legend={<Badge>Application Address</Badge>}>
-                            <Text c="dimmed">
-                                {application.applicationAddress}
-                            </Text>
-                        </Fieldset>
-                        <Fieldset legend={<Badge>Portal Address</Badge>}>
-                            <Text c="dimmed">{etherPortalAddress}</Text>
-                        </Fieldset>
-                    </Stack>
-                </Collapse>
+                <TransactionDetails details={details} />
                 <EtherDepositSection form={form} onSuccess={onDepositSuccess} />
             </Stack>
         </form>
