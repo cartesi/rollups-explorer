@@ -12,6 +12,24 @@ interface RootLayoutProps {
     children: ReactNode;
 }
 
+/**
+ * This is a workaround to solve a problem when react-dom-client.development
+ * is trying to stringify bigints.
+ *
+ * refer to issue {@link https://github.com/facebook/react/issues/35004}
+ * a PR is currently open here {@link https://github.com/facebook/react/pull/35013}
+ */
+if (process.env.NODE_ENV === "development") {
+    Object.defineProperty(BigInt.prototype, "toJSON", {
+        writable: false,
+        enumerable: true,
+        configurable: false,
+        value() {
+            return this.toString();
+        },
+    });
+}
+
 const RootLayout: FC<RootLayoutProps> = ({ children }) => {
     return (
         <html lang="en" {...mantineHtmlProps}>
