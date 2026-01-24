@@ -7,6 +7,7 @@ import { type FC } from "react";
 import { useConfig } from "wagmi";
 import { BlockExplorerLink } from "../BlockExplorerLink";
 import type { TransactionFormSuccessData } from "../transactions/DepositFormTypes";
+import { ERC20DepositForm } from "../transactions/ERC20DepositForm";
 import { EtherDepositForm } from "../transactions/EtherDepositForm";
 import { useSendAction, useSendState } from "./hooks";
 import type { TransactionType } from "./SendContexts";
@@ -86,6 +87,11 @@ const SendModal: FC = () => {
         >
             {state.transactionType === "deposit_eth" ? (
                 <EtherDepositForm
+                    application={state.application}
+                    onSuccess={onSuccess}
+                />
+            ) : state.transactionType === "deposit_erc20" ? (
+                <ERC20DepositForm
                     application={state.application}
                     onSuccess={onSuccess}
                 />
