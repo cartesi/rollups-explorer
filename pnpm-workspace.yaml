@@ -3,19 +3,20 @@ packages:
     - packages/*
 
 catalog:
+    "@tanstack/react-query": ^5.90.12
     eslint: ^9.39.1
     prettier: ^3.7.4
+    react: ^19.2.3
+    react-dom: ^19.2.3
     typescript: ^5.9.3
     viem: ^2.41.2
     wagmi: ^2.18.2
-    "@tanstack/react-query": ^5.90.12
-    react: "^19.2.3"
-    "react-dom": "^19.2.3"
 
 onlyBuiltDependencies:
     - "@parcel/watcher"
     - "@vercel/speed-insights"
     - bufferutil
+    - core-js-pure
     - esbuild
     - keccak
     - protobufjs

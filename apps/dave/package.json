@@ -10,6 +10,8 @@
         "start": "next start",
         "lint": "eslint .",
         "storybook": "storybook dev -p 6006",
+        "codegen": "run-s gen:wagmi",
+        "gen:wagmi": "wagmi generate",
         "build-storybook": "storybook build",
         "format:check": "prettier \"**/*.{ts,tsx}\" --check",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
@@ -50,6 +52,7 @@
         "@types/ramda": "^0.31.1",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
+        "@wagmi/cli": "^2.1.2",
         "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
         "eslint-plugin-react-refresh": "^0.4.21",
