@@ -1,10 +1,9 @@
-import { erc20Abi, type Hex } from "viem";
+import { type Hex } from "viem";
+import { useWaitForTransactionReceipt } from "wagmi";
 import {
-    useSimulateContract,
-    type UseSimulateContractReturnType,
-    useWaitForTransactionReceipt,
-    useWriteContract,
-} from "wagmi";
+    useSimulateErc20Approve,
+    useWriteErc20Approve,
+} from "../../../../generated/wagmi";
 
 interface Props {
     erc20Address: Hex;
@@ -13,8 +12,8 @@ interface Props {
 }
 
 interface UseERC20ApproveReturn {
-    approvePrepare: UseSimulateContractReturnType<typeof erc20Abi, "approve">;
-    approve: ReturnType<typeof useWriteContract>;
+    approvePrepare: ReturnType<typeof useSimulateErc20Approve>;
+    approve: ReturnType<typeof useWriteErc20Approve>;
     approveWait: ReturnType<typeof useWaitForTransactionReceipt>;
 }
 
@@ -23,9 +22,7 @@ export const useERC20Approve = ({
     erc20Address,
     isQueryEnabled,
 }: Props): UseERC20ApproveReturn => {
-    const approvePrepare = useSimulateContract({
-        abi: erc20Abi,
-        functionName: "approve",
+    const approvePrepare = useSimulateErc20Approve({
         address: erc20Address,
         args,
         query: {
@@ -33,7 +30,7 @@ export const useERC20Approve = ({
         },
     });
 
-    const approve = useWriteContract();
+    const approve = useWriteErc20Approve();
     const approveWait = useWaitForTransactionReceipt({
         hash: approve.data,
     });
