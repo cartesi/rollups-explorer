@@ -92,7 +92,6 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-20</Text>
                 </Menu.Item>
                 <Menu.Item
-                    disabled
                     leftSection={<TbCurrencyEthereum size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();

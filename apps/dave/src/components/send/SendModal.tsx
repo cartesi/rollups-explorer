@@ -3,12 +3,13 @@ import type { Application } from "@cartesi/viem";
 import { Group, Modal, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { defaultTo, isNil, isNotNil } from "ramda";
-import { type FC } from "react";
+import { useCallback, type FC } from "react";
 import { useConfig } from "wagmi";
 import { BlockExplorerLink } from "../BlockExplorerLink";
 import type { TransactionFormSuccessData } from "../transactions/DepositFormTypes";
 import { ERC1155DepositForm } from "../transactions/ERC1155DepositForm";
 import { ERC20DepositForm } from "../transactions/ERC20DepositForm";
+import { ERC721DepositForm } from "../transactions/ERC721DepositForm";
 import { EtherDepositForm } from "../transactions/EtherDepositForm";
 import { useSendAction, useSendState } from "./hooks";
 import type { TransactionType } from "./SendContexts";
@@ -51,27 +52,30 @@ const SendModal: FC = () => {
     const actions = useSendAction();
     const config = useConfig();
 
-    const onSuccess = ({ receipt, type }: TransactionFormSuccessData) => {
-        const message = receipt?.transactionHash
-            ? {
-                  message: (
-                      <BlockExplorerLink
-                          value={receipt.transactionHash.toString()}
-                          type="tx"
-                          chain={config.chains[0]}
-                      />
-                  ),
-                  title: `${type} transaction completed`,
-              }
-            : { message: `${type} transaction completed.` };
+    const onSuccess = useCallback(
+        ({ receipt, type }: TransactionFormSuccessData) => {
+            const message = receipt?.transactionHash
+                ? {
+                      message: (
+                          <BlockExplorerLink
+                              value={receipt.transactionHash.toString()}
+                              type="tx"
+                              chain={config.chains[0]}
+                          />
+                      ),
+                      title: `${type} transaction completed`,
+                  }
+                : { message: `${type} transaction completed.` };
 
-        notifications.show({
-            withCloseButton: true,
-            autoClose: false,
-            color: "green",
-            ...message,
-        });
-    };
+            notifications.show({
+                withCloseButton: true,
+                autoClose: false,
+                color: "green",
+                ...message,
+            });
+        },
+        [config],
+    );
 
     if (!state) return "";
 
@@ -105,6 +109,11 @@ const SendModal: FC = () => {
             ) : state.transactionType === "deposit_erc1155Batch" ? (
                 <ERC1155DepositForm
                     mode="batch"
+                    application={state.application}
+                    onSuccess={onSuccess}
+                />
+            ) : state.transactionType === "deposit_erc721" ? (
+                <ERC721DepositForm
                     application={state.application}
                     onSuccess={onSuccess}
                 />
