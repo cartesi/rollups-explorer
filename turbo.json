@@ -32,9 +32,11 @@
             ]
         },
         "build-storybook": {
+            "dependsOn": ["codegen"],
             "outputs": ["dist/**", "storybook-static/**"]
         },
         "storybook": {
+            "dependsOn": ["codegen"],
             "outputs": ["dist/**", "storybook-static/**"]
         },
         "clean": {
