@@ -7,10 +7,15 @@ import { Providers } from '../src/providers/Providers';
 import theme from "../src/providers/theme";
 import './global.css';
 
-// @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
+try {
+    // @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+    BigInt.prototype.toJSON = function () {
+      return this.toString();
+    };
+    
+} catch (error: unknown) {
+    console.info((error as Error).message)
+}
 
 const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     const { title } = context;
