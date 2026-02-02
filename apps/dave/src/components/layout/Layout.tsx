@@ -37,10 +37,14 @@ const logQueries = () => {
     // @ts-expect-error saving whatever is the original to reset.
     const orig = BigInt.prototype.toJSON;
 
-    // @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
-    BigInt.prototype.toJSON = function () {
-        return `$bigint:${this.toString()}`;
-    };
+    try {
+        // @ts-expect-error JSON.stringify will try to call toJSON on bigints.  ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+        BigInt.prototype.toJSON = function () {
+            return `$bigint:${this.toString()}`;
+        };
+    } catch (error) {
+        console.log((error as Error).message);
+    }
 
     queries.forEach((query) => {
         obj.push({ queryKey: query.queryKey, data: query.state.data });
