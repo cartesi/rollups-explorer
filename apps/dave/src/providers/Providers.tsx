@@ -21,14 +21,18 @@ import WalletProvider from "./WalletProvider";
  * a PR is currently open here {@link https://github.com/facebook/react/pull/35013}
  */
 if (process.env.NODE_ENV === "development") {
-    Object.defineProperty(BigInt.prototype, "toJSON", {
-        writable: false,
-        enumerable: true,
-        configurable: false,
-        value() {
-            return this.toString();
-        },
-    });
+    try {
+        Object.defineProperty(BigInt.prototype, "toJSON", {
+            writable: false,
+            enumerable: true,
+            configurable: false,
+            value() {
+                return this.toString();
+            },
+        });
+    } catch (error: unknown) {
+        console.info((error as Error).message);
+    }
 }
 
 type ProviderProps = { children: ReactNode };
