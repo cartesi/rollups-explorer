@@ -17,8 +17,8 @@
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "dependencies": {
-        "@cartesi/viem": "2.0.0-alpha.24",
-        "@cartesi/wagmi": "2.0.0-alpha.27",
+        "@cartesi/viem": "2.0.0-alpha.26",
+        "@cartesi/wagmi": "2.0.0-alpha.30",
         "@mantine/core": "^8.3.13",
         "@mantine/form": "^8.3.13",
         "@mantine/hooks": "^8.3.13",
@@ -31,6 +31,7 @@
         "date-fns": "^4.1.0",
         "humanize-duration": "^3.33.2",
         "next": "^16.1.5",
+        "pretty-ms": "^8",
         "ramda": "^0.32.0",
         "ramda-adjunct": "^5.1.0",
         "react": "catalog:",
