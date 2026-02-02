@@ -1,0 +1,29 @@
+import type { GetReportReturnType } from "@cartesi/viem";
+import { Spoiler, Text } from "@mantine/core";
+import { useEffect, useRef, type FC } from "react";
+import { getDecoder } from "../../lib/decoders";
+import type { DecoderType } from "../types";
+
+interface ReportProps {
+    displayAs?: DecoderType;
+    report: GetReportReturnType;
+}
+
+export const Report: FC<ReportProps> = ({ displayAs = "raw", report }) => {
+    const decoderFn = getDecoder(displayAs);
+    const ref = useRef<HTMLTextAreaElement | null>(null);
+
+    useEffect(() => {
+        if (ref.current !== null) {
+            ref.current.blur();
+        }
+    });
+
+    return (
+        <Spoiler hideLabel="Show less" showLabel="Show more" maxHeight={80}>
+            <Text style={{ wordBreak: "break-all" }}>
+                {decoderFn(report.rawData)}
+            </Text>
+        </Spoiler>
+    );
+};
