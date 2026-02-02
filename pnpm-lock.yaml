@@ -66,11 +66,11 @@ importers:
   apps/dave:
     dependencies:
       '@cartesi/viem':
-        specifier: 2.0.0-alpha.24
-        version: 2.0.0-alpha.24(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)
+        specifier: 2.0.0-alpha.26
+        version: 2.0.0-alpha.26(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)
       '@cartesi/wagmi':
-        specifier: 2.0.0-alpha.27
-        version: 2.0.0-alpha.27(@tanstack/react-query@5.90.12(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.2.7)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))(zod@4.1.12)
+        specifier: 2.0.0-alpha.30
+        version: 2.0.0-alpha.30(@tanstack/react-query@5.90.12(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.2.7)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))(zod@4.1.12)
       '@mantine/core':
         specifier: ^8.3.13
         version: 8.3.13(@mantine/hooks@8.3.13(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -107,6 +107,9 @@ importers:
       next:
         specifier: ^16.1.5
         version: 16.1.5(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      pretty-ms:
+        specifier: ^8
+        version: 8.0.0
       ramda:
         specifier: ^0.32.0
         version: 0.32.0
@@ -597,7 +600,7 @@ importers:
         version: link:../tsconfig
       '@sunodo/wagmi-plugin-hardhat-deploy':
         specifier: ^0.4.0
-        version: 0.4.0(@wagmi/core@2.22.1(@tanstack/query-core@5.90.12)(@types/react@19.1.13)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.3))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)))(abitype@1.2.2(typescript@5.9.3)(zod@3.25.76))(typescript@5.9.3)(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.1.13)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
+        version: 0.4.0(@wagmi/core@2.22.1(@tanstack/query-core@5.90.12)(@types/react@19.1.13)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.3))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)))(abitype@1.2.3(typescript@5.9.3)(zod@3.25.76))(typescript@5.9.3)(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.1.13)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
       '@types/node':
         specifier: ^20
         version: 20.19.4
@@ -1660,24 +1663,24 @@ packages:
   '@cartesi/rollups@2.1.1':
     resolution: {integrity: sha512-1k+8gEp6VL6pGr0hlUTqK1hEIvBmRKUBodU3259e7rpR7ECaTLUV08C+P4efnXrz5Zj2SYWF8QZuFUVMxsMBVA==}
 
-  '@cartesi/rpc@2.0.0-alpha.17':
-    resolution: {integrity: sha512-hD+ROXq0YMBZwNp6FlR5gYpzU6Am7Ug3lhIyD7OrP6/SVzmJC5u6Q7PY5kSPf6xrGGoE9U0tVAWl0tQWWYMv5w==}
+  '@cartesi/rpc@2.0.0-alpha.19':
+    resolution: {integrity: sha512-KOA3dzeq0B7iQe9RCYvNPC/VaKDFoNHZHqjSfjhXUSJA6VsJzJgKjAnkZm1bKpSIiMnq/eKAhPW/+Urr194phA==}
 
   '@cartesi/util@6.3.0':
     resolution: {integrity: sha512-UgsyTklI4mf3ZbnPHQTuYJcMyldM3y9Xm+ib9xBgDzDq6TxMO81xkrPv/gwA23seHL2/bkJ5flXJEhCE8poW8Q==}
 
-  '@cartesi/viem@2.0.0-alpha.24':
-    resolution: {integrity: sha512-rKFVELnilpJf3vqqV0qwbddoTpXg7i4GocIP3bRkFJpGhXFA4j5b7aEzUtsUPstbmf5rq7xu074ttp6FPnpsrQ==}
+  '@cartesi/viem@2.0.0-alpha.26':
+    resolution: {integrity: sha512-TbdYh44cga4YVROKllZDd1w2dpVBkjhkkFiCtqNE+ASvRpAhDrGzBycYlkX92O0z3ZaLCDRUfpNUJwh52gv/qQ==}
     peerDependencies:
       viem: ^2.0.0
 
-  '@cartesi/wagmi@2.0.0-alpha.27':
-    resolution: {integrity: sha512-WBqKhLD69aYmginxvFBpFT43NELbrFQIK3wE1eoT49c7bfWEMCWWEcC73AW3wv13vfJczLHlXZW8pYiyIVVHoQ==}
+  '@cartesi/wagmi@2.0.0-alpha.30':
+    resolution: {integrity: sha512-bbbLBhGK3E9nKxy+Pan87wkc1B+FdKtffyfAfp2U35Q3NrIL9NwMLMHez/by0g0r3OJIUD0WjXwkECi7eGFAPw==}
     peerDependencies:
       '@tanstack/react-query': ^5.0.0
       react: ^19.0.0
       viem: ^2.0.0
-      wagmi: ^2.0.0
+      wagmi: ^3.0.0
 
   '@changesets/apply-release-plan@7.0.14':
     resolution: {integrity: sha512-ddBvf9PHdy2YY0OUiEl3TV78mH9sckndJR14QAt87KLEbIov81XO0q0QAmvooBxXlqRRP8I9B7XOzZwQG7JkWA==}
@@ -4409,6 +4412,17 @@ packages:
 
   abitype@1.2.2:
     resolution: {integrity: sha512-4DOIMWscIB3j8hboLAUjLZCE8TMLdgecBpHFumfU4PdO/C1SBCVx4Nu1wPYXaL2iK8B0Jk3tiwnDLCpUtm3fZg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3.22.0 || ^4.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  abitype@1.2.3:
+    resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3.22.0 || ^4.0.0
@@ -9946,6 +9960,9 @@ packages:
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
+  web-solc@0.5.1:
+    resolution: {integrity: sha512-Z/hBplZq1+4i4bYeIeD9N3vP1BLUBXpSDa4h0Ipm2Z2cHv7x7DtZ2zFb0E1L1VZo4BF+OJGVtGlT+nTUXGgncQ==}
+
   web-streams-polyfill@3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
     engines: {node: '>= 8'}
@@ -11523,25 +11540,25 @@ snapshots:
 
   '@cartesi/rollups@2.1.1': {}
 
-  '@cartesi/rpc@2.0.0-alpha.17':
+  '@cartesi/rpc@2.0.0-alpha.19':
     dependencies:
       json-rpc-2.0: 1.7.1
 
   '@cartesi/util@6.3.0': {}
 
-  '@cartesi/viem@2.0.0-alpha.24(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)':
+  '@cartesi/viem@2.0.0-alpha.26(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)':
     dependencies:
-      '@cartesi/rpc': 2.0.0-alpha.17
-      abitype: 1.2.2(typescript@5.9.3)(zod@4.1.12)
+      '@cartesi/rpc': 2.0.0-alpha.19
+      abitype: 1.2.3(typescript@5.9.3)(zod@4.1.12)
       p-retry: 7.1.1
       viem: 2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12)
     transitivePeerDependencies:
       - typescript
       - zod
 
-  '@cartesi/wagmi@2.0.0-alpha.27(@tanstack/react-query@5.90.12(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.2.7)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))(zod@4.1.12)':
+  '@cartesi/wagmi@2.0.0-alpha.30(@tanstack/react-query@5.90.12(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.2.7)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))(zod@4.1.12)':
     dependencies:
-      '@cartesi/viem': 2.0.0-alpha.24(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)
+      '@cartesi/viem': 2.0.0-alpha.26(typescript@5.9.3)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)
       '@tanstack/react-query': 5.90.12(react@19.2.3)
       react: 19.2.3
       viem: 2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12)
@@ -14540,9 +14557,9 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@sunodo/wagmi-plugin-hardhat-deploy@0.4.0(@wagmi/core@2.22.1(@tanstack/query-core@5.90.12)(@types/react@19.1.13)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.3))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)))(abitype@1.2.2(typescript@5.9.3)(zod@3.25.76))(typescript@5.9.3)(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.1.13)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))':
+  '@sunodo/wagmi-plugin-hardhat-deploy@0.4.0(@wagmi/core@2.22.1(@tanstack/query-core@5.90.12)(@types/react@19.1.13)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.3))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)))(abitype@1.2.3(typescript@5.9.3)(zod@3.25.76))(typescript@5.9.3)(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.1.13)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))':
     dependencies:
-      abitype: 1.2.2(typescript@5.9.3)(zod@3.25.76)
+      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
     optionalDependencies:
       '@wagmi/core': 2.22.1(@tanstack/query-core@5.90.12)(@types/react@19.1.13)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.3))(viem@2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       typescript: 5.9.3
@@ -14847,7 +14864,7 @@ snapshots:
       '@usecannon/web-solc': 0.5.1
       acorn: 8.15.0
       axios: 1.10.0(debug@4.4.3)
-      axios-retry: 4.5.0(axios@1.10.0)
+      axios-retry: 4.5.0(axios@1.10.0(debug@4.4.3))
       buffer: 6.0.3
       chalk: 4.1.2
       debug: 4.4.3
@@ -14905,7 +14922,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@usecannon/web-solc@0.5.1': {}
+  '@usecannon/web-solc@0.5.1':
+    dependencies:
+      web-solc: 0.5.1
 
   '@vanilla-extract/css@1.17.3':
     dependencies:
@@ -16185,6 +16204,16 @@ snapshots:
       typescript: 5.9.3
       zod: 4.1.12
 
+  abitype@1.2.3(typescript@5.9.3)(zod@3.25.76):
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 3.25.76
+
+  abitype@1.2.3(typescript@5.9.3)(zod@4.1.12):
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 4.1.12
+
   abort-controller@3.0.0:
     dependencies:
       event-target-shim: 5.0.1
@@ -16425,7 +16454,7 @@ snapshots:
 
   axe-core@4.11.0: {}
 
-  axios-retry@4.5.0(axios@1.10.0):
+  axios-retry@4.5.0(axios@1.10.0(debug@4.4.3)):
     dependencies:
       axios: 1.10.0(debug@4.4.3)
       is-retry-allowed: 2.2.0
@@ -22611,6 +22640,10 @@ snapshots:
   wcwidth@1.0.1:
     dependencies:
       defaults: 1.0.4
+
+  web-solc@0.5.1:
+    dependencies:
+      semver: 7.7.3
 
   web-streams-polyfill@3.2.1: {}
 
