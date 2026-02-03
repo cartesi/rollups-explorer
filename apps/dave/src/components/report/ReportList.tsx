@@ -1,74 +1,31 @@
-import type { ListReportsParams } from "@cartesi/viem";
-import { useReports } from "@cartesi/wagmi";
-import { Card, Center, Stack, Text } from "@mantine/core";
+import type { Pagination as QPagination, Report } from "@cartesi/viem";
+import { Stack } from "@mantine/core";
 import { type FC } from "react";
+import { QueryPagination } from "../QueryPagination";
 import type { DecoderType } from "../types";
-import { Report } from "./Report";
+import { ReportView } from "./ReportView";
 
-interface ReportListProps extends ListReportsParams {
-    decoderType?: DecoderType;
-}
-
-const NoReports = () => (
-    <Center>
-        <Text c="dimmed" size="xl">
-            No reports generated
-        </Text>
-    </Center>
-);
+type ReportListProps = {
+    reports: Report[];
+    decoderType: DecoderType;
+    pagination: QPagination;
+    onPaginationChange?: (newOffset: number) => void;
+};
 
 export const ReportList: FC<ReportListProps> = ({
-    application,
-    descending = true,
-    epochIndex,
-    inputIndex,
-    limit,
-    offset,
+    pagination,
+    onPaginationChange,
+    reports,
     decoderType = "raw",
 }) => {
-    const {
-        data: result,
-        isLoading,
-        error,
-        isError,
-    } = useReports({
-        application,
-        epochIndex,
-        inputIndex,
-        descending,
-        limit,
-        offset,
-    });
-
-    if (isLoading) {
-        return (
-            <Card>
-                <Center>
-                    <Text c="dimmed">Checking for reports...</Text>
-                </Center>
-            </Card>
-        );
-    }
-
-    if (isError) {
-        console.error(error.message);
-        return (
-            <Card>
-                <Center>
-                    <Text c="red">Could not fetch the reports</Text>
-                </Center>
-            </Card>
-        );
-    }
-
-    if (!result || result.data.length === 0) {
-        return <NoReports />;
-    }
-
     return (
         <Stack id="reports-list">
-            {result.data.map((report) => (
-                <Report
+            <QueryPagination
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+            />
+            {reports.map((report) => (
+                <ReportView
                     key={`${report.inputIndex}-${report.index}`}
                     report={report}
                     displayAs={decoderType}

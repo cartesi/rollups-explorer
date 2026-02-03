@@ -11,7 +11,7 @@ import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
 import type { DecoderType } from "../types";
 
-interface OutputProps {
+interface OutputViewProps {
     displayAs?: DecoderType;
     output: GetOutputReturnType;
 }
@@ -48,6 +48,7 @@ const VoucherContent: FC<VoucherProps> = ({
         isHex(decodedData.payload) && decodedData.payload !== "0x";
     const amount = decodedData.type === "Voucher" ? decodedData.value : 0n;
     const hasAmount = amount > 0n;
+    console.log(amount);
 
     return (
         <Fieldset legend={title}>
@@ -79,7 +80,10 @@ const VoucherContent: FC<VoucherProps> = ({
     );
 };
 
-export const Output: FC<OutputProps> = ({ displayAs = "raw", output }) => {
+export const OutputView: FC<OutputViewProps> = ({
+    displayAs = "raw",
+    output,
+}) => {
     const outputType = output.decodedData.type;
     return (
         <>

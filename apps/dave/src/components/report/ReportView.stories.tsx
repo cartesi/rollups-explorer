@@ -3,13 +3,13 @@ import { SegmentedControl, Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState } from "react";
 import { type DecoderType } from "../types";
-import { Report } from "./Report";
+import { ReportView } from "./ReportView";
 
 const meta = {
     title: "Components/Report",
-    component: Report,
+    component: ReportView,
     tags: ["autodocs"],
-} satisfies Meta<typeof Report>;
+} satisfies Meta<typeof ReportView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,7 +23,7 @@ const validReport: GetReportReturnType = {
         "0x7b22616374696f6e223a2265726332305f6465706f736974222c2264617461223a7b226d7367223a22576974686472617720766f7563686572206f662033353030204552432d323020746f203078613037343638334235424530313546303533623544636562303634433431664339443131423645352067656e6572617465642e227d7d",
 };
 
-type Props = Parameters<typeof Report>[0];
+type Props = Parameters<typeof ReportView>[0];
 
 const WithDecoding = (props: Props) => {
     const options = [
@@ -40,7 +40,7 @@ const WithDecoding = (props: Props) => {
                 data={options}
                 onChange={(value) => setDisplayOpt(value as DecoderType)}
             />
-            <Report report={props.report} displayAs={displayOpt} />
+            <ReportView report={props.report} displayAs={displayOpt} />
         </Stack>
     );
 };
