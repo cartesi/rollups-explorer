@@ -1,5 +1,5 @@
 import type { GetReportReturnType } from "@cartesi/viem";
-import { Spoiler, Text } from "@mantine/core";
+import { Fieldset, Spoiler, Text } from "@mantine/core";
 import { useEffect, useRef, type FC } from "react";
 import { getDecoder } from "../../lib/decoders";
 import type { DecoderType } from "../types";
@@ -23,10 +23,12 @@ export const ReportView: FC<ReportViewProps> = ({
     });
 
     return (
-        <Spoiler hideLabel="Show less" showLabel="Show more" maxHeight={80}>
-            <Text style={{ wordBreak: "break-all" }}>
-                {decoderFn(report.rawData)}
-            </Text>
-        </Spoiler>
+        <Fieldset>
+            <Spoiler hideLabel="Show less" showLabel="Show more" maxHeight={80}>
+                <Text style={{ wordBreak: "break-all" }}>
+                    {decoderFn(report.rawData)}
+                </Text>
+            </Spoiler>
+        </Fieldset>
     );
 };
