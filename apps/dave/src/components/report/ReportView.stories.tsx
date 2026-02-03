@@ -6,7 +6,7 @@ import { type DecoderType } from "../types";
 import { ReportView } from "./ReportView";
 
 const meta = {
-    title: "Components/Report",
+    title: "Components/Report/ReportView",
     component: ReportView,
     tags: ["autodocs"],
 } satisfies Meta<typeof ReportView>;
