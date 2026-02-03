@@ -4,12 +4,15 @@ import { useEffect, useRef, type FC } from "react";
 import { getDecoder } from "../../lib/decoders";
 import type { DecoderType } from "../types";
 
-interface ReportProps {
+interface ReportViewProps {
     displayAs?: DecoderType;
     report: GetReportReturnType;
 }
 
-export const Report: FC<ReportProps> = ({ displayAs = "raw", report }) => {
+export const ReportView: FC<ReportViewProps> = ({
+    displayAs = "raw",
+    report,
+}) => {
     const decoderFn = getDecoder(displayAs);
     const ref = useRef<HTMLTextAreaElement | null>(null);
 

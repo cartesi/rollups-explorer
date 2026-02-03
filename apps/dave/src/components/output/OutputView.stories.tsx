@@ -3,13 +3,13 @@ import { SegmentedControl, Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState } from "react";
 import { type DecoderType } from "../types";
-import { Output } from "./Output";
+import { OutputView } from "./OutputView";
 
 const meta = {
-    title: "Components/Output",
-    component: Output,
+    title: "Components/Output/OutputView",
+    component: OutputView,
     tags: ["autodocs"],
-} satisfies Meta<typeof Output>;
+} satisfies Meta<typeof OutputView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -179,7 +179,7 @@ const validNotice: GetOutputReturnType = {
     },
 };
 
-type Props = Parameters<typeof Output>[0];
+type Props = Parameters<typeof OutputView>[0];
 
 const WithDecoding = (props: Props) => {
     const options = [
@@ -196,7 +196,7 @@ const WithDecoding = (props: Props) => {
                 data={options}
                 onChange={(value) => setDisplayOpt(value as DecoderType)}
             />
-            <Output output={props.output} displayAs={displayOpt} />
+            <OutputView output={props.output} displayAs={displayOpt} />
         </Stack>
     );
 };

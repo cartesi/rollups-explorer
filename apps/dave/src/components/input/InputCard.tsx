@@ -19,8 +19,8 @@ import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
 import { PrettyTime } from "../PrettyTime";
 import TransactionHash from "../TransactionHash";
-import { OutputList } from "../output/OutputList";
-import { ReportList } from "../report/ReportList";
+import { OutputContainer } from "../output/OutputContainer";
+import { ReportContainer } from "../report/ReportContainer";
 import { contentDisplayOptions, type DecoderType } from "../types";
 
 interface Props {
@@ -119,7 +119,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     <Activity
                         mode={viewControl === "output" ? "visible" : "hidden"}
                     >
-                        <OutputList
+                        <OutputContainer
                             application={input.decodedData.applicationContract}
                             inputIndex={input.index}
                             epochIndex={input.epochIndex}
@@ -131,7 +131,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     <Activity
                         mode={viewControl === "report" ? "visible" : "hidden"}
                     >
-                        <ReportList
+                        <ReportContainer
                             application={input.decodedData.applicationContract}
                             inputIndex={input.index}
                             epochIndex={input.epochIndex}

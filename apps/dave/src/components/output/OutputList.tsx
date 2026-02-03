@@ -1,96 +1,54 @@
-import type { ListOutputsParams } from "@cartesi/viem";
-import { useOutputs } from "@cartesi/wagmi";
-import { Card, Center, Group, Pagination, Stack, Text } from "@mantine/core";
-import { Activity, useState, type FC } from "react";
+import type {
+    Output as OutputReturn,
+    Pagination as QueryPagination,
+} from "@cartesi/viem";
+import { Group, Pagination, Stack } from "@mantine/core";
+import { Activity, type FC } from "react";
 import type { DecoderType } from "../types";
-import { Output } from "./Output";
+import { OutputView } from "./OutputView";
 
-interface OutputListProps extends ListOutputsParams {
+type OutputListProps = {
     decoderType?: DecoderType;
-}
+    outputs: OutputReturn[];
+    pagination: QueryPagination;
+    onPaginationChange?: (newOffset: number) => void;
+};
 
-const NoOutputs = () => (
-    <Center>
-        <Text c="dimmed" size="xl">
-            No outputs generated
-        </Text>
-    </Center>
-);
+const getActivePage = (offset: number, limit: number) => {
+    const safeLimit = limit === 0 ? 1 : limit;
+    return offset / safeLimit + 1;
+};
 
 export const OutputList: FC<OutputListProps> = ({
-    application,
-    descending = true,
-    inputIndex,
-    epochIndex,
-    limit = 50,
-    outputType,
-    offset = 0,
-    voucherAddress,
+    outputs,
+    pagination,
     decoderType = "raw",
+    onPaginationChange,
 }) => {
-    const [newOffSet, setNewOffset] = useState<number>(offset);
-    const {
-        data: result,
-        isLoading,
-        error,
-        isError,
-    } = useOutputs({
-        application,
-        epochIndex,
-        inputIndex,
-        outputType,
-        voucherAddress,
-        limit,
-        offset: newOffSet,
-        descending,
-    });
-
-    if (isLoading) {
-        return (
-            <Card>
-                <Center>
-                    <Text c="dimmed">Checking for outputs...</Text>
-                </Center>
-            </Card>
-        );
-    }
-
-    if (isError) {
-        console.error(error.message);
-        return (
-            <Card>
-                <Center>
-                    <Text c="red">Could not fetch the outputs</Text>
-                </Center>
-            </Card>
-        );
-    }
-
-    if (!result || result.data.length === 0) {
-        return <NoOutputs />;
-    }
-
-    const hasMoreThanOne = result.pagination.totalCount;
+    const totalPages = Math.ceil(pagination.totalCount / pagination.limit);
+    const activePage = getActivePage(pagination.offset, pagination.limit);
+    const hasMoreThanOnePage = totalPages > 1;
 
     return (
         <Stack id="output-list" gap={0}>
-            <Activity mode={hasMoreThanOne ? "visible" : "hidden"}>
+            <Activity mode={hasMoreThanOnePage ? "visible" : "hidden"}>
                 <Group justify="flex-end">
                     <Pagination
-                        total={result.pagination.totalCount}
-                        value={newOffSet + 1}
-                        onChange={(value) => {
-                            if (value !== newOffSet + 1) {
-                                setNewOffset(value - 1);
-                            } else {
-                                console.log(`Clicked same number ${value}`);
+                        total={totalPages}
+                        value={activePage}
+                        onChange={(newPageNumber) => {
+                            if (newPageNumber !== activePage) {
+                                onPaginationChange?.(
+                                    newPageNumber * pagination.limit -
+                                        pagination.limit,
+                                );
                             }
                         }}
                     />
                 </Group>
             </Activity>
-            {result.data.map((output) => (
-                <Output
+            {outputs.map((output) => (
+                <OutputView
                     key={`${output.epochIndex}-${output.inputIndex}-${output.index}`}
                     output={output}
                     displayAs={decoderType}
