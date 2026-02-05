@@ -4,7 +4,7 @@ export const ContainerSkeleton = () => {
     const repeat = Array.from({ length: 4 });
 
     return (
-        <Stack mt="md">
+        <Stack my="xl" gap="xl">
             <Group>
                 <Skeleton animate={false} height={34} circle mb="xl" />
                 <Skeleton animate={false} height={13} width="40%" mb="xl" />

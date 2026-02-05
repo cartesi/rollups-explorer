@@ -1,6 +1,5 @@
 "use client";
 import { useCommitments, useMatches, useTournament } from "@cartesi/wagmi";
-import { Stack } from "@mantine/core";
 import { notFound } from "next/navigation";
 import type { FC } from "react";
 import {
@@ -13,6 +12,7 @@ import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { TournamentPage } from "../page/TournamentPage";
 import { pathBuilder, type TournamentParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
+import ContainerStack from "./ContainerStack";
 
 export const TournamentContainer: FC<TournamentParams> = (params) => {
     const { data: tournament, isLoading } = useTournament({
@@ -69,7 +69,11 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
         { title: "Home", href: "/" },
         {
             title: params.application,
-            href: pathBuilder.epochs({ application: params.application }),
+            href: pathBuilder.application(params),
+        },
+        {
+            title: "epochs",
+            href: pathBuilder.epochs(params),
         },
         {
             title: `Epoch #${params.epochIndex}`,
@@ -99,7 +103,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
     }
 
     return (
-        <Stack pt="lg" gap="lg">
+        <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
             {isLoading && <ContainerSkeleton />}
             {!!tournament && (
@@ -109,6 +113,6 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                     tournament={tournament}
                 />
             )}
-        </Stack>
+        </ContainerStack>
     );
 };

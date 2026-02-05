@@ -1,7 +1,6 @@
 "use client";
 
 import { useApplications } from "@cartesi/wagmi";
-import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import {
     Hierarchy,
@@ -9,6 +8,7 @@ import {
 } from "../components/navigation/Hierarchy";
 import { ApplicationsPage } from "../page/ApplicationsPage";
 import { ContainerSkeleton } from "./ContainerSkeleton";
+import ContainerStack from "./ContainerStack";
 
 export type HomeContainerProps = {
     descending?: boolean;
@@ -22,7 +22,7 @@ export const ApplicationsContainer: FC<HomeContainerProps> = (props) => {
     const applications = data?.data ?? [];
 
     return (
-        <Stack pt="lg" gap="lg">
+        <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
 
             {isLoading ? (
@@ -33,6 +33,6 @@ export const ApplicationsContainer: FC<HomeContainerProps> = (props) => {
                     pagination={data?.pagination}
                 />
             )}
-        </Stack>
+        </ContainerStack>
     );
 };
