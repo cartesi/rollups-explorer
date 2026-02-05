@@ -9,7 +9,7 @@ interface Props {
 
 export const InputList: FC<Props> = ({ inputs }) => {
     return (
-        <Stack gap="xs" py="md">
+        <Stack gap="xs" pb="md">
             {inputs.map((input) => (
                 <InputCard input={input} key={input.index} />
             ))}

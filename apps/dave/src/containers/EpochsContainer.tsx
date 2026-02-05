@@ -1,13 +1,14 @@
 "use client";
 import { useEpochs } from "@cartesi/wagmi";
-import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { EpochsPage } from "../page/EpochsPage";
+import { pathBuilder } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
+import ContainerStack from "./ContainerStack";
 
 export type EpochsContainerProps = {
     application: string;
@@ -22,19 +23,23 @@ export const EpochsContainer: FC<EpochsContainerProps> = (props) => {
         { title: "Home", href: "/" },
         {
             title: props.application,
-            href: `apps/${props.application}/epochs`,
+            href: pathBuilder.application(props),
+        },
+        {
+            title: "epochs",
+            href: pathBuilder.epochs(props),
         },
     ];
 
     const epochs = data?.data ?? [];
 
     return (
-        <Stack pt="lg" gap="lg">
+        <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
             {isLoading && <ContainerSkeleton />}
             {props.application && (
                 <EpochsPage epochs={epochs} pagination={data?.pagination} />
             )}
-        </Stack>
+        </ContainerStack>
     );
 };
