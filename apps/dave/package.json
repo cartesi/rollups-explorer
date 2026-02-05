@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules && rm -rf dist && rm -rf src/generated",
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
@@ -25,6 +25,7 @@
         "@mantine/notifications": "^8.3.13",
         "@rainbow-me/rainbowkit": "^2.2.10",
         "@raugfer/jazzicon": "^1.0.6",
+        "@react-spring/web": "^10.0.1",
         "@tabler/icons-react": "^3.35.0",
         "@tanstack/react-query": "catalog:",
         "@vercel/analytics": "^1.6.1",
