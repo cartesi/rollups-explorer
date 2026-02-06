@@ -1,22 +1,15 @@
-import type {
-    Output as OutputReturn,
-    Pagination as QueryPagination,
-} from "@cartesi/viem";
-import { Group, Pagination, Stack } from "@mantine/core";
-import { Activity, type FC } from "react";
+import type { Output, Pagination } from "@cartesi/viem";
+import { Stack } from "@mantine/core";
+import { type FC } from "react";
+import { QueryPagination } from "../QueryPagination";
 import type { DecoderType } from "../types";
 import { OutputView } from "./OutputView";
 
 type OutputListProps = {
     decoderType?: DecoderType;
-    outputs: OutputReturn[];
-    pagination: QueryPagination;
+    outputs: Output[];
+    pagination: Pagination;
     onPaginationChange?: (newOffset: number) => void;
-};
-
-const getActivePage = (offset: number, limit: number) => {
-    const safeLimit = limit === 0 ? 1 : limit;
-    return offset / safeLimit + 1;
 };
 
 export const OutputList: FC<OutputListProps> = ({
@@ -25,28 +18,12 @@ export const OutputList: FC<OutputListProps> = ({
     decoderType = "raw",
     onPaginationChange,
 }) => {
-    const totalPages = Math.ceil(pagination.totalCount / pagination.limit);
-    const activePage = getActivePage(pagination.offset, pagination.limit);
-    const hasMoreThanOnePage = totalPages > 1;
-
     return (
         <Stack id="output-list" gap={0}>
-            <Activity mode={hasMoreThanOnePage ? "visible" : "hidden"}>
-                <Group justify="flex-end">
-                    <Pagination
-                        total={totalPages}
-                        value={activePage}
-                        onChange={(newPageNumber) => {
-                            if (newPageNumber !== activePage) {
-                                onPaginationChange?.(
-                                    newPageNumber * pagination.limit -
-                                        pagination.limit,
-                                );
-                            }
-                        }}
-                    />
-                </Group>
-            </Activity>
+            <QueryPagination
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+            />
             {outputs.map((output) => (
                 <OutputView
                     key={`${output.epochIndex}-${output.inputIndex}-${output.index}`}
