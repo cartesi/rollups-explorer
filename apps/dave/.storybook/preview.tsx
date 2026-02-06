@@ -1,10 +1,11 @@
-import { MantineProvider } from "@mantine/core";
+import { useMantineColorScheme } from "@mantine/core";
 import "@mantine/core/styles.css";
-import { Notifications } from "@mantine/notifications";
 import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
+import { ReactNode, useCallback, useEffect, useState } from "react";
+import { UPDATE_GLOBALS } from "storybook/internal/core-events";
+import { addons, useGlobals } from 'storybook/preview-api';
 import Layout from "../src/components/layout/Layout";
 import { Providers } from '../src/providers/Providers';
-import theme from "../src/providers/theme";
 import './global.css';
 
 try {
@@ -17,6 +18,8 @@ try {
     console.info((error as Error).message)
 }
 
+type Globals = ReturnType<typeof useGlobals>[0]
+
 const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     const { title } = context;
     const [sectionType] = title.split("/");
@@ -27,22 +30,71 @@ const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     return <>{StoryFn(context.args, context)}</>;
 };
 
-const withProviders = (StoryFn: StoryFn, context: StoryContext) => {
-    return <Providers>{StoryFn(context.args, context)}</Providers>
+const withProviders = (StoryFn: StoryFn, context: StoryContext) => {    
+    return (
+        <Providers>
+            <ColorSchemeWrapper context={context}>
+            {StoryFn(context.args, context)}
+            </ColorSchemeWrapper>            
+        </Providers>
+    )
 }
 
-const withMantine = (StoryFn: StoryFn, context: StoryContext) => {
-    const currentBg = context.globals.backgrounds?.value ?? "light";
+const channel = addons.getChannel();
 
-    return (
-        <MantineProvider forceColorScheme={currentBg} theme={theme}>
-            <Notifications />
-            {StoryFn(context.args, context)}
-        </MantineProvider>
-    );
-};
+const generateNewBackgroundEvt = (colorScheme: unknown) => ({globals: { backgrounds: {value: colorScheme, grid: false}}})
 
-const preview: Preview = {
+// eslint-disable-next-line react-refresh/only-export-components
+function ColorSchemeWrapper({ children, context}: { children: ReactNode, context: StoryContext }) {
+    const { colorScheme, setColorScheme } = useMantineColorScheme();
+    const [latestGlobalsBg, setLatestGlobalBg] = useState<string | undefined>(colorScheme);
+
+    const handleColorScheme = useCallback(({ globals }: { globals: Globals }) => {        
+        const bgValue = globals.backgrounds?.value
+        const newMode = bgValue ?? 'light';        
+        if(newMode !== colorScheme) {
+            setColorScheme(newMode);
+            setLatestGlobalBg(newMode);  
+        } else if (newMode !== latestGlobalsBg) {
+            setLatestGlobalBg(newMode)
+        }
+        // update the handler function every time both variables change
+        // as the handler is outside of React's detection. We want 
+        // to make sure the handler works with fresh values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [colorScheme, latestGlobalsBg]);
+
+
+    useEffect(() => {
+        // Only when on story mode i.e. not on autodocs view. 
+        // Due to the many re-renders until its finished. That cause slow but infinite loops.
+        if(context.viewMode === 'story') {
+            // on-mount emit single event to sync whatever is the default color-scheme on mantine
+            channel.emit(UPDATE_GLOBALS, generateNewBackgroundEvt(colorScheme))
+        }
+    }, [])
+
+    useEffect(() => {
+        channel.on("updateGlobals", handleColorScheme);
+        return () => {
+             // unsubscribe to subscribe again with fresher handler.
+             channel.off("updateGlobals", handleColorScheme);
+        }
+    }, [handleColorScheme]);
+
+    useEffect(() => {
+        if(colorScheme !== latestGlobalsBg) {
+            console.log('color-scheme new value came from App ui interaction. emitting event to sync.');
+            channel.emit(UPDATE_GLOBALS, generateNewBackgroundEvt(colorScheme));
+        }
+    }, [colorScheme, latestGlobalsBg])
+
+    
+
+    return <>{children}</>;
+}
+
+const preview: Preview = {    
     initialGlobals: {
         backgrounds: { value: "light" },
     },
@@ -64,10 +116,10 @@ const preview: Preview = {
         },
     },
     decorators: [
-        // Order matters. So layout decorator first. Fn calling is router(mantine(layout))        
-        withLayout,
+        // Order matters. So layout decorator first. Fn calling is providers(layout(Story))
+        withLayout,        
         withProviders,
-        withMantine,
+        
     ],
 };
 
