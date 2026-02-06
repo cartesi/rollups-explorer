@@ -1,4 +1,4 @@
-import { createTheme, virtualColor } from "@mantine/core";
+import { createTheme, Spoiler, virtualColor } from "@mantine/core";
 
 const theme = createTheme({
     colors: {
@@ -55,6 +55,13 @@ const theme = createTheme({
                 withBorder: true,
             },
         },
+        Spoiler: Spoiler.extend({
+            defaultProps: {
+                hideLabel: "Show less",
+                showLabel: "Show more",
+                maxHeight: 80,
+            },
+        }),
     },
 });
 
