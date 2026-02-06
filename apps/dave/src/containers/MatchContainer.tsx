@@ -5,7 +5,6 @@ import {
     useTournament,
     useTournaments,
 } from "@cartesi/wagmi";
-import { Stack } from "@mantine/core";
 import { notFound } from "next/navigation";
 import type { FC } from "react";
 import {
@@ -18,6 +17,7 @@ import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
+import ContainerStack from "./ContainerStack";
 
 export const MatchContainer: FC<MatchParams> = (params) => {
     const now = Date.now();
@@ -55,6 +55,10 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         { title: "Home", href: "/" },
         {
             title: params.application,
+            href: pathBuilder.application(params),
+        },
+        {
+            title: "epochs",
             href: pathBuilder.epochs(params),
         },
         {
@@ -112,7 +116,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
     }
 
     return (
-        <Stack pt="lg" gap="lg">
+        <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
             {isLoading && <ContainerSkeleton />}
             {tournament !== null && match !== null && (
@@ -124,6 +128,6 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     now={now}
                 />
             )}
-        </Stack>
+        </ContainerStack>
     );
 };

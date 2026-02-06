@@ -4,4 +4,5 @@ node_modules
 .storybook
 graphql
 contracts.ts
+**/src/generated/**
 **/rollups-wagmi/src/index.tsx

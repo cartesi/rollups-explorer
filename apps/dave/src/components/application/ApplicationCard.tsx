@@ -26,7 +26,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
         application;
     const stateColour = getStateColour(state);
     const appConfig = useAppConfig();
-    const url = pathBuilder.epochs({ application: application.name });
+    const url = pathBuilder.application({ application: application.name });
     const inputsLabel =
         processedInputs === 0n
             ? "no inputs"

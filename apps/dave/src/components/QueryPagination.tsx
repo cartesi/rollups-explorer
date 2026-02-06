@@ -1,10 +1,16 @@
 import type { Pagination as QPagination } from "@cartesi/viem";
 import { Group, Pagination, type GroupProps } from "@mantine/core";
+import { isNil } from "ramda";
 import type { FC } from "react";
 
 const getActivePage = (offset: number, limit: number) => {
     const safeLimit = limit === 0 ? 1 : limit;
     return offset / safeLimit + 1;
+};
+
+const getTotalPages = (totalCount: number, limit: number) => {
+    const denominator = limit === 0 || isNil(limit) ? 1 : limit;
+    return Math.ceil(totalCount / denominator);
 };
 
 type QueryPaginationProps = {
@@ -20,11 +26,12 @@ export const QueryPagination: FC<QueryPaginationProps> = ({
     groupProps,
     hideIfSinglePage = true,
 }) => {
-    const totalPages = Math.ceil(pagination.totalCount / pagination.limit);
+    const totalPages = getTotalPages(pagination.totalCount, pagination.limit);
     const activePage = getActivePage(pagination.offset, pagination.limit);
-    const displayPagination = totalPages > 1 && hideIfSinglePage;
+    const hasNoPages = totalPages === 0;
+    const isSinglePage = totalPages === 1;
 
-    if (!displayPagination) return "";
+    if (hasNoPages || (isSinglePage && hideIfSinglePage)) return "";
 
     return (
         <Group justify="flex-end" {...groupProps}>

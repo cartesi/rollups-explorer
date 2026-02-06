@@ -1,6 +1,5 @@
 "use client";
 import { useEpoch, useInputs } from "@cartesi/wagmi";
-import { Stack } from "@mantine/core";
 import { notFound } from "next/navigation";
 import { type FC } from "react";
 import {
@@ -10,6 +9,7 @@ import {
 import { EpochPage } from "../page/EpochPage";
 import { pathBuilder } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
+import ContainerStack from "./ContainerStack";
 
 export type EpochContainerProps = {
     application: string;
@@ -29,6 +29,10 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
         { title: "Home", href: "/" },
         {
             title: props.application,
+            href: pathBuilder.application(props),
+        },
+        {
+            title: "epochs",
             href: pathBuilder.epochs(props),
         },
         {
@@ -42,7 +46,7 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
     }
 
     return (
-        <Stack pt="lg" gap="lg">
+        <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
             {isLoading && <ContainerSkeleton />}
             {!!epoch && (
@@ -52,6 +56,6 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
                     pagination={inputs?.pagination}
                 />
             )}
-        </Stack>
+        </ContainerStack>
     );
 };

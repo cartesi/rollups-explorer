@@ -10,6 +10,7 @@ import {
     Stack,
     Text,
     Tooltip,
+    useMantineTheme,
     type MantineColor,
 } from "@mantine/core";
 import { Activity, useMemo, useState, type FC } from "react";
@@ -41,9 +42,9 @@ const getStatusColor = (status: InputStatus): MantineColor => {
 type ViewControl = "payload" | "output" | "report";
 
 const maxHeight = 450;
-const iconSize = 21;
 // TODO: Define what else will be inside like payload (decoding etc)
 export const InputCard: FC<Props> = ({ input }) => {
+    const theme = useMantineTheme();
     const statusColor = useRightColorShade(getStatusColor(input.status));
     const [viewControl, setViewControl] = useState<ViewControl>("payload");
     const [decoderType, setDecoderType] = useState<DecoderType>("raw");
@@ -54,7 +55,12 @@ export const InputCard: FC<Props> = ({ input }) => {
         <Card shadow="md" withBorder>
             <Card.Section withBorder inheritPadding py="sm">
                 <Group justify="space-between">
-                    <Address value={input.decodedData.sender} icon shorten />
+                    <Address
+                        value={input.decodedData.sender}
+                        icon
+                        shorten
+                        iconSize={theme.other.mdIconSize}
+                    />
                     <Group>
                         <Text fw="bold"># {input.index}</Text>
                         <Activity
@@ -105,11 +111,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     <Activity
                         mode={viewControl === "payload" ? "visible" : "hidden"}
                     >
-                        <Spoiler
-                            maxHeight={80}
-                            showLabel="Show more"
-                            hideLabel="Show less"
-                        >
+                        <Spoiler>
                             <Text style={{ wordBreak: "break-all" }}>
                                 {decoderFn(input.decodedData.payload)}
                             </Text>
@@ -144,7 +146,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                 <Group gap="xs" justify="space-between">
                     <Group gap={3}>
                         <Tooltip label="Transaction hash">
-                            <TbReceipt size={iconSize} />
+                            <TbReceipt size={theme.other.mdIconSize} />
                         </Tooltip>
                         <TransactionHash
                             transactionHash={input.transactionReference}
