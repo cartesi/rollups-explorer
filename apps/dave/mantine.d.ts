@@ -8,6 +8,15 @@ type ExtendedCustomColors =
     | core.DefaultMantineColor;
 declare module "@mantine/core" {
     export { core };
+
+    /**
+     * Making it optional as default values to the
+     * declared interface members are added in the theme.
+     */
+    export interface SpoilerProps extends core.SpoilerProps {
+        hideLabel?: core.SpoilerProps["hideLabel"];
+        showLabel?: core.SpoilerProps["showLabel"];
+    }
     export interface MantineThemeOther {
         lgIconSize: number;
         mdIconSize: number;
