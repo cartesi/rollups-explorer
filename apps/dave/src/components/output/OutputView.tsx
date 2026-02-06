@@ -23,7 +23,7 @@ const NoticeContent: FC<NoticeProps> = ({ decodedData, decoderType }) => {
 
     return (
         <Fieldset legend="Notice">
-            <Spoiler hideLabel="Show less" showLabel="Show more" maxHeight={80}>
+            <Spoiler>
                 <Text style={{ wordBreak: "break-all" }}>
                     {decoderFn(decodedData.payload)}
                 </Text>

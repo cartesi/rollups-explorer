@@ -105,11 +105,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     <Activity
                         mode={viewControl === "payload" ? "visible" : "hidden"}
                     >
-                        <Spoiler
-                            maxHeight={80}
-                            showLabel="Show more"
-                            hideLabel="Show less"
-                        >
+                        <Spoiler>
                             <Text style={{ wordBreak: "break-all" }}>
                                 {decoderFn(input.decodedData.payload)}
                             </Text>
