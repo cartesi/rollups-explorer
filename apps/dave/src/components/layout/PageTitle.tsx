@@ -10,8 +10,8 @@ const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
     const theme = useMantineTheme();
     return (
         <Group gap="xs">
-            <Icon size={theme.other.mdIconSize} />
-            <Title order={2}>{title}</Title>
+            <Icon size={theme.other.lgIconSize} />
+            <Title order={1}>{title}</Title>
         </Group>
     );
 };
