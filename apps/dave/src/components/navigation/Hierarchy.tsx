@@ -124,7 +124,7 @@ export const Hierarchy: FC<HierarchyProps> = ({
             px={0}
             w={"100%"}
             pos="sticky"
-            top="calc(var(--app-shell-header-height) - 3px)"
+            top="calc(var(--app-shell-header-height))"
             style={{ zIndex: theme.other.zIndexXS }}
         >
             {showShortForm ? (
