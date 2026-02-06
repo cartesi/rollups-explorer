@@ -195,7 +195,52 @@ export const Finalized: Story = {
 
 export const MidLevelDispute: Story = {
     args: {
-        commitments: [],
+        commitments: [
+            {
+                blockNumber: 1n,
+                commitment: claim(7).hash,
+                createdAt: new Date(timestamp),
+                epochIndex,
+                tournamentAddress,
+                finalStateHash: zeroHash,
+                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+            },
+            {
+                blockNumber: 1n,
+                commitment: claim(8).hash,
+                createdAt: new Date(timestamp),
+                epochIndex,
+                tournamentAddress,
+                finalStateHash: zeroHash,
+                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+            },
+            {
+                blockNumber: 1n,
+                commitment: claim(9).hash,
+                createdAt: new Date(timestamp),
+                epochIndex,
+                tournamentAddress,
+                finalStateHash: zeroHash,
+                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+            },
+            {
+                blockNumber: 1n,
+                commitment: claim(10).hash,
+                createdAt: new Date(timestamp),
+                epochIndex,
+                tournamentAddress,
+                finalStateHash: zeroHash,
+                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                updatedAt: new Date(timestamp),
+            },
+        ],
         tournament: {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
