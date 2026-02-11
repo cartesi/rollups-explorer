@@ -3,7 +3,9 @@ on: push
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
+env:
+  NEXT_PUBLIC_CARTESI_NODE_RPC_URL: http://127.0.0.1:10011/rpc
+  NEXT_PUBLIC_MOCK_ENABLED: true
 jobs:
   chromatic-deployment:
     runs-on: ubuntu-latest
