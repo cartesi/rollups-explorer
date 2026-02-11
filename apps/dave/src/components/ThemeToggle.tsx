@@ -1,26 +1,34 @@
 "use client";
-import { Switch, useMantineColorScheme, VisuallyHidden } from "@mantine/core";
+import {
+    Switch,
+    Text,
+    useMantineColorScheme,
+    VisuallyHidden,
+} from "@mantine/core";
 import type { FC } from "react";
-import { TbMoonStars, TbSun } from "react-icons/tb";
 
 export const ThemeToggle: FC = () => {
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     return (
         <Switch
-            label={<VisuallyHidden>Theme mode switch</VisuallyHidden>}
-            checked={colorScheme === "light"}
+            aria-label="Theme mode switch"
+            checked={colorScheme === "dark"}
             onChange={() => toggleColorScheme()}
             size="md"
             onLabel={
                 <>
                     <VisuallyHidden>Dark Mode</VisuallyHidden>
-                    <TbMoonStars size="1rem" />
+                    <Text fw="bold" tt="uppercase" size="xs">
+                        on
+                    </Text>
                 </>
             }
             offLabel={
                 <>
                     <VisuallyHidden>Light Mode</VisuallyHidden>
-                    <TbSun size="1rem" />
+                    <Text fw="bold" tt="uppercase" size="xs">
+                        off
+                    </Text>
                 </>
             }
         />
