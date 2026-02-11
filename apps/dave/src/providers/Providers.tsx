@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
+import { ConnectionProvider } from "../components/connection/ConnectionProvider";
 import { SendProvider } from "../components/send/SendProvider";
+import { getConfiguredCartesiNodeRpcUrl } from "../lib/getConfigCartesiNodeRpcUrl";
 import { getConfiguredDebugEnabled } from "../lib/getConfigDebugEnabled";
 import { getConfiguredIsContainer } from "../lib/getConfigIsContainer";
 import { getConfiguredMockEnabled } from "../lib/getConfigMockEnabled";
@@ -11,7 +13,6 @@ import {
 } from "./AppConfigProvider";
 import DataProvider from "./DataProvider";
 import { StyleProvider } from "./StyleProvider";
-import WalletProvider from "./WalletProvider";
 
 /**
  * This is a workaround to solve a problem when react-dom-client.development
@@ -56,7 +57,7 @@ const loadConfig = async () => {
 export function Providers({ children }: ProviderProps) {
     const [value, setValue] = useState<AppConfigContextProps>({
         nodeRpcUrl: getConfiguredNodeRpcUrl(),
-        cartesiNodeRpcUrl: getConfiguredNodeRpcUrl(),
+        cartesiNodeRpcUrl: getConfiguredCartesiNodeRpcUrl(),
         isDebugEnabled: getConfiguredDebugEnabled(),
         isMockEnabled: getConfiguredMockEnabled(),
     });
@@ -72,11 +73,11 @@ export function Providers({ children }: ProviderProps) {
     return (
         <StyleProvider>
             <AppConfigProvider value={value}>
-                <DataProvider>
-                    <WalletProvider>
+                <ConnectionProvider>
+                    <DataProvider>
                         <SendProvider>{children}</SendProvider>
-                    </WalletProvider>
-                </DataProvider>
+                    </DataProvider>
+                </ConnectionProvider>
             </AppConfigProvider>
         </StyleProvider>
     );
