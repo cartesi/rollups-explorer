@@ -1,10 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useReducer, type FC, type ReactNode } from "react";
-import { useAppConfig } from "../../providers/AppConfigProvider";
 import { pathBuilder } from "../../routes/routePathBuilder";
-import PageLoader from "../layout/PageLoader";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -18,42 +15,9 @@ const indexedDbRepository = new IndexedDbRepository();
 
 interface ConnectionProviderProps {
     children: ReactNode;
+    systemConnection: NodeConnectionConfig | null;
     repository?: Repository;
 }
-
-const defaultVal = {
-    id: Number.MAX_SAFE_INTEGER,
-    chain: undefined,
-    isDeletable: false,
-    isPreferred: true,
-    timestamp: Date.now(),
-    version: "v2.0.0-alpha.9",
-};
-
-const useSystemNodeConnection = (
-    cartesiNodeRpcUrl: string,
-    isMockEnabled: boolean,
-): NodeConnectionConfig | null => {
-    if (isMockEnabled) {
-        return {
-            ...defaultVal,
-            name: "mocked-system-setup",
-            type: "system_mock",
-            url: "local://in-memory",
-        };
-    }
-
-    if (isNotNilOrEmpty(cartesiNodeRpcUrl)) {
-        return {
-            ...defaultVal,
-            name: "system-set-node-rpc",
-            type: "system",
-            url: cartesiNodeRpcUrl,
-        };
-    }
-
-    return null;
-};
 
 const getPreferredNodeConnection = (
     userConnections: NodeConnectionConfig[],
@@ -65,15 +29,11 @@ const getPreferredNodeConnection = (
 
 export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     children,
+    systemConnection,
     repository = indexedDbRepository,
 }) => {
     const [state, dispatch] = useReducer(reducer, repository, initState);
-    const { cartesiNodeRpcUrl, isMockEnabled } = useAppConfig();
     const router = useRouter();
-    const systemConnection = useSystemNodeConnection(
-        cartesiNodeRpcUrl,
-        isMockEnabled,
-    );
 
     useEffect(() => {
         dispatch({
@@ -118,6 +78,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
                     payload: false,
                 }),
             );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [repository]);
 
     useEffect(() => {
@@ -127,7 +88,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     }, [state.selectedConnection]);
 
     if (state.fetching) {
-        return <PageLoader />;
+        return "";
     }
 
     return (
