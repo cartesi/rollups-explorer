@@ -62,6 +62,7 @@ export const ConnectWallet: FC<ConnectWalletProps> = ({
                 mounted,
             }) => {
                 const connected = mounted && account && chain;
+                const hasBalanceToShow = showBalance && account?.displayBalance;
 
                 if (!connected) {
                     return (
@@ -126,9 +127,9 @@ export const ConnectWallet: FC<ConnectWalletProps> = ({
                                     height: "100%",
                                 },
                             }}
-                            pr={0}
+                            pr={hasBalanceToShow ? 0 : ""}
                             rightSection={
-                                showBalance && account.displayBalance ? (
+                                hasBalanceToShow ? (
                                     <Badge radius={0} h="inherit">
                                         <Text fw="bold" size="sm">
                                             {account.displayBalance}
