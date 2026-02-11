@@ -12,7 +12,6 @@ import {
 } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { trustWallet } from "@rainbow-me/rainbowkit/wallets";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, type ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, WagmiProvider } from "wagmi";
@@ -22,7 +21,6 @@ import getSupportedChainInfo, {
 } from "../lib/supportedChains";
 import createClientFor from "../lib/transportClient";
 import { useAppConfig } from "./AppConfigProvider";
-import queryClient from "./queryClient";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 
@@ -88,15 +86,13 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
 
     return isMounted ? (
         <WagmiProvider config={wagmiConfig}>
-            <QueryClientProvider client={queryClient}>
-                <RainbowKitProvider
-                    appInfo={appInfo}
-                    theme={walletTheme}
-                    avatar={CustomAvatar}
-                >
-                    {children}
-                </RainbowKitProvider>
-            </QueryClientProvider>
+            <RainbowKitProvider
+                appInfo={appInfo}
+                theme={walletTheme}
+                avatar={CustomAvatar}
+            >
+                {children}
+            </RainbowKitProvider>
         </WagmiProvider>
     ) : null;
 };

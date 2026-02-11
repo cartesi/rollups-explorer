@@ -1,16 +1,25 @@
 import { CartesiProvider } from "@cartesi/wagmi";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { FC, PropsWithChildren } from "react";
+import { useSelectedNodeConnection } from "../components/connection/hooks";
 import queryClient from "./queryClient";
+import WalletProvider from "./WalletProvider";
 
-const nodeRpcUrl =
-    process.env.NEXT_PUBLIC_CARTESI_NODE_RPC_URL ??
-    "http://127.0.0.1:10011/rpc";
+const newQueryClient = new QueryClient();
 
 const DataProvider: FC<PropsWithChildren> = ({ children }) => {
+    const selectedConnection = useSelectedNodeConnection();
+
+    const client =
+        selectedConnection?.type === "system_mock"
+            ? queryClient
+            : newQueryClient;
+
     return (
-        <QueryClientProvider client={queryClient}>
-            <CartesiProvider rpcUrl={nodeRpcUrl}>{children}</CartesiProvider>
+        <QueryClientProvider client={client}>
+            <CartesiProvider rpcUrl={selectedConnection?.url ?? ""}>
+                <WalletProvider>{children}</WalletProvider>
+            </CartesiProvider>
         </QueryClientProvider>
     );
 };
