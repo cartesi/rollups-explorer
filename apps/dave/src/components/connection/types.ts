@@ -14,7 +14,9 @@ export interface NodeConnectionConfig {
 }
 
 export interface Repository {
-    add: (conn: NodeConnectionConfig) => Promise<NodeConnectionConfig>;
+    add: (
+        conn: NodeConnectionConfig,
+    ) => Promise<Required<NodeConnectionConfig>>;
     remove: (id: number) => Promise<boolean>;
     get: (id: number) => Promise<NodeConnectionConfig | null>;
     list: () => Promise<NodeConnectionConfig[]>;
