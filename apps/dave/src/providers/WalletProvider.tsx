@@ -1,12 +1,8 @@
 "use client";
-import { useChainId } from "@cartesi/wagmi";
-import { useMantineColorScheme } from "@mantine/core";
 import { useMounted } from "@mantine/hooks";
 import {
     connectorsForWallets,
-    darkTheme,
     getDefaultWallets,
-    lightTheme,
     RainbowKitProvider,
     type AvatarComponent,
 } from "@rainbow-me/rainbowkit";
@@ -15,6 +11,7 @@ import { trustWallet } from "@rainbow-me/rainbowkit/wallets";
 import { useMemo, type ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, WagmiProvider } from "wagmi";
+import { useSelectedNodeConnection } from "../components/connection/hooks";
 import getSupportedChainInfo, {
     defaultSupportedChain,
     type SupportedChainId,
@@ -63,34 +60,20 @@ const buildWagmiConfig = (chainId: string, nodeRpcUrl?: string) => {
 };
 
 const WalletProvider = ({ children }: { children: ReactNode }) => {
-    const scheme = useMantineColorScheme();
     const isMounted = useMounted();
     const appConfig = useAppConfig();
+    const selectedConnection = useSelectedNodeConnection();
     const nodeRpcUrl = appConfig.nodeRpcUrl;
-    const { data } = useChainId({});
+    const data = selectedConnection?.chain;
     const chainId = data?.toString() ?? defaultSupportedChain.id.toString();
-
-    const themeOptions = {
-        accentColor: "rgb(12, 133, 153)",
-        borderRadius: "small",
-    } as const;
 
     const wagmiConfig = useMemo(() => {
         return buildWagmiConfig(chainId, nodeRpcUrl);
     }, [nodeRpcUrl, chainId]);
 
-    const walletTheme =
-        scheme.colorScheme == "dark"
-            ? darkTheme(themeOptions)
-            : lightTheme(themeOptions);
-
     return isMounted ? (
         <WagmiProvider config={wagmiConfig}>
-            <RainbowKitProvider
-                appInfo={appInfo}
-                theme={walletTheme}
-                avatar={CustomAvatar}
-            >
+            <RainbowKitProvider appInfo={appInfo} avatar={CustomAvatar}>
                 {children}
             </RainbowKitProvider>
         </WagmiProvider>
