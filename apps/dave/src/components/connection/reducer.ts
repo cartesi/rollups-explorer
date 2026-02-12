@@ -41,7 +41,7 @@ const reducer: ConnectionReducer = (state, action) => {
         case "set_connections":
             return {
                 ...state,
-                connections: action.payload.connections,
+                connections: sortByTimestampDesc(action.payload.connections),
             };
         case "set_fetching":
             return {
