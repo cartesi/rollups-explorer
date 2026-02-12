@@ -4,11 +4,13 @@ import { pathOr } from "ramda";
 import { Activity, type FC } from "react";
 import CopyButton from "../CopyButton";
 import { PrettyTime } from "../PrettyTime";
-import { useNodeConnection, useSelectedNodeConnection } from "./hooks";
+import { useNodeConnection } from "./hooks";
 import type { NodeConnectionConfig } from "./types";
 
 interface ConnectionViewProps {
     connection: NodeConnectionConfig;
+    hideIfSelected?: boolean;
+    onConnect?: () => void;
 }
 
 const colors = {
@@ -23,18 +25,26 @@ type NotificationType = "success" | "error" | "info" | "warn";
 const notify = (type: NotificationType, message: string, title?: string) =>
     notifications.show({ message, title, color: colors[type] });
 
-const ConnectionView: FC<ConnectionViewProps> = ({ connection }) => {
-    const selectedConnection = useSelectedNodeConnection();
-    const { removeConnection, setSelectedConnection } = useNodeConnection();
+const ConnectionView: FC<ConnectionViewProps> = ({
+    connection,
+    onConnect,
+    hideIfSelected = false,
+}) => {
+    const { removeConnection, setSelectedConnection, getSelectedConnection } =
+        useNodeConnection();
+    const selectedConnection = getSelectedConnection();
     const isConnected = selectedConnection?.id === connection.id;
     const isSystem = ["system", "system_mock"].includes(connection.type);
+    const hideFooter = isSystem && isConnected;
+
+    if (isConnected && hideIfSelected) return "";
 
     return (
         <Card shadow="sm" id={`connection-view-${connection.id}`}>
             <Card.Section withBorder inheritPadding py="sm">
                 <Group justify="space-between" align="flex-start">
                     <Text fw="bold">{connection?.name}</Text>
-                    <Badge>{connection?.type}</Badge>
+                    {isConnected && <Badge color="green">connected</Badge>}
                 </Group>
             </Card.Section>
 
@@ -58,58 +68,63 @@ const ConnectionView: FC<ConnectionViewProps> = ({ connection }) => {
                 </Group>
             </Stack>
 
-            <Card.Section inheritPadding withBorder py="sm">
-                <Group justify={isSystem ? "flex-end" : "space-between"}>
-                    <Activity mode={isSystem ? "hidden" : "visible"}>
-                        <Switch
-                            label="Preferred"
-                            labelPosition="left"
-                            checked={connection?.isPreferred ?? false}
-                        />
-                    </Activity>
+            <Activity mode={hideFooter ? "hidden" : "visible"}>
+                <Card.Section inheritPadding withBorder py="sm">
+                    <Group justify={isSystem ? "flex-end" : "space-between"}>
+                        <Activity mode={isSystem ? "hidden" : "visible"}>
+                            <Switch
+                                label="Preferred"
+                                labelPosition="left"
+                                checked={connection?.isPreferred ?? false}
+                            />
+                        </Activity>
 
-                    <Group>
-                        {connection?.isDeletable && (
-                            <Button
-                                onClick={() => {
-                                    removeConnection(connection.id as number, {
-                                        onSuccess: () =>
-                                            notify(
-                                                "success",
-                                                `Connection ${connection.name} removed!`,
-                                            ),
-                                        onFailure: (reason: unknown) =>
-                                            notify(
-                                                "error",
-                                                pathOr(
-                                                    "Could not delete the connection",
-                                                    ["message"],
-                                                    reason,
-                                                ),
-                                            ),
-                                    });
-                                }}
-                            >
-                                REMOVE
-                            </Button>
-                        )}
+                        <Group>
+                            {connection?.isDeletable && (
+                                <Button
+                                    color="red"
+                                    onClick={() => {
+                                        removeConnection(
+                                            connection.id as number,
+                                            {
+                                                onSuccess: () =>
+                                                    notify(
+                                                        "success",
+                                                        `Connection ${connection.name} removed!`,
+                                                    ),
+                                                onFailure: (reason: unknown) =>
+                                                    notify(
+                                                        "error",
+                                                        pathOr(
+                                                            "Could not delete the connection",
+                                                            ["message"],
+                                                            reason,
+                                                        ),
+                                                    ),
+                                            },
+                                        );
+                                    }}
+                                >
+                                    REMOVE
+                                </Button>
+                            )}
 
-                        {isConnected ? (
-                            <Badge color="green" radius={0}>
-                                connected
-                            </Badge>
-                        ) : (
-                            <Button
-                                onClick={() => {
-                                    setSelectedConnection(connection);
-                                }}
-                            >
-                                <Text tt="uppercase">connect</Text>
-                            </Button>
-                        )}
+                            {isConnected ? (
+                                ""
+                            ) : (
+                                <Button
+                                    onClick={() => {
+                                        onConnect?.();
+                                        setSelectedConnection(connection);
+                                    }}
+                                >
+                                    <Text tt="uppercase">connect</Text>
+                                </Button>
+                            )}
+                        </Group>
                     </Group>
-                </Group>
-            </Card.Section>
+                </Card.Section>
+            </Activity>
         </Card>
     );
 };

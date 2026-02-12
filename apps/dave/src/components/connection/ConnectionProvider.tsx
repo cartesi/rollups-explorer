@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { isNotNil } from "ramda";
 import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import {
@@ -43,11 +44,15 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
         });
         repository
             .list()
-            .then((connections) => {
+            .then((nodeConnections) => {
                 const preferredConnection = getPreferredNodeConnection(
-                    connections,
+                    nodeConnections,
                     systemConnection,
                 );
+
+                const connections = isNotNil(systemConnection)
+                    ? [...nodeConnections, systemConnection]
+                    : nodeConnections;
 
                 dispatch({
                     type: "set_connections",
