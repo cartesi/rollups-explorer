@@ -7,14 +7,10 @@ import {
     Text,
 } from "@mantine/core";
 import { isNotNil } from "ramda";
-import { Activity, useState, type FC } from "react";
+import { Activity, useEffect, useRef, useState, type FC } from "react";
 import ConnectionForm from "./ConnectionForm";
 import ConnectionView from "./ConnectionView";
-import {
-    useNodeConnection,
-    useShowConnectionModal,
-    useSystemConnection,
-} from "./hooks";
+import { useNodeConnection, useShowConnectionModal } from "./hooks";
 
 type ViewControl = "manage" | "create";
 
@@ -22,10 +18,18 @@ const connectionListMaxHeight = 380;
 
 const ConnectionModal: FC = () => {
     const showModal = useShowConnectionModal();
-    const systemConnection = useSystemConnection();
     const { closeConnectionModal, listConnections, getSelectedConnection } =
         useNodeConnection();
+    const selectedConnection = getSelectedConnection();
     const [viewControl, setViewControl] = useState<ViewControl>("manage");
+    const viewport = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        viewport.current?.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    }, [selectedConnection?.timestamp]);
 
     return (
         <Modal
@@ -51,6 +55,7 @@ const ConnectionModal: FC = () => {
 
             <Stack mt="lg" mah={connectionListMaxHeight} gap={"lg"}>
                 <ScrollArea.Autosize
+                    viewportRef={viewport}
                     mah={connectionListMaxHeight}
                     type="scroll"
                     scrollbars="y"
@@ -62,14 +67,17 @@ const ConnectionModal: FC = () => {
                                 viewControl === "manage" ? "visible" : "hidden"
                             }
                         >
-                            {isNotNil(systemConnection) && (
-                                <ConnectionView connection={systemConnection} />
+                            {isNotNil(selectedConnection) && (
+                                <ConnectionView
+                                    connection={selectedConnection}
+                                    key={selectedConnection.id}
+                                />
                             )}
-
                             {listConnections().map((connection) => (
                                 <ConnectionView
                                     key={connection.id}
                                     connection={connection}
+                                    hideIfSelected
                                 />
                             ))}
                         </Activity>
