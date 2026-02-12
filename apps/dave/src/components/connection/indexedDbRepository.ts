@@ -12,7 +12,7 @@ export interface ConnectionItem extends NodeConnectionConfig {
  */
 class IndexedDbRepository extends Dexie implements Repository {
     // Notify the typing system that 'connections' is added by dexie when declaring the stores()
-    private connections!: Table<NodeConnectionConfig, number>;
+    connections!: Table<NodeConnectionConfig, number>;
 
     constructor() {
         super(dbName);
@@ -25,7 +25,7 @@ class IndexedDbRepository extends Dexie implements Repository {
 
     async add(newConn: NodeConnectionConfig) {
         const id = await this.connections.add(newConn);
-        return { ...newConn, id };
+        return { ...newConn, id } as Required<NodeConnectionConfig>;
     }
 
     async remove(id: number) {
