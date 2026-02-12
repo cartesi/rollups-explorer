@@ -1,6 +1,7 @@
 "use client";
 import {
     ActionIcon,
+    Button,
     Group,
     Menu,
     Stack,
@@ -11,7 +12,10 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import type { FC } from "react";
 import { TbSettings } from "react-icons/tb";
-import { useSelectedNodeConnection } from "../connection/hooks";
+import {
+    useNodeConnection,
+    useSelectedNodeConnection,
+} from "../connection/hooks";
 import { ThemeToggle } from "../ThemeToggle";
 
 interface SettingsMenuProps {
@@ -22,6 +26,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
     const theme = useMantineTheme();
     const [opened, handlers] = useDisclosure(false);
     const selectedNodeConnection = useSelectedNodeConnection();
+    const { openConnectionModal } = useNodeConnection();
 
     return (
         <Menu
@@ -47,7 +52,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
 
             <Menu.Dropdown>
                 <Menu.Label>Connection</Menu.Label>
-                <Menu.Item>
+                <Menu.Item component="div">
                     <Stack gap="xs">
                         <Group justify="space-between">
                             <Text fw="bold">Name</Text>
@@ -65,11 +70,25 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
                                 {selectedNodeConnection?.version ?? "n/a"}
                             </Text>
                         </Group>
+                        <Group justify="flex-end">
+                            <Button
+                                variant="transparent"
+                                px={0}
+                                onClick={() => {
+                                    handlers.close();
+                                    openConnectionModal();
+                                }}
+                            >
+                                <Text fw="bold" tt="uppercase">
+                                    manage
+                                </Text>
+                            </Button>
+                        </Group>
                     </Stack>
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Label>Global</Menu.Label>
-                <Menu.Item>
+                <Menu.Item component="div">
                     <Group justify="space-between">
                         <Text fw="bold">Dark mode</Text>
                         <ThemeToggle />

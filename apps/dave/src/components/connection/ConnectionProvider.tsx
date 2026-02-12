@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useReducer, type FC, type ReactNode } from "react";
+import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import {
     ConnectionActionContext,
@@ -34,6 +34,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 }) => {
     const [state, dispatch] = useReducer(reducer, repository, initState);
     const router = useRouter();
+    const prev = useRef(state.selectedConnection);
 
     useEffect(() => {
         dispatch({
@@ -83,7 +84,10 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 
     useEffect(() => {
         // when the selected-connection change we route the user back to home page.
-        if (state.selectedConnection !== null) router.push(pathBuilder.base);
+        if (prev.current?.id !== state.selectedConnection?.id) {
+            prev.current = state.selectedConnection;
+            router.push(pathBuilder.base, { scroll: false });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.selectedConnection]);
 

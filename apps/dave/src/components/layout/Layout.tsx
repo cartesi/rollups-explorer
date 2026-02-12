@@ -14,6 +14,7 @@ import { Activity, type FC, type PropsWithChildren } from "react";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
+import ConnectionModal from "../connection/ConnectionModal";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
@@ -70,11 +71,12 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     const selectedNodeConnection = useSelectedNodeConnection();
     const { isSmallDevice, viewport } = useIsSmallDevice();
     const { height } = viewport;
-    const { isMockEnabled, isDebugEnabled } = useAppConfig();
+    const { isDebugEnabled } = useAppConfig();
 
     return (
         <>
             <SendModal />
+            <ConnectionModal />
             <AppShell>
                 <AppShellHeader style={{ zIndex: theme.other.zIndexXS }}>
                     <Group

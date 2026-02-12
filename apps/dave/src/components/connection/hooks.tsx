@@ -9,8 +9,8 @@ import {
 } from "./ConnectionContexts";
 import type { NodeConnectionConfig } from "./types";
 
-type ActionLifecycle = {
-    onSuccess?: () => void;
+type ActionLifecycle<T = undefined> = {
+    onSuccess?: (...params: T extends undefined ? [never?] : [T]) => void;
     onFailure?: (reason?: unknown) => void;
     onFinished?: () => void;
 };
@@ -47,7 +47,7 @@ const useNodeConnectionActions = () => {
             closeConnectionModal: () => dispatch({ type: "close_modal" }),
             addConnection: (
                 newConn: NodeConnectionConfig,
-                opt?: ActionLifecycle,
+                opt?: ActionLifecycle<Required<NodeConnectionConfig>>,
             ) => {
                 repository
                     .add(newConn)
@@ -56,7 +56,7 @@ const useNodeConnectionActions = () => {
                             type: "add_connection",
                             payload: { connection },
                         });
-                        opt?.onSuccess?.();
+                        opt?.onSuccess?.(connection);
                     })
                     .catch((reason) => {
                         console.error(reason);
@@ -137,6 +137,8 @@ type GetNodeInformationResult =
     | {
           status: Exclude<NetworkStatus, "success" | "error">;
       };
+
+// ###### EXPORTED HOOKS
 
 /**
  * This is meant to provide fresh cartesi-client
@@ -327,4 +329,17 @@ export const useCheckNodeConnection = (
     }, [config?.url, config?.chain, config?.version, config?.type]);
 
     return result;
+};
+
+export const useShowConnectionModal = () => {
+    const state = useConnectionState();
+    return useMemo(
+        () => state.showConnectionModal,
+        [state.showConnectionModal],
+    );
+};
+
+export const useSystemConnection = () => {
+    const state = useConnectionState();
+    return useMemo(() => state.systemConnection, [state.systemConnection]);
 };
