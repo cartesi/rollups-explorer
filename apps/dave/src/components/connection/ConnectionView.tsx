@@ -5,10 +5,10 @@ import { Activity, type FC } from "react";
 import CopyButton from "../CopyButton";
 import { PrettyTime } from "../PrettyTime";
 import { useNodeConnection } from "./hooks";
-import type { NodeConnectionConfig } from "./types";
+import type { DbNodeConnectionConfig } from "./types";
 
 interface ConnectionViewProps {
-    connection: NodeConnectionConfig;
+    connection: DbNodeConnectionConfig;
     hideIfSelected?: boolean;
     onConnect?: () => void;
 }
@@ -79,49 +79,50 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                             />
                         </Activity>
 
-                        <Group>
-                            {connection?.isDeletable && (
-                                <Button
-                                    color="red"
-                                    onClick={() => {
-                                        removeConnection(
-                                            connection.id as number,
-                                            {
-                                                onSuccess: () =>
-                                                    notify(
-                                                        "success",
-                                                        `Connection ${connection.name} removed!`,
-                                                    ),
-                                                onFailure: (reason: unknown) =>
-                                                    notify(
-                                                        "error",
-                                                        pathOr(
-                                                            "Could not delete the connection",
-                                                            ["message"],
-                                                            reason,
+                        <Activity mode={isConnected ? "hidden" : "visible"}>
+                            <Group>
+                                {connection?.isDeletable && (
+                                    <Button
+                                        color="red"
+                                        variant="subtle"
+                                        onClick={() => {
+                                            removeConnection(
+                                                connection.id as number,
+                                                {
+                                                    onSuccess: () =>
+                                                        notify(
+                                                            "success",
+                                                            `Connection ${connection.name} removed!`,
                                                         ),
-                                                    ),
-                                            },
-                                        );
-                                    }}
-                                >
-                                    REMOVE
-                                </Button>
-                            )}
+                                                    onFailure: (
+                                                        reason: unknown,
+                                                    ) =>
+                                                        notify(
+                                                            "error",
+                                                            pathOr(
+                                                                "Could not delete the connection",
+                                                                ["message"],
+                                                                reason,
+                                                            ),
+                                                        ),
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        <Text tt="uppercase">remove</Text>
+                                    </Button>
+                                )}
 
-                            {isConnected ? (
-                                ""
-                            ) : (
                                 <Button
                                     onClick={() => {
                                         onConnect?.();
-                                        setSelectedConnection(connection);
+                                        setSelectedConnection(connection.id);
                                     }}
                                 >
                                     <Text tt="uppercase">connect</Text>
                                 </Button>
-                            )}
-                        </Group>
+                            </Group>
+                        </Activity>
                     </Group>
                 </Card.Section>
             </Activity>
