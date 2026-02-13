@@ -61,7 +61,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
                         <Group justify="space-between">
                             <Text fw="bold">Chain</Text>
                             <Text>
-                                {selectedNodeConnection?.chain ?? "n/a"}
+                                {selectedNodeConnection?.chain.id ?? "n/a"}
                             </Text>
                         </Group>
                         <Group justify="space-between">

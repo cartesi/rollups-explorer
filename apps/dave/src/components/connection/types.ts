@@ -5,7 +5,10 @@ export interface NodeConnectionConfig {
     id?: number;
     name: string;
     url: string;
-    chain?: number;
+    chain?: {
+        id: number;
+        rpcUrl: string;
+    };
     version: string;
     timestamp: number;
     isPreferred: boolean;
