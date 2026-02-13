@@ -1,6 +1,7 @@
 "use client";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState, type ReactNode } from "react";
+import ConnectionModal from "../components/connection/ConnectionModal";
 import { ConnectionProvider } from "../components/connection/ConnectionProvider";
 import { useGetNodeInformation } from "../components/connection/hooks";
 import type { NodeConnectionConfig } from "../components/connection/types";
@@ -140,6 +141,7 @@ export function Providers({ children }: ProviderProps) {
                     <ConnectionProvider
                         systemConnection={systemNodeResult.config}
                     >
+                        <ConnectionModal />
                         <DataProvider>
                             <SendProvider>{children}</SendProvider>
                         </DataProvider>
