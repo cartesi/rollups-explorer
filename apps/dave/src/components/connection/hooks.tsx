@@ -1,13 +1,29 @@
 "use client";
 import { createCartesiPublicClient } from "@cartesi/viem";
-import { join, map, pipe, prop } from "ramda";
+import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { http } from "wagmi";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
 } from "./ConnectionContexts";
-import type { NodeConnectionConfig } from "./types";
+import { sortByTimestampDesc } from "./functions";
+import type { DbNodeConnectionConfig, NodeConnectionConfig } from "./types";
+
+type NetworkStatus = "idle" | "pending" | "error" | "success" | "noop";
+
+type GetNodeInformationResult =
+    | {
+          status: "success";
+          data: { chainId: number; nodeVersion: string };
+      }
+    | {
+          status: "error";
+          error: Error;
+      }
+    | {
+          status: Exclude<NetworkStatus, "success" | "error">;
+      };
 
 type ActionLifecycle<T = undefined> = {
     onSuccess?: (...params: T extends undefined ? [never?] : [T]) => void;
@@ -24,17 +40,14 @@ const useConnectionRepository = () => {
     return useMemo(() => state.repository, [state.repository]);
 };
 
-const keyGen: (connections: NodeConnectionConfig[]) => string = pipe(
-    map(prop("id")),
-    join("/"),
-);
-
-const useGetConnections = () => {
-    const { connections } = useConnectionState();
-    const key = keyGen(connections);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    return useMemo(() => connections, [key]);
+/**
+ * Retrieve a dictionary of connections loaded, keys are the ids and value is the
+ * node-connection-config.
+ * @returns {Record<number, DbNodeConnectionConfig>} Connections dictionary
+ */
+const useConnectionsMap = () => {
+    const state = useConnectionState();
+    return state.connections;
 };
 
 const useNodeConnectionActions = () => {
@@ -86,10 +99,10 @@ const useNodeConnectionActions = () => {
                     });
             },
 
-            setSelectedConnection: (connection: NodeConnectionConfig) =>
+            setSelectedConnection: (id: number) =>
                 dispatch({
                     type: "set_selected_connection",
-                    payload: { connection },
+                    payload: { id },
                 }),
         }),
         [dispatch, repository],
@@ -97,23 +110,35 @@ const useNodeConnectionActions = () => {
 };
 
 /**
- * Retrieve the selected node connection to be used
+ * Retrieve the selected connection id.
+ * based on ConnectionProvider data information
+ */
+const useSelectedConnection = () => {
+    const state = useConnectionState();
+    return state.selectedConnection;
+};
+
+// ###### EXPORTED HOOKS
+
+/**
+ * Retrieve the selected node connection instance to be used
  * based on ConnectionProvider data information
  * @returns
  */
-export const useSelectedNodeConnection = () => {
-    const state = useConnectionState();
-    return useMemo(() => state.selectedConnection, [state.selectedConnection]);
+export const useSelectedNodeConnection = (): DbNodeConnectionConfig | null => {
+    const connections = useConnectionsMap();
+    const id = useSelectedConnection();
+    return connections[id ?? -1] ?? null;
 };
 
 export const useNodeConnection = () => {
-    const connections = useGetConnections();
-    const selectedConnection = useSelectedNodeConnection();
+    const connections = useConnectionsMap();
+    const selectedConnection = useSelectedConnection();
     const actions = useNodeConnectionActions();
-    const getConnection = (id: number) =>
-        connections.find((value) => value.id === id);
-    const listConnections = () => connections;
-    const getSelectedConnection = () => selectedConnection;
+    const getConnection = (id: number) => connections[id];
+    const listConnections = () =>
+        sortByTimestampDesc(Object.values(connections));
+    const getSelectedConnection = () => getConnection(selectedConnection ?? -1);
 
     return {
         getSelectedConnection,
@@ -122,23 +147,6 @@ export const useNodeConnection = () => {
         ...actions,
     };
 };
-
-type NetworkStatus = "idle" | "pending" | "error" | "success" | "noop";
-
-type GetNodeInformationResult =
-    | {
-          status: "success";
-          data: { chainId: number; nodeVersion: string };
-      }
-    | {
-          status: "error";
-          error: Error;
-      }
-    | {
-          status: Exclude<NetworkStatus, "success" | "error">;
-      };
-
-// ###### EXPORTED HOOKS
 
 /**
  * This is meant to provide fresh cartesi-client
@@ -342,4 +350,63 @@ export const useShowConnectionModal = () => {
 export const useSystemConnection = () => {
     const state = useConnectionState();
     return useMemo(() => state.systemConnection, [state.systemConnection]);
+};
+
+const defaultVal = {
+    id: Number.MAX_SAFE_INTEGER,
+    chain: 13370,
+    isDeletable: false,
+    isPreferred: true,
+    timestamp: Date.now(),
+    version: "2.0.0-alpha.9",
+};
+
+type BuildSystemNodeReturn = {
+    config: DbNodeConnectionConfig | null;
+    isFetching?: boolean;
+};
+
+/**
+ * @description For internal use. It builds a system-node-connection based on parameters
+ * For internal use
+ * @param cartesiNodeRpcUrl
+ * @param isMockEnabled
+ * @returns
+ */
+export const useBuildSystemNodeConnection = (
+    cartesiNodeRpcUrl: string,
+    isMockEnabled: boolean,
+): BuildSystemNodeReturn => {
+    const url = isMockEnabled ? null : cartesiNodeRpcUrl;
+    const result = useGetNodeInformation(url);
+
+    if (isMockEnabled) {
+        return {
+            config: {
+                ...defaultVal,
+                name: "mocked-system-setup",
+                type: "system_mock",
+                url: "local://in-memory",
+            },
+        };
+    }
+
+    if (result.status === "pending") {
+        return { config: null, isFetching: true };
+    }
+
+    if (isNotNilOrEmpty(cartesiNodeRpcUrl) && result.status === "success") {
+        return {
+            config: {
+                ...defaultVal,
+                name: "system-set-node-rpc",
+                type: "system",
+                url: cartesiNodeRpcUrl,
+                chain: result.data.chainId,
+                version: result.data.nodeVersion,
+            },
+        };
+    }
+
+    return { config: null };
 };
