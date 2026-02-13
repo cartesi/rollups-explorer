@@ -14,7 +14,6 @@ import { Activity, type FC, type PropsWithChildren } from "react";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
-import ConnectionModal from "../connection/ConnectionModal";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
@@ -76,7 +75,6 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     return (
         <>
             <SendModal />
-            <ConnectionModal />
             <AppShell>
                 <AppShellHeader style={{ zIndex: theme.other.zIndexXS }}>
                     <Group
