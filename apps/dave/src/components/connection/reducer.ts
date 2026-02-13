@@ -1,16 +1,26 @@
 "use client";
-import { omit } from "ramda";
+import { isNil, omit } from "ramda";
 import type { ConnectionReducer, ConnectionState } from "./ConnectionContexts";
 import type { DbNodeConnectionConfig } from "./types";
 
 const mapById = (
-    acc: ConnectionState["connections"],
+    accumulator: ConnectionState["connections"],
     next: DbNodeConnectionConfig,
 ) => {
     if (next.id) {
-        acc[next.id] = next;
+        accumulator[next.id] = next;
     }
-    return acc;
+    return accumulator;
+};
+
+const connectionsById = (
+    conns: DbNodeConnectionConfig[],
+    systemConnection: DbNodeConnectionConfig | null,
+) => {
+    const newList = isNil(systemConnection)
+        ? conns
+        : [...conns, systemConnection];
+    return newList.reduce(mapById, {});
 };
 
 const reducer: ConnectionReducer = (state, action) => {
@@ -42,7 +52,10 @@ const reducer: ConnectionReducer = (state, action) => {
         case "set_connections":
             return {
                 ...state,
-                connections: action.payload.connections.reduce(mapById, {}),
+                connections: connectionsById(
+                    action.payload.connections,
+                    state.systemConnection,
+                ),
             };
         case "set_fetching":
             return {
@@ -58,7 +71,11 @@ const reducer: ConnectionReducer = (state, action) => {
         case "set_system_connection":
             return {
                 ...state,
-                systemConnection: action.payload.id,
+                systemConnection: action.payload.connection,
+                connections: {
+                    ...state.connections,
+                    [action.payload.connection.id]: action.payload.connection,
+                },
             };
         default:
             return state;

@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { isNotNil } from "ramda";
 import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import {
@@ -34,6 +33,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     repository = indexedDbRepository,
 }) => {
     const [state, dispatch] = useReducer(reducer, repository, initState);
+
     const router = useRouter();
     const prev = useRef(state.selectedConnection);
 
@@ -44,34 +44,28 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
         });
         repository
             .list()
-            .then((nodeConnections) => {
+            .then((userConnections) => {
                 const preferredConnection = getPreferredNodeConnection(
-                    nodeConnections,
+                    userConnections,
                     systemConnection,
                 );
 
-                const connections = (
-                    isNotNil(systemConnection)
-                        ? [...nodeConnections, systemConnection]
-                        : nodeConnections
-                ) as DbNodeConnectionConfig[];
+                if (null !== systemConnection) {
+                    dispatch({
+                        type: "set_system_connection",
+                        payload: { connection: systemConnection },
+                    });
+                }
 
                 dispatch({
                     type: "set_connections",
-                    payload: { connections },
+                    payload: { connections: userConnections },
                 });
 
                 if (null !== preferredConnection) {
                     dispatch({
                         type: "set_selected_connection",
                         payload: { id: preferredConnection.id! },
-                    });
-                }
-
-                if (null !== systemConnection) {
-                    dispatch({
-                        type: "set_system_connection",
-                        payload: { id: systemConnection.id },
                     });
                 }
             })
