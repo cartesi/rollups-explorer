@@ -18,7 +18,7 @@ type SetSelectedConnection = {
 };
 type SetSystemConnection = {
     type: "set_system_connection";
-    payload: { id: number };
+    payload: { connection: DbNodeConnectionConfig };
 };
 type SetConnections = {
     type: "set_connections";
@@ -26,7 +26,7 @@ type SetConnections = {
 };
 
 export type ConnectionState = {
-    systemConnection: number | null;
+    systemConnection: DbNodeConnectionConfig | null;
     selectedConnection: number | null;
     repository: Repository;
     connections: Record<number, DbNodeConnectionConfig>;

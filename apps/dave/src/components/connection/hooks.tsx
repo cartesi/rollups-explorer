@@ -1,13 +1,17 @@
 "use client";
 import { createCartesiPublicClient } from "@cartesi/viem";
+import { path, pathOr } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { http } from "wagmi";
+import { supportedChains } from "../../lib/supportedChains";
+import { useAppConfig } from "../../providers/AppConfigProvider";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
 } from "./ConnectionContexts";
 import { sortByTimestampDesc } from "./functions";
+import type IndexedDbRepository from "./indexedDbRepository";
 import type { DbNodeConnectionConfig, NodeConnectionConfig } from "./types";
 
 type NetworkStatus = "idle" | "pending" | "error" | "success" | "noop";
@@ -98,12 +102,58 @@ const useNodeConnectionActions = () => {
                         opt?.onFailure?.(reason);
                     });
             },
-
             setSelectedConnection: (id: number) =>
                 dispatch({
                     type: "set_selected_connection",
                     payload: { id },
                 }),
+            updateIsPreferred: async (
+                params: {
+                    newValue: boolean;
+                    connection: DbNodeConnectionConfig;
+                },
+                opt?: ActionLifecycle,
+            ) => {
+                // casting for raw access.
+                const db = repository as IndexedDbRepository;
+                try {
+                    const modifyCount = await db.connections
+                        .toCollection()
+                        .modify({ isPreferred: false });
+                    console.info(`Modified ${modifyCount} entries`);
+                    const updateResult = await db.connections.update(
+                        params.connection.id,
+                        { isPreferred: params.newValue },
+                    );
+                    console.info(
+                        `Connection id ${params.connection.id} ${updateResult === 0 ? "was not" : "was"} updated!`,
+                    );
+
+                    if (updateResult === 1) {
+                        const newList = await repository.list();
+                        dispatch({
+                            type: "set_connections",
+                            payload: { connections: newList },
+                        });
+                        opt?.onSuccess?.();
+                    } else {
+                        opt?.onFailure?.(
+                            new Error("The connection could not be updated."),
+                        );
+                    }
+                } catch (error) {
+                    console.error(error);
+                    opt?.onFailure?.(
+                        pathOr(
+                            "Something went wrong when trying to update the connection",
+                            ["message"],
+                            error,
+                        ),
+                    );
+                } finally {
+                    opt?.onFinished?.();
+                }
+            },
         }),
         [dispatch, repository],
     );
@@ -161,8 +211,6 @@ export const useGetNodeInformation = (cartesiNodeUrl: string | null) => {
     });
 
     useEffect(() => {
-        console.count("check-node-connection");
-
         if (!cartesiNodeUrl) {
             setResult({ status: "noop" });
             return;
@@ -258,8 +306,6 @@ export const useCheckNodeConnection = (
     });
 
     useEffect(() => {
-        console.count("check-node-connection");
-
         if (!config?.url) {
             setResult({ status: "noop" });
             return;
@@ -354,7 +400,14 @@ export const useSystemConnection = () => {
 
 const defaultVal = {
     id: Number.MAX_SAFE_INTEGER,
-    chain: 13370,
+    chain: {
+        id: 13370,
+        rpcUrl: pathOr(
+            "http://localhost:8545",
+            ["13370", "rpcUrls", "default", "http", "0"],
+            supportedChains,
+        ),
+    },
     isDeletable: false,
     isPreferred: true,
     timestamp: Date.now(),
@@ -379,6 +432,7 @@ export const useBuildSystemNodeConnection = (
 ): BuildSystemNodeReturn => {
     const url = isMockEnabled ? null : cartesiNodeRpcUrl;
     const result = useGetNodeInformation(url);
+    const appConfig = useAppConfig();
 
     if (isMockEnabled) {
         return {
@@ -396,13 +450,28 @@ export const useBuildSystemNodeConnection = (
     }
 
     if (isNotNilOrEmpty(cartesiNodeRpcUrl) && result.status === "success") {
+        const rpcUrl =
+            appConfig.nodeRpcUrl ??
+            path(
+                [
+                    result.data.chainId.toString(),
+                    "rpcUrls",
+                    "default",
+                    "http",
+                    "0",
+                ],
+                supportedChains,
+            );
         return {
             config: {
                 ...defaultVal,
                 name: "system-set-node-rpc",
                 type: "system",
                 url: cartesiNodeRpcUrl,
-                chain: result.data.chainId,
+                chain: {
+                    id: result.data.chainId,
+                    rpcUrl: rpcUrl,
+                },
                 version: result.data.nodeVersion,
             },
         };

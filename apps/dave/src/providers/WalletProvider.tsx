@@ -17,7 +17,6 @@ import getSupportedChainInfo, {
     type SupportedChainId,
 } from "../lib/supportedChains";
 import createClientFor from "../lib/transportClient";
-import { useAppConfig } from "./AppConfigProvider";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 
@@ -61,11 +60,11 @@ const buildWagmiConfig = (chainId: string, nodeRpcUrl?: string) => {
 
 const WalletProvider = ({ children }: { children: ReactNode }) => {
     const isMounted = useMounted();
-    const appConfig = useAppConfig();
     const selectedConnection = useSelectedNodeConnection();
-    const nodeRpcUrl = appConfig.nodeRpcUrl;
-    const data = selectedConnection?.chain;
-    const chainId = data?.toString() ?? defaultSupportedChain.id.toString();
+    const nodeRpcUrl = selectedConnection?.chain.rpcUrl;
+    const chainId =
+        selectedConnection?.chain.id.toString() ??
+        defaultSupportedChain.id.toString();
 
     const wagmiConfig = useMemo(() => {
         return buildWagmiConfig(chainId, nodeRpcUrl);

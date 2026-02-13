@@ -30,8 +30,12 @@ const ConnectionView: FC<ConnectionViewProps> = ({
     onConnect,
     hideIfSelected = false,
 }) => {
-    const { removeConnection, setSelectedConnection, getSelectedConnection } =
-        useNodeConnection();
+    const {
+        removeConnection,
+        setSelectedConnection,
+        getSelectedConnection,
+        updateIsPreferred,
+    } = useNodeConnection();
     const selectedConnection = getSelectedConnection();
     const isConnected = selectedConnection?.id === connection.id;
     const isSystem = ["system", "system_mock"].includes(connection.type);
@@ -51,21 +55,31 @@ const ConnectionView: FC<ConnectionViewProps> = ({
             <Stack gap={3} py="sm">
                 <Group justify="flex-start" gap={3}>
                     <Text tt="uppercase">url:</Text>
-                    <Text fw="bold">{connection?.url}</Text>
-                    <CopyButton value={connection?.url ?? ""} />
+                    <Text fw="bold">{connection.url}</Text>
+                    <CopyButton value={connection.url ?? ""} />
                 </Group>
                 <Group justify="flex-start" gap={3}>
                     <Text tt="uppercase">node version:</Text>
-                    <Text fw="bold">{connection?.version}</Text>
+                    <Text fw="bold">{connection.version}</Text>
                 </Group>
 
                 <Group justify="flex-start" gap={3}>
                     <Text tt="uppercase">created:</Text>
                     <PrettyTime
-                        milliseconds={connection?.timestamp ?? 0}
+                        milliseconds={connection.timestamp ?? 0}
                         size="lg"
                     />
                 </Group>
+
+                <Stack gap="3">
+                    <Group justify="flex-start" gap={3}>
+                        <Text tt="uppercase">Chain:</Text>
+                        <Text>{connection.chain.id}</Text>
+                    </Group>
+                    <Text c="dimmed" size="sm">
+                        {connection.chain.rpcUrl}
+                    </Text>
+                </Stack>
             </Stack>
 
             <Activity mode={hideFooter ? "hidden" : "visible"}>
@@ -75,13 +89,37 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                             <Switch
                                 label="Preferred"
                                 labelPosition="left"
-                                checked={connection?.isPreferred ?? false}
+                                checked={connection.isPreferred}
+                                onChange={(evt) => {
+                                    updateIsPreferred(
+                                        {
+                                            newValue: evt.currentTarget.checked,
+                                            connection,
+                                        },
+                                        {
+                                            onSuccess: () =>
+                                                notify(
+                                                    "success",
+                                                    `Connection ${connection.name} is set as preferred.`,
+                                                ),
+                                            onFailure: (reason) =>
+                                                notify(
+                                                    "error",
+                                                    pathOr(
+                                                        "Could not update the connection",
+                                                        ["message"],
+                                                        reason,
+                                                    ),
+                                                ),
+                                        },
+                                    );
+                                }}
                             />
                         </Activity>
 
                         <Activity mode={isConnected ? "hidden" : "visible"}>
                             <Group>
-                                {connection?.isDeletable && (
+                                {connection.isDeletable && (
                                     <Button
                                         color="red"
                                         variant="subtle"

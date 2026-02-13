@@ -20,6 +20,8 @@ declare module "@mantine/core" {
     export interface MantineThemeOther {
         lgIconSize: number;
         mdIconSize: number;
+        smIconSize: number;
+        xsIconSize: number;
         zIndexXS: number;
         zIndexSM: number;
         zIndexMD: number;
