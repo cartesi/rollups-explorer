@@ -1,7 +1,7 @@
 "use client";
 import { createContext, type ActionDispatch } from "react";
 import IndexedDbRepository from "./indexedDbRepository";
-import type { NodeConnectionConfig, Repository } from "./types";
+import type { DbNodeConnectionConfig, Repository } from "./types";
 
 // Actions
 type CloseModal = { type: "close_modal" };
@@ -9,27 +9,27 @@ type OpenModal = { type: "open_modal" };
 type SetFetching = { type: "set_fetching"; payload: boolean };
 type AddConnection = {
     type: "add_connection";
-    payload: { connection: NodeConnectionConfig };
+    payload: { connection: DbNodeConnectionConfig };
 };
 type RemoveConnection = { type: "remove_connection"; payload: { id: number } };
 type SetSelectedConnection = {
     type: "set_selected_connection";
-    payload: { connection: NodeConnectionConfig };
+    payload: { id: number };
 };
 type SetSystemConnection = {
     type: "set_system_connection";
-    payload: { connection: NodeConnectionConfig };
+    payload: { id: number };
 };
 type SetConnections = {
     type: "set_connections";
-    payload: { connections: NodeConnectionConfig[] };
+    payload: { connections: DbNodeConnectionConfig[] };
 };
 
 export type ConnectionState = {
-    systemConnection: NodeConnectionConfig | null;
-    selectedConnection: NodeConnectionConfig | null;
+    systemConnection: number | null;
+    selectedConnection: number | null;
     repository: Repository;
-    connections: NodeConnectionConfig[];
+    connections: Record<number, DbNodeConnectionConfig>;
     showConnectionModal: boolean;
     fetching: boolean;
 };
@@ -51,7 +51,7 @@ export type ConnectionReducer = (
 
 export const initState = (repository: Repository): ConnectionState => {
     return {
-        connections: [],
+        connections: {},
         fetching: true,
         repository,
         selectedConnection: null,
@@ -63,6 +63,7 @@ export const initState = (repository: Repository): ConnectionState => {
 export const ConnectionStateContext = createContext<ConnectionState>(
     initState(new IndexedDbRepository()),
 );
+
 export const ConnectionActionContext = createContext<
     ActionDispatch<[action: ConnectionAction]>
 >(() => null);

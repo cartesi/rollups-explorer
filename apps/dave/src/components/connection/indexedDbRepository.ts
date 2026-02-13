@@ -1,6 +1,11 @@
 "use client";
 import Dexie, { type Table } from "dexie";
-import { dbName, type NodeConnectionConfig, type Repository } from "./types";
+import {
+    dbName,
+    type DbNodeConnectionConfig,
+    type NodeConnectionConfig,
+    type Repository,
+} from "./types";
 
 export interface ConnectionItem extends NodeConnectionConfig {
     network: string;
@@ -25,7 +30,7 @@ class IndexedDbRepository extends Dexie implements Repository {
 
     async add(newConn: NodeConnectionConfig) {
         const id = await this.connections.add(newConn);
-        return { ...newConn, id } as Required<NodeConnectionConfig>;
+        return { ...newConn, id } as DbNodeConnectionConfig;
     }
 
     async remove(id: number) {
@@ -35,12 +40,14 @@ class IndexedDbRepository extends Dexie implements Repository {
     }
 
     async get(id: number) {
-        const connection = await this.connections.get(id);
+        const connection = (await this.connections.get(
+            id,
+        )) as DbNodeConnectionConfig;
         return connection ?? null;
     }
 
     async list() {
-        return await this.connections.toArray();
+        return (await this.connections.toArray()) as DbNodeConnectionConfig[];
     }
 }
 

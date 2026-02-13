@@ -1,11 +1,17 @@
 "use client";
-import { descend, propOr, reject, sort } from "ramda";
-import type { ConnectionReducer } from "./ConnectionContexts";
-import type { NodeConnectionConfig } from "./types";
+import { omit } from "ramda";
+import type { ConnectionReducer, ConnectionState } from "./ConnectionContexts";
+import type { DbNodeConnectionConfig } from "./types";
 
-const sortByTimestampDesc = sort<NodeConnectionConfig>(
-    descend<NodeConnectionConfig>(propOr<number>(0, "timestamp")),
-);
+const mapById = (
+    acc: ConnectionState["connections"],
+    next: DbNodeConnectionConfig,
+) => {
+    if (next.id) {
+        acc[next.id] = next;
+    }
+    return acc;
+};
 
 const reducer: ConnectionReducer = (state, action) => {
     switch (action.type) {
@@ -23,25 +29,20 @@ const reducer: ConnectionReducer = (state, action) => {
         case "add_connection":
             return {
                 ...state,
-                connections: sortByTimestampDesc([
+                connections: {
                     ...state.connections,
-                    action.payload.connection,
-                ]),
+                    [action.payload.connection.id]: action.payload.connection,
+                },
             };
         case "remove_connection":
             return {
                 ...state,
-                connections: sortByTimestampDesc(
-                    reject(
-                        (val) => val.id === action.payload.id,
-                        state.connections,
-                    ),
-                ),
+                connections: omit([action.payload.id], state.connections),
             };
         case "set_connections":
             return {
                 ...state,
-                connections: sortByTimestampDesc(action.payload.connections),
+                connections: action.payload.connections.reduce(mapById, {}),
             };
         case "set_fetching":
             return {
@@ -51,13 +52,13 @@ const reducer: ConnectionReducer = (state, action) => {
         case "set_selected_connection": {
             return {
                 ...state,
-                selectedConnection: action.payload.connection,
+                selectedConnection: action.payload.id,
             };
         }
         case "set_system_connection":
             return {
                 ...state,
-                systemConnection: action.payload.connection,
+                systemConnection: action.payload.id,
             };
         default:
             return state;

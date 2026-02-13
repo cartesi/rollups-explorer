@@ -13,13 +13,13 @@ export interface NodeConnectionConfig {
     type: ConfigType;
 }
 
+export type DbNodeConnectionConfig = Required<NodeConnectionConfig>;
+
 export interface Repository {
-    add: (
-        conn: NodeConnectionConfig,
-    ) => Promise<Required<NodeConnectionConfig>>;
+    add: (conn: NodeConnectionConfig) => Promise<DbNodeConnectionConfig>;
     remove: (id: number) => Promise<boolean>;
-    get: (id: number) => Promise<NodeConnectionConfig | null>;
-    list: () => Promise<NodeConnectionConfig[]>;
+    get: (id: number) => Promise<DbNodeConnectionConfig | null>;
+    list: () => Promise<DbNodeConnectionConfig[]>;
 }
 
 export const dbName = "cartesi_rollups_explorer" as const;

@@ -1,10 +1,8 @@
 "use client";
-import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useEffect, useState, type ReactNode } from "react";
 import ConnectionModal from "../components/connection/ConnectionModal";
 import { ConnectionProvider } from "../components/connection/ConnectionProvider";
-import { useGetNodeInformation } from "../components/connection/hooks";
-import type { NodeConnectionConfig } from "../components/connection/types";
+import { useBuildSystemNodeConnection } from "../components/connection/hooks";
 import PageLoader from "../components/layout/PageLoader";
 import { SendProvider } from "../components/send/SendProvider";
 import { getConfiguredCartesiNodeRpcUrl } from "../lib/getConfigCartesiNodeRpcUrl";
@@ -59,58 +57,6 @@ const loadConfig = async () => {
     return config;
 };
 
-const defaultVal = {
-    id: Number.MAX_SAFE_INTEGER,
-    chain: 13370,
-    isDeletable: false,
-    isPreferred: true,
-    timestamp: Date.now(),
-    version: "2.0.0-alpha.9",
-};
-
-type UseSystemNodeConnectionReturn = {
-    config: NodeConnectionConfig | null;
-    isFetching?: boolean;
-};
-
-const useSystemNodeConnection = (
-    cartesiNodeRpcUrl: string,
-    isMockEnabled: boolean,
-): UseSystemNodeConnectionReturn => {
-    const url = isMockEnabled ? null : cartesiNodeRpcUrl;
-    const result = useGetNodeInformation(url);
-
-    if (isMockEnabled) {
-        return {
-            config: {
-                ...defaultVal,
-                name: "mocked-system-setup",
-                type: "system_mock",
-                url: "local://in-memory",
-            },
-        };
-    }
-
-    if (result.status === "pending") {
-        return { config: null, isFetching: true };
-    }
-
-    if (isNotNilOrEmpty(cartesiNodeRpcUrl) && result.status === "success") {
-        return {
-            config: {
-                ...defaultVal,
-                name: "system-set-node-rpc",
-                type: "system",
-                url: cartesiNodeRpcUrl,
-                chain: result.data.chainId,
-                version: result.data.nodeVersion,
-            },
-        };
-    }
-
-    return { config: null };
-};
-
 export function Providers({ children }: ProviderProps) {
     const [value, setValue] = useState<AppConfigContextProps>({
         nodeRpcUrl: getConfiguredNodeRpcUrl(),
@@ -119,7 +65,7 @@ export function Providers({ children }: ProviderProps) {
         isMockEnabled: getConfiguredMockEnabled(),
     });
 
-    const systemNodeResult = useSystemNodeConnection(
+    const systemNodeResult = useBuildSystemNodeConnection(
         value.cartesiNodeRpcUrl,
         value.isMockEnabled,
     );

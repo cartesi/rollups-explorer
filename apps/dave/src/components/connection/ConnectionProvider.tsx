@@ -10,19 +10,19 @@ import {
 } from "./ConnectionContexts";
 import IndexedDbRepository from "./indexedDbRepository";
 import reducer from "./reducer";
-import type { NodeConnectionConfig, Repository } from "./types";
+import type { DbNodeConnectionConfig, Repository } from "./types";
 
 const indexedDbRepository = new IndexedDbRepository();
 
 interface ConnectionProviderProps {
     children: ReactNode;
-    systemConnection: NodeConnectionConfig | null;
+    systemConnection: DbNodeConnectionConfig | null;
     repository?: Repository;
 }
 
 const getPreferredNodeConnection = (
-    userConnections: NodeConnectionConfig[],
-    systemConnection: NodeConnectionConfig | null,
+    userConnections: DbNodeConnectionConfig[],
+    systemConnection: DbNodeConnectionConfig | null,
 ) => {
     const conn = userConnections.find((config) => config.isPreferred);
     return conn ?? systemConnection;
@@ -50,9 +50,11 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
                     systemConnection,
                 );
 
-                const connections = isNotNil(systemConnection)
-                    ? [...nodeConnections, systemConnection]
-                    : nodeConnections;
+                const connections = (
+                    isNotNil(systemConnection)
+                        ? [...nodeConnections, systemConnection]
+                        : nodeConnections
+                ) as DbNodeConnectionConfig[];
 
                 dispatch({
                     type: "set_connections",
@@ -62,14 +64,14 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
                 if (null !== preferredConnection) {
                     dispatch({
                         type: "set_selected_connection",
-                        payload: { connection: preferredConnection },
+                        payload: { id: preferredConnection.id! },
                     });
                 }
 
                 if (null !== systemConnection) {
                     dispatch({
                         type: "set_system_connection",
-                        payload: { connection: systemConnection },
+                        payload: { id: systemConnection.id },
                     });
                 }
             })
@@ -89,7 +91,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 
     useEffect(() => {
         // when the selected-connection change we route the user back to home page.
-        if (prev.current?.id !== state.selectedConnection?.id) {
+        if (prev.current !== state.selectedConnection) {
             prev.current = state.selectedConnection;
             router.push(pathBuilder.base, { scroll: false });
         }
