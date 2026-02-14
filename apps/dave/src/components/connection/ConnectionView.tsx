@@ -106,11 +106,6 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                                             connection,
                                         },
                                         {
-                                            onSuccess: () =>
-                                                notify(
-                                                    "success",
-                                                    `Connection ${connection.name} is set as preferred.`,
-                                                ),
                                             onFailure: (reason) =>
                                                 notify(
                                                     "error",
