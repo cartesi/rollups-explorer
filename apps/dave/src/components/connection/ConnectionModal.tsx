@@ -87,7 +87,11 @@ const ConnectionModal: FC = () => {
                                 viewControl === "create" ? "visible" : "hidden"
                             }
                         >
-                            <ConnectionForm />
+                            <ConnectionForm
+                                onConnectionSaved={() =>
+                                    setViewControl("manage")
+                                }
+                            />
                         </Activity>
                     </Stack>
                 </ScrollArea.Autosize>
