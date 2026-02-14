@@ -13,23 +13,21 @@ import {
     TextInput,
     useMantineTheme,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useForm, type FormErrors } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { isEmpty, isNotEmpty, isNotNil, pathOr } from "ramda";
-import React, { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { isEmpty, isNil, isNotNil, path, toPairs } from "ramda";
+import React, { useEffect, useRef, useState, type FC } from "react";
 import {
     TbCircleCheckFilled,
     TbCircleXFilled,
     TbPlugConnected,
     TbPlugConnectedX,
 } from "react-icons/tb";
-import { createConfig, useBlockNumber } from "wagmi";
+import { createPublicClient, http, type Chain } from "viem";
 import useRightColorShade from "../../hooks/useRightColorShade";
-import { checkChainId, defaultSupportedChain } from "../../lib/supportedChains";
+import { checkChainId } from "../../lib/supportedChains";
 import { checkNodeVersion } from "../../lib/supportedRollupsNode";
-import createClientFor from "../../lib/transportClient";
 import { useGetNodeInformation, useNodeConnection } from "./hooks";
 import type { NodeConnectionConfig } from "./types";
 
@@ -41,7 +39,7 @@ const checkURL = (url: string) => {
     try {
         const result = new URL(url);
         return {
-            validURL: true,
+            validUrl: true,
             result,
             url,
         };
@@ -54,16 +52,84 @@ const checkURL = (url: string) => {
     }
 };
 
-const queryClient = new QueryClient();
+type ChainRpcHealthCheck =
+    | {
+          status: "success";
+          blocknumber: bigint;
+      }
+    | {
+          status: "error";
+          error: Error;
+      }
+    | {
+          status: "idle";
+      }
+    | {
+          status: "pending";
+      };
 
-const WrappedConnectionForm: FC<ConnectionFormProps> = ({
-    onConnectionSaved,
-}) => {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <ConnectionForm onConnectionSaved={onConnectionSaved} />
-        </QueryClientProvider>
-    );
+const useChainRpcHealthCheck = (
+    url: string,
+    chain: Chain | null,
+): ChainRpcHealthCheck => {
+    const [result, setResult] = useState<ChainRpcHealthCheck>({
+        status: "idle",
+    });
+
+    useEffect(() => {
+        const urlCheck = checkURL(url);
+        if (!urlCheck.validUrl || isNil(chain)) return;
+
+        setResult({ status: "pending" });
+        const abortController = new AbortController();
+        const publicClient = createPublicClient({
+            chain,
+            transport: http(url, {}),
+        });
+
+        publicClient
+            .getBlockNumber()
+            .then((blocknumber) => {
+                if (abortController.signal.aborted) {
+                    console.info(
+                        `skipping blocknumber return: ${abortController.signal.reason}`,
+                    );
+                    return;
+                }
+                setResult({
+                    status: "success",
+                    blocknumber,
+                });
+            })
+            .catch((reason) => {
+                if (abortController.signal.aborted) {
+                    console.info(
+                        `Skipping promise catch handling: ${abortController.signal.reason}`,
+                    );
+                }
+                setResult({
+                    status: "error",
+                    error: reason,
+                });
+            });
+
+        return () => {
+            abortController.abort("Url or Chain changed.");
+            setResult({ status: "idle" });
+        };
+    }, [url, chain]);
+
+    return result;
+};
+
+const handleSubmitFormErrors = (errors: FormErrors) => {
+    toPairs(errors).forEach(([key, value]) => {
+        notifications.show({
+            id: key,
+            message: value,
+            color: "red",
+        });
+    });
 };
 
 const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
@@ -97,21 +163,16 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
     });
     const [submitting, setSubmitting] = useState(false);
     const { url, chainRpcUrl } = form.getTransformedValues();
-    const [debouncedUrl] = useDebouncedValue(url, 300);
-    const [debouncedChainUrl] = useDebouncedValue(chainRpcUrl, 300);
+    const [debouncedUrl] = useDebouncedValue(url, 500);
+    const [debouncedChainUrl] = useDebouncedValue(chainRpcUrl, 500);
 
-    const { validURL } = React.useMemo(
+    const { validUrl } = React.useMemo(
         () => checkURL(debouncedUrl),
         [debouncedUrl],
     );
 
-    const { validURL: validChainUrl } = React.useMemo(
-        () => checkURL(debouncedChainUrl),
-        [debouncedChainUrl],
-    );
-
     const nodeInfoResult = useGetNodeInformation(
-        validURL ? debouncedUrl : null,
+        validUrl ? debouncedUrl : null,
     );
 
     const { chainId, nodeVersion } =
@@ -125,29 +186,12 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
     const nodeChain =
         chainCheckRes?.status === "supported" ? chainCheckRes.chain : null;
 
-    const config = useMemo(
-        () =>
-            createConfig({
-                chains: nodeChain ? [nodeChain] : [defaultSupportedChain],
-                client: ({ chain }) =>
-                    createClientFor(chain!, debouncedChainUrl, {
-                        timeout: 1000,
-                    }),
-            }),
-        [debouncedChainUrl, nodeChain],
+    const chainRpcHealthCheck = useChainRpcHealthCheck(
+        debouncedChainUrl,
+        nodeChain,
     );
 
-    const blockNumber = useBlockNumber({
-        config,
-        query: {
-            enabled:
-                isNotEmpty(chainRpcUrl) && nodeChain !== null && validChainUrl,
-            retry: 2,
-            retryDelay: 2000,
-        },
-    });
-
-    const testSuccess = validURL && nodeInfoResult.status === "success";
+    const testSuccess = validUrl && nodeInfoResult.status === "success";
     const nodeInfoError =
         nodeInfoResult.status === "error" ? nodeInfoResult.error : null;
 
@@ -155,7 +199,7 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
         nodeInfoResult.status === "success" &&
         versionCheckRes?.status === "supported" &&
         chainCheckRes?.status === "supported" &&
-        blockNumber.status === "success";
+        chainRpcHealthCheck.status === "success";
 
     const showNodeInformation =
         nodeInfoResult.status === "success" &&
@@ -169,8 +213,9 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
             color: "green",
             withBorder: true,
         });
-        onConnectionSaved?.();
         form.reset();
+        setSubmitting(false);
+        onConnectionSaved?.();
     };
 
     const onFailure = () => {
@@ -179,10 +224,6 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
             color: "red",
             withBorder: true,
         });
-    };
-
-    const onFinished = () => {
-        setSubmitting((v) => !v);
     };
 
     useEffect(() => {
@@ -224,19 +265,18 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
                     };
 
                     addConnection(newConfig, {
-                        onFinished,
                         onSuccess,
                         onFailure,
                     });
                 } else {
                     notifications.show({
                         message:
-                            "To save a connection the endpoint needs to be working",
+                            "To save a connection the endpoints must be working",
                         color: "orange",
                         withBorder: true,
                     });
                 }
-            })}
+            }, handleSubmitFormErrors)}
         >
             <Stack gap="sm">
                 <TextInput
@@ -256,13 +296,13 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
                     rightSection={
                         nodeInfoResult.status === "pending" ? (
                             <Loader data-testid="icon-test-loading" size="sm" />
-                        ) : !validURL || !url ? (
+                        ) : !validUrl || !url ? (
                             <TbPlugConnected
                                 data-testid="icon-test-inactive"
                                 size={theme.other.mdIconSize}
                                 color={idleColor}
                             />
-                        ) : validURL && !testSuccess ? (
+                        ) : validUrl && !testSuccess ? (
                             <TbPlugConnectedX
                                 data-testid="icon-test-failed"
                                 size={theme.other.mdIconSize}
@@ -425,18 +465,20 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
                                 description="The chain json-rpc to connect and send transactions"
                                 data-testid="chain-rpc-url"
                                 rightSection={
-                                    blockNumber.fetchStatus === "fetching" ? (
+                                    chainRpcHealthCheck.status === "pending" ? (
                                         <Loader
                                             data-testid="icon-test-loading"
                                             size="sm"
                                         />
-                                    ) : !validChainUrl || !chainRpcUrl ? (
+                                    ) : chainRpcHealthCheck.status ===
+                                      "idle" ? (
                                         <TbPlugConnected
                                             data-testid="icon-test-inactive"
                                             size={theme.other.mdIconSize}
                                             color={idleColor}
                                         />
-                                    ) : blockNumber.status === "error" ? (
+                                    ) : chainRpcHealthCheck.status ===
+                                      "error" ? (
                                         <TbPlugConnectedX
                                             data-testid="icon-test-failed"
                                             size={theme.other.mdIconSize}
@@ -453,11 +495,11 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
                                 {...form.getInputProps("chainRpcUrl")}
                                 error={
                                     form.errors["chainRpcUrl"] ||
-                                    pathOr(
-                                        null,
-                                        ["shortMessage"],
-                                        blockNumber.error,
-                                    )
+                                    (chainRpcHealthCheck.status === "error" &&
+                                        path(
+                                            ["shortMessage"],
+                                            chainRpcHealthCheck.error,
+                                        ))
                                 }
                             />
                         </Stack>
@@ -467,7 +509,6 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
 
             <Flex direction="row" justify="flex-end" align="center" pt="xl">
                 <Button
-                    disabled={!canSave}
                     ref={btnRef}
                     type="submit"
                     loading={submitting}
@@ -480,4 +521,4 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
     );
 };
 
-export default WrappedConnectionForm;
+export default ConnectionForm;
