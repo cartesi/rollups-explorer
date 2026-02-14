@@ -12,6 +12,7 @@ import {
     sepolia,
 } from "viem/chains";
 
+export const supportedDevnets = [foundry, cannon];
 export const supportedChains = {
     [mainnet.id]: mainnet,
     [sepolia.id]: sepolia,
@@ -69,6 +70,10 @@ export const checkChainId = (chainId: number): CheckChainIdReturn => {
         status: "supported",
         chain,
     };
+};
+
+export const isDevnet = (chainId: number): boolean => {
+    return supportedDevnets.some((chain) => chain.id === chainId);
 };
 
 export default getSupportedChainInfo;
