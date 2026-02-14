@@ -7,13 +7,13 @@ import { isNil } from "ramda";
 import type { FC } from "react";
 import { TbCoins, TbCurrencyEthereum, TbInbox, TbSend } from "react-icons/tb";
 import { useAccount } from "wagmi";
-import { useAppConfig } from "../../providers/AppConfigProvider";
+import { useSelectedNodeConnection } from "../connection/hooks";
 import { useSendAction } from "./hooks";
 
 type SendMenuProps = { application: Application };
 
 const SendMenu: FC<SendMenuProps> = ({ application }) => {
-    const appConfig = useAppConfig();
+    const selectedConnection = useSelectedNodeConnection();
     const [opened, handlers] = useDisclosure(false);
     const actions = useSendAction();
     const account = useAccount();
@@ -22,7 +22,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const needSwitchNetwork = account.isConnected && isNil(account.chain);
     const canSend = !needSwitchNetwork && account.isConnected;
 
-    if (appConfig.isMockEnabled) return null;
+    if (selectedConnection?.type === "system_mock") return null;
 
     return (
         <Menu

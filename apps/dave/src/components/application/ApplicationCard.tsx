@@ -2,8 +2,8 @@ import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import { Activity, type FC } from "react";
-import { useAppConfig } from "../../providers/AppConfigProvider";
 import { pathBuilder } from "../../routes/routePathBuilder";
+import { useSelectedNodeConnection } from "../connection/hooks";
 import SendMenu from "../send/SendMenu";
 
 type ApplicationCardProps = { application: Application };
@@ -25,7 +25,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
     const stateColour = getStateColour(state);
-    const appConfig = useAppConfig();
+    const selectedConnection = useSelectedNodeConnection();
     const url = pathBuilder.application({ application: application.name });
     const inputsLabel =
         processedInputs === 0n
@@ -47,7 +47,11 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
                         </Text>
                     </Stack>
                     <Activity
-                        mode={appConfig.isMockEnabled ? "hidden" : "visible"}
+                        mode={
+                            selectedConnection?.type === "system_mock"
+                                ? "hidden"
+                                : "visible"
+                        }
                     >
                         <SendMenu application={application} />
                     </Activity>

@@ -23,6 +23,8 @@ const theme = createTheme({
     other: {
         lgIconSize: 40,
         mdIconSize: 24,
+        smIconSize: 18,
+        xsIconSize: 13,
         zIndexXS: 100,
         zIndexSM: 200,
         zIndexMD: 300,
