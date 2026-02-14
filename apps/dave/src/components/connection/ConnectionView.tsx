@@ -2,6 +2,7 @@ import { Badge, Button, Card, Group, Stack, Switch, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { pathOr } from "ramda";
 import { Activity, type FC } from "react";
+import { isDevnet } from "../../lib/supportedChains";
 import CopyButton from "../CopyButton";
 import { PrettyTime } from "../PrettyTime";
 import { useNodeConnection } from "./hooks";
@@ -21,9 +22,16 @@ const colors = {
 } as const;
 
 type NotificationType = "success" | "error" | "info" | "warn";
+type NotifyOpts = {
+    autoClose: Parameters<typeof notifications.show>[0]["autoClose"];
+};
 
-const notify = (type: NotificationType, message: string, title?: string) =>
-    notifications.show({ message, title, color: colors[type] });
+const notify = (
+    type: NotificationType,
+    message: string,
+    title?: string,
+    opts?: NotifyOpts,
+) => notifications.show({ message, title, color: colors[type], ...opts });
 
 const ConnectionView: FC<ConnectionViewProps> = ({
     connection,
@@ -35,6 +43,7 @@ const ConnectionView: FC<ConnectionViewProps> = ({
         setSelectedConnection,
         getSelectedConnection,
         updateIsPreferred,
+        countConnectionSameChainDiffRpc,
     } = useNodeConnection();
     const selectedConnection = getSelectedConnection();
     const isConnected = selectedConnection?.id === connection.id;
@@ -154,6 +163,41 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                                 <Button
                                     onClick={() => {
                                         onConnect?.();
+                                        const isDevnetConnection = isDevnet(
+                                            connection.chain.id,
+                                        );
+
+                                        if (
+                                            connection.type !== "system_mock" &&
+                                            isDevnetConnection
+                                        ) {
+                                            const countConns =
+                                                countConnectionSameChainDiffRpc(
+                                                    connection.chain.id,
+                                                    connection.chain.rpcUrl,
+                                                );
+
+                                            const multipleRpcsForSameChainId =
+                                                countConns >= 1;
+
+                                            notify(
+                                                "info",
+                                                `If your wallet provider e.g Metamask has a network configuration for ${connection.chain.id},
+                                                make sure the rpc-url set matches. Also, you could edit manually or just delete and reconnect your wallet`,
+                                                "Good to know",
+                                                { autoClose: 8000 },
+                                            );
+
+                                            if (multipleRpcsForSameChainId) {
+                                                notify(
+                                                    "warn",
+                                                    `It looks like you have ${countConns + 1} saved connections for the same chain id with different rpc-urls. Check the wallet once connected`,
+                                                    "Avoid transactions going somewhere else",
+                                                    { autoClose: false },
+                                                );
+                                            }
+                                        }
+
                                         setSelectedConnection(connection.id);
                                     }}
                                 >
