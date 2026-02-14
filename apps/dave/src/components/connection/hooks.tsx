@@ -185,15 +185,41 @@ export const useNodeConnection = () => {
     const connections = useConnectionsMap();
     const selectedConnection = useSelectedConnection();
     const actions = useNodeConnectionActions();
-    const getConnection = (id: number) => connections[id];
-    const listConnections = () =>
-        sortByTimestampDesc(Object.values(connections));
-    const getSelectedConnection = () => getConnection(selectedConnection ?? -1);
+
+    const functions = useMemo(() => {
+        const getConnection = (id: number) => connections[id];
+        const listConnections = () =>
+            sortByTimestampDesc(Object.values(connections));
+        const getSelectedConnection = () =>
+            getConnection(selectedConnection ?? -1);
+        const hasChainRegistered = (chainId: number) =>
+            listConnections().some((conn) => conn.chain.id === chainId);
+        const countConnectionSameChainDiffRpc = (
+            chainId: number,
+            rpcUrl: string,
+        ) =>
+            listConnections().filter(
+                (conn) =>
+                    conn.chain.id === chainId &&
+                    conn.chain.rpcUrl.toLowerCase() !== rpcUrl.toLowerCase(),
+            ).length;
+
+        return {
+            getConnection,
+            listConnections,
+            getSelectedConnection,
+            hasChainRegistered,
+            countConnectionSameChainDiffRpc,
+        };
+    }, [connections, selectedConnection]);
 
     return {
-        getSelectedConnection,
-        getConnection,
-        listConnections,
+        getSelectedConnection: functions.getSelectedConnection,
+        getConnection: functions.getConnection,
+        hasChainRegistered: functions.hasChainRegistered,
+        listConnections: functions.listConnections,
+        countConnectionSameChainDiffRpc:
+            functions.countConnectionSameChainDiffRpc,
         ...actions,
     };
 };
