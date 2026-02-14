@@ -33,6 +33,10 @@ import createClientFor from "../../lib/transportClient";
 import { useGetNodeInformation, useNodeConnection } from "./hooks";
 import type { NodeConnectionConfig } from "./types";
 
+interface ConnectionFormProps {
+    onConnectionSaved?: () => void;
+}
+
 const checkURL = (url: string) => {
     try {
         const result = new URL(url);
@@ -52,15 +56,17 @@ const checkURL = (url: string) => {
 
 const queryClient = new QueryClient();
 
-const WrappedConnectionForm: FC = () => {
+const WrappedConnectionForm: FC<ConnectionFormProps> = ({
+    onConnectionSaved,
+}) => {
     return (
         <QueryClientProvider client={queryClient}>
-            <ConnectionForm />
+            <ConnectionForm onConnectionSaved={onConnectionSaved} />
         </QueryClientProvider>
     );
 };
 
-const ConnectionForm: FC = () => {
+const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
     const { addConnection } = useNodeConnection();
     const theme = useMantineTheme();
     const btnRef = useRef<HTMLButtonElement>(null);
@@ -163,7 +169,7 @@ const ConnectionForm: FC = () => {
             color: "green",
             withBorder: true,
         });
-
+        onConnectionSaved?.();
         form.reset();
     };
 
