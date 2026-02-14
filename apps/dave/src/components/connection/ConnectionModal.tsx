@@ -53,20 +53,16 @@ const ConnectionModal: FC = () => {
                 ]}
             />
 
-            <Stack mt="lg" mah={connectionListMaxHeight} gap={"lg"}>
-                <ScrollArea.Autosize
-                    viewportRef={viewport}
-                    mah={connectionListMaxHeight}
-                    type="scroll"
-                    scrollbars="y"
-                    offsetScrollbars
-                >
-                    <Stack gap="sm" py="xs">
-                        <Activity
-                            mode={
-                                viewControl === "manage" ? "visible" : "hidden"
-                            }
-                        >
+            <Activity mode={viewControl === "manage" ? "visible" : "hidden"}>
+                <Stack py="lg" mah={connectionListMaxHeight}>
+                    <ScrollArea.Autosize
+                        viewportRef={viewport}
+                        mah={connectionListMaxHeight}
+                        type="scroll"
+                        scrollbars="y"
+                        offsetScrollbars
+                    >
+                        <Stack gap="sm" py="xs">
                             {isNotNil(selectedConnection) && (
                                 <ConnectionView
                                     connection={selectedConnection}
@@ -80,21 +76,17 @@ const ConnectionModal: FC = () => {
                                     hideIfSelected
                                 />
                             ))}
-                        </Activity>
+                        </Stack>
+                    </ScrollArea.Autosize>
+                </Stack>
+            </Activity>
 
-                        <Activity
-                            mode={
-                                viewControl === "create" ? "visible" : "hidden"
-                            }
-                        >
-                            <ConnectionForm
-                                onConnectionSaved={() =>
-                                    setViewControl("manage")
-                                }
-                            />
-                        </Activity>
-                    </Stack>
-                </ScrollArea.Autosize>
+            <Stack py="lg">
+                {viewControl === "create" && (
+                    <ConnectionForm
+                        onConnectionSaved={() => setViewControl("manage")}
+                    />
+                )}
             </Stack>
         </Modal>
     );
