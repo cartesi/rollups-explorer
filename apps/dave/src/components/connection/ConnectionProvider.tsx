@@ -1,4 +1,6 @@
 "use client";
+import { Button, Group, Stack, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
 import { pathBuilder } from "../../routes/routePathBuilder";
@@ -6,7 +8,9 @@ import {
     ConnectionActionContext,
     ConnectionStateContext,
     initState,
+    type ConnectionState,
 } from "./ConnectionContexts";
+import { useCheckNodeConnection } from "./hooks";
 import IndexedDbRepository from "./indexedDbRepository";
 import reducer from "./reducer";
 import type { DbNodeConnectionConfig, Repository } from "./types";
@@ -27,6 +31,30 @@ const getPreferredNodeConnection = (
     return conn ?? systemConnection;
 };
 
+const getSelectedConfig = (
+    state: ConnectionState,
+): DbNodeConnectionConfig | null => {
+    return state.connections[state.selectedConnection ?? -1] ?? null;
+};
+
+const ConnectivityProblem: FC<{ message: string; onClick: () => void }> = ({
+    message,
+    onClick,
+}) => {
+    return (
+        <Stack>
+            <Text size="sm" fw="bold">
+                {message}
+            </Text>
+            <Group>
+                <Button onClick={onClick} size="compact-md">
+                    <Text tt="uppercase">manage</Text>
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
+
 export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     children,
     systemConnection,
@@ -36,6 +64,8 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 
     const router = useRouter();
     const prev = useRef(state.selectedConnection);
+    const selectedConfig = getSelectedConfig(state);
+    const [result] = useCheckNodeConnection(selectedConfig);
 
     useEffect(() => {
         dispatch({
@@ -91,6 +121,25 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.selectedConnection]);
+
+    useEffect(() => {
+        if (null !== prev.current && result.status === "error") {
+            notifications.show({
+                id: prev.current.toString(),
+                color: "red",
+                autoClose: false,
+                title: "Connectivity problem!",
+                message: (
+                    <ConnectivityProblem
+                        message={
+                            result.error?.message ?? "Something went wrong!"
+                        }
+                        onClick={() => dispatch({ type: "open_modal" })}
+                    />
+                ),
+            });
+        }
+    }, [result]);
 
     if (state.fetching) {
         return "";
