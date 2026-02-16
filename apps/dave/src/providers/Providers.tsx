@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
-import ConnectionModal from "../components/connection/ConnectionModal";
 import { ConnectionProvider } from "../components/connection/ConnectionProvider";
 import { useBuildSystemNodeConnection } from "../components/connection/hooks";
 import PageLoader from "../components/layout/PageLoader";
@@ -87,7 +86,6 @@ export function Providers({ children }: ProviderProps) {
                     <ConnectionProvider
                         systemConnection={systemNodeResult.config}
                     >
-                        <ConnectionModal />
                         <DataProvider>
                             <SendProvider>{children}</SendProvider>
                         </DataProvider>

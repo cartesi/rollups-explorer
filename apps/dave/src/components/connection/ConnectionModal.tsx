@@ -6,23 +6,34 @@ import {
     Stack,
     Text,
 } from "@mantine/core";
-import { isNotNil } from "ramda";
-import { Activity, useEffect, useRef, useState, type FC } from "react";
+import { isEmpty, isNotNil } from "ramda";
+import { Activity, useEffect, useRef, type FC } from "react";
+import CenteredText from "../CenteredText";
 import ConnectionForm from "./ConnectionForm";
 import ConnectionView from "./ConnectionView";
-import { useNodeConnection, useShowConnectionModal } from "./hooks";
+import {
+    useConnectionModalMode,
+    useNodeConnection,
+    useShowConnectionModal,
+} from "./hooks";
 
-type ViewControl = "manage" | "create";
+export type ViewControl = "manage" | "create";
 
 const connectionListMaxHeight = 380;
 
 const ConnectionModal: FC = () => {
     const showModal = useShowConnectionModal();
-    const { closeConnectionModal, listConnections, getSelectedConnection } =
-        useNodeConnection();
+    const viewMode = useConnectionModalMode();
+    const {
+        closeConnectionModal,
+        listConnections,
+        getSelectedConnection,
+        changeViewMode,
+    } = useNodeConnection();
     const selectedConnection = getSelectedConnection();
-    const [viewControl, setViewControl] = useState<ViewControl>("manage");
     const viewport = useRef<HTMLDivElement>(null);
+    const connections = listConnections();
+    const hasConnections = !isEmpty(connections);
 
     useEffect(() => {
         viewport.current?.scrollTo({
@@ -35,6 +46,7 @@ const ConnectionModal: FC = () => {
         <Modal
             size="xl"
             opened={showModal}
+            withCloseButton={isNotNil(selectedConnection)}
             onClose={closeConnectionModal}
             closeOnClickOutside={false}
             closeOnEscape={false}
@@ -45,15 +57,15 @@ const ConnectionModal: FC = () => {
             }
         >
             <SegmentedControl
-                value={viewControl}
-                onChange={(value) => setViewControl(value as ViewControl)}
+                value={viewMode}
+                onChange={(value) => changeViewMode(value as ViewControl)}
                 data={[
                     { value: "manage", label: "Manage" },
                     { value: "create", label: "Create" },
                 ]}
             />
 
-            <Activity mode={viewControl === "manage" ? "visible" : "hidden"}>
+            <Activity mode={viewMode === "manage" ? "visible" : "hidden"}>
                 <Stack py="lg" mah={connectionListMaxHeight}>
                     <ScrollArea.Autosize
                         viewportRef={viewport}
@@ -69,22 +81,31 @@ const ConnectionModal: FC = () => {
                                     key={selectedConnection.id}
                                 />
                             )}
-                            {listConnections().map((connection) => (
+                            {connections.map((connection) => (
                                 <ConnectionView
                                     key={connection.id}
                                     connection={connection}
                                     hideIfSelected
                                 />
                             ))}
+                            {!hasConnections && (
+                                <CenteredText
+                                    key={"no-connections-manage-view"}
+                                    text="No connections"
+                                    cardProps={{
+                                        shadow: "sm",
+                                    }}
+                                />
+                            )}
                         </Stack>
                     </ScrollArea.Autosize>
                 </Stack>
             </Activity>
 
             <Stack py="lg">
-                {viewControl === "create" && (
+                {viewMode === "create" && (
                     <ConnectionForm
-                        onConnectionSaved={() => setViewControl("manage")}
+                        onConnectionSaved={() => changeViewMode("manage")}
                     />
                 )}
             </Stack>
