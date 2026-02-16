@@ -1,3 +1,10 @@
+export type ConnectionNetworkStatus =
+    | "idle"
+    | "pending"
+    | "error"
+    | "success"
+    | "noop";
+
 type ConfigType = "system" | "system_mock" | "user";
 
 export interface NodeConnectionConfig {

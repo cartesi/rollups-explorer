@@ -1,22 +1,22 @@
 "use client";
-import { createCartesiPublicClient } from "@cartesi/viem";
 import { path, pathOr } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { http } from "wagmi";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { supportedChains } from "../../lib/supportedChains";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
 } from "./ConnectionContexts";
-import { sortByTimestampDesc } from "./functions";
+import { fetchRollupsNodeMeta, sortByTimestampDesc } from "./functions";
 import type IndexedDbRepository from "./indexedDbRepository";
-import type { DbNodeConnectionConfig, NodeConnectionConfig } from "./types";
+import type {
+    ConnectionNetworkStatus,
+    DbNodeConnectionConfig,
+    NodeConnectionConfig,
+} from "./types";
 
-type NetworkStatus = "idle" | "pending" | "error" | "success" | "noop";
-
-type GetNodeInformationResult =
+export type NodeInformationResult =
     | {
           status: "success";
           data: { chainId: number; nodeVersion: string };
@@ -26,8 +26,13 @@ type GetNodeInformationResult =
           error: Error;
       }
     | {
-          status: Exclude<NetworkStatus, "success" | "error">;
+          status: Exclude<ConnectionNetworkStatus, "success" | "error">;
       };
+
+export type GetNodeInformationResult = [
+    result: NodeInformationResult,
+    retry: () => void,
+];
 
 type ActionLifecycle<T = undefined> = {
     onSuccess?: (...params: T extends undefined ? [never?] : [T]) => void;
@@ -231,10 +236,17 @@ export const useNodeConnection = () => {
  * url defined. If URL is nil a noop is returned.
  * @param cartesiNodeUrl
  */
-export const useGetNodeInformation = (cartesiNodeUrl: string | null) => {
-    const [result, setResult] = useState<GetNodeInformationResult>({
+export const useGetNodeInformation = (
+    cartesiNodeUrl: string | null,
+): GetNodeInformationResult => {
+    const [toRetry, setToRetry] = useState<number>(0);
+    const [result, setResult] = useState<NodeInformationResult>({
         status: "idle",
     });
+
+    const retry = useCallback(() => {
+        setToRetry(Date.now());
+    }, [setToRetry]);
 
     useEffect(() => {
         if (!cartesiNodeUrl) {
@@ -246,52 +258,23 @@ export const useGetNodeInformation = (cartesiNodeUrl: string | null) => {
 
         const abortController = new AbortController();
 
-        const cartesiClient = createCartesiPublicClient({
-            transport: http(cartesiNodeUrl),
+        fetchRollupsNodeMeta(cartesiNodeUrl).then((result) => {
+            if (abortController.signal.aborted) return;
+
+            if (result.status === "success") {
+                setResult({
+                    status: "success",
+                    data: {
+                        chainId: result.chainId,
+                        nodeVersion: result.nodeVersion,
+                    },
+                });
+            } else if (result.status === "error") {
+                setResult({ status: "error", error: result.error });
+            } else {
+                console.warn(`Unhandled rollusp-node-meta result ${result}`);
+            }
         });
-
-        const promises = [
-            cartesiClient.getChainId(),
-            cartesiClient.getNodeVersion(),
-        ];
-
-        Promise.allSettled(promises).then(
-            ([chainIdSettled, nodeVersionSettled]) => {
-                if (abortController.signal.aborted) {
-                    console.log(abortController.signal.reason);
-                    return;
-                }
-
-                const bothFailed =
-                    chainIdSettled.status === "rejected" &&
-                    nodeVersionSettled.status === "rejected";
-                if (bothFailed) {
-                    setResult({
-                        status: "error",
-                        error: new Error(
-                            "Looks like the node is not responding.",
-                        ),
-                    });
-                } else {
-                    const nodeVersion =
-                        nodeVersionSettled.status === "fulfilled"
-                            ? nodeVersionSettled.value
-                            : "";
-                    const chainId =
-                        chainIdSettled.status === "fulfilled"
-                            ? chainIdSettled.value
-                            : "";
-
-                    setResult({
-                        status: "success",
-                        data: {
-                            chainId: chainId as number,
-                            nodeVersion: nodeVersion as string,
-                        },
-                    });
-                }
-            },
-        );
 
         return () => {
             abortController.abort(
@@ -299,13 +282,13 @@ export const useGetNodeInformation = (cartesiNodeUrl: string | null) => {
             );
             setResult({ status: "idle" });
         };
-    }, [cartesiNodeUrl]);
+    }, [cartesiNodeUrl, toRetry]);
 
-    return result;
+    return [result, retry];
 };
 
 interface CheckNodeConnectionReturn {
-    status: NetworkStatus;
+    status: ConnectionNetworkStatus;
     matchVersion?: boolean;
     matchChain?: boolean;
     error?: Error;
@@ -350,55 +333,30 @@ export const useCheckNodeConnection = (
 
         const abortController = new AbortController();
 
-        const cartesiClient = createCartesiPublicClient({
-            transport: http(config.url),
+        fetchRollupsNodeMeta(config.url).then((result) => {
+            if (abortController.signal.aborted) return;
+
+            if (result.status === "success") {
+                const { chainId, nodeVersion } = result;
+                const matchChain =
+                    config.chain?.toString() === chainId.toString();
+                const matchVersion = config.version === nodeVersion.toString();
+
+                setResult({
+                    status: "success",
+                    matchChain,
+                    matchVersion,
+                    response: {
+                        chainId,
+                        nodeVersion,
+                    },
+                });
+            } else if (result.status === "error") {
+                setResult({ status: "error", error: result.error });
+            } else {
+                console.warn(`Unhandled rollusp-node-meta result ${result}`);
+            }
         });
-
-        const promises = [
-            cartesiClient.getChainId(),
-            cartesiClient.getNodeVersion(),
-        ];
-
-        Promise.allSettled(promises).then(
-            ([chainIdSettled, nodeVersionSettled]) => {
-                if (abortController.signal.aborted) {
-                    console.log(abortController.signal.reason);
-                    return;
-                }
-
-                const bothFailed =
-                    chainIdSettled.status === "rejected" &&
-                    nodeVersionSettled.status === "rejected";
-                if (bothFailed) {
-                    setResult({
-                        status: "error",
-                        error: new Error(
-                            "Looks like the node is not responding.",
-                        ),
-                    });
-                } else {
-                    const nodeVersion =
-                        nodeVersionSettled.status === "fulfilled"
-                            ? nodeVersionSettled.value
-                            : "";
-                    const chainId =
-                        chainIdSettled.status === "fulfilled"
-                            ? chainIdSettled.value
-                            : "";
-
-                    setResult({
-                        status: "success",
-                        matchChain:
-                            config.chain?.toString() === chainId.toString(),
-                        matchVersion: config.version === nodeVersion.toString(),
-                        response: {
-                            chainId: chainId as number,
-                            nodeVersion: nodeVersion as string,
-                        },
-                    });
-                }
-            },
-        );
 
         return () => {
             abortController.abort(
