@@ -287,7 +287,7 @@ export const useGetNodeInformation = (
     return [result, retry];
 };
 
-interface CheckNodeConnectionReturn {
+type NodeConnectionResult = {
     status: ConnectionNetworkStatus;
     matchVersion?: boolean;
     matchChain?: boolean;
@@ -296,7 +296,12 @@ interface CheckNodeConnectionReturn {
         chainId: number;
         nodeVersion: string;
     };
-}
+};
+
+export type CheckNodeConnectionReturn = [
+    result: NodeConnectionResult,
+    retry: () => void,
+];
 
 /**
  * Based on a node-connection-configuration
@@ -308,11 +313,14 @@ interface CheckNodeConnectionReturn {
  * @returns
  */
 export const useCheckNodeConnection = (
-    config?: NodeConnectionConfig | null,
+    config?: DbNodeConnectionConfig | null,
 ): CheckNodeConnectionReturn => {
-    const [result, setResult] = useState<CheckNodeConnectionReturn>({
+    const [toRetry, setToRetry] = useState<number>(0);
+    const [result, setResult] = useState<NodeConnectionResult>({
         status: "idle",
     });
+
+    const retry = useCallback(() => setToRetry(Date.now()), [setToRetry]);
 
     useEffect(() => {
         if (!config?.url) {
@@ -325,6 +333,10 @@ export const useCheckNodeConnection = (
                 status: "success",
                 matchChain: true,
                 matchVersion: true,
+                response: {
+                    chainId: config.chain.id,
+                    nodeVersion: config.version,
+                },
             });
             return;
         }
@@ -364,9 +376,9 @@ export const useCheckNodeConnection = (
             );
             setResult({ status: "idle" });
         };
-    }, [config?.url, config?.chain, config?.version, config?.type]);
+    }, [config?.url, config?.chain, config?.version, config?.type, toRetry]);
 
-    return result;
+    return [result, retry];
 };
 
 export const useShowConnectionModal = () => {
