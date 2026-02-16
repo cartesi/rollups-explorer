@@ -1,12 +1,25 @@
-import { Badge, Button, Card, Group, Stack, Switch, Text } from "@mantine/core";
+import {
+    ActionIcon,
+    Badge,
+    Button,
+    Card,
+    Group,
+    Stack,
+    Switch,
+    Text,
+    Tooltip,
+    useMantineTheme,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { pathOr } from "ramda";
+import { isNilOrEmpty } from "ramda-adjunct";
 import { Activity, type FC } from "react";
+import { TbRefresh } from "react-icons/tb";
 import { isDevnet } from "../../lib/supportedChains";
 import CopyButton from "../CopyButton";
 import { PrettyTime } from "../PrettyTime";
-import { useNodeConnection } from "./hooks";
-import type { DbNodeConnectionConfig } from "./types";
+import { useGetNodeInformation, useNodeConnection } from "./hooks";
+import type { ConnectionNetworkStatus, DbNodeConnectionConfig } from "./types";
 
 interface ConnectionViewProps {
     connection: DbNodeConnectionConfig;
@@ -33,6 +46,36 @@ const notify = (
     opts?: NotifyOpts,
 ) => notifications.show({ message, title, color: colors[type], ...opts });
 
+type ConnectionStatusProps = {
+    status: ConnectionNetworkStatus;
+    errorMessage?: string;
+};
+const ConnectionStatus: FC<ConnectionStatusProps> = ({
+    status,
+    errorMessage,
+}) => {
+    const config =
+        status === "pending"
+            ? { color: "orange", text: "checking..." }
+            : status === "error"
+              ? { color: "red", text: "not healthy" }
+              : status === "idle"
+                ? { color: "gray", text: "..." }
+                : { color: "green", text: "healthy" };
+
+    return (
+        <Tooltip
+            label={errorMessage}
+            disabled={isNilOrEmpty(errorMessage)}
+            withArrow
+        >
+            <Badge size="sm" color={config.color}>
+                {config.text}
+            </Badge>
+        </Tooltip>
+    );
+};
+
 const ConnectionView: FC<ConnectionViewProps> = ({
     connection,
     onConnect,
@@ -45,19 +88,25 @@ const ConnectionView: FC<ConnectionViewProps> = ({
         updateIsPreferred,
         countConnectionSameChainDiffRpc,
     } = useNodeConnection();
+    const theme = useMantineTheme();
     const selectedConnection = getSelectedConnection();
-    const isConnected = selectedConnection?.id === connection.id;
-    const isSystem = ["system", "system_mock"].includes(connection.type);
-    const hideFooter = isSystem && isConnected;
+    const isMock = connection.type === "system_mock";
+    const [result, refetchNodeInfo] = useGetNodeInformation(
+        isMock ? null : connection.url,
+    );
 
-    if (isConnected && hideIfSelected) return "";
+    const isSelected = selectedConnection?.id === connection.id;
+    const isSystem = ["system", "system_mock"].includes(connection.type);
+    const hideFooter = isSystem && isSelected;
+
+    if (isSelected && hideIfSelected) return "";
 
     return (
         <Card shadow="sm" id={`connection-view-${connection.id}`}>
             <Card.Section withBorder inheritPadding py="sm">
                 <Group justify="space-between" align="flex-start">
                     <Text fw="bold">{connection?.name}</Text>
-                    {isConnected && <Badge color="green">connected</Badge>}
+                    {isSelected && <Badge color="green">selected</Badge>}
                 </Group>
             </Card.Section>
 
@@ -67,6 +116,27 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                     <Text fw="bold">{connection.url}</Text>
                     <CopyButton value={connection.url ?? ""} />
                 </Group>
+                <Group justify="flex-start" gap={3}>
+                    <Text tt="uppercase">status:</Text>
+                    <ConnectionStatus
+                        status={result.status}
+                        errorMessage={
+                            result.status === "error"
+                                ? result.error.message
+                                : ""
+                        }
+                    />
+
+                    <ActionIcon
+                        variant="transparent"
+                        aria-label="check-node-connectivity"
+                        onClick={refetchNodeInfo}
+                        disabled={result.status === "pending"}
+                    >
+                        <TbRefresh size={theme.other.smIconSize} />
+                    </ActionIcon>
+                </Group>
+
                 <Group justify="flex-start" gap={3}>
                     <Text tt="uppercase">node version:</Text>
                     <Text fw="bold">{connection.version}</Text>
@@ -121,7 +191,7 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                             />
                         </Activity>
 
-                        <Activity mode={isConnected ? "hidden" : "visible"}>
+                        <Activity mode={isSelected ? "hidden" : "visible"}>
                             <Group>
                                 {connection.isDeletable && (
                                     <Button
