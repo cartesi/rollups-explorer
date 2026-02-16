@@ -29,7 +29,7 @@ export const fetchRollupsNodeMeta = async (
     cartesiNodeUrl: string,
 ): Promise<NodeMetaResult> => {
     const cartesiClient = createCartesiPublicClient({
-        transport: http(cartesiNodeUrl, { timeout: 2000 }),
+        transport: http(cartesiNodeUrl, { timeout: 5000 }),
     });
 
     const promises: [chainId: Promise<number>, nodeVersion: Promise<string>] = [

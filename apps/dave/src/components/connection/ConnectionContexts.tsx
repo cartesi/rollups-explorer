@@ -1,11 +1,12 @@
 "use client";
 import { createContext, type ActionDispatch } from "react";
+import type { ViewControl } from "./ConnectionModal";
 import IndexedDbRepository from "./indexedDbRepository";
 import type { DbNodeConnectionConfig, Repository } from "./types";
 
 // Actions
 type CloseModal = { type: "close_modal" };
-type OpenModal = { type: "open_modal" };
+type OpenModal = { type: "open_modal"; payload?: ViewControl };
 type SetFetching = { type: "set_fetching"; payload: boolean };
 type AddConnection = {
     type: "add_connection";
@@ -31,6 +32,7 @@ export type ConnectionState = {
     repository: Repository;
     connections: Record<number, DbNodeConnectionConfig>;
     showConnectionModal: boolean;
+    connectionModalMode: ViewControl;
     fetching: boolean;
 };
 
@@ -57,6 +59,7 @@ export const initState = (repository: Repository): ConnectionState => {
         selectedConnection: null,
         systemConnection: null,
         showConnectionModal: false,
+        connectionModalMode: "manage",
     };
 };
 

@@ -8,6 +8,7 @@ import {
     ConnectionActionContext,
     ConnectionStateContext,
 } from "./ConnectionContexts";
+import type { ViewControl } from "./ConnectionModal";
 import { fetchRollupsNodeMeta, sortByTimestampDesc } from "./functions";
 import type IndexedDbRepository from "./indexedDbRepository";
 import type {
@@ -65,6 +66,8 @@ const useNodeConnectionActions = () => {
 
     return useMemo(
         () => ({
+            changeViewMode: (viewControl: ViewControl) =>
+                dispatch({ type: "open_modal", payload: viewControl }),
             openConnectionModal: () => dispatch({ type: "open_modal" }),
             closeConnectionModal: () => dispatch({ type: "close_modal" }),
             addConnection: (
@@ -302,7 +305,6 @@ export type CheckNodeConnectionReturn = [
     result: NodeConnectionResult,
     retry: () => void,
 ];
-
 /**
  * Based on a node-connection-configuration
  * Checks if the target node-rollups-rpc-api is still running,
@@ -389,6 +391,11 @@ export const useShowConnectionModal = () => {
     );
 };
 
+export const useConnectionModalMode = () => {
+    const state = useConnectionState();
+    return state.connectionModalMode;
+};
+
 export const useSystemConnection = () => {
     const state = useConnectionState();
     return useMemo(() => state.systemConnection, [state.systemConnection]);
@@ -427,7 +434,7 @@ export const useBuildSystemNodeConnection = (
     isMockEnabled: boolean,
 ): BuildSystemNodeReturn => {
     const url = isMockEnabled ? null : cartesiNodeRpcUrl;
-    const result = useGetNodeInformation(url);
+    const [result] = useGetNodeInformation(url);
     const appConfig = useAppConfig();
 
     if (isMockEnabled) {
