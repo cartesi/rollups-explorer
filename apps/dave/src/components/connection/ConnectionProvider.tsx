@@ -2,6 +2,7 @@
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
+import { isEmpty, isNotNil } from "ramda";
 import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import {
@@ -10,6 +11,7 @@ import {
     initState,
     type ConnectionState,
 } from "./ConnectionContexts";
+import ConnectionModal, { type ViewControl } from "./ConnectionModal";
 import { useCheckNodeConnection } from "./hooks";
 import IndexedDbRepository from "./indexedDbRepository";
 import reducer from "./reducer";
@@ -124,8 +126,9 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 
     useEffect(() => {
         if (null !== prev.current && result.status === "error") {
+            const notificationId = prev.current.toString();
             notifications.show({
-                id: prev.current.toString(),
+                id: notificationId,
                 color: "red",
                 autoClose: false,
                 title: "Connectivity problem!",
@@ -134,12 +137,54 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
                         message={
                             result.error?.message ?? "Something went wrong!"
                         }
-                        onClick={() => dispatch({ type: "open_modal" })}
+                        onClick={() => {
+                            dispatch({ type: "open_modal" });
+                            notifications.hide(notificationId);
+                        }}
                     />
                 ),
             });
         }
     }, [result]);
+
+    useEffect(() => {
+        // the state starts with fetching. After startup if a connection is not selected;
+        // we display the connection modal for manage or creation depending on the situation
+        // The rest of the react tree must not be rendered until a connection is selected.
+        if (!state.fetching && state.selectedConnection === null) {
+            const hasConnections =
+                !isEmpty(state.connections) || isNotNil(state.systemConnection);
+            const config = hasConnections
+                ? {
+                      action: "manage",
+                      message:
+                          "Select a connection. Mark as preferred to skip this step.",
+                      title: "Connections",
+                  }
+                : {
+                      message: "Create your first connection.",
+                      title: "Connection is required!",
+                      action: "create",
+                  };
+
+            notifications.show({
+                id: config.action,
+                color: "blue",
+                message: config.message,
+                title: config.title,
+            });
+
+            dispatch({
+                type: "open_modal",
+                payload: config.action as ViewControl,
+            });
+        }
+    }, [
+        state.fetching,
+        state.selectedConnection,
+        state.connections,
+        state.systemConnection,
+    ]);
 
     if (state.fetching) {
         return "";
@@ -148,7 +193,8 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     return (
         <ConnectionStateContext value={state}>
             <ConnectionActionContext value={dispatch}>
-                {children}
+                <ConnectionModal />
+                {!selectedConfig ? "" : children}
             </ConnectionActionContext>
         </ConnectionStateContext>
     );

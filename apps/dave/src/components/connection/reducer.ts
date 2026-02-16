@@ -1,5 +1,5 @@
 "use client";
-import { isNil, omit } from "ramda";
+import { isNil, omit, pathOr } from "ramda";
 import type { ConnectionReducer, ConnectionState } from "./ConnectionContexts";
 import type { DbNodeConnectionConfig } from "./types";
 
@@ -29,6 +29,7 @@ const reducer: ConnectionReducer = (state, action) => {
             return {
                 ...state,
                 showConnectionModal: true,
+                connectionModalMode: pathOr("manage", ["payload"], action),
             };
         case "close_modal":
             return {
