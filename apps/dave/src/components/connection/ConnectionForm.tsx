@@ -28,29 +28,13 @@ import { createPublicClient, http, type Chain } from "viem";
 import useRightColorShade from "../../hooks/useRightColorShade";
 import { checkChainId } from "../../lib/supportedChains";
 import { checkNodeVersion } from "../../lib/supportedRollupsNode";
+import { checkURL } from "../../lib/urlUtils";
 import { useGetNodeInformation, useNodeConnection } from "./hooks";
 import type { NodeConnectionConfig } from "./types";
 
 interface ConnectionFormProps {
     onConnectionSaved?: () => void;
 }
-
-const checkURL = (url: string) => {
-    try {
-        const result = new URL(url);
-        return {
-            validUrl: true,
-            result,
-            url,
-        };
-    } catch (error: unknown) {
-        return {
-            validUrl: false,
-            error: error as TypeError,
-            url,
-        };
-    }
-};
 
 type ChainRpcHealthCheck =
     | {
@@ -171,7 +155,7 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
         [debouncedUrl],
     );
 
-    const nodeInfoResult = useGetNodeInformation(
+    const [nodeInfoResult] = useGetNodeInformation(
         validUrl ? debouncedUrl : null,
     );
 
