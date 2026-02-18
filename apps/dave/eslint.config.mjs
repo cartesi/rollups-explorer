@@ -1,13 +1,15 @@
-import { config as reactInternal } from "eslint-config-cartesi/react-internal";
+import { nextJsConfig } from "eslint-config-cartesi/next-js";
 import reactRefresh from "eslint-plugin-react-refresh";
 import storybook from "eslint-plugin-storybook";
 import globals from "globals";
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-    ...reactInternal,
+    ...nextJsConfig,
+
     {
         files: ["**/*.{ts,tsx}"],
+        ignores: ["coverage/**", ".turbo/**", "public/**", ".next/**"],
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,
