@@ -31,5 +31,3 @@ export interface Repository {
     get: (id: number) => Promise<DbNodeConnectionConfig | null>;
     list: () => Promise<DbNodeConnectionConfig[]>;
 }
-
-export const dbName = "cartesi_rollups_explorer" as const;
