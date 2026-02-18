@@ -54,7 +54,9 @@
             "cache": false,
             "persistent": true
         },
-        "lint": {},
+        "lint": {
+            "cache": false
+        },
         "test": {
             "dependsOn": ["build"],
             "inputs": [
