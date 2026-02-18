@@ -1,7 +1,7 @@
 "use client";
 import Dexie, { type Table } from "dexie";
+import { databaseName } from "../../lib/db";
 import {
-    dbName,
     type DbNodeConnectionConfig,
     type NodeConnectionConfig,
     type Repository,
@@ -20,7 +20,7 @@ class IndexedDbRepository extends Dexie implements Repository {
     connections!: Table<NodeConnectionConfig, number>;
 
     constructor() {
-        super(dbName);
+        super(databaseName);
         // Create first version of the connections store with auto-incremented id as primary key
         // Don't declare all columns like in SQL. You only declare properties you want to index for where() clause use.
         this.version(1).stores({
