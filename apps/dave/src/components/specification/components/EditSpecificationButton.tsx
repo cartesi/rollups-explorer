@@ -2,6 +2,7 @@ import { ActionIcon, VisuallyHidden } from "@mantine/core";
 import Link from "next/link";
 import { type FC } from "react";
 import { TbEdit } from "react-icons/tb";
+import { pathBuilder } from "../../../routes/routePathBuilder";
 
 export const EditSpecificationButton: FC<{ id: string; iconSize?: number }> = ({
     id,
@@ -14,7 +15,7 @@ export const EditSpecificationButton: FC<{ id: string; iconSize?: number }> = ({
             component={Link}
             color="yellow"
             role="link"
-            href={`/specifications/edit/${id}`}
+            href={pathBuilder.specificationsEdit(id)}
         >
             <VisuallyHidden>Edit Specification id {id}</VisuallyHidden>
             <TbEdit size={iconSize} />
