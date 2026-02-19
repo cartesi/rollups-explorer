@@ -19,6 +19,7 @@ export type MatchParams = TournamentParams & {
 export const pathBuilder = {
     base: "/" as const,
     specifications: () => `${pathBuilder.base}specifications` as const,
+    specificationsNew: () => `${pathBuilder.specifications()}/new` as const,
     home: () => pathBuilder.base,
     applications: () => `${pathBuilder.home()}apps` as const,
     application: (params: ApplicationParams) =>
