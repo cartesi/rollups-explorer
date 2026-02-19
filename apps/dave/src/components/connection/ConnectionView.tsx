@@ -17,7 +17,6 @@ import { Activity, type FC } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { isDevnet } from "../../lib/supportedChains";
 import CopyButton from "../CopyButton";
-import { PrettyTime } from "../PrettyTime";
 import { useGetNodeInformation, useNodeConnection } from "./hooks";
 import type { ConnectionNetworkStatus, DbNodeConnectionConfig } from "./types";
 
@@ -112,11 +111,6 @@ const ConnectionView: FC<ConnectionViewProps> = ({
 
             <Stack gap={3} py="sm">
                 <Group justify="flex-start" gap={3}>
-                    <Text tt="uppercase">url:</Text>
-                    <Text fw="bold">{connection.url}</Text>
-                    <CopyButton value={connection.url ?? ""} />
-                </Group>
-                <Group justify="flex-start" gap={3}>
                     <Text tt="uppercase">status:</Text>
                     <ConnectionStatus
                         status={result.status}
@@ -138,27 +132,25 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                 </Group>
 
                 <Group justify="flex-start" gap={3}>
-                    <Text tt="uppercase">node version:</Text>
-                    <Text fw="bold">{connection.version}</Text>
+                    <Text tt="uppercase">url:</Text>
+                    <Text fw="bold">{connection.url}</Text>
+                    <CopyButton value={connection.url ?? ""} />
                 </Group>
 
                 <Group justify="flex-start" gap={3}>
-                    <Text tt="uppercase">created:</Text>
-                    <PrettyTime
-                        milliseconds={connection.timestamp ?? 0}
-                        size="lg"
-                    />
+                    <Text tt="uppercase">node version:</Text>
+                    <Text>{connection.version}</Text>
                 </Group>
 
-                <Stack gap="3">
-                    <Group justify="flex-start" gap={3}>
-                        <Text tt="uppercase">Chain:</Text>
-                        <Text>{connection.chain.id}</Text>
-                    </Group>
-                    <Text c="dimmed" size="sm">
-                        {connection.chain.rpcUrl}
-                    </Text>
-                </Stack>
+                <Group justify="flex-start" gap={3}>
+                    <Text tt="uppercase">Chain id:</Text>
+                    <Text>{connection.chain.id}</Text>
+                </Group>
+
+                <Group justify="flex-start" gap={8}>
+                    <Text tt="uppercase">Chain RPC:</Text>
+                    <Text>{connection.chain.rpcUrl}</Text>
+                </Group>
             </Stack>
 
             <Activity mode={hideFooter ? "hidden" : "visible"}>
