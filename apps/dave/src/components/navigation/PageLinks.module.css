@@ -1,0 +1,9 @@
+.linkGroup {
+    &[data-selected="true"] {
+        border-bottom: solid 3px var(--mantine-primary-color-filled);
+    }
+
+    &:hover {
+        color: var(--mantine-primary-color-filled-hover);
+    }
+}
