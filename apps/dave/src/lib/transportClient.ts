@@ -1,5 +1,5 @@
 import { isNotNilOrEmpty } from "ramda-adjunct";
-import { createClient, http } from "viem";
+import { createClient, http, type HttpTransportConfig } from "viem";
 import { type SupportedChain } from "./supportedChains";
 
 /**
@@ -8,13 +8,17 @@ import { type SupportedChain } from "./supportedChains";
  * @param {SupportedChain} chain
  * @returns
  */
-const createClientFor = (chain: SupportedChain, nodeRpcUrl?: string) => {
+const createClientFor = (
+    chain: SupportedChain,
+    nodeRpcUrl?: string,
+    transportOpts?: HttpTransportConfig,
+) => {
     console.info(`Creating client transport for: ${chain.id} (${chain.name})`);
 
     const [defaultRpcUrl] = chain.rpcUrls.default.http;
     const transport = isNotNilOrEmpty(nodeRpcUrl)
-        ? http(nodeRpcUrl)
-        : http(defaultRpcUrl);
+        ? http(nodeRpcUrl, transportOpts)
+        : http(defaultRpcUrl, transportOpts);
 
     return createClient({ chain, transport });
 };

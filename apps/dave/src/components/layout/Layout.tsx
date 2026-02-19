@@ -9,15 +9,16 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { Activity, type FC, type PropsWithChildren } from "react";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
+import { useSelectedNodeConnection } from "../connection/hooks";
+import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
 import SendModal from "../send/SendModal";
-import { ThemeToggle } from "../ThemeToggle";
+import SettingsMenu from "../settings/SettingsMenu";
 
 const printQueryInfo = () => {
     const defaultOpts = queryClient.getDefaultOptions();
@@ -66,9 +67,10 @@ const logQueries = () => {
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
     const theme = useMantineTheme();
+    const selectedNodeConnection = useSelectedNodeConnection();
     const { isSmallDevice, viewport } = useIsSmallDevice();
     const { height } = viewport;
-    const { isMockEnabled, isDebugEnabled } = useAppConfig();
+    const { isDebugEnabled } = useAppConfig();
 
     return (
         <>
@@ -85,18 +87,18 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                             <CartesiLogo height={isSmallDevice ? 30 : 40} />
                         </Link>
 
-                        <Group>
+                        <Group gap="3">
                             <Activity
-                                mode={isMockEnabled ? "hidden" : "visible"}
+                                mode={
+                                    selectedNodeConnection?.type ===
+                                    "system_mock"
+                                        ? "hidden"
+                                        : "visible"
+                                }
                             >
-                                <ConnectButton
-                                    showBalance={{
-                                        smallScreen: false,
-                                        largeScreen: true,
-                                    }}
-                                />
+                                <ConnectWallet />
                             </Activity>
-                            <ThemeToggle />
+                            <SettingsMenu />
                             <Activity
                                 mode={isDebugEnabled ? "visible" : "hidden"}
                             >

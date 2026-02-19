@@ -104,6 +104,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      dexie:
+        specifier: ^4.0.11
+        version: 4.0.11
       humanize-duration:
         specifier: ^3.33.2
         version: 3.33.2
@@ -131,6 +134,9 @@ importers:
       react-jazzicon:
         specifier: ^1
         version: 1.0.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      semver:
+        specifier: ^7.7.4
+        version: 7.7.4
       viem:
         specifier: 'catalog:'
         version: 2.41.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12)
@@ -171,6 +177,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
       '@wagmi/cli':
         specifier: ^2.1.2
         version: 2.1.2(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)
@@ -3944,6 +3953,9 @@ packages:
 
   '@types/semver@7.5.6':
     resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
+
+  '@types/semver@7.7.1':
+    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -8713,13 +8725,13 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  semver@7.7.2:
-    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
     engines: {node: '>=10'}
     hasBin: true
 
-  semver@7.7.3:
-    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+  semver@7.7.4:
+    resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -13190,7 +13202,7 @@ snapshots:
       debug: 4.4.3
       lodash: 4.17.21
       pony-cause: 2.1.11
-      semver: 7.7.3
+      semver: 7.7.4
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -13200,7 +13212,7 @@ snapshots:
       '@ethereumjs/tx': 4.2.0
       '@types/debug': 4.1.12
       debug: 4.4.3
-      semver: 7.7.3
+      semver: 7.7.4
       superstruct: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -13214,7 +13226,7 @@ snapshots:
       '@types/debug': 4.1.12
       debug: 4.4.3
       pony-cause: 2.1.11
-      semver: 7.7.3
+      semver: 7.7.4
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -13228,7 +13240,7 @@ snapshots:
       '@types/debug': 4.1.12
       debug: 4.4.3
       pony-cause: 2.1.11
-      semver: 7.7.3
+      semver: 7.7.4
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -14422,7 +14434,7 @@ snapshots:
       '@storybook/builder-webpack5': 10.1.7(esbuild@0.19.12)(storybook@10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10))(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(tsx@4.20.3)(yaml@2.8.1))
       '@storybook/preset-react-webpack': 10.1.7(esbuild@0.19.12)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10))(typescript@5.9.3)
       '@storybook/react': 10.1.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10))(typescript@5.9.3)
-      '@types/semver': 7.5.6
+      '@types/semver': 7.7.1
       babel-loader: 9.2.1(@babel/core@7.28.4)(webpack@5.103.0(esbuild@0.19.12))
       css-loader: 6.11.0(webpack@5.103.0(esbuild@0.19.12))
       image-size: 2.0.2
@@ -14436,7 +14448,7 @@ snapshots:
       react-refresh: 0.14.2
       resolve-url-loader: 5.0.0
       sass-loader: 16.0.6(webpack@5.103.0(esbuild@0.19.12))
-      semver: 7.7.3
+      semver: 7.7.4
       storybook: 10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10)
       style-loader: 3.3.4(webpack@5.103.0(esbuild@0.19.12))
       styled-jsx: 5.1.6(@babel/core@7.28.4)(react@19.2.3)
@@ -14469,13 +14481,13 @@ snapshots:
     dependencies:
       '@storybook/core-webpack': 10.1.7(storybook@10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10))
       '@storybook/react-docgen-typescript-plugin': 1.0.6--canary.9.0c3f3b7.0(typescript@5.9.3)(webpack@5.103.0(esbuild@0.19.12))
-      '@types/semver': 7.5.6
+      '@types/semver': 7.7.1
       magic-string: 0.30.17
       react: 19.2.3
       react-docgen: 7.1.1
       react-dom: 19.2.3(react@19.2.3)
       resolve: 1.22.8
-      semver: 7.7.3
+      semver: 7.7.4
       storybook: 10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10)
       tsconfig-paths: 4.2.0
       webpack: 5.103.0(esbuild@0.19.12)
@@ -14748,6 +14760,8 @@ snapshots:
 
   '@types/semver@7.5.6': {}
 
+  '@types/semver@7.7.1': {}
+
   '@types/trusted-types@2.0.7': {}
 
   '@types/uuid@10.0.0': {}
@@ -14829,7 +14843,7 @@ snapshots:
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.2
+      semver: 7.7.3
       ts-api-utils: 2.1.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -14864,7 +14878,7 @@ snapshots:
       '@usecannon/web-solc': 0.5.1
       acorn: 8.15.0
       axios: 1.10.0(debug@4.4.3)
-      axios-retry: 4.5.0(axios@1.10.0)
+      axios-retry: 4.5.0(axios@1.10.0(debug@4.4.3))
       buffer: 6.0.3
       chalk: 4.1.2
       debug: 4.4.3
@@ -14899,7 +14913,7 @@ snapshots:
       glob: 11.0.3
       lodash: 4.17.21
       prompts: 2.4.2
-      semver: 7.7.2
+      semver: 7.7.3
       table: 6.9.0
       tildify: 3.0.0
       untildify: 4.0.0
@@ -16451,7 +16465,7 @@ snapshots:
 
   axe-core@4.11.0: {}
 
-  axios-retry@4.5.0(axios@1.10.0):
+  axios-retry@4.5.0(axios@1.10.0(debug@4.4.3)):
     dependencies:
       axios: 1.10.0(debug@4.4.3)
       is-retry-allowed: 2.2.0
@@ -17127,7 +17141,7 @@ snapshots:
 
   create-storybook@9.1.7:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   cross-fetch@3.1.8(encoding@0.1.13):
     dependencies:
@@ -17185,7 +17199,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.6)
       postcss-modules-values: 4.0.0(postcss@8.5.6)
       postcss-value-parser: 4.2.0
-      semver: 7.7.3
+      semver: 7.7.4
     optionalDependencies:
       webpack: 5.103.0(esbuild@0.19.12)
 
@@ -17198,7 +17212,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.6)
       postcss-modules-values: 4.0.0(postcss@8.5.6)
       postcss-value-parser: 4.2.0
-      semver: 7.7.3
+      semver: 7.7.4
     optionalDependencies:
       webpack: 5.103.0(esbuild@0.19.12)
 
@@ -18220,7 +18234,7 @@ snapshots:
       minimatch: 3.1.2
       node-abort-controller: 3.1.1
       schema-utils: 3.3.0
-      semver: 7.7.3
+      semver: 7.7.4
       tapable: 2.3.0
       typescript: 5.9.3
       webpack: 5.103.0(esbuild@0.19.12)
@@ -20321,7 +20335,7 @@ snapshots:
       cosmiconfig: 9.0.0(typescript@5.9.3)
       jiti: 2.6.1
       postcss: 8.5.6
-      semver: 7.7.3
+      semver: 7.7.4
     optionalDependencies:
       webpack: 5.103.0(esbuild@0.19.12)
     transitivePeerDependencies:
@@ -21100,9 +21114,9 @@ snapshots:
 
   semver@6.3.1: {}
 
-  semver@7.7.2: {}
-
   semver@7.7.3: {}
+
+  semver@7.7.4: {}
 
   send@1.2.0:
     dependencies:
@@ -21213,7 +21227,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.0.0
       detect-libc: 2.1.2
-      semver: 7.7.3
+      semver: 7.7.4
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
@@ -21424,7 +21438,7 @@ snapshots:
       esbuild: 0.25.10
       open: 10.2.0
       recast: 0.23.6
-      semver: 7.7.3
+      semver: 7.7.4
       use-sync-external-store: 1.6.0(react@19.2.3)
       ws: 8.18.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
@@ -21448,7 +21462,7 @@ snapshots:
       esbuild: 0.25.10
       esbuild-register: 3.5.0(esbuild@0.25.10)
       recast: 0.23.6
-      semver: 7.7.2
+      semver: 7.7.3
       ws: 8.18.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
       prettier: 3.6.2

@@ -48,7 +48,6 @@ const VoucherContent: FC<VoucherProps> = ({
         isHex(decodedData.payload) && decodedData.payload !== "0x";
     const amount = decodedData.type === "Voucher" ? decodedData.value : 0n;
     const hasAmount = amount > 0n;
-    console.log(amount);
 
     return (
         <Fieldset legend={title}>
