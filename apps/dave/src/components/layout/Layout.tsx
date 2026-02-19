@@ -17,6 +17,7 @@ import queryClient from "../../providers/queryClient";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
+import PageLinks from "../navigation/PageLinks";
 import SendModal from "../send/SendModal";
 import SettingsMenu from "../settings/SettingsMenu";
 
@@ -81,11 +82,13 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                         h="100%"
                         justify="space-between"
                         align="center"
-                        px={isSmallDevice ? "xs" : "lg"}
+                        px={isSmallDevice ? "xs" : "xl"}
                     >
                         <Link href="/" aria-label="Home">
                             <CartesiLogo height={isSmallDevice ? 30 : 40} />
                         </Link>
+
+                        <PageLinks />
 
                         <Group gap="3">
                             <Activity
