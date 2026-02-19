@@ -1,5 +1,7 @@
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
+// prettier-ignore code-highlight styles must be imported after the core.
+import "@mantine/code-highlight/styles.css";
 import "@mantine/notifications/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { FC, ReactNode } from "react";
