@@ -1,10 +1,8 @@
 "use client";
 import {
     ActionIcon,
-    Button,
     Group,
     Menu,
-    Stack,
     Text,
     useMantineTheme,
     type ActionIconProps,
@@ -12,11 +10,9 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import type { FC } from "react";
 import { TbSettings } from "react-icons/tb";
-import {
-    useNodeConnection,
-    useSelectedNodeConnection,
-} from "../connection/hooks";
 import { ThemeToggle } from "../ThemeToggle";
+import { ConnectionSettings } from "./ConnectionSettings";
+import classes from "./Menu.module.css";
 
 interface SettingsMenuProps {
     buttonSize?: ActionIconProps["size"];
@@ -25,8 +21,6 @@ interface SettingsMenuProps {
 const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
     const theme = useMantineTheme();
     const [opened, handlers] = useDisclosure(false);
-    const selectedNodeConnection = useSelectedNodeConnection();
-    const { openConnectionModal } = useNodeConnection();
 
     return (
         <Menu
@@ -36,6 +30,8 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
             withArrow
             arrowSize={13}
             closeOnItemClick={false}
+            withOverlay={false}
+            classNames={{ item: classes.item }}
         >
             <Menu.Target>
                 <ActionIcon
@@ -50,41 +46,10 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
                 </ActionIcon>
             </Menu.Target>
 
-            <Menu.Dropdown>
+            <Menu.Dropdown miw="18rem">
                 <Menu.Label>Connection</Menu.Label>
                 <Menu.Item component="div">
-                    <Stack gap="xs">
-                        <Group justify="space-between">
-                            <Text fw="bold">Name</Text>
-                            <Text>{selectedNodeConnection?.name}</Text>
-                        </Group>
-                        <Group justify="space-between">
-                            <Text fw="bold">Chain</Text>
-                            <Text>
-                                {selectedNodeConnection?.chain.id ?? "n/a"}
-                            </Text>
-                        </Group>
-                        <Group justify="space-between">
-                            <Text fw="bold">Version</Text>
-                            <Text>
-                                {selectedNodeConnection?.version ?? "n/a"}
-                            </Text>
-                        </Group>
-                        <Group justify="flex-end">
-                            <Button
-                                variant="transparent"
-                                px={0}
-                                onClick={() => {
-                                    handlers.close();
-                                    openConnectionModal();
-                                }}
-                            >
-                                <Text fw="bold" tt="uppercase">
-                                    manage
-                                </Text>
-                            </Button>
-                        </Group>
-                    </Stack>
+                    <ConnectionSettings onClick={handlers.close} />
                 </Menu.Item>
                 <Menu.Divider />
                 <Menu.Label>Global</Menu.Label>

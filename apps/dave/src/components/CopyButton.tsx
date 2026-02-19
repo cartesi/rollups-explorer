@@ -9,9 +9,10 @@ import { TbCheck, TbCopy } from "react-icons/tb";
 
 interface CopyButtonProps {
     value: string;
+    disableTooltip?: boolean;
 }
 
-const CopyButton: FC<CopyButtonProps> = ({ value }) => {
+const CopyButton: FC<CopyButtonProps> = ({ value, disableTooltip = false }) => {
     return (
         <MantineCopyButton value={value} timeout={2000}>
             {({ copied, copy }) => (
@@ -19,6 +20,7 @@ const CopyButton: FC<CopyButtonProps> = ({ value }) => {
                     label={copied ? "Copied" : "Copy"}
                     withArrow
                     position="right"
+                    disabled={disableTooltip}
                 >
                     <ActionIcon
                         color={copied ? "teal" : "gray"}

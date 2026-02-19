@@ -195,7 +195,9 @@ export const useNodeConnection = () => {
     const actions = useNodeConnectionActions();
 
     const functions = useMemo(() => {
-        const getConnection = (id: number) => connections[id];
+        const getConnection = (
+            id: number,
+        ): DbNodeConnectionConfig | undefined => connections[id];
         const listConnections = () =>
             sortByTimestampDesc(Object.values(connections));
         const getSelectedConnection = () =>
@@ -353,7 +355,7 @@ export const useCheckNodeConnection = (
             if (result.status === "success") {
                 const { chainId, nodeVersion } = result;
                 const matchChain =
-                    config.chain?.toString() === chainId.toString();
+                    config.chain?.id.toString() === chainId.toString();
                 const matchVersion = config.version === nodeVersion.toString();
 
                 setResult({
@@ -368,7 +370,7 @@ export const useCheckNodeConnection = (
             } else if (result.status === "error") {
                 setResult({ status: "error", error: result.error });
             } else {
-                console.warn(`Unhandled rollusp-node-meta result ${result}`);
+                console.warn(`Unhandled rollups-node-meta result ${result}`);
             }
         });
 
