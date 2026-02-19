@@ -1,4 +1,5 @@
 "use client";
+import { Provider as JotaiProvider } from "jotai";
 import { useEffect, useState, type ReactNode } from "react";
 import { ConnectionProvider } from "../components/connection/ConnectionProvider";
 import { useBuildSystemNodeConnection } from "../components/connection/hooks";
@@ -83,13 +84,15 @@ export function Providers({ children }: ProviderProps) {
                 <PageLoader />
             ) : (
                 <AppConfigProvider value={value}>
-                    <ConnectionProvider
-                        systemConnection={systemNodeResult.config}
-                    >
-                        <DataProvider>
-                            <SendProvider>{children}</SendProvider>
-                        </DataProvider>
-                    </ConnectionProvider>
+                    <JotaiProvider>
+                        <ConnectionProvider
+                            systemConnection={systemNodeResult.config}
+                        >
+                            <DataProvider>
+                                <SendProvider>{children}</SendProvider>
+                            </DataProvider>
+                        </ConnectionProvider>
+                    </JotaiProvider>
                 </AppConfigProvider>
             )}
         </StyleProvider>
