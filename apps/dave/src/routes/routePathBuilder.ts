@@ -20,6 +20,8 @@ export const pathBuilder = {
     base: "/" as const,
     specifications: () => `${pathBuilder.base}specifications` as const,
     specificationsNew: () => `${pathBuilder.specifications()}/new` as const,
+    specificationsEdit: (id: string) =>
+        `${pathBuilder.specifications()}/edit/${id}` as const,
     home: () => pathBuilder.base,
     applications: () => `${pathBuilder.home()}apps` as const,
     application: (params: ApplicationParams) =>
