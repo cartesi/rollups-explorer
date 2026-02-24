@@ -3,6 +3,7 @@ import {
     Badge,
     Card,
     Group,
+    JsonInput,
     ScrollArea,
     SegmentedControl,
     Select,
@@ -13,6 +14,7 @@ import {
     useMantineTheme,
     type MantineColor,
 } from "@mantine/core";
+import { isNotNil } from "ramda";
 import { Activity, useMemo, useState, type FC } from "react";
 import { TbReceipt } from "react-icons/tb";
 import useRightColorShade from "../../hooks/useRightColorShade";
@@ -22,6 +24,7 @@ import { PrettyTime } from "../PrettyTime";
 import TransactionHash from "../TransactionHash";
 import { OutputContainer } from "../output/OutputContainer";
 import { ReportContainer } from "../report/ReportContainer";
+import { useAbiDecodingOnInput } from "../specification/hooks/useAbiDecodingOnInput";
 import { contentDisplayOptions, type DecoderType } from "../types";
 
 interface Props {
@@ -50,6 +53,13 @@ export const InputCard: FC<Props> = ({ input }) => {
     const [decoderType, setDecoderType] = useState<DecoderType>("raw");
     const decoderFn = useMemo(() => getDecoder(decoderType), [decoderType]);
     const millis = Number(input.decodedData.blockTimestamp * 1000n);
+    const [result, decodingInfo] = useAbiDecodingOnInput(input);
+    const hasDecodedContent = isNotNil(decodingInfo.specApplied);
+    const isDecodedSelected = decoderType === "decoded";
+    const inputContent =
+        hasDecodedContent && isDecodedSelected
+            ? decoderFn(result)
+            : decoderFn(input.decodedData.payload);
 
     return (
         <Card shadow="md" withBorder>
@@ -92,7 +102,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                     />
                     <Select
                         id="decoder-type-select"
-                        w="100"
+                        w="130"
                         allowDeselect={false}
                         data={contentDisplayOptions}
                         value={decoderType}
@@ -112,9 +122,26 @@ export const InputCard: FC<Props> = ({ input }) => {
                         mode={viewControl === "payload" ? "visible" : "hidden"}
                     >
                         <Spoiler>
-                            <Text style={{ wordBreak: "break-all" }}>
-                                {decoderFn(input.decodedData.payload)}
-                            </Text>
+                            {isDecodedSelected ? (
+                                <JsonInput
+                                    key={`decoded-view-${input.index}`}
+                                    variant="filled"
+                                    size="md"
+                                    autoFocus
+                                    autosize
+                                    defaultValue={inputContent}
+                                    onFocus={(evt) => evt.currentTarget.blur()}
+                                    placeholder="No content defined"
+                                    formatOnBlur
+                                />
+                            ) : (
+                                <Text
+                                    key={`${decoderType}-view-${input.index}`}
+                                    style={{ wordBreak: "break-all" }}
+                                >
+                                    {inputContent}
+                                </Text>
+                            )}
                         </Spoiler>
                     </Activity>
 
