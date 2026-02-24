@@ -21,6 +21,10 @@ export const contentDisplayOptions = [
         value: "json",
         label: "as Json",
     },
+    {
+        value: "decoded",
+        label: "Decoded",
+    },
 ] as const;
 
 export type DecoderType = (typeof contentDisplayOptions)[number]["value"];
