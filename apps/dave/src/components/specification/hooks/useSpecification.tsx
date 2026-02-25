@@ -1,6 +1,6 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
-import { find, isNil, reject } from "ramda";
+import { append, find, isNil, reject } from "ramda";
 import { isFunction } from "ramda-adjunct";
 import { useEffect, useState } from "react";
 import { type DbSpecification, type Specification } from "../types";
@@ -56,11 +56,13 @@ const addSpecificationAtom = atom(
     null,
     (get, set, action: AddSpecificationAction) => {
         const repository = get(repositoryAtom);
-        const specs = get(specificationsAtom) ?? [];
         repository
             .add(action.payload)
             .then((newSpec) => {
-                set(specificationsAtom, [...specs, newSpec]);
+                set(
+                    specificationsAtom,
+                    append(newSpec, get(specificationsAtom) ?? []),
+                );
                 if (isFunction(action.opt.onSuccess)) action.opt.onSuccess();
             })
             .catch(catchBuilder(action.opt))
@@ -72,10 +74,10 @@ const updateSpecificationAtom = atom(
     null,
     (get, set, action: UpdateSpecificationAction) => {
         const repository = get(repositoryAtom);
-        const specs = get(specificationsAtom) ?? [];
         repository
             .update(action.payload)
             .then((updatedSpec) => {
+                const specs = get(specificationsAtom) ?? [];
                 const newList = specs.map((val) => {
                     return val.id === updatedSpec.id ? updatedSpec : val;
                 });
@@ -91,10 +93,10 @@ const removeSpecificationAtom = atom(
     null,
     (get, set, action: RemoveSpecificationAction) => {
         const repository = get(repositoryAtom);
-        const specs = get(specificationsAtom) ?? [];
         repository
             .remove(action.payload)
             .then(() => {
+                const specs = get(specificationsAtom) ?? [];
                 set(
                     specificationsAtom,
                     reject((spec) => spec.id === action.payload, specs),
