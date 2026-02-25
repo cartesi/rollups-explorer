@@ -29,10 +29,7 @@ class SpecificationRepository extends Dexie implements Repository {
     async add(spec: Specification) {
         const id = v4();
         const newSpec: DbSpecification = { ...spec, id, timestamp: Date.now() };
-        const savedId = await this.specifications.add(newSpec);
-
-        console.log(`savedIdReturned: ${savedId}`);
-        console.log(`savedIdGenerated: ${id}`);
+        await this.specifications.add(newSpec);
 
         return newSpec;
     }
