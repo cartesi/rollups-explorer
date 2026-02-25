@@ -3,7 +3,6 @@ import {
     Badge,
     Card,
     Group,
-    JsonInput,
     ScrollArea,
     SegmentedControl,
     Select,
@@ -20,6 +19,7 @@ import { TbReceipt } from "react-icons/tb";
 import useRightColorShade from "../../hooks/useRightColorShade";
 import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
+import JSONViewer from "../JSONViewer";
 import { PrettyTime } from "../PrettyTime";
 import TransactionHash from "../TransactionHash";
 import { OutputContainer } from "../output/OutputContainer";
@@ -123,20 +123,13 @@ export const InputCard: FC<Props> = ({ input }) => {
                     >
                         <Spoiler>
                             {isDecodedSelected ? (
-                                <JsonInput
-                                    key={`decoded-view-${input.index}`}
-                                    variant="filled"
-                                    size="md"
-                                    autoFocus
-                                    autosize
-                                    defaultValue={inputContent}
-                                    onFocus={(evt) => evt.currentTarget.blur()}
-                                    placeholder="No content defined"
-                                    formatOnBlur
+                                <JSONViewer
+                                    key={`decoded-view-input-${input.index}`}
+                                    content={inputContent}
                                 />
                             ) : (
                                 <Text
-                                    key={`${decoderType}-view-${input.index}`}
+                                    key={`${decoderType}-view-input-${input.index}`}
                                     style={{ wordBreak: "break-all" }}
                                 >
                                     {inputContent}
