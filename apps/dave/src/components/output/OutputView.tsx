@@ -5,10 +5,13 @@ import type {
     Voucher,
 } from "@cartesi/viem";
 import { Divider, Fieldset, Group, Spoiler, Text } from "@mantine/core";
+import { isNotNil } from "ramda";
 import type { FC } from "react";
 import { formatUnits, isHex } from "viem";
 import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
+import JSONViewer from "../JSONViewer";
+import useVoucherDecoder from "../specification/hooks/useVoucherDecoder";
 import type { DecoderType } from "../types";
 
 interface OutputViewProps {
@@ -48,6 +51,9 @@ const VoucherContent: FC<VoucherProps> = ({
         isHex(decodedData.payload) && decodedData.payload !== "0x";
     const amount = decodedData.type === "Voucher" ? decodedData.value : 0n;
     const hasAmount = amount > 0n;
+    const voucherDecodingRes = useVoucherDecoder({ voucher: decodedData });
+    const hasDecodedData = isNotNil(voucherDecodingRes.data);
+    const isDecodedSelected = decoderType === "decoded";
 
     return (
         <Fieldset legend={title}>
@@ -69,9 +75,16 @@ const VoucherContent: FC<VoucherProps> = ({
                         showLabel="Show more"
                         maxHeight={80}
                     >
-                        <Text style={{ wordBreak: "break-all" }}>
-                            {decoderFn(decodedData.payload)}
-                        </Text>
+                        {hasDecodedData && isDecodedSelected ? (
+                            <JSONViewer
+                                content={voucherDecodingRes.data ?? ""}
+                                key={`decoded-view-${decodedData.destination}`}
+                            />
+                        ) : (
+                            <Text style={{ wordBreak: "break-all" }}>
+                                {decoderFn(decodedData.payload)}
+                            </Text>
+                        )}
                     </Spoiler>
                 </>
             )}

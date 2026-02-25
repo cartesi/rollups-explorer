@@ -1,5 +1,5 @@
 "use client";
-import { type Voucher } from "@cartesi/viem";
+import type { DelegateCallVoucher, Voucher } from "@cartesi/viem";
 import { whatsabi } from "@shazow/whatsabi";
 import { isNil, isNotNil } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";
@@ -15,7 +15,7 @@ import { type Specification } from "../types";
 import { stringifyContent } from "../utils";
 
 type UseVoucherDecoderProps = {
-    voucher: Voucher;
+    voucher: Voucher | DelegateCallVoucher;
 };
 const cache = new Map<string, Abi>();
 
@@ -86,8 +86,14 @@ type DecodeOutputReturn =
  * @param appVersion
  * @returns
  */
-const decodeOutput = (voucher: Voucher): DecodeOutputReturn => {
-    if (voucher.payload === "0x" && isNotNil(voucher.value)) {
+const decodeOutput = (
+    voucher: Voucher | DelegateCallVoucher,
+): DecodeOutputReturn => {
+    if (
+        voucher.type === "Voucher" &&
+        voucher.payload === "0x" &&
+        isNotNil(voucher.value)
+    ) {
         return {
             isEtherWithdraw: true,
             withdrawData: {
@@ -149,7 +155,7 @@ const useVoucherDecoder = ({ voucher }: UseVoucherDecoderProps) => {
         status: "idle",
         data: null,
     });
-    // const appConfig = useAppConfig();
+
     const selectedNodeConfig = useSelectedNodeConnection();
     const nodeRpcUrl = selectedNodeConfig?.chain.rpcUrl;
     const chainId = selectedNodeConfig?.chain.id;
