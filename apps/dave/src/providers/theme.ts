@@ -1,4 +1,4 @@
-import { createTheme, Spoiler, virtualColor } from "@mantine/core";
+import { AppShell, createTheme, Spoiler, virtualColor } from "@mantine/core";
 
 const theme = createTheme({
     colors: {
@@ -42,15 +42,19 @@ const theme = createTheme({
                 },
             },
         },
-        AppShell: {
+        AppShell: AppShell.extend({
             defaultProps: {
                 header: { height: 60 },
                 aside: {
                     width: 0,
                     breakpoint: "sm",
                 },
+                navbar: {
+                    width: 300,
+                    breakpoint: "sm",
+                },
             },
-        },
+        }),
         Card: {
             defaultProps: {
                 shadow: "sm",

@@ -3,23 +3,33 @@ import {
     AppShell,
     AppShellHeader,
     AppShellMain,
+    Burger,
     Button,
     Container,
+    Divider,
     Group,
+    NavLink,
+    Stack,
+    Text,
     useMantineTheme,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import Link from "next/link";
 import { Activity, type FC, type PropsWithChildren } from "react";
+import { TbCode, TbHome } from "react-icons/tb";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
 import queryClient from "../../providers/queryClient";
+import { pathBuilder } from "../../routes/routePathBuilder";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
 import PageLinks from "../navigation/PageLinks";
 import SendModal from "../send/SendModal";
+import { ConnectionSettings } from "../settings/ConnectionSettings";
 import SettingsMenu from "../settings/SettingsMenu";
+import { ThemeToggle } from "../ThemeToggle";
 
 const printQueryInfo = () => {
     const defaultOpts = queryClient.getDefaultOptions();
@@ -68,15 +78,24 @@ const logQueries = () => {
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
     const theme = useMantineTheme();
+    const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
+        useDisclosure();
     const selectedNodeConnection = useSelectedNodeConnection();
     const { isSmallDevice, viewport } = useIsSmallDevice();
     const { height } = viewport;
     const { isDebugEnabled } = useAppConfig();
+    const navbarDefaults =
+        theme.components?.AppShell?.defaultProps?.navbar ?? {};
 
     return (
         <>
             <SendModal />
-            <AppShell>
+            <AppShell
+                navbar={{
+                    ...navbarDefaults,
+                    collapsed: { desktop: true, mobile: !opened },
+                }}
+            >
                 <AppShellHeader style={{ zIndex: theme.other.zIndexXS }}>
                     <Group
                         h="100%"
@@ -88,33 +107,83 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                             <CartesiLogo height={isSmallDevice ? 30 : 40} />
                         </Link>
 
-                        <PageLinks />
+                        <Burger
+                            onClick={toggleMobileMenu}
+                            hiddenFrom="sm"
+                            aria-label="Navigation Menu"
+                            opened={opened}
+                        />
 
-                        <Group gap="3">
-                            <Activity
-                                mode={
-                                    selectedNodeConnection?.type ===
-                                    "system_mock"
-                                        ? "hidden"
-                                        : "visible"
-                                }
-                            >
-                                <ConnectWallet />
-                            </Activity>
-                            <SettingsMenu />
-                            <Activity
-                                mode={isDebugEnabled ? "visible" : "hidden"}
-                            >
-                                <Button onClick={printQueryInfo}>
-                                    Show cache
-                                </Button>
-                                <Button onClick={logQueries}>
-                                    Export queries
-                                </Button>
-                            </Activity>
-                        </Group>
+                        <Activity mode={isSmallDevice ? "hidden" : "visible"}>
+                            <PageLinks />
+
+                            <Group gap="3">
+                                <Activity
+                                    mode={
+                                        selectedNodeConnection?.type ===
+                                        "system_mock"
+                                            ? "hidden"
+                                            : "visible"
+                                    }
+                                >
+                                    <ConnectWallet />
+                                </Activity>
+                                <SettingsMenu />
+                                <Activity
+                                    mode={isDebugEnabled ? "visible" : "hidden"}
+                                >
+                                    <Button onClick={printQueryInfo}>
+                                        Show cache
+                                    </Button>
+                                    <Button onClick={logQueries}>
+                                        Export queries
+                                    </Button>
+                                </Activity>
+                            </Group>
+                        </Activity>
                     </Group>
                 </AppShellHeader>
+                <AppShell.Navbar py="md" px={4}>
+                    <Stack h="inherit" justify="space-between">
+                        <Stack>
+                            <NavLink
+                                component={Link}
+                                href={pathBuilder.home()}
+                                label="Home"
+                                leftSection={
+                                    <TbHome size={theme.other.smIconSize} />
+                                }
+                                onClick={closeMobileMenu}
+                            />
+
+                            <NavLink
+                                component={Link}
+                                href={pathBuilder.specifications()}
+                                label="Specs"
+                                leftSection={
+                                    <TbCode size={theme.other.smIconSize} />
+                                }
+                                onClick={closeMobileMenu}
+                            />
+                        </Stack>
+
+                        <Stack px="sm">
+                            <Stack px="sm">
+                                <Divider label="Connection" />
+                                <ConnectionSettings onClick={closeMobileMenu} />
+                            </Stack>
+                            <Divider />
+                            <Group justify="space-between">
+                                <Text>Wallet</Text>
+                                <ConnectWallet showBalance={false} />
+                            </Group>
+                            <Group justify="space-between">
+                                <Text>Dark Mode</Text>
+                                <ThemeToggle />
+                            </Group>
+                        </Stack>
+                    </Stack>
+                </AppShell.Navbar>
                 <AppShellMain>
                     <Container
                         px={isSmallDevice ? "lg" : "sm"}
