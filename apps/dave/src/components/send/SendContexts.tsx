@@ -1,6 +1,7 @@
 "use client";
 import type { Application } from "@cartesi/viem";
 import { createContext, type ActionDispatch } from "react";
+import type { DbSpecification } from "../specification/types";
 
 // Actions
 type CloseModal = { type: "close_modal" };
@@ -15,10 +16,14 @@ export type DepositType =
 export type TransactionType = DepositType | InputType;
 
 type Deposit = { type: DepositType; payload: { application: Application } };
-type GenericInput = { type: InputType; payload: { application: Application } };
+type GenericInput = {
+    type: InputType;
+    payload: { application: Application; specifications: DbSpecification[] };
+};
 
 type SendState = {
     application: Application;
+    specifications: DbSpecification[];
     transactionType: TransactionType;
     timestamp: number;
 } | null;

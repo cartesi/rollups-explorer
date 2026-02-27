@@ -11,6 +11,10 @@ import { ERC1155DepositForm } from "../transactions/ERC1155DepositForm";
 import { ERC20DepositForm } from "../transactions/ERC20DepositForm";
 import { ERC721DepositForm } from "../transactions/ERC721DepositForm";
 import { EtherDepositForm } from "../transactions/EtherDepositForm";
+import {
+    GenericInputForm,
+    type GenericInputFormSpecification,
+} from "../transactions/GenericInputForm";
 import { useSendAction, useSendState } from "./hooks";
 import type { TransactionType } from "./SendContexts";
 
@@ -115,6 +119,14 @@ const SendModal: FC = () => {
             ) : state.transactionType === "deposit_erc721" ? (
                 <ERC721DepositForm
                     application={state.application}
+                    onSuccess={onSuccess}
+                />
+            ) : state.transactionType === "generic_input" ? (
+                <GenericInputForm
+                    application={state.application}
+                    specifications={
+                        state.specifications as GenericInputFormSpecification[]
+                    }
                     onSuccess={onSuccess}
                 />
             ) : null}

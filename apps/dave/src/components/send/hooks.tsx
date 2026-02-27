@@ -1,6 +1,7 @@
 "use client";
 import type { Application } from "@cartesi/viem";
 import { useContext } from "react";
+import type { DbSpecification } from "../specification/types";
 import { SendActionContext, SendStateContext } from "./SendContexts";
 
 export const useSendState = () => {
@@ -27,8 +28,14 @@ export const useSendAction = () => {
                 type: "deposit_erc1155Batch",
                 payload: { application },
             }),
-        sendGenericInput: (application: Application) =>
-            dispatch({ type: "generic_input", payload: { application } }),
+        sendGenericInput: (
+            application: Application,
+            specifications: DbSpecification[],
+        ) =>
+            dispatch({
+                type: "generic_input",
+                payload: { application, specifications },
+            }),
         closeModal: () => dispatch({ type: "close_modal" }),
     };
 };

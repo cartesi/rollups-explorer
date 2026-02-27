@@ -3,17 +3,22 @@ import type { Application } from "@cartesi/viem";
 import { Button, Group, Menu, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { isNil } from "ramda";
+import { filter, isNil } from "ramda";
 import type { FC } from "react";
 import { TbCoins, TbCurrencyEthereum, TbInbox, TbSend } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import { useSelectedNodeConnection } from "../connection/hooks";
+import { useSpecification } from "../specification/hooks/useSpecification";
+import type { DbSpecification } from "../specification/types";
 import { useSendAction } from "./hooks";
 
 type SendMenuProps = { application: Application };
 
+const jsonAbiOnly = (spec: DbSpecification) => spec.mode === "json_abi";
+
 const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const selectedConnection = useSelectedNodeConnection();
+    const { listSpecifications } = useSpecification();
     const [opened, handlers] = useDisclosure(false);
     const actions = useSendAction();
     const account = useAccount();
@@ -54,11 +59,14 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
 
             <Menu.Dropdown>
                 <Menu.Item
-                    disabled
                     leftSection={<TbInbox size={24} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
-                        actions.sendGenericInput(application);
+                        const specifications = filter(
+                            jsonAbiOnly,
+                            listSpecifications() ?? [],
+                        );
+                        actions.sendGenericInput(application, specifications);
                         handlers.close();
                     }}
                 >

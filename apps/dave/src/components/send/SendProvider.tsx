@@ -13,10 +13,17 @@ const sendReducer: SendReducer = (state, action) => {
         case "deposit_erc721":
         case "deposit_erc1155Single":
         case "deposit_erc1155Batch":
+            return {
+                transactionType: action.type,
+                application: action.payload.application,
+                specifications: [],
+                timestamp: Date.now(),
+            };
         case "generic_input":
             return {
                 transactionType: action.type,
                 application: action.payload.application,
+                specifications: action.payload.specifications,
                 timestamp: Date.now(),
             };
         case "close_modal":
