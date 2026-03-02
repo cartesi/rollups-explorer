@@ -35,6 +35,7 @@ const SettingsMenu: FC<SettingsMenuProps> = ({ buttonSize = "input-sm" }) => {
         >
             <Menu.Target>
                 <ActionIcon
+                    aria-label="Application settings menu"
                     size={buttonSize}
                     onClick={(evt) => {
                         evt.stopPropagation();
