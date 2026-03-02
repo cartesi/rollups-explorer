@@ -141,9 +141,13 @@ const ConnectionForm: FC<ConnectionFormProps> = ({ onConnectionSaved }) => {
             },
             url: (v) => {
                 if (isEmpty(v)) return "URL is a required field!";
+
+                return null;
             },
             chainRpcUrl: (v) => {
                 if (isEmpty(v)) return "Chain json-rpc endpoint can't be blank";
+
+                return null;
             },
         },
     });
