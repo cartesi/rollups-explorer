@@ -21,6 +21,7 @@ const JSONViewer: FC<JSONViewerProps> = ({
     return (
         <JsonInput
             id={id}
+            key={value}
             variant={variant}
             size={size}
             autoFocus
