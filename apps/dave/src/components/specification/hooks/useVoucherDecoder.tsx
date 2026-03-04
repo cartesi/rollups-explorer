@@ -165,6 +165,8 @@ const useVoucherDecoder = ({ voucher }: UseVoucherDecoderProps) => {
 
         setResult((old) => ({ ...old, status: "loading" }));
 
+        const abortController = new AbortController();
+
         (async () => {
             const outputResult = decodeOutput(voucher);
             const result = outputResult.isEtherWithdraw
@@ -176,8 +178,11 @@ const useVoucherDecoder = ({ voucher }: UseVoucherDecoderProps) => {
                       nodeRpcUrl,
                   });
 
-            setResult(() => ({ status: "idle", data: result }));
+            if (!abortController.signal.aborted)
+                setResult(() => ({ status: "idle", data: result }));
         })();
+
+        return () => abortController.abort("useEffect dependencies changed!");
     }, [chainId, voucher, nodeRpcUrl]);
 
     return result;
