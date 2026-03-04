@@ -21,7 +21,17 @@ import {
 import { createFormActions, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { type AbiType } from "abitype";
-import { any, clone, gt, gte, isEmpty, isNil, lt, reject } from "ramda";
+import {
+    any,
+    clone,
+    gt,
+    gte,
+    isEmpty,
+    isNil,
+    isNotNil,
+    lt,
+    reject,
+} from "ramda";
 import {
     isBlank,
     isBoolean,
@@ -164,28 +174,30 @@ const hasOverlap = (value: number, slices: SliceInstruction[]) =>
 
 const fromValidation = (value: string, values: FormValues) => {
     if (isBlank(value)) return "From is required!";
-
-    if (isNotNilOrEmpty(values.sliceInput.to) && value > values.sliceInput.to)
-        return "From can't be bigger than To value.";
-
     const from = parseInt(value);
+    const to = isNotNilOrEmpty(values.sliceInput.to)
+        ? parseInt(values.sliceInput.to)
+        : null;
+
+    if (isNotNil(to) && from > to) return "From can't be bigger than To value.";
 
     if (values.slices.length > 0 && hasOverlap(from, values.slices)) {
         return "Overlap with added entry! Check review.";
     }
+
     return null;
 };
 
 const toValidation = (value: string, values: FormValues) => {
     if (isBlank(value)) return null;
 
-    if (
-        isNotNilOrEmpty(values.sliceInput.from) &&
-        value < values.sliceInput.from
-    )
-        return "To value can't be smaller than From field.";
-
     const to = parseInt(value);
+    const from = isNotNilOrEmpty(values.sliceInput.from)
+        ? parseInt(values.sliceInput.from)
+        : null;
+
+    if (isNotNil(from) && to < from)
+        return "To value can't be smaller than From field.";
 
     if (values.slices.length > 0 && hasOverlap(to, values.slices)) {
         return "Overlap with added entry! Check review.";
