@@ -10,7 +10,7 @@ interface Props {
 
 /**
  *
- * Component to be used in conjuction with Mantine input type components
+ * Component to be used in conjunction with Mantine input type components
  * to be passed as the Label value when besides description a tooltip is
  * also desired.
  */
