@@ -12,6 +12,7 @@ const modeInfo: Record<Modes, ReactNode> = {
             <Anchor
                 href="https://abitype.dev/api/human"
                 target="_blank"
+                rel="noopener noreferrer"
                 display="inline-block"
             >
                 <Group gap={2} component="span">
@@ -30,7 +31,8 @@ const modeInfo: Record<Modes, ReactNode> = {
             parameters must include valid{" "}
             <Anchor
                 href="https://docs.soliditylang.org/en/v0.8.25/abi-spec.html#types"
-                target="blank"
+                target="_blank"
+                rel="noopener noreferrer"
                 display="inline-block"
             >
                 <Group gap={2} component="span">
