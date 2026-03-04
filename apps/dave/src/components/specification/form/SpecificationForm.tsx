@@ -173,7 +173,7 @@ export const SpecificationForm: FC<SpecificationFormProps> = ({
                     if (form.isValid() && specification !== null) {
                         setSubmitting(true);
                         const lifecycle = {
-                            onFinished: () => setSubmitting((v) => !v),
+                            onFinished: () => setSubmitting(false),
                             onSuccess: () => onComplete(specification),
                             onFailure,
                         };
