@@ -9,6 +9,7 @@ type OutputListProps = {
     decoderType?: DecoderType;
     outputs: Output[];
     pagination: Pagination;
+    application: string;
     onPaginationChange?: (newOffset: number) => void;
 };
 
@@ -17,6 +18,7 @@ export const OutputList: FC<OutputListProps> = ({
     pagination,
     decoderType = "raw",
     onPaginationChange,
+    application,
 }) => {
     return (
         <Stack id="output-list" gap={0}>
@@ -26,6 +28,7 @@ export const OutputList: FC<OutputListProps> = ({
             />
             {outputs.map((output) => (
                 <OutputView
+                    application={application}
                     key={`${output.epochIndex}-${output.inputIndex}-${output.index}`}
                     output={output}
                     displayAs={decoderType}

@@ -72,6 +72,7 @@ export const OutputContainer: FC<OutputContainerProps> = ({
 
     return (
         <OutputList
+            application={application}
             outputs={result.data}
             pagination={result.pagination}
             decoderType={decoderType}
