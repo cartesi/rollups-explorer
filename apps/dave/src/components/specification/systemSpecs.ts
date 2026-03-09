@@ -22,7 +22,10 @@ const ERC1155SinglePortalSpec: DbSpecification = {
         { from: 20, to: 40, name: "from" },
         { from: 40, to: 72, name: "tokenId", type: "uint" },
         { from: 72, to: 104, name: "amount", type: "uint" },
+        { from: 104, name: "data", optional: true },
     ],
+    sliceTarget: "data",
+    abiParams: ["bytes baseLayer, bytes execLayer"],
     conditionals: [
         {
             logicalOperator: "or",
@@ -36,7 +39,6 @@ const ERC1155SinglePortalSpec: DbSpecification = {
         },
     ],
     timestamp,
-    abiParams: [],
     version: 1,
 } as const;
 
@@ -117,8 +119,10 @@ const ERC721PortalSpec: DbSpecification = {
         { from: 0, to: 20, name: "tokenAddress" },
         { from: 20, to: 40, name: "from" },
         { from: 40, to: 72, name: "tokenIndex", type: "uint" },
+        { from: 72, name: "data", optional: true },
     ],
-    abiParams: [],
+    sliceTarget: "data",
+    abiParams: ["bytes baseLayer, bytes execLayer"],
     conditionals: [
         {
             logicalOperator: "or",
