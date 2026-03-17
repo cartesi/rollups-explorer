@@ -1,16 +1,18 @@
-FROM node:22-alpine AS base
+ARG NODE_VERSION=22.22-alpine3.23
+
+FROM node:${NODE_VERSION} AS base
 
 RUN corepack enable
-RUN corepack prepare pnpm@10.17.1 --activate
+RUN corepack prepare pnpm@10.25.0 --activate
 
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
 WORKDIR /app
-RUN npm install -g turbo@2.6.3
+RUN npm install -g turbo@^2.8.11
 COPY . .
-RUN turbo prune --scope=web --docker
+RUN turbo prune --scope=explorer --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
@@ -28,8 +30,12 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 ARG ENVIRONMENT=localhost
-COPY --from=builder /app/out/full/apps/web/.env.${ENVIRONMENT} ./apps/web/.env
-RUN pnpm build --filter=web
+# Remove any local env files accidentally copied.
+RUN rm -f ./apps/explorer/.env.*
+# Generate one based on docker argument + builder stage.
+COPY --from=builder /app/out/full/apps/explorer/.env.${ENVIRONMENT} ./apps/explorer/.env
+RUN ls -la ./apps/explorer/
+RUN pnpm build --filter=explorer
 
 FROM base AS runner
 WORKDIR /app
@@ -41,17 +47,17 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 #COPY --from=installer /app/apps/web/public ./public
-COPY --from=installer /app/apps/web/next.config.js .
-COPY --from=installer /app/apps/web/package.json .
+COPY --from=installer /app/apps/explorer/next.config.ts .
+COPY --from=installer /app/apps/explorer/package.json .
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/explorer/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/explorer/.next/static ./apps/explorer/.next/static
 
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "apps/explorer/server.js"]

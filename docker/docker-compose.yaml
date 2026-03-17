@@ -10,5 +10,9 @@ services:
             - ./traefik:/etc/traefik
     explorer:
         image: cartesi/rollups-explorer:devel
+        # Available variables to override the defaults.
+        # environment:
+        # - CARTESI_NODE_RPC_URL=http://127.0.0.1:6751/rpc
+        # - NODE_RPC_URL=http://127.0.0.1:6751/anvil
         expose:
             - 3000
