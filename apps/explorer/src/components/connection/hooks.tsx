@@ -3,7 +3,6 @@ import { path, pathOr } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { supportedChains } from "../../lib/supportedChains";
-import { useAppConfig } from "../../providers/AppConfigProvider";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -432,12 +431,12 @@ type BuildSystemNodeReturn = {
  * @returns
  */
 export const useBuildSystemNodeConnection = (
+    nodeRpcUrl: string,
     cartesiNodeRpcUrl: string,
     isMockEnabled: boolean,
 ): BuildSystemNodeReturn => {
     const url = isMockEnabled ? null : cartesiNodeRpcUrl;
     const [result] = useGetNodeInformation(url);
-    const appConfig = useAppConfig();
 
     if (isMockEnabled) {
         return {
@@ -456,7 +455,7 @@ export const useBuildSystemNodeConnection = (
 
     if (isNotNilOrEmpty(cartesiNodeRpcUrl) && result.status === "success") {
         const rpcUrl =
-            appConfig.nodeRpcUrl ??
+            nodeRpcUrl ??
             path(
                 [
                     result.data.chainId.toString(),
