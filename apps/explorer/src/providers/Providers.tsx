@@ -66,6 +66,7 @@ export function Providers({ children }: ProviderProps) {
     });
 
     const systemNodeResult = useBuildSystemNodeConnection(
+        value.nodeRpcUrl,
         value.cartesiNodeRpcUrl,
         value.isMockEnabled,
     );
