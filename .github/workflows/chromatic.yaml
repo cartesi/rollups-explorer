@@ -35,7 +35,7 @@ jobs:
         run: pnpm lint
 
       - name: Build Storybook
-        run: pnpm build:storybook --filter=dave
+        run: pnpm build:storybook --filter=explorer
 
       - name: Publish to Chromatic
         uses: chromaui/action@v13.2.0
@@ -43,5 +43,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           storybookBuildDir: storybook-static
-          workingDir: ./apps/dave
+          workingDir: ./apps/explorer
           exitOnceUploaded: true
