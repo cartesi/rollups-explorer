@@ -62,7 +62,7 @@ export const InputCard: FC<Props> = ({ input }) => {
     const inputContent =
         hasDecodedContent && isDecodedSelected
             ? decoderFn(result)
-            : decoderFn(input.decodedData?.payload ?? "");
+            : decoderFn(input.decodedData?.payload ?? "0x");
 
     return (
         <Card shadow="md" withBorder>
