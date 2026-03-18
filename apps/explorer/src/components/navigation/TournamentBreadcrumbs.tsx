@@ -29,6 +29,7 @@ export const TournamentBreadcrumbs: FC<TournamentBreadcrumbsProps> = (
                 {levels[index]}
             </Button>,
             <MatchBadge
+                key={`${index}-${match.commitmentOne}-${match.commitmentTwo}-badge`}
                 claim1={{ hash: match.commitmentOne }}
                 claim2={{ hash: match.commitmentTwo }}
                 variant="default"

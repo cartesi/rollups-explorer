@@ -62,12 +62,12 @@ export const useAbiDecodingOnInput = (
         : (find((spec) => spec.id === specId, specifications) ?? null);
 
     const envelope = specification
-        ? decodePayload(specification, input.decodedData.payload)
+        ? decodePayload(specification, input.decodedData?.payload ?? "0x")
         : undefined;
 
     const result = getStringifiedDecodedValueOrPayload(
         envelope,
-        input.decodedData.payload,
+        input.decodedData?.payload ?? "0x",
     );
 
     return [

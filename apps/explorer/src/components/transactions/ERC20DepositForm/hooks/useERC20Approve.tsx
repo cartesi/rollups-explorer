@@ -1,5 +1,9 @@
-import { type Hex } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
+import type {
+    AbiParametersToPrimitiveTypes,
+    ExtractAbiFunction,
+} from "abitype";
+import { erc20Abi, type Hex, type SimulateContractReturnType } from "viem";
+import { useWaitForTransactionReceipt, type Config } from "wagmi";
 import {
     useSimulateErc20Approve,
     useWriteErc20Approve,
@@ -11,8 +15,30 @@ interface Props {
     isQueryEnabled: boolean;
 }
 
+type ApproveFunctionName = "approve";
+type ApproveArgs = AbiParametersToPrimitiveTypes<
+    ExtractAbiFunction<typeof erc20Abi, ApproveFunctionName>["inputs"]
+>;
+
+type ApproveSimulateReturn = SimulateContractReturnType<
+    typeof erc20Abi,
+    ApproveFunctionName
+>;
+
+/**
+ * Facilitates TypeScript type inference for values returned by useERC20Approve hook.
+ */
+type ApprovePrepare = ReturnType<
+    typeof useSimulateErc20Approve<
+        ApproveFunctionName,
+        ApproveArgs,
+        Config,
+        undefined,
+        ApproveSimulateReturn
+    >
+>;
 interface UseERC20ApproveReturn {
-    approvePrepare: ReturnType<typeof useSimulateErc20Approve>;
+    approvePrepare: ApprovePrepare;
     approve: ReturnType<typeof useWriteErc20Approve>;
     approveWait: ReturnType<typeof useWaitForTransactionReceipt>;
 }

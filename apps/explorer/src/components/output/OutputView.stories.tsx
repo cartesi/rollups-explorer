@@ -181,6 +181,8 @@ const validNotice: GetOutputReturnType = {
 
 type Props = Parameters<typeof OutputView>[0];
 
+const application = "0xFc0E04b72f5630b277a07cD50c7F88Ca2331EB65";
+
 const WithDecoding = (props: Props) => {
     const options = [
         { label: "Raw", value: "raw" },
@@ -196,13 +198,18 @@ const WithDecoding = (props: Props) => {
                 data={options}
                 onChange={(value) => setDisplayOpt(value as DecoderType)}
             />
-            <OutputView output={props.output} displayAs={displayOpt} />
+            <OutputView
+                application={props.application}
+                output={props.output}
+                displayAs={displayOpt}
+            />
         </Stack>
     );
 };
 
 export const Notice: Story = {
     args: {
+        application,
         displayAs: "raw",
         output: validNotice,
     },
@@ -211,6 +218,7 @@ export const Notice: Story = {
 
 export const Voucher: Story = {
     args: {
+        application,
         displayAs: "raw",
         output: validVoucher,
     },

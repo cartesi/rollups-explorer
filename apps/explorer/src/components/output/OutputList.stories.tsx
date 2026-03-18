@@ -68,6 +68,8 @@ const validEthVoucher: GetOutputReturnType = {
     },
 };
 
+const application = "0xFc0E04b72f5630b277a07cD50c7F88Ca2331EB65";
+
 type Props = Parameters<typeof OutputList>[0];
 
 const Wrapper = (props: Props) => {
@@ -86,6 +88,7 @@ const Wrapper = (props: Props) => {
 
 export const SingleOutputPerPage: Story = {
     args: {
+        application,
         outputs: [validNotice, validVoucher],
         pagination: {
             limit: 1,
@@ -99,6 +102,7 @@ export const SingleOutputPerPage: Story = {
 
 export const MultipleOutputsPerPage: Story = {
     args: {
+        application,
         outputs: [
             validNotice,
             validVoucher,
