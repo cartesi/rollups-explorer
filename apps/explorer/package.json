@@ -17,8 +17,8 @@
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "dependencies": {
-        "@cartesi/viem": "2.0.0-alpha.26",
-        "@cartesi/wagmi": "2.0.0-alpha.30",
+        "@cartesi/viem": "2.0.0-alpha.29",
+        "@cartesi/wagmi": "2.0.0-alpha.33",
         "@mantine/code-highlight": "^8.3.15",
         "@mantine/core": "^8.3.15",
         "@mantine/form": "^8.3.15",
