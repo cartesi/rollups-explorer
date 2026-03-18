@@ -2,6 +2,7 @@ import type { Application, ApplicationState } from "@cartesi/viem";
 import { Badge, Card, Group, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 import { Activity, type FC } from "react";
+import useRightColorShade from "../../hooks/useRightColorShade";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import SendMenu from "../send/SendMenu";
@@ -12,19 +13,21 @@ const getStateColour = (state: ApplicationState) => {
     switch (state) {
         case "ENABLED":
             return "green";
-        case "DISABLED":
+        case "FAILED":
             return "red";
-        case "INOPERABLE":
+        case "DISABLED":
             return "gray";
+        case "INOPERABLE":
+            return "dark";
         default:
-            return "black";
+            return "orange";
     }
 };
 
 export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
     const { applicationAddress, consensusType, name, processedInputs, state } =
         application;
-    const stateColour = getStateColour(state);
+    const stateColour = useRightColorShade(getStateColour(state));
     const selectedConnection = useSelectedNodeConnection();
     const url = pathBuilder.application({ application: application.name });
     const inputsLabel =

@@ -16,6 +16,7 @@ import {
 import { isNotNil } from "ramda";
 import { Activity, useMemo, useState, type FC } from "react";
 import { TbReceipt } from "react-icons/tb";
+import { zeroAddress } from "viem";
 import useRightColorShade from "../../hooks/useRightColorShade";
 import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
@@ -52,21 +53,23 @@ export const InputCard: FC<Props> = ({ input }) => {
     const [viewControl, setViewControl] = useState<ViewControl>("payload");
     const [decoderType, setDecoderType] = useState<DecoderType>("raw");
     const decoderFn = useMemo(() => getDecoder(decoderType), [decoderType]);
-    const millis = Number(input.decodedData.blockTimestamp * 1000n);
+    const millis = input.decodedData?.blockTimestamp
+        ? Number(input.decodedData.blockTimestamp * 1000n)
+        : null;
     const [result, decodingInfo] = useAbiDecodingOnInput(input);
     const hasDecodedContent = isNotNil(decodingInfo.specApplied);
     const isDecodedSelected = decoderType === "decoded";
     const inputContent =
         hasDecodedContent && isDecodedSelected
             ? decoderFn(result)
-            : decoderFn(input.decodedData.payload);
+            : decoderFn(input.decodedData?.payload ?? "");
 
     return (
         <Card shadow="md" withBorder>
             <Card.Section withBorder inheritPadding py="sm">
                 <Group justify="space-between">
                     <Address
-                        value={input.decodedData.sender}
+                        value={input.decodedData?.sender ?? zeroAddress}
                         icon
                         shorten
                         iconSize={theme.other.mdIconSize}
@@ -142,7 +145,10 @@ export const InputCard: FC<Props> = ({ input }) => {
                         mode={viewControl === "output" ? "visible" : "hidden"}
                     >
                         <OutputContainer
-                            application={input.decodedData.applicationContract}
+                            application={
+                                input.decodedData?.applicationContract ??
+                                zeroAddress
+                            }
                             inputIndex={input.index}
                             epochIndex={input.epochIndex}
                             decoderType={decoderType}
@@ -154,7 +160,10 @@ export const InputCard: FC<Props> = ({ input }) => {
                         mode={viewControl === "report" ? "visible" : "hidden"}
                     >
                         <ReportContainer
-                            application={input.decodedData.applicationContract}
+                            application={
+                                input.decodedData?.applicationContract ??
+                                zeroAddress
+                            }
                             inputIndex={input.index}
                             epochIndex={input.epochIndex}
                             decoderType={decoderType}
@@ -172,12 +181,13 @@ export const InputCard: FC<Props> = ({ input }) => {
                             transactionHash={input.transactionReference}
                         />
                     </Group>
-
-                    <PrettyTime
-                        milliseconds={millis}
-                        displayTimestampUTC
-                        size="xs"
-                    />
+                    {isNotNil(millis) && (
+                        <PrettyTime
+                            milliseconds={millis}
+                            displayTimestampUTC
+                            size="xs"
+                        />
+                    )}
                 </Group>
             </Card.Section>
         </Card>

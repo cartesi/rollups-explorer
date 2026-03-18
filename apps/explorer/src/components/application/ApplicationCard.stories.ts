@@ -26,6 +26,13 @@ export const Disabled: Story = {
 };
 
 /**
+ * Card for a disabled application
+ */
+export const Failed: Story = {
+    args: { application: { ...applications[0], state: "FAILED" } },
+};
+
+/**
  * Card for application that is inoperable
  */
 export const Inoperable: Story = {

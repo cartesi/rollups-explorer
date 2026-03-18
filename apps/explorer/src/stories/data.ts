@@ -124,10 +124,11 @@ export const applications: ApplicationEpochs[] = [
                 inputIndexLowerBound: 0x0n,
                 inputIndexUpperBound: 0x1n,
                 virtualIndex: 0n,
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 machineHash:
                     "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-                claimHash:
-                    "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
                 claimTransactionHash:
                     "0xd6dcb8aafbdc19a690c242625c45e2e5d0cbe6369905ae3447df7b6005478d30",
                 commitment:
@@ -161,8 +162,9 @@ export const applications: ApplicationEpochs[] = [
                 virtualIndex: 0x1n,
                 machineHash:
                     "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-                claimHash:
-                    "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash:
                     "0xda1118c110f5c8b2b252df62c382338e2da79cf03ad5d698f657ffe1f7827420",
                 commitment:
@@ -199,8 +201,9 @@ export const applications: ApplicationEpochs[] = [
                 virtualIndex: 0x2n,
                 machineHash:
                     "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-                claimHash:
-                    "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash:
                     "0xbbfbbf103ab4a1119d2bfac6124cb80d84e0e71452ae1aea2d15d954b51e7197",
                 commitment:
@@ -237,8 +240,9 @@ export const applications: ApplicationEpochs[] = [
                 virtualIndex: 0x3n,
                 machineHash:
                     "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-                claimHash:
-                    "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash:
                     "0x59ec08bd457a7df7501f9fa50719d5eddb2cf5e4089fffe5abaa5791c4833d90",
                 commitment:
@@ -415,8 +419,9 @@ export const applications: ApplicationEpochs[] = [
                 virtualIndex: 0x4n,
                 machineHash:
                     "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-                claimHash:
-                    "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash: null,
                 commitment: null,
                 tournamentAddress: "0x3fd36d25c4515b8be331de689a5e65d2318ddea3",
@@ -432,7 +437,9 @@ export const applications: ApplicationEpochs[] = [
                 inputIndexUpperBound: 0xan,
                 virtualIndex: 0x5n,
                 machineHash: null,
-                claimHash: null,
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash: null,
                 commitment: null,
                 tournamentAddress: null,
@@ -524,7 +531,9 @@ export const applications: ApplicationEpochs[] = [
                 inputIndexUpperBound: 0x11n,
                 virtualIndex: 0x5n,
                 machineHash: null,
-                claimHash: null,
+                commitmentProof: null,
+                outputsMerkleProof: null,
+                outputsMerkleRoot: null,
                 claimTransactionHash: null,
                 commitment: null,
                 tournamentAddress: null,
