@@ -2,7 +2,10 @@
 import { path, pathOr } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { supportedChains } from "../../lib/supportedChains";
+import {
+    supportedChains,
+    type SupportedChainId,
+} from "../../lib/supportedChains";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -454,18 +457,14 @@ export const useBuildSystemNodeConnection = (
     }
 
     if (isNotNilOrEmpty(cartesiNodeRpcUrl) && result.status === "success") {
-        const rpcUrl =
-            nodeRpcUrl ??
-            path(
-                [
-                    result.data.chainId.toString(),
-                    "rpcUrls",
-                    "default",
-                    "http",
-                    "0",
-                ],
-                supportedChains,
-            );
+        const chainId = result.data.chainId as SupportedChainId;
+        const rpcUrl = isNotNilOrEmpty(nodeRpcUrl)
+            ? nodeRpcUrl
+            : path(
+                  ["rpcUrls", "default", "http", "0"],
+                  supportedChains[chainId],
+              );
+
         return {
             config: {
                 ...defaultVal,
