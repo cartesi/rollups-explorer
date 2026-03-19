@@ -6,7 +6,7 @@ const ContentSecurityPolicy = `
   font-src 'self' https:;
   style-src 'self' 'unsafe-inline' https:;
   img-src 'self' data: https:;
-  connect-src 'self' https: wss:;
+  connect-src 'self' https: wss: http:;
   frame-ancestors 'self' https://app.safe.global https://verify.walletconnect.org;
   object-src 'none';
   base-uri 'self';
