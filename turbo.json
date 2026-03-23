@@ -19,7 +19,8 @@
         "GITHUB_SHA",
         "CARTESI_NODE_RPC_URL",
         "MOCK_ENABLED",
-        "DEBUG_ENABLED"
+        "DEBUG_ENABLED",
+        "HEALTHZ_UPTIME_ENABLED"
     ],
     "tasks": {
         "build": {
