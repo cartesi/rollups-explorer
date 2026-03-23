@@ -42,13 +42,27 @@ declare namespace NodeJS {
         NEXT_PUBLIC_NODE_RPC_URL: string;
 
         /**
-         * Signal the app is in an containerize environment.
+         * Signal the app is in an containerized environment.
          */
         NEXT_PUBLIC_IS_CONTAINER?: string;
+
+        /**
+         * When enabled, it will set the uptimeSeconds response property from /healthz endpoint.
+         * It is useful for uptime monitoring on a long running server environment.
+         * Should be disabled on serverless environments to avoid confusion.
+         */
+        HEALTHZ_UPTIME_ENABLED?: string;
 
         /**
          * required id to use with walletconnect. Check {@link: https://cloud.walletconnect.com/}
          */
         NEXT_PUBLIC_PROJECT_ID: string;
+
+        /**
+         * The base path of the application. Useful when the app is not served at the root of the domain.
+         * When empty the NEXT_PUBLIC prefixed version should be the fallback.
+         */
+        BASE_PATH?: string;
+        NEXT_PUBLIC_BASE_PATH?: string;
     }
 }
