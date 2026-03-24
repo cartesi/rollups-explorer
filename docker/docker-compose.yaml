@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
     proxy:
-        image: traefik:v2.10
+        image: traefik:v3.3.7
         ports:
             - 8080:8080
             - 8088:8088
