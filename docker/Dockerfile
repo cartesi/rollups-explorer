@@ -1,16 +1,17 @@
 ARG NODE_VERSION=22.22-alpine3.23
 
 FROM node:${NODE_VERSION} AS base
-
+ARG PNPM_VERSION
 RUN corepack enable
-RUN corepack prepare pnpm@10.25.0 --activate
+RUN corepack prepare pnpm@${PNPM_VERSION} --activate
 
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk update
 
 WORKDIR /app
-RUN npm install -g turbo@^2.8.11
+ARG TURBO_VERSION
+RUN npm install -g turbo@^${TURBO_VERSION}
 COPY . .
 RUN turbo prune --scope=explorer --docker
 
@@ -46,7 +47,6 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-#COPY --from=installer /app/apps/web/public ./public
 COPY --from=installer /app/apps/explorer/next.config.ts .
 COPY --from=installer /app/apps/explorer/package.json .
 
