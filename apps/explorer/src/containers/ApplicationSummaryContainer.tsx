@@ -1,11 +1,13 @@
 "use client";
 import {
+    useApplication,
     useEpochs,
     useInputs,
     useOutputs,
     useReports,
     useTournaments,
 } from "@cartesi/wagmi";
+import { isNotNil } from "ramda";
 import type { FC } from "react";
 import {
     Hierarchy,
@@ -13,6 +15,7 @@ import {
 } from "../components/navigation/Hierarchy";
 import { ApplicationSummaryPage } from "../page/ApplicationSummaryPage";
 import { pathBuilder } from "../routes/routePathBuilder";
+import { ContainerSkeleton } from "./ContainerSkeleton";
 import ContainerStack from "./ContainerStack";
 
 interface ApplicationSummaryContainerProps {
@@ -27,6 +30,10 @@ const defaultParams = {
 export const ApplicationSummaryContainer: FC<
     ApplicationSummaryContainerProps
 > = (props) => {
+    const { data: application, isLoading: isLoadingApplication } =
+        useApplication({
+            application: props.application,
+        });
     const epochsResult = useEpochs({
         application: props.application,
         ...defaultParams,
@@ -86,17 +93,24 @@ export const ApplicationSummaryContainer: FC<
         },
     ];
 
+    const isLoading = isLoadingApplication;
+    const showPage = isNotNil(application);
+
     return (
         <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
-            <ApplicationSummaryPage
-                application={props.application}
-                epochs={epochs}
-                inputs={inputs}
-                outputs={outputs}
-                reports={reports}
-                tournaments={tournaments}
-            />
+            {isLoading && <ContainerSkeleton />}
+            {showPage && (
+                <ApplicationSummaryPage
+                    application={props.application}
+                    applicationConsensusType={application.consensusType}
+                    epochs={epochs}
+                    inputs={inputs}
+                    outputs={outputs}
+                    reports={reports}
+                    tournaments={tournaments}
+                />
+            )}
         </ContainerStack>
     );
 };

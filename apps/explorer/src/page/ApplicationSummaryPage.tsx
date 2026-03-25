@@ -1,4 +1,5 @@
 import type {
+    Application,
     GetEpochReturnType,
     GetInputReturnType,
     GetTournamentReturnType,
@@ -7,7 +8,7 @@ import { Anchor, Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { head } from "ramda";
 import { isNilOrEmpty } from "ramda-adjunct";
-import type { FC } from "react";
+import { Activity, type FC } from "react";
 import {
     TbClock,
     TbInbox,
@@ -34,6 +35,7 @@ type Meta<T> = OmitNever<{
 
 interface Props {
     application: string;
+    applicationConsensusType: Application["consensusType"];
     inputs: Meta<GetInputReturnType[]>;
     epochs: Meta<GetEpochReturnType[]>;
     outputs: Meta<never>;
@@ -41,7 +43,14 @@ interface Props {
     tournaments: Meta<GetTournamentReturnType[]>;
 }
 
-const gridSpan = { base: 12, xs: 6, sm: 4 };
+const getGridSpan = (consensusType: Application["consensusType"]) => {
+    switch (consensusType) {
+        case "PRT":
+            return { base: 12, xs: 6, sm: 4 };
+        default:
+            return { base: 12, xs: 6 };
+    }
+};
 
 export const ApplicationSummaryPage: FC<Props> = ({
     application,
@@ -50,9 +59,12 @@ export const ApplicationSummaryPage: FC<Props> = ({
     outputs,
     reports,
     tournaments,
+    applicationConsensusType,
 }) => {
     const latestTournament = head(tournaments.data);
     const epochsUrls = pathBuilder.epochs({ application });
+
+    const gridSpan = getGridSpan(applicationConsensusType);
 
     const tournamentUrl =
         latestTournament !== undefined
@@ -100,14 +112,22 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     />
                 </Grid.Col>
 
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Tournaments"
-                        value={tournaments.totalCount}
-                        icon={TbTrophy}
-                        displaySkeleton={tournaments.isLoading}
-                    />
-                </Grid.Col>
+                <Activity
+                    mode={
+                        applicationConsensusType === "PRT"
+                            ? "visible"
+                            : "hidden"
+                    }
+                >
+                    <Grid.Col span={gridSpan} mb="sm">
+                        <SummaryCard
+                            title="Tournaments"
+                            value={tournaments.totalCount}
+                            icon={TbTrophy}
+                            displaySkeleton={tournaments.isLoading}
+                        />
+                    </Grid.Col>
+                </Activity>
             </Grid>
 
             {tournamentUrl && (
