@@ -1,6 +1,7 @@
 "use client";
-import { useEpoch, useInputs } from "@cartesi/wagmi";
+import { useApplication, useEpoch, useInputs } from "@cartesi/wagmi";
 import { notFound } from "next/navigation";
+import { isNotNil } from "ramda";
 import { type FC } from "react";
 import {
     Hierarchy,
@@ -22,8 +23,11 @@ export type EpochContainerProps = {
 export const EpochContainer: FC<EpochContainerProps> = (props) => {
     const { data: epoch, isLoading: isEpochLoading } = useEpoch(props);
     const { data: inputs, isLoading: isInputsLoading } = useInputs(props);
+    const { data: application, isLoading: isApplicationLoading } =
+        useApplication({ application: props.application });
 
-    const isLoading = isEpochLoading || isInputsLoading;
+    const isLoading = isEpochLoading || isInputsLoading || isApplicationLoading;
+    const showPage = isNotNil(epoch) && isNotNil(application);
 
     const hierarchyConfig: HierarchyConfig[] = [
         { title: "Home", href: "/" },
@@ -49,9 +53,10 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
         <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
             {isLoading && <ContainerSkeleton />}
-            {!!epoch && (
+            {showPage && (
                 <EpochPage
                     epoch={epoch}
+                    application={application}
                     inputs={inputs?.data ?? []}
                     pagination={inputs?.pagination}
                 />

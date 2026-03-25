@@ -1,4 +1,4 @@
-import type { Epoch, Input, Pagination } from "@cartesi/viem";
+import type { Application, Epoch, Input, Pagination } from "@cartesi/viem";
 import {
     Anchor,
     Badge,
@@ -22,6 +22,7 @@ import PageTitle from "../components/layout/PageTitle";
 import { NextPagination } from "../components/navigation/NextPagination";
 
 type Props = {
+    application: Application;
     epoch: Epoch;
     inputs: Input[];
     pagination?: Pagination;
@@ -37,7 +38,12 @@ const NoInputs = () => (
     </Card>
 );
 
-export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
+export const EpochPage: FC<Props> = ({
+    epoch,
+    inputs,
+    pagination,
+    application,
+}) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
     const tournamentAddress = epoch.tournamentAddress;
@@ -62,34 +68,40 @@ export const EpochPage: FC<Props> = ({ epoch, inputs, pagination }) => {
                 )}
             </Group>
 
-            <Activity mode={isNotNil(tournamentUrl) ? "visible" : "hidden"}>
-                <Anchor
-                    component={Link}
-                    href={tournamentUrl!}
-                    variant="text"
-                    c={tournamentColor}
-                >
-                    <Group gap="xs">
-                        <Group gap="sm">
-                            <TbTrophy
-                                size={theme.other.mdIconSize}
-                                color={tournamentColor}
+            <Activity
+                mode={
+                    application.consensusType === "PRT" ? "visible" : "hidden"
+                }
+            >
+                <Activity mode={isNotNil(tournamentUrl) ? "visible" : "hidden"}>
+                    <Anchor
+                        component={Link}
+                        href={tournamentUrl!}
+                        variant="text"
+                        c={tournamentColor}
+                    >
+                        <Group gap="xs">
+                            <Group gap="sm">
+                                <TbTrophy
+                                    size={theme.other.mdIconSize}
+                                    color={tournamentColor}
+                                />
+                                <Text c={tournamentColor}>Tournament</Text>
+                            </Group>
+                            <CycleRangeFormatted
+                                size="md"
+                                range={[startCycle, endCycle]}
                             />
-                            <Text c={tournamentColor}>Tournament</Text>
                         </Group>
-                        <CycleRangeFormatted
-                            size="md"
-                            range={[startCycle, endCycle]}
-                        />
-                    </Group>
-                </Anchor>
-            </Activity>
+                    </Anchor>
+                </Activity>
 
-            <Activity mode={isNil(tournamentUrl) ? "visible" : "hidden"}>
-                <Group gap="sm">
-                    <TbTrophy size={theme.other.mdIconSize} />
-                    <Text>No Tournament Yet</Text>
-                </Group>
+                <Activity mode={isNil(tournamentUrl) ? "visible" : "hidden"}>
+                    <Group gap="sm">
+                        <TbTrophy size={theme.other.mdIconSize} />
+                        <Text>No Tournament Yet</Text>
+                    </Group>
+                </Activity>
             </Activity>
 
             <Group gap="xs">
