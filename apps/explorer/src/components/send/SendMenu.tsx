@@ -87,7 +87,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                         handlers.close();
                     }}
                 >
-                    <Text fw="500">Ethereum</Text>
+                    <Text fw="500">Ether</Text>
                 </Menu.Item>
                 <Menu.Item
                     leftSection={<TbCurrencyEthereum size={24} />}
