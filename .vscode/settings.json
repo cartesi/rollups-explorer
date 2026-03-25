@@ -6,7 +6,7 @@
         "source.fixAll": "explicit",
         "source.organizeImports": "explicit"
     },
-    "typescript.tsdk": "node_modules/typescript/lib",
+    "js/ts.tsdk.path": "node_modules/typescript/lib",
     "[terraform]": {
         "editor.defaultFormatter": "hashicorp.terraform"
     },
