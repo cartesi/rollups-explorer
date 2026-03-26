@@ -11,7 +11,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import Link from "next/link";
-import { isEmpty, isNil, isNotNil } from "ramda";
+import { isEmpty, isNotNil } from "ramda";
 import { Activity, type FC } from "react";
 import { TbClockFilled, TbInbox, TbTrophy } from "react-icons/tb";
 import { isAddress } from "viem";
@@ -73,7 +73,7 @@ export const EpochPage: FC<Props> = ({
                     application.consensusType === "PRT" ? "visible" : "hidden"
                 }
             >
-                <Activity mode={isNotNil(tournamentUrl) ? "visible" : "hidden"}>
+                {isNotNil(tournamentUrl) ? (
                     <Anchor
                         component={Link}
                         href={tournamentUrl!}
@@ -94,14 +94,12 @@ export const EpochPage: FC<Props> = ({
                             />
                         </Group>
                     </Anchor>
-                </Activity>
-
-                <Activity mode={isNil(tournamentUrl) ? "visible" : "hidden"}>
+                ) : (
                     <Group gap="sm">
                         <TbTrophy size={theme.other.mdIconSize} />
                         <Text>No Tournament Yet</Text>
                     </Group>
-                </Activity>
+                )}
             </Activity>
 
             <Group gap="xs">
