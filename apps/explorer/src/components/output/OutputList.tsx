@@ -26,14 +26,16 @@ export const OutputList: FC<OutputListProps> = ({
                 pagination={pagination}
                 onPaginationChange={onPaginationChange}
             />
-            {outputs.map((output) => (
-                <OutputView
-                    application={application}
-                    key={`${output.epochIndex}-${output.inputIndex}-${output.index}`}
-                    output={output}
-                    displayAs={decoderType}
-                />
-            ))}
+            <Stack id={`${application}-output-list-items`}>
+                {outputs.map((output) => (
+                    <OutputView
+                        application={application}
+                        key={`${output.epochIndex}-${output.inputIndex}-${output.index}`}
+                        output={output}
+                        displayAs={decoderType}
+                    />
+                ))}
+            </Stack>
         </Stack>
     );
 };

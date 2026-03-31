@@ -111,10 +111,10 @@ export const OutputView: FC<OutputViewProps> = ({
     output,
     application,
 }) => {
-    const outputType = output.decodedData.type;
+    const outputType = output.decodedData?.type;
     return (
         <>
-            {outputType === "Notice" ? (
+            {outputType === "Notice" && isNotNil(output.decodedData) ? (
                 <NoticeContent
                     decodedData={output.decodedData}
                     decoderType={displayAs}
