@@ -26,6 +26,8 @@ export const pathBuilder = {
     applications: () => `${pathBuilder.home()}apps` as const,
     application: (params: ApplicationParams) =>
         `${pathBuilder.applications()}/${params.application}` as const,
+    outputs: (params: ApplicationParams) =>
+        `${pathBuilder.application(params)}/outputs` as const,
     epochs: (params: ApplicationParams) =>
         `${pathBuilder.application(params)}/epochs` as const,
     epoch: (params: EpochParams) =>
