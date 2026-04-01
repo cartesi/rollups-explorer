@@ -101,6 +101,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
                         value={outputs.totalCount}
                         icon={TbMail}
                         displaySkeleton={outputs.isLoading}
+                        href={pathBuilder.outputs({ application })}
                     />
                 </Grid.Col>
                 <Grid.Col span={gridSpan} mb="sm">
