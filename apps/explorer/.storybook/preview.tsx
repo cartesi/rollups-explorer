@@ -40,6 +40,19 @@ const withProviders = (StoryFn: StoryFn, context: StoryContext) => {
     )
 }
 
+const withLinkClickInterception = (StoryFn: StoryFn, context: StoryContext) => (
+    // Mantine's Anchor with component={Link} still renders a plain <a> tag,
+    // which the browser follows natively even when the Next.js router is mocked.
+    // Capturing and preventing the default on all anchor clicks keeps Storybook
+    // from navigating to non-existing pages.
+    <div onClick={(e) => {
+        const anchor = (e.target as Element).closest('a');
+        if (anchor) e.preventDefault();
+    }}>
+        {StoryFn(context.args, context)}
+    </div>
+);
+
 const channel = addons.getChannel();
 
 const generateNewBackgroundEvt = (colorScheme: unknown) => ({globals: { backgrounds: {value: colorScheme, grid: false}}})
@@ -118,7 +131,7 @@ const preview: Preview = {
         // Order matters. So layout decorator first. Fn calling is providers(layout(Story))
         withLayout,        
         withProviders,
-        
+        withLinkClickInterception,
     ],
 };
 
