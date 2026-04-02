@@ -80,6 +80,9 @@ const OutputExecution: FC<OutputExecutionProps> = ({
     } = wasOutputExecutedQuery;
 
     const proof = buildProof(output);
+    // L2 response has priority as currently we don't check on L1 if output was executed
+    // in case it returns the execution-transaction hash, we consider the output as executed.
+    const isExecuted = hasExecutionTransaction || wasOutputExecuted === true;
 
     const hasHashes = isNotEmpty(proof.outputHashesSiblings);
     const canSimulate =
@@ -121,7 +124,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
     const isExecuteDisabled =
         !isClaimAccepted ||
         checkingOutputExecuted ||
-        wasOutputExecuted ||
+        isExecuted ||
         prepare.isFetching ||
         hasErrors;
 
@@ -224,7 +227,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
                     >
                         {isNotNil(output.executionTransactionHash) && (
                             <Group gap={3}>
-                                <Tooltip label="Transaction hash">
+                                <Tooltip label="Execution transaction hash">
                                     <TbReceipt size={theme.other.mdIconSize} />
                                 </Tooltip>
                                 <TransactionHash
@@ -257,7 +260,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
                                 }
                             }}
                         >
-                            {wasOutputExecuted
+                            {isExecuted
                                 ? "Executed"
                                 : checkingOutputExecuted
                                   ? "Checking voucher..."
