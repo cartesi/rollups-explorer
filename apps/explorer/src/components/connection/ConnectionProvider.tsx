@@ -1,10 +1,8 @@
 "use client";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
 import { isEmpty, isNotNil } from "ramda";
 import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
-import { pathBuilder } from "../../routes/routePathBuilder";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -64,7 +62,6 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
 }) => {
     const [state, dispatch] = useReducer(reducer, repository, initState);
 
-    const router = useRouter();
     const prev = useRef(state.selectedConnection);
     const selectedConfig = getSelectedConfig(state);
     const [result] = useCheckNodeConnection(selectedConfig);
@@ -114,15 +111,6 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
             );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [repository]);
-
-    useEffect(() => {
-        // when the selected-connection change we route the user back to home page.
-        if (prev.current !== state.selectedConnection) {
-            prev.current = state.selectedConnection;
-            router.push(pathBuilder.base, { scroll: false });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.selectedConnection]);
 
     useEffect(() => {
         if (null !== prev.current && result.status === "error") {
