@@ -17,6 +17,7 @@ import { ApplicationSummaryPage } from "../page/ApplicationSummaryPage";
 import { pathBuilder } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 import ContainerStack from "./ContainerStack";
+import DisplayContainerError from "./DisplayContainerError";
 
 interface ApplicationSummaryContainerProps {
     application: string;
@@ -30,10 +31,13 @@ const defaultParams = {
 export const ApplicationSummaryContainer: FC<
     ApplicationSummaryContainerProps
 > = (props) => {
-    const { data: application, isLoading: isLoadingApplication } =
-        useApplication({
-            application: props.application,
-        });
+    const {
+        data: application,
+        isLoading: isLoadingApplication,
+        error: applicationError,
+    } = useApplication({
+        application: props.application,
+    });
     const epochsResult = useEpochs({
         application: props.application,
         ...defaultParams,
@@ -99,8 +103,14 @@ export const ApplicationSummaryContainer: FC<
     return (
         <ContainerStack>
             <Hierarchy hierarchyConfig={hierarchyConfig} />
-            {isLoading && <ContainerSkeleton />}
-            {showPage && (
+            {isLoading ? (
+                <ContainerSkeleton />
+            ) : applicationError ? (
+                <DisplayContainerError
+                    title={`Something went wrong while fetching data for application ${props.application}`}
+                    subtitle={"Check your node connection and try again."}
+                />
+            ) : showPage ? (
                 <ApplicationSummaryPage
                     application={props.application}
                     applicationConsensusType={application.consensusType}
@@ -109,6 +119,10 @@ export const ApplicationSummaryContainer: FC<
                     outputs={outputs}
                     reports={reports}
                     tournaments={tournaments}
+                />
+            ) : (
+                <DisplayContainerError
+                    title={`An unexpected error occurred while fetching the application data.`}
                 />
             )}
         </ContainerStack>
