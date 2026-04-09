@@ -1,10 +1,8 @@
 "use client";
 import type { Pagination } from "@cartesi/viem";
 import { useApplication, useOutputs } from "@cartesi/wagmi";
-import { Anchor, Stack, Title } from "@mantine/core";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { isNil, isNotNil, pathOr } from "ramda";
+import { isNil, isNotNil } from "ramda";
 import { useEffect, useMemo, useRef, type FC } from "react";
 import {
     Hierarchy,
@@ -21,24 +19,10 @@ import { OutputsPage } from "../page/OutputsPage";
 import { pathBuilder } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 import ContainerStack from "./ContainerStack";
+import DisplayContainerError from "./DisplayContainerError";
 
 export type OutputsContainerProps = {
     application: string;
-};
-
-const HomeLink = () => (
-    <Anchor component={Link} href={pathBuilder.home()}>
-        Go back to Home
-    </Anchor>
-);
-
-const DisplayError: FC<{ message: string }> = ({ message }) => {
-    return (
-        <Stack align="center" justify="center" pt="xl">
-            <Title order={2}>{message}</Title>
-            <HomeLink />
-        </Stack>
-    );
 };
 
 export const OutputsContainer: FC<OutputsContainerProps> = (props) => {
@@ -124,23 +108,20 @@ export const OutputsContainer: FC<OutputsContainerProps> = (props) => {
                     sort={queryParams.sort}
                 />
             ) : isNotNil(applicationError) ? (
-                <DisplayError
-                    message={pathOr(
-                        `Application ${props.application} not found`,
-                        ["details"],
-                        applicationError,
-                    )}
+                <DisplayContainerError
+                    title={`Something went wrong while fetching data for application ${props.application}`}
+                    subtitle="Check your node connection and try again."
                 />
             ) : isNotNil(outputError) ? (
-                <DisplayError
-                    message={pathOr(
-                        `Outputs for application ${props.application} not found`,
-                        ["details"],
-                        outputError,
-                    )}
+                <DisplayContainerError
+                    title={`Something went wrong while fetching the outputs for application ${props.application}`}
+                    subtitle="Check your node connection and try again."
                 />
             ) : (
-                <DisplayError message="Unexpected error occurred" />
+                <DisplayContainerError
+                    title="An unexpected error occurred."
+                    subtitle="Check your node connection."
+                />
             )}
         </ContainerStack>
     );
