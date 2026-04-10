@@ -2,7 +2,7 @@
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { isEmpty, isNotNil } from "ramda";
-import { useEffect, useReducer, useRef, type FC, type ReactNode } from "react";
+import { useEffect, useReducer, type FC, type ReactNode } from "react";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -61,8 +61,6 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     repository = indexedDbRepository,
 }) => {
     const [state, dispatch] = useReducer(reducer, repository, initState);
-
-    const prev = useRef(state.selectedConnection);
     const selectedConfig = getSelectedConfig(state);
     const [result] = useCheckNodeConnection(selectedConfig);
 
@@ -113,8 +111,8 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
     }, [repository]);
 
     useEffect(() => {
-        if (null !== prev.current && result.status === "error") {
-            const notificationId = prev.current.toString();
+        if (isNotNil(selectedConfig?.id) && result.status === "error") {
+            const notificationId = selectedConfig.id.toString();
             notifications.show({
                 id: notificationId,
                 color: "red",
@@ -133,7 +131,7 @@ export const ConnectionProvider: FC<ConnectionProviderProps> = ({
                 ),
             });
         }
-    }, [result]);
+    }, [result, selectedConfig]);
 
     useEffect(() => {
         // the state starts with fetching. After startup if a connection is not selected;
