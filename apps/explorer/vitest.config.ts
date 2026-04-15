@@ -14,6 +14,7 @@ export default defineConfig({
                 "**/generated/**",
                 "**/app/**",
                 "**/providers/localdata/**",
+                "**.stories.*",
             ],
             include: ["**/src"],
         },
