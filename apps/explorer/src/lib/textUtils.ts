@@ -1,3 +1,7 @@
+import { isHash } from "viem";
 export const shortenHash = (hash: string) => {
-    return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
+    if (isHash(hash)) {
+        return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
+    }
+    return hash;
 };
