@@ -5,7 +5,7 @@ export default defineConfig({
         dir: "./test",
         exclude: ["node_modules/**"],
         globals: true,
-        environment: "happy-dom",
+        environment: "jsdom",
         setupFiles: ["./vitest.setup.ts"],
         coverage: {
             provider: "v8",
@@ -16,6 +16,7 @@ export default defineConfig({
                 "**/providers/localdata/**",
                 "**/stories/**",
                 "**.stories.*",
+                "**.DS_Store",
             ],
             include: ["**/src"],
         },
