@@ -7,7 +7,7 @@ export default defineConfig({
         exclude: ["e2e/**", "node_modules/**"],
         globals: true,
         environment: "happy-dom",
-        setupFiles: "vitest-setup.ts",
+        setupFiles: ["./vitest-setup.ts"],
         coverage: {
             reporter: ["text", "lcov"],
             exclude: ["**/graphql/**", "**/app/**"],
