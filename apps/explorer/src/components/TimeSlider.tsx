@@ -20,7 +20,6 @@ export const TimeSlider: FC<TimeSliderProps> = ({ timestamps, onChange }) => {
 
     useEffect(() => {
         if (timestamps.length > 0) {
-            console.log("running....");
             // find the minimum and maximum timestamps
             const min = Math.min(...timestamps);
             const max = Math.max(...timestamps);
