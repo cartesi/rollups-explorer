@@ -5,7 +5,7 @@ import { isNotNil } from "ramda";
 import { useEffect, useRef, useState } from "react";
 import type { Address } from "viem";
 
-type useTournamentHierarchyOpts = {
+export type useTournamentHierarchyOpts = {
     application: string | Address;
     epochIndex: bigint;
     tournament?: Tournament;
