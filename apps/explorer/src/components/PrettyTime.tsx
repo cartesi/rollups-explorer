@@ -1,7 +1,7 @@
 import { Button, Text, type TextProps } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import prettyMillis, { type Options } from "pretty-ms";
-import { Activity, type FC } from "react";
+import { type FC } from "react";
 
 interface PrettyTimeProps {
     milliseconds: number;
@@ -30,7 +30,7 @@ export const PrettyTime: FC<PrettyTimeProps> = ({
 
     return (
         <>
-            <Activity mode={displayTimestampUTC ? "visible" : "hidden"}>
+            {displayTimestampUTC ? (
                 <Button
                     variant="transparent"
                     px={0}
@@ -40,10 +40,9 @@ export const PrettyTime: FC<PrettyTimeProps> = ({
                 >
                     {text}
                 </Button>
-            </Activity>
-            <Activity mode={!displayTimestampUTC ? "visible" : "hidden"}>
+            ) : (
                 <Text size={size}>{text}</Text>
-            </Activity>
+            )}
         </>
     );
 };

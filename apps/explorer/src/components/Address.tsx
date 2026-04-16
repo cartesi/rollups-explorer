@@ -16,7 +16,7 @@ import { type Address as AddressType, getAddress } from "viem";
 import CopyButton from "./CopyButton";
 
 import RollupContractResolver from "../lib/rollupContractResolver";
-import { shortenHash } from "../lib/textUtils";
+import { shortenAddress } from "../lib/textUtils";
 
 export interface AddressProps extends GroupProps {
     value: AddressType;
@@ -40,7 +40,7 @@ const Address: FC<AddressProps> = ({
 }) => {
     value = getAddress(value);
     const name = RollupContractResolver.resolveName(value);
-    const text = shorten ? shortenHash(value) : value;
+    const text = shorten ? shortenAddress(value) : value;
     const textStyle: MantineStyleProp = { wordBreak: "break-all" };
 
     const label = name ? (
