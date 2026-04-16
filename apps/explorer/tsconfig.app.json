@@ -22,6 +22,7 @@
         "noUncheckedSideEffectImports": true
     },
     "include": [
+        "vitest.setup.ts",
         "additional.d.ts",
         "mantine.d.ts",
         "next-env.d.ts",

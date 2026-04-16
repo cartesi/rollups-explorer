@@ -27,7 +27,7 @@ const LabelWithTooltip: FC<Props> = ({ label, tooltipLabel, tooltipProps }) => {
                 {...toolProps}
             >
                 <Flex direction="column-reverse">
-                    <TbHelp />
+                    <TbHelp aria-label={`Help icon for ${label}`} />
                 </Flex>
             </Tooltip>
         </Group>

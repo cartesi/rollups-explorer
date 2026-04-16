@@ -1,6 +1,14 @@
-import { AppShell, createTheme, Spoiler, virtualColor } from "@mantine/core";
+import {
+    AppShell,
+    createTheme,
+    DEFAULT_THEME,
+    mergeMantineTheme,
+    Spoiler,
+    virtualColor,
+    type MantineTheme,
+} from "@mantine/core";
 
-const theme = createTheme({
+const customTheme = createTheme({
     colors: {
         open: virtualColor({ name: "open", light: "green", dark: "green" }),
         disputed: virtualColor({
@@ -69,6 +77,8 @@ const theme = createTheme({
             },
         }),
     },
-});
+}) as MantineTheme;
+
+const theme = mergeMantineTheme(DEFAULT_THEME, customTheme);
 
 export default theme;

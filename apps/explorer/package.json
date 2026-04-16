@@ -14,7 +14,10 @@
         "gen:wagmi": "wagmi generate",
         "build-storybook": "storybook build",
         "format:check": "prettier \"**/*.{ts,tsx}\" --check",
-        "format": "prettier --write \"**/*.{ts,tsx,md}\""
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:ci": "vitest run --coverage"
     },
     "dependencies": {
         "@cartesi/viem": "2.0.0-alpha.29",
@@ -56,12 +59,16 @@
         "@storybook/addon-docs": "^10.1.5",
         "@storybook/addon-onboarding": "^10.1.5",
         "@storybook/nextjs": "^10.1.5",
+        "@testing-library/dom": "10.4.1",
+        "@testing-library/jest-dom": "6.9.1",
+        "@testing-library/react": "16.3.2",
         "@types/humanize-duration": "^3.27.4",
         "@types/node": "^24.10.2",
         "@types/ramda": "^0.31.1",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
         "@types/semver": "^7.7.1",
+        "@vitest/coverage-v8": "4.1.4",
         "@wagmi/cli": "^2.1.2",
         "eslint": "catalog:",
         "eslint-config-cartesi": "workspace:*",
@@ -74,6 +81,7 @@
         "postcss-simple-vars": "^7.0.1",
         "prettier": "catalog:",
         "storybook": "^10.1.5",
-        "typescript": "catalog:"
+        "typescript": "catalog:",
+        "vitest": "4.1.4"
     }
 }
