@@ -5,7 +5,7 @@ import { isNotNil } from "ramda";
 import { useEffect, useRef, useState } from "react";
 import type { Address } from "viem";
 
-export type useTournamentHierarchyOpts = {
+export type UseTournamentHierarchyOpts = {
     application: string | Address;
     epochIndex: bigint;
     tournament?: Tournament;
@@ -38,7 +38,7 @@ const getSearchStatus = (params: {
  * @param options options for the tournament hierarchy query.
  * @returns
  */
-export const useTournamentHierarchy = (options: useTournamentHierarchyOpts) => {
+export const useTournamentHierarchy = (options: UseTournamentHierarchyOpts) => {
     const [nextParents, setNextParents] = useState<NextParents>({});
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [matches, setMatches] = useState<Match[]>([]);
