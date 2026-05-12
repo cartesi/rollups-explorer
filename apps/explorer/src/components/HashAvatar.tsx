@@ -16,5 +16,5 @@ const buildDataUrl = (hash: Hash): string =>
 
 export const HashAvatar: FC<HashAvatarProps> = ({ hash, ...props }) => {
     const src = useMemo(() => buildDataUrl(hash), [hash]);
-    return <Avatar id={`hash-avatar-${hash}`} src={src} {...props} />;
+    return <Avatar data-hash={`avatar-hash-${hash}`} src={src} {...props} />;
 };
