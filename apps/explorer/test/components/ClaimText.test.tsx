@@ -21,8 +21,9 @@ describe("ClaimText", () => {
         const { container } = render(<ClaimText claim={claim} showParents />);
         const expected = claim.parentClaims?.[0] ?? "0x";
 
+        expect(screen.queryAllByRole("img")).toHaveLength(2);
         expect(
-            container.querySelector(`#hash-avatar-${expected}`),
+            container.querySelector(`[data-hash="avatar-hash-${expected}"]`),
         ).toBeVisible();
     });
 
