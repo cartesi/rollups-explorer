@@ -13,7 +13,7 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "postcss.config.js",
-        "./vitest-setup.ts"
+        "./vitest.setup.ts"
     ],
     "exclude": ["node_modules"]
 }
