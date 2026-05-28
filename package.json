@@ -27,7 +27,7 @@
         "eslint-config-cartesi": "workspace:*",
         "lcov-result-merger": "5.0.1",
         "prettier": "catalog:",
-        "turbo": "^2.8.11",
+        "turbo": "^2.9.14",
         "typescript": "catalog:"
     },
     "engines": {
