@@ -79,6 +79,6 @@
         "postcss-simple-vars": "^7",
         "ts-node": "^10",
         "typescript": "catalog:",
-        "vitest": "^3.2.4"
+        "vitest": "^3.2.6"
     }
 }
