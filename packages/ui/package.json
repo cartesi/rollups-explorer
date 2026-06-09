@@ -61,7 +61,7 @@
         "react": "catalog:",
         "tsup": "^8.5.0",
         "typescript": "catalog:",
-        "vitest": "^3.2.4"
+        "vitest": "^3.2.6"
     },
     "publishConfig": {
         "access": "public"
