@@ -6,11 +6,13 @@ export const getEpochStatusColor = (state: EpochStatus) => {
         case "OPEN":
         case "INPUTS_PROCESSED":
             return "open";
+        case "CLAIM_STAGED":
         case "CLAIM_COMPUTED":
         case "CLAIM_REJECTED":
         case "CLAIM_SUBMITTED":
         case "CLOSED":
             return "closed";
+        case "CLAIM_FORECLOSED":
         case "CLAIM_ACCEPTED":
             return "finalized";
         default:
