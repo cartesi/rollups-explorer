@@ -104,6 +104,18 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
                     </Group>
                 </Group>
             </Stack>
+            {isNotNil(reason) && (
+                <Card.Section p={0} mt="sm">
+                    <Alert
+                        autoContrast
+                        color="info"
+                        icon={<TbInfoCircle size={theme.other.mdIconSize} />}
+                        title={status}
+                    >
+                        <Spoiler maxHeight={25}>{reason}</Spoiler>
+                    </Alert>
+                </Card.Section>
+            )}
         </Card>
     );
 };
