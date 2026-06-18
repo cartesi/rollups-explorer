@@ -84,11 +84,20 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
                     </Activity>
                 </Group>
                 <Group justify="space-between">
-                    <Badge variant="default">{inputsLabel}</Badge>
+                    <Group gap={5}>
+                        <Badge color={`${enabled ? "green" : "red"}`}>
+                            {enabled ? "enabled" : "disabled"}
+                        </Badge>
+
+                        {isAppForeclosed && (
+                            <Badge color="foreclosed">foreclosed</Badge>
+                        )}
+                        <Badge>{inputsLabel}</Badge>
+                    </Group>
                     <Group gap="xs">
-                        {state !== "ENABLED" && (
+                        {status !== "OK" && (
                             <Group gap="xs">
-                                <Badge color={stateColour}>{state}</Badge>
+                                <Badge color={stateColour}>{status}</Badge>
                             </Group>
                         )}
                         <Badge>{consensusType}</Badge>
