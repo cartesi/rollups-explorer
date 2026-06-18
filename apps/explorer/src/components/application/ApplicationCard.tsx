@@ -1,35 +1,55 @@
-import type { Application, ApplicationState } from "@cartesi/viem";
-import { Badge, Card, Group, Stack, Text } from "@mantine/core";
+import type { Application, ApplicationStatus } from "@cartesi/viem";
+import {
+    Alert,
+    Badge,
+    Card,
+    Group,
+    Spoiler,
+    Stack,
+    Text,
+    useMantineTheme,
+} from "@mantine/core";
 import Link from "next/link";
+import { isNotNil } from "ramda";
 import { Activity, type FC } from "react";
+import { TbInfoCircle } from "react-icons/tb";
 import useRightColorShade from "../../hooks/useRightColorShade";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import SendMenu from "../send/SendMenu";
+import { isForeclosed } from "./utils";
 
 type ApplicationCardProps = { application: Application };
 
-const getStateColour = (state: ApplicationState) => {
+const getStateColour = (state: ApplicationStatus) => {
     switch (state) {
-        case "ENABLED":
+        case "OK":
             return "green";
         case "FAILED":
             return "red";
-        case "DISABLED":
+        case "DIVERGED":
+        case "CORRUPTED":
             return "gray";
-        case "INOPERABLE":
-            return "dark";
         default:
             return "orange";
     }
 };
 
 export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
-    const { applicationAddress, consensusType, name, processedInputs, state } =
-        application;
-    const stateColour = useRightColorShade(getStateColour(state));
+    const {
+        applicationAddress,
+        consensusType,
+        name,
+        processedInputs,
+        status,
+        reason,
+        enabled,
+    } = application;
+    const stateColour = useRightColorShade(getStateColour(status));
+    const theme = useMantineTheme();
     const selectedConnection = useSelectedNodeConnection();
     const url = pathBuilder.application({ application: application.name });
+    const isAppForeclosed = isForeclosed(application);
     const inputsLabel =
         processedInputs === 0n
             ? "no inputs"
@@ -45,7 +65,11 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
                         <Group justify="space-between">
                             <Text size="xl">{name}</Text>
                         </Group>
-                        <Text c="dimmed" size="xs">
+                        <Text
+                            c="dimmed"
+                            size="xs"
+                            style={{ wordBreak: "break-all" }}
+                        >
                             {applicationAddress}
                         </Text>
                     </Stack>
