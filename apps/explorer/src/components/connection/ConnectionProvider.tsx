@@ -3,6 +3,7 @@ import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { isEmpty, isNotNil } from "ramda";
 import { useEffect, useReducer, type FC, type ReactNode } from "react";
+import { checkNodeVersion } from "../../lib/supportedRollupsNode";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -27,7 +28,12 @@ const getPreferredNodeConnection = (
     userConnections: DbNodeConnectionConfig[],
     systemConnection: DbNodeConnectionConfig | null,
 ) => {
-    const conn = userConnections.find((config) => config.isPreferred);
+    const conn = userConnections
+        .filter((nodeConnection) => {
+            const result = checkNodeVersion(nodeConnection.version);
+            return result.status === "supported";
+        })
+        .find((config) => config.isPreferred);
     return conn ?? systemConnection;
 };
 
