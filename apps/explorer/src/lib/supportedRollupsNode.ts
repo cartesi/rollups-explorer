@@ -10,7 +10,7 @@ import {
 /**
  * Use semantic versioning to declare supported versions.
  */
-const supportedVersionRange = new Range("^2.0.0-alpha.9");
+const supportedVersionRange = new Range("^2.0.0-alpha.12");
 const fullSupportedRange = validRange(supportedVersionRange.raw)!;
 const minimalVersion = minVersion(supportedVersionRange);
 
