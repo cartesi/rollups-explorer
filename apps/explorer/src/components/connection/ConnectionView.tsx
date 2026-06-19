@@ -17,6 +17,7 @@ import { isNilOrEmpty } from "ramda-adjunct";
 import { Activity, type FC } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { isDevnet } from "../../lib/supportedChains";
+import { checkNodeVersion } from "../../lib/supportedRollupsNode";
 import CopyButton from "../CopyButton";
 import { useGetNodeInformation, useNodeConnection } from "./hooks";
 import type { ConnectionNetworkStatus, DbNodeConnectionConfig } from "./types";
@@ -50,18 +51,30 @@ type ConnectionStatusProps = {
     status: ConnectionNetworkStatus;
     errorMessage?: string;
 };
+
+const getConnectionStatusConfig = (status: ConnectionNetworkStatus) => {
+    switch (status) {
+        case "pending":
+            return { color: "orange", text: "checking..." };
+        case "error":
+            return { color: "red", text: "not healthy" };
+        case "noop":
+            return { color: "gray", text: "no connection" };
+        case "idle":
+            return { color: "gray", text: "..." };
+        case "success":
+            return { color: "green", text: "healthy" };
+        default:
+            // This should never happen, but just in case, we return a default value
+            return { color: "black", text: "unknown" };
+    }
+};
+
 const ConnectionStatus: FC<ConnectionStatusProps> = ({
     status,
     errorMessage,
 }) => {
-    const config =
-        status === "pending"
-            ? { color: "orange", text: "checking..." }
-            : status === "error"
-              ? { color: "red", text: "not healthy" }
-              : status === "idle"
-                ? { color: "gray", text: "..." }
-                : { color: "green", text: "healthy" };
+    const config = getConnectionStatusConfig(status);
 
     return (
         <Tooltip
@@ -88,11 +101,14 @@ const ConnectionView: FC<ConnectionViewProps> = ({
         updateIsPreferred,
         countConnectionSameChainDiffRpc,
     } = useNodeConnection();
+    const isConnOnSupportedVersion =
+        checkNodeVersion(connection.version).status === "supported";
     const theme = useMantineTheme();
     const selectedConnection = getSelectedConnection();
     const isMock = connection.type === "system_mock";
+    const connUrl = isConnOnSupportedVersion ? connection.url : null;
     const [result, refetchNodeInfo] = useGetNodeInformation(
-        isMock ? null : connection.url,
+        isMock ? null : connUrl,
     );
 
     const isSelected = selectedConnection?.id === connection.id;
@@ -138,7 +154,11 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                     <CopyButton value={connection.url ?? ""} />
                 </Group>
 
-                <Group justify="flex-start" gap={3}>
+                <Group
+                    justify="flex-start"
+                    gap={3}
+                    c={!isConnOnSupportedVersion ? "red" : undefined}
+                >
                     <Text tt="uppercase">node version:</Text>
                     <Text>{connection.version}</Text>
                 </Group>
@@ -219,6 +239,7 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                                 )}
 
                                 <Button
+                                    disabled={!isConnOnSupportedVersion}
                                     onClick={() => {
                                         onConnect?.();
                                         const isDevnetConnection = isDevnet(
@@ -259,7 +280,13 @@ const ConnectionView: FC<ConnectionViewProps> = ({
                                         setSelectedConnection(connection.id);
                                     }}
                                 >
-                                    <Text tt="uppercase">connect</Text>
+                                    {!isConnOnSupportedVersion ? (
+                                        <Text tt="uppercase">
+                                            unsupported version
+                                        </Text>
+                                    ) : (
+                                        <Text tt="uppercase">connect</Text>
+                                    )}
                                 </Button>
                             </Group>
                         </Activity>
