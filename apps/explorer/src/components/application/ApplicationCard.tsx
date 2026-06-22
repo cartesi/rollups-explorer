@@ -21,8 +21,8 @@ import { isForeclosed } from "./utils";
 
 type ApplicationCardProps = { application: Application };
 
-const getStateColour = (state: ApplicationStatus) => {
-    switch (state) {
+const getStatusColour = (status: ApplicationStatus) => {
+    switch (status) {
         case "OK":
             return "green";
         case "FAILED":
@@ -45,7 +45,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
         reason,
         enabled,
     } = application;
-    const stateColour = useRightColorShade(getStateColour(status));
+    const statusColour = useRightColorShade(getStatusColour(status));
     const theme = useMantineTheme();
     const selectedConnection = useSelectedNodeConnection();
     const url = pathBuilder.application({ application: application.name });
@@ -97,7 +97,7 @@ export const ApplicationCard: FC<ApplicationCardProps> = ({ application }) => {
                     <Group gap="xs">
                         {status !== "OK" && (
                             <Group gap="xs">
-                                <Badge color={stateColour}>{status}</Badge>
+                                <Badge color={statusColour}>{status}</Badge>
                             </Group>
                         )}
                         <Badge>{consensusType}</Badge>
