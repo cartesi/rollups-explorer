@@ -1,11 +1,19 @@
 import { useMantineColorScheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
+import { Provider as JotaiProvider } from "jotai";
+import { pathOr } from "ramda";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { UPDATE_GLOBALS } from "storybook/internal/core-events";
 import { addons, useGlobals } from 'storybook/preview-api';
+import { ConnectionProvider } from "../src/components/connection/ConnectionProvider";
+import { DbNodeConnectionConfig } from "../src/components/connection/types";
 import Layout from "../src/components/layout/Layout";
-import { Providers } from '../src/providers/Providers';
+import { SendProvider } from "../src/components/send/SendProvider";
+import { supportedChains } from "../src/lib/supportedChains";
+import { AppConfigProvider } from "../src/providers/AppConfigProvider";
+import DataProvider from "../src/providers/DataProvider";
+import { StyleProvider } from "../src/providers/StyleProvider";
 import './global.css';
 
 try {
@@ -30,13 +38,45 @@ const withLayout = (StoryFn: StoryFn, context: StoryContext) => {
     return <>{StoryFn(context.args, context)}</>;
 };
 
+
+const nodeConfig: DbNodeConnectionConfig = {
+    id: Number.MAX_SAFE_INTEGER,
+    chain: {
+        id: 31337,
+        rpcUrl: pathOr(
+            "http://localhost:8545",
+            ["31337", "rpcUrls", "default", "http", "0"],
+            supportedChains,
+        ),
+    },
+    isDeletable: false,
+    isPreferred: true,
+    timestamp: Date.now(),
+    version: "2.0.0-alpha.12",
+    name: "storybook-mocked-setup",
+    type: "system_mock",
+    url: "local://in-memory",
+}
+
 const withProviders = (StoryFn: StoryFn, context: StoryContext) => {    
     return (
-        <Providers>
-            <ColorSchemeWrapper context={context}>
-            {StoryFn(context.args, context)}
-            </ColorSchemeWrapper>            
-        </Providers>
+        <StyleProvider>            
+                <AppConfigProvider value={{cartesiNodeRpcUrl: '', nodeRpcUrl: '', isMockEnabled: true, isDebugEnabled: false}}>
+                    <JotaiProvider>
+                        <ConnectionProvider
+                            systemConnection={nodeConfig}
+                        >
+                            <DataProvider>
+                                <SendProvider>
+                                    <ColorSchemeWrapper context={context}>
+                                    {StoryFn(context.args, context)}
+                                    </ColorSchemeWrapper>
+                                </SendProvider>
+                            </DataProvider>
+                        </ConnectionProvider>
+                    </JotaiProvider>
+                </AppConfigProvider>
+        </StyleProvider>
     )
 }
 
