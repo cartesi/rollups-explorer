@@ -4,6 +4,7 @@ import {
     DEFAULT_THEME,
     mergeMantineTheme,
     Spoiler,
+    Tooltip,
     virtualColor,
     type MantineTheme,
 } from "@mantine/core";
@@ -80,6 +81,16 @@ const customTheme = createTheme({
                 hideLabel: "Show less",
                 showLabel: "Show more",
                 maxHeight: 80,
+            },
+        }),
+        Tooltip: Tooltip.extend({
+            defaultProps: {
+                transitionProps: { transition: "pop" },
+                withArrow: true,
+                maw: "95%",
+                zIndex: 100,
+                multiline: true,
+                style: { textAlign: "start" },
             },
         }),
     },

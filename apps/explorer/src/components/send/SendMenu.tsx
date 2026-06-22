@@ -1,12 +1,13 @@
 "use client";
 import type { Application } from "@cartesi/viem";
-import { Button, Group, Menu, Text } from "@mantine/core";
+import { Button, Group, Menu, Text, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { filter, isNil } from "ramda";
+import { cond, filter, isNil } from "ramda";
 import type { FC } from "react";
 import { TbCoins, TbCurrencyEthereum, TbInbox, TbSend } from "react-icons/tb";
 import { useAccount } from "wagmi";
+import { isForeclosed } from "../application/utils";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import type { DbSpecification } from "../specification/types";
@@ -16,45 +17,72 @@ type SendMenuProps = { application: Application };
 
 const jsonAbiOnly = (spec: DbSpecification) => spec.mode === "json_abi";
 
+const getMenuState = cond([
+    [
+        isForeclosed,
+        () => ({
+            tooltip:
+                "The application is foreclosed. You can no longer send transactions.",
+            disabled: true,
+        }),
+    ],
+    [() => true, () => ({ tooltip: "", disabled: false })],
+]);
+
 const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const selectedConnection = useSelectedNodeConnection();
     const { listSpecifications } = useSpecification();
     const [opened, handlers] = useDisclosure(false);
+    const [openedTooltip, tooltipHandlers] = useDisclosure(false);
     const actions = useSendAction();
     const account = useAccount();
     const connectModal = useConnectModal();
     const chainModal = useChainModal();
     const needSwitchNetwork = account.isConnected && isNil(account.chain);
     const canSend = !needSwitchNetwork && account.isConnected;
+    const menuState = getMenuState(application);
 
     if (selectedConnection?.type === "system_mock") return null;
 
     return (
         <Menu
+            disabled={menuState.disabled}
             opened={opened}
             onClose={handlers.close}
             onDismiss={handlers.close}
         >
             <Menu.Target>
-                <Button
-                    variant="light"
-                    onClick={(evt) => {
-                        evt.stopPropagation();
-                        evt.preventDefault();
-
-                        if (needSwitchNetwork)
-                            return chainModal.openChainModal?.();
-
-                        if (canSend) {
-                            handlers.toggle();
-                        } else {
-                            connectModal.openConnectModal?.();
-                        }
-                    }}
-                    rightSection={<TbSend size={18} />}
+                <Tooltip
+                    label={menuState.tooltip}
+                    disabled={!menuState.disabled}
+                    opened={openedTooltip}
                 >
-                    Send
-                </Button>
+                    <Button
+                        aria-disabled={menuState.disabled}
+                        variant="light"
+                        onClick={(evt) => {
+                            evt.stopPropagation();
+                            evt.preventDefault();
+
+                            if (isForeclosed(application)) {
+                                tooltipHandlers.toggle();
+                                return;
+                            }
+
+                            if (needSwitchNetwork)
+                                return chainModal.openChainModal?.();
+
+                            if (canSend) {
+                                handlers.toggle();
+                            } else {
+                                connectModal.openConnectModal?.();
+                            }
+                        }}
+                        rightSection={<TbSend size={18} />}
+                    >
+                        Send
+                    </Button>
+                </Tooltip>
             </Menu.Target>
 
             <Menu.Dropdown>
