@@ -6,9 +6,11 @@ export type TRANSACTION_TYPE =
     | "ERC-721"
     | "ETHER"
     | "RAW"
-    | "ADDRESS-RELAY";
+    | "ADDRESS-RELAY"
+    | "FORECLOSE";
 
 export type TransactionFormSuccessData = {
     receipt: UseWaitForTransactionReceiptReturnType["data"];
     type: TRANSACTION_TYPE;
+    message?: string;
 };

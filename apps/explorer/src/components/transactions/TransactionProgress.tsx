@@ -1,5 +1,6 @@
 "use client";
 import {
+    ActionIcon,
     Center,
     Code,
     Collapse,
@@ -11,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { hasPath, path } from "ramda";
-import { type FC } from "react";
+import { Activity, type FC } from "react";
 import {
     TbCheck,
     TbChevronDown,
@@ -104,18 +105,20 @@ export const TransactionProgress: FC<TransactionProgressProps> = ({
                         <Text size="xs" c={errorColor}>
                             {shortErrorMessage || defaultErrorMessage}
                         </Text>
-                        {errorMessage &&
-                            (showError ? (
-                                <TbChevronUp
-                                    color={errorColor}
-                                    onClick={toggleError}
-                                />
-                            ) : (
-                                <TbChevronDown
-                                    color={errorColor}
-                                    onClick={toggleError}
-                                />
-                            ))}
+
+                        <Activity mode={errorMessage ? "visible" : "hidden"}>
+                            <ActionIcon
+                                onClick={toggleError}
+                                variant="transparent"
+                                data-testid="transaction-progress-error-toggle"
+                            >
+                                {showError ? (
+                                    <TbChevronUp color={errorColor} />
+                                ) : (
+                                    <TbChevronDown color={errorColor} />
+                                )}
+                            </ActionIcon>
+                        </Activity>
                     </Group>
                 )}
             </Center>
