@@ -28,6 +28,11 @@ export const useSendAction = () => {
                 type: "deposit_erc1155Batch",
                 payload: { application },
             }),
+        foreclose: (application: Application) =>
+            dispatch({
+                type: "foreclose",
+                payload: { application },
+            }),
         sendGenericInput: (
             application: Application,
             specifications: DbSpecification[],

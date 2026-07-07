@@ -1,13 +1,28 @@
 "use client";
 import type { Application } from "@cartesi/viem";
-import { Button, Group, Menu, Text, Tooltip } from "@mantine/core";
+import {
+    Button,
+    Group,
+    Menu,
+    Text,
+    Tooltip,
+    useMantineTheme,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { cond, filter, isNil } from "ramda";
-import type { FC } from "react";
-import { TbCoins, TbCurrencyEthereum, TbInbox, TbSend } from "react-icons/tb";
+import { cond, filter, isNil, isNotNil } from "ramda";
+import { useState, type FC, type ReactNode } from "react";
+import {
+    TbCoins,
+    TbCurrencyEthereum,
+    TbInbox,
+    TbLockFilled,
+    TbSend,
+} from "react-icons/tb";
 import { useAccount } from "wagmi";
-import { isForeclosed } from "../application/utils";
+import { content } from "../../content";
+import { isForeclosed, isGuardian } from "../application/utils";
+import { ConfirmationModal } from "../ConfirmationModal";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { useSpecification } from "../specification/hooks/useSpecification";
 import type { DbSpecification } from "../specification/types";
@@ -21,8 +36,7 @@ const getMenuState = cond([
     [
         isForeclosed,
         () => ({
-            tooltip:
-                "The application is foreclosed. You can no longer send transactions.",
+            tooltip: content.foreclose.sendTooltip,
             disabled: true,
         }),
     ],
@@ -33,7 +47,13 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const selectedConnection = useSelectedNodeConnection();
     const { listSpecifications } = useSpecification();
     const [opened, handlers] = useDisclosure(false);
+    const theme = useMantineTheme();
     const [openedTooltip, tooltipHandlers] = useDisclosure(false);
+    const [confirmationState, setConfirmationState] = useState<null | {
+        action: () => void;
+        title?: string;
+        text: ReactNode;
+    }>(null);
     const actions = useSendAction();
     const account = useAccount();
     const connectModal = useConnectModal();
@@ -41,6 +61,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
     const needSwitchNetwork = account.isConnected && isNil(account.chain);
     const canSend = !needSwitchNetwork && account.isConnected;
     const menuState = getMenuState(application);
+    const isAppGuardian = isGuardian(application, account.address);
 
     if (selectedConnection?.type === "system_mock") return null;
 
@@ -51,6 +72,19 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
             onClose={handlers.close}
             onDismiss={handlers.close}
         >
+            <ConfirmationModal
+                isOpened={isNotNil(confirmationState)}
+                title={confirmationState?.title}
+                text={confirmationState?.text ?? ""}
+                onClose={() => {
+                    setConfirmationState(null);
+                }}
+                onConfirm={() => {
+                    confirmationState?.action();
+                    setConfirmationState(null);
+                }}
+            />
+
             <Menu.Target>
                 <Tooltip
                     label={menuState.tooltip}
@@ -87,7 +121,7 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
 
             <Menu.Dropdown>
                 <Menu.Item
-                    leftSection={<TbInbox size={24} />}
+                    leftSection={<TbInbox size={theme.other.mdIconSize} />}
                     onClick={(evt) => {
                         evt.stopPropagation();
                         const specifications = filter(
@@ -103,12 +137,14 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                 <Menu.Divider />
                 <Menu.Label>
                     <Group gap={3}>
-                        <TbCoins size={21} />
+                        <TbCoins size={theme.other.smIconSize} />
                         <Text>Deposits</Text>
                     </Group>
                 </Menu.Label>
                 <Menu.Item
-                    leftSection={<TbCurrencyEthereum size={24} />}
+                    leftSection={
+                        <TbCurrencyEthereum size={theme.other.mdIconSize} />
+                    }
                     onClick={(evt) => {
                         evt.stopPropagation();
                         actions.depositEth(application);
@@ -118,7 +154,9 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">Ether</Text>
                 </Menu.Item>
                 <Menu.Item
-                    leftSection={<TbCurrencyEthereum size={24} />}
+                    leftSection={
+                        <TbCurrencyEthereum size={theme.other.mdIconSize} />
+                    }
                     onClick={(evt) => {
                         evt.stopPropagation();
                         actions.depositErc20(application);
@@ -128,7 +166,9 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-20</Text>
                 </Menu.Item>
                 <Menu.Item
-                    leftSection={<TbCurrencyEthereum size={24} />}
+                    leftSection={
+                        <TbCurrencyEthereum size={theme.other.mdIconSize} />
+                    }
                     onClick={(evt) => {
                         evt.stopPropagation();
                         actions.depositErc721(application);
@@ -138,7 +178,9 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-721</Text>
                 </Menu.Item>
                 <Menu.Item
-                    leftSection={<TbCurrencyEthereum size={24} />}
+                    leftSection={
+                        <TbCurrencyEthereum size={theme.other.mdIconSize} />
+                    }
                     onClick={(evt) => {
                         evt.stopPropagation();
                         actions.depositErc1155Single(application);
@@ -148,7 +190,9 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                     <Text fw="500">ERC-1155 (Single)</Text>
                 </Menu.Item>
                 <Menu.Item
-                    leftSection={<TbCurrencyEthereum size={24} />}
+                    leftSection={
+                        <TbCurrencyEthereum size={theme.other.mdIconSize} />
+                    }
                     onClick={(evt) => {
                         evt.stopPropagation();
                         actions.depositErc1155Batch(application);
@@ -157,6 +201,34 @@ const SendMenu: FC<SendMenuProps> = ({ application }) => {
                 >
                     <Text fw="500">ERC-1155 (Batch)</Text>
                 </Menu.Item>
+
+                {isAppGuardian ? (
+                    <>
+                        <Menu.Divider />
+                        <Menu.Item
+                            leftSection={
+                                <TbLockFilled size={theme.other.mdIconSize} />
+                            }
+                            color="red"
+                            onClick={(evt) => {
+                                evt.stopPropagation();
+                                setConfirmationState({
+                                    title: content.foreclose.confirmation.title,
+                                    text: content.foreclose.confirmation
+                                        .description,
+                                    action: () => {
+                                        actions.foreclose(application);
+                                    },
+                                });
+                                handlers.close();
+                            }}
+                        >
+                            <Text fw="500">
+                                {content.foreclose.forecloseTxt}
+                            </Text>
+                        </Menu.Item>
+                    </>
+                ) : null}
             </Menu.Dropdown>
         </Menu>
     );

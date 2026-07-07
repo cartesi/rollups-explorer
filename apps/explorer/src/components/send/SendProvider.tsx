@@ -26,6 +26,13 @@ const sendReducer: SendReducer = (state, action) => {
                 specifications: action.payload.specifications,
                 timestamp: Date.now(),
             };
+        case "foreclose":
+            return {
+                transactionType: action.type,
+                application: action.payload.application,
+                specifications: [],
+                timestamp: Date.now(),
+            };
         case "close_modal":
             return null;
         default:

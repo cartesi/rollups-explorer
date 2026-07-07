@@ -11,6 +11,7 @@ import { ERC1155DepositForm } from "../transactions/ERC1155DepositForm";
 import { ERC20DepositForm } from "../transactions/ERC20DepositForm";
 import { ERC721DepositForm } from "../transactions/ERC721DepositForm";
 import { EtherDepositForm } from "../transactions/EtherDepositForm";
+import { ForecloseForm } from "../transactions/ForecloseForm";
 import {
     GenericInputForm,
     type GenericInputFormSpecification,
@@ -25,6 +26,7 @@ const wordingPrefix: Record<TransactionType, string> = {
     deposit_erc1155Single: "Send ERC-1155 to",
     deposit_erc20: "Send ERC-20 to",
     deposit_erc721: "Send ERC-721 to",
+    foreclose: "Foreclose application",
 };
 
 type SendModalTitleProps = {
@@ -57,7 +59,11 @@ const SendModal: FC = () => {
     const config = useConfig();
 
     const onSuccess = useCallback(
-        ({ receipt, type }: TransactionFormSuccessData) => {
+        ({
+            receipt,
+            type,
+            message: successMessage,
+        }: TransactionFormSuccessData) => {
             const message = receipt?.transactionHash
                 ? {
                       message: (
@@ -67,9 +73,12 @@ const SendModal: FC = () => {
                               chain={config.chains[0]}
                           />
                       ),
-                      title: `${type} transaction completed`,
+                      title: successMessage ?? `${type} transaction completed`,
                   }
-                : { message: `${type} transaction completed.` };
+                : {
+                      message:
+                          successMessage ?? `${type} transaction completed.`,
+                  };
 
             notifications.show({
                 withCloseButton: true,
@@ -128,6 +137,15 @@ const SendModal: FC = () => {
                         state.specifications as GenericInputFormSpecification[]
                     }
                     onSuccess={onSuccess}
+                />
+            ) : state.transactionType === "foreclose" ? (
+                <ForecloseForm
+                    application={state.application}
+                    onSuccess={(data) => {
+                        onSuccess(data);
+                        // Close the modal after foreclose is successful
+                        actions.closeModal();
+                    }}
                 />
             ) : null}
         </Modal>
