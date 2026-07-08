@@ -24,6 +24,7 @@ import { TbExclamationCircle, TbInfoCircle, TbReceipt } from "react-icons/tb";
 import type { TransactionReceipt } from "viem";
 import { type Hex } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { content } from "../../content";
 import TransactionHash from "../TransactionHash";
 import OutputExecutionError, {
     type WagmiActionError,
@@ -163,7 +164,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
                             leftSection={
                                 <Tooltip
                                     label={
-                                        "Once the epoch status become CLAIM_ACCEPTED the voucher will become executable."
+                                        content.output.epoch.nonAcceptedClaim
                                     }
                                 >
                                     <TbInfoCircle
@@ -187,7 +188,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
                     >
                         {isNotNil(output.executionTransactionHash) && (
                             <Group gap={3}>
-                                <Tooltip label="Execution transaction hash">
+                                <Tooltip label={content.output.txhash}>
                                     <TbReceipt size={theme.other.mdIconSize} />
                                 </Tooltip>
                                 <TransactionHash
@@ -221,12 +222,12 @@ const OutputExecution: FC<OutputExecutionProps> = ({
                             }}
                         >
                             {isExecuted
-                                ? "Executed"
+                                ? content.output.voucher.executed
                                 : checkingOutputExecuted
-                                  ? "Checking voucher..."
+                                  ? content.output.voucher.checking
                                   : prepare.isFetching
-                                    ? "Preparing voucher..."
-                                    : "Execute"}
+                                    ? content.output.voucher.preparing
+                                    : content.output.voucher.execute}
                         </Button>
                     </Group>
                 </Activity>
