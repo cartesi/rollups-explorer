@@ -4,6 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { isNotNil } from "ramda";
 import { type FC } from "react";
 import { formatUnits, isHex, type Hex } from "viem";
+import { content } from "../../content";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { getDecoder } from "../../lib/decoders";
 import Address from "../Address";
@@ -24,7 +25,7 @@ const NoticeContent: FC<NoticeContentProps> = ({
     const decoderFn = getDecoder(decoderType);
 
     return (
-        <Fieldset legend="Notice">
+        <Fieldset legend={content.output.noticeTxt}>
             <Spoiler>
                 <Text style={{ wordBreak: "break-all" }}>
                     {decoderFn(decodedData.payload)}
@@ -38,7 +39,7 @@ const VoucherContent: FC<VoucherContentProps> = ({
     decoderType,
     output,
     application,
-    title = "Voucher",
+    title = content.output.voucherTxt,
 }) => {
     const decoderFn = getDecoder(decoderType);
     const { isSmallDevice } = useIsSmallDevice();
@@ -95,8 +96,11 @@ const VoucherContent: FC<VoucherContentProps> = ({
                 output={output}
                 onSuccess={() => {
                     notifications.show({
-                        title: "Voucher execution status",
-                        message: "Executed successfully",
+                        title: content.output.voucher.feedback
+                            .executionStatusTxt,
+                        message:
+                            content.output.voucher.feedback
+                                .executionStatusSuccess,
                         color: "green",
                         withBorder: true,
                     });
@@ -128,7 +132,7 @@ export const OutputView: FC<OutputViewProps> = ({
             ) : outputType === "DelegateCallVoucher" ? (
                 <VoucherContent
                     application={application}
-                    title="Delegated Call Voucher"
+                    title={content.output.delegateCallVoucherTxt}
                     output={output as VoucherOutput}
                     decoderType={displayAs}
                 />
