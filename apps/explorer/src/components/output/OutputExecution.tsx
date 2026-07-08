@@ -17,22 +17,18 @@ import {
 } from "@mantine/core";
 import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { useQueryClient } from "@tanstack/react-query";
-import { isNil, isNotEmpty, isNotNil, pathOr } from "ramda";
-import { isFunction, isNotNilOrEmpty, isObj, isString } from "ramda-adjunct";
+import { isNil, isNotEmpty, isNotNil } from "ramda";
+import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
 import { Activity, useEffect, useMemo, type FC } from "react";
 import { TbExclamationCircle, TbInfoCircle, TbReceipt } from "react-icons/tb";
 import type { TransactionReceipt } from "viem";
 import { type Hex } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { useSelectedNodeConnection } from "../connection/hooks";
 import TransactionHash from "../TransactionHash";
 import OutputExecutionError, {
     type WagmiActionError,
 } from "./errors/OutputExecutionError";
 import type { VoucherOutput } from "./types";
-
-// xxx: Maybe should become an environment var.
-const POLLING_INTERVAL_MS = 8000 as const;
 
 type OutputExecutionProps = {
     output: VoucherOutput;
@@ -57,7 +53,6 @@ const OutputExecution: FC<OutputExecutionProps> = ({
     const theme = useMantineTheme();
     const userAccount = useAccount();
     const connectModal = useConnectModal();
-    const selectedNode = useSelectedNodeConnection();
     const chainModal = useChainModal();
     const epochQuery = useEpoch({ epochIndex: output.epochIndex, application });
     const queryClient = useQueryClient();
@@ -154,41 +149,6 @@ const OutputExecution: FC<OutputExecutionProps> = ({
             onError(errors);
         }
     }, [errors, onError]);
-
-    useEffect(() => {
-        let key: unknown;
-        // skip invalidation if there is no node-connected or the connected node is a mock.
-        if (
-            isNotNil(selectedNode) &&
-            selectedNode.type !== "system_mock" &&
-            !isClaimAccepted
-        ) {
-            key = setInterval(() => {
-                // Invalidation makes the targeted queries stale.
-                // It creates a Polling effect.
-                queryClient.invalidateQueries({
-                    predicate: (query) => {
-                        const [baseKey, paramsKey] = query.queryKey;
-                        const isEpochQuery =
-                            isString(baseKey) && baseKey.includes("epoch");
-                        const isMatchingEpochIndex =
-                            isObj(paramsKey) &&
-                            pathOr("", ["epochIndex"], paramsKey) ===
-                                output.epochIndex.toString();
-
-                        return isEpochQuery && isMatchingEpochIndex;
-                    },
-                });
-            }, POLLING_INTERVAL_MS);
-        }
-
-        return () => {
-            if (isNotNil(key)) {
-                console.info(`Clearing the polling.`);
-                clearInterval(key as number);
-            }
-        };
-    }, [queryClient, isClaimAccepted, selectedNode, output.epochIndex]);
 
     return (
         <>
