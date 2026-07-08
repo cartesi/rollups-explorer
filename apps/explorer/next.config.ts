@@ -6,12 +6,11 @@ const ContentSecurityPolicy = `
   font-src 'self' https:;
   style-src 'self' 'unsafe-inline' https:;
   img-src 'self' data: https:;
-  connect-src 'self' https: wss: http:;
+  connect-src 'self' https: wss: http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*;
   frame-ancestors 'self' https://app.safe.global https://verify.walletconnect.org;
   object-src 'none';
   base-uri 'self';
-  form-action 'self';  
-  upgrade-insecure-requests;
+  form-action 'self';
 `;
 
 const nextConfig: NextConfig = {
