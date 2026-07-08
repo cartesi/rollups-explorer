@@ -1,4 +1,5 @@
 "use client";
+import type { EpochStatus } from "@cartesi/viem";
 import {
     useEpoch,
     useReadApplicationWasOutputExecuted,
@@ -21,8 +22,7 @@ import { isNil, isNotEmpty, isNotNil } from "ramda";
 import { isFunction, isNotNilOrEmpty } from "ramda-adjunct";
 import { Activity, useEffect, useMemo, type FC } from "react";
 import { TbExclamationCircle, TbInfoCircle, TbReceipt } from "react-icons/tb";
-import type { TransactionReceipt } from "viem";
-import { type Hex } from "viem";
+import { type Hex, type TransactionReceipt } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { content } from "../../content";
 import TransactionHash from "../TransactionHash";
@@ -45,6 +45,27 @@ const buildProof = (output: VoucherOutput): Proof => ({
     outputHashesSiblings: output.outputHashesSiblings ?? [],
 });
 
+const buildFeedback = (epochStatus?: EpochStatus) => {
+    if (isNil(epochStatus)) return null;
+
+    switch (epochStatus) {
+        case "CLAIM_FORECLOSED":
+            return {
+                status: epochStatus,
+                tooltip: content.output.epoch.claimForeclosed,
+                body: content.output.epoch.executionForeclosed,
+            };
+        case "CLAIM_ACCEPTED":
+            return null;
+        default:
+            return {
+                status: epochStatus,
+                tooltip: content.output.epoch.nonAcceptedClaim,
+                body: content.output.epoch.waitingClaim,
+            };
+    }
+};
+
 const OutputExecution: FC<OutputExecutionProps> = ({
     application,
     output,
@@ -57,8 +78,10 @@ const OutputExecution: FC<OutputExecutionProps> = ({
     const chainModal = useChainModal();
     const epochQuery = useEpoch({ epochIndex: output.epochIndex, application });
     const queryClient = useQueryClient();
-    const isClaimAccepted = epochQuery.data?.status === "CLAIM_ACCEPTED";
+    const epochStatus = epochQuery.data?.status;
+    const isClaimAccepted = epochStatus === "CLAIM_ACCEPTED";
     const hasExecutionTransaction = isNotNil(output.executionTransactionHash);
+    const feedback = buildFeedback(epochStatus);
 
     const wasOutputExecutedQuery = useReadApplicationWasOutputExecuted({
         address: application,
@@ -156,27 +179,29 @@ const OutputExecution: FC<OutputExecutionProps> = ({
             <Stack>
                 <Divider mt="sm" />
 
-                <Activity mode={!isClaimAccepted ? "visible" : "hidden"}>
+                {isNotNil(feedback) ? (
                     <Group justify="flex-end">
                         <Badge
+                            color={
+                                feedback.status === "CLAIM_FORECLOSED"
+                                    ? "foreclosed"
+                                    : undefined
+                            }
+                            variant="filled"
                             radius="xs"
                             size="lg"
                             leftSection={
-                                <Tooltip
-                                    label={
-                                        content.output.epoch.nonAcceptedClaim
-                                    }
-                                >
+                                <Tooltip label={feedback.tooltip}>
                                     <TbInfoCircle
                                         size={theme.other.smIconSize}
                                     />
                                 </Tooltip>
                             }
                         >
-                            Waiting Claim
+                            {feedback.body}
                         </Badge>
                     </Group>
-                </Activity>
+                ) : null}
 
                 <Activity mode={isClaimAccepted ? "visible" : "hidden"}>
                     <Group
