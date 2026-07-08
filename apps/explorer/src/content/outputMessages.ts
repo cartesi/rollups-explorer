@@ -23,5 +23,7 @@ export const outputMessages = {
             "Once the epoch status become CLAIM_ACCEPTED the output will become executable.",
         claimForeclosed:
             "The epoch claim is foreclosed. The output cannot be executed.",
+        waitingClaim: "Waiting for claim.",
+        executionForeclosed: "Execution foreclosed.",
     },
 } as const;
