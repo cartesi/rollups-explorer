@@ -6,9 +6,11 @@ import {
     useOutputs,
     useReports,
     useTournaments,
+    useWithdrawals,
 } from "@cartesi/wagmi";
 import { isNotNil } from "ramda";
 import type { FC } from "react";
+import { isForeclosed } from "../components/application/utils";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -62,6 +64,18 @@ export const ApplicationSummaryContainer: FC<
         ...defaultParams,
     });
 
+    const withdrawalsResult = useWithdrawals({
+        application: props.application,
+        descending: true,
+        enabled: isNotNil(application) && isForeclosed(application),
+    });
+
+    const withdrawals = {
+        data: withdrawalsResult.data?.data ?? [],
+        totalCount: withdrawalsResult.data?.pagination.totalCount ?? 0,
+        isLoading: withdrawalsResult.isLoading,
+    };
+
     const epochs = {
         data: epochsResult.data?.data ?? [],
         totalCount: epochsResult.data?.pagination.totalCount ?? 0,
@@ -112,13 +126,13 @@ export const ApplicationSummaryContainer: FC<
                 />
             ) : showPage ? (
                 <ApplicationSummaryPage
-                    application={props.application}
-                    applicationConsensusType={application.consensusType}
+                    application={application}
                     epochs={epochs}
                     inputs={inputs}
                     outputs={outputs}
                     reports={reports}
                     tournaments={tournaments}
+                    withdrawals={withdrawals}
                 />
             ) : (
                 <DisplayContainerError
