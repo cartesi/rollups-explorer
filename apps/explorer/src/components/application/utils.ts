@@ -1,6 +1,12 @@
 import type { Application } from "@cartesi/viem";
 import { isNil } from "ramda";
-import { isAddressEqual, zeroHash, type Address, type Hash } from "viem";
+import {
+    isAddressEqual,
+    zeroAddress,
+    zeroHash,
+    type Address,
+    type Hash,
+} from "viem";
 
 /**
  *
@@ -10,7 +16,7 @@ import { isAddressEqual, zeroHash, type Address, type Hash } from "viem";
  * @param application {Application} - The application object to check for foreclosure status.
  * @returns {boolean} - Returns true if the application is foreclosed, otherwise false.
  */
-export const isForeclosed = (application: Application) => {
+const isForeclosed = (application: Application) => {
     return (
         application.forecloseBlock !== 0n &&
         hasForecloseTransaction(application.forecloseTransaction)
@@ -24,13 +30,27 @@ const hasForecloseTransaction = (hash: Hash | null | undefined) => {
     return true;
 };
 
+const isAccountsDriveProved = (application: Application) => {
+    return (
+        application.accountsDriveProvedBlock !== 0n &&
+        hasDriveProveTransaction(application.accountsDriveProvedTransaction)
+    );
+};
+
+const hasDriveProveTransaction = (hash: Hash | null | undefined) => {
+    if (isNil(hash) || hash === zeroHash) {
+        return false;
+    }
+    return true;
+};
+
 /**
  * Check if the given address is the guardian configured in the withdrawal setup of the application.
  * @param application The application object containing the withdrawal configuration.
  * @param address  The address to check against the guardian address in the application's withdrawal configuration.
  * @returns {boolean} - Returns true if the address is the guardian, otherwise false.
  */
-export const isGuardian = (application: Application, address?: Address) => {
+const isGuardian = (application: Application, address?: Address) => {
     if (!address || !application) return false;
 
     if (
@@ -42,5 +62,9 @@ export const isGuardian = (application: Application, address?: Address) => {
 
     const guardian = application.withdrawalConfig.guardian;
 
+    if (isAddressEqual(guardian, zeroAddress)) return false;
+
     return isAddressEqual(address, guardian);
 };
+
+export { isAccountsDriveProved, isForeclosed, isGuardian };
