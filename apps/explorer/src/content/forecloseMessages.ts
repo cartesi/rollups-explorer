@@ -20,4 +20,7 @@ export const forecloseMessages = {
     },
     forecloseTxt: "Foreclose",
     foreclosedTxt: "Foreclosed",
+    application: {
+        isForeclosed: "This application is foreclosed.",
+    },
 } as const;
