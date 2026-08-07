@@ -87,5 +87,6 @@ export const buildSearchSort = (sortVal: string | null): Sort => {
 export const buildSearchOffset = (offsetVal: string | null) => {
     if (isNilOrEmpty(offsetVal)) return 0;
     const defaultValue = 0;
-    return Math.max(parseInt(offsetVal ?? "0"), defaultValue);
+    const offset = parseInt(offsetVal ?? "0");
+    return Number.isNaN(offset) ? defaultValue : Math.max(offset, defaultValue);
 };
