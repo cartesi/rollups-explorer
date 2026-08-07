@@ -2,6 +2,7 @@ import { useMantineColorScheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import type { Preview, StoryContext, StoryFn } from "@storybook/nextjs";
 import { Provider as JotaiProvider } from "jotai";
+import { mswLoader } from "msw-storybook-addon/csf3";
 import { pathOr } from "ramda";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { UPDATE_GLOBALS } from "storybook/internal/core-events";
@@ -167,6 +168,7 @@ const preview: Preview = {
             },
         },
     },
+    loaders: [mswLoader()],
     decorators: [
         // Order matters. So layout decorator first. Fn calling is providers(layout(Story))
         withLayout,        

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import type { Application } from "@cartesi/viem";
+import type { Application, Withdrawal } from "@cartesi/viem";
 import { MantineProvider } from "@mantine/core";
 import { render, type RenderOptions } from "@testing-library/react";
 import { zeroHash } from "viem";
@@ -25,6 +25,8 @@ type ApplicationOverrides = Partial<
     Pick<
         Application,
         | "applicationAddress"
+        | "accountsDriveProvedBlock"
+        | "accountsDriveProvedTransaction"
         | "forecloseBlock"
         | "forecloseTransaction"
         | "name"
@@ -36,7 +38,19 @@ export const createApplication = (overrides?: ApplicationOverrides) =>
     ({
         name: "My App",
         applicationAddress: "0x1234567890abcdef1234567890abcdef12345678",
+        accountsDriveProvedBlock: 0n,
+        accountsDriveProvedTransaction: zeroHash,
         forecloseBlock: 0n,
         forecloseTransaction: zeroHash,
         ...overrides,
     }) as Application;
+
+export const createWithdrawal = (overrides: Partial<Withdrawal> = {}) =>
+    ({
+        accountIndex: 1n,
+        account: "0x1234567890abcdef1234567890abcdef12345678",
+        output: "0x12345678",
+        transactionHash:
+            "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        ...overrides,
+    }) as Withdrawal;

@@ -1,4 +1,5 @@
 import type { Match, Tournament, WinnerCommitment } from "@cartesi/viem";
+import { HttpResponse } from "msw";
 import {
     concat,
     encodeAbiParameters,
@@ -201,4 +202,40 @@ export const randomMatches = (
     }
 
     return matches;
+};
+
+export const STORIES_RPC_URL = "http://127.0.0.1:8545";
+
+export type GenericJSONRPCRequest = {
+    id: number | string | null;
+    method: string;
+    params?: unknown[] | Record<string, unknown>;
+};
+
+export const createMethodNotFoundResponse = (body: GenericJSONRPCRequest) =>
+    HttpResponse.json({
+        jsonrpc: "2.0",
+        id: body.id,
+        error: { code: -32601, message: "Method not found" },
+    });
+
+export const getMockResponse = (body: GenericJSONRPCRequest) => {
+    // Mock response for the stories.
+    // other values from body can be used to evaluate the response.
+    switch (body.method) {
+        case "eth_call":
+            return HttpResponse.json({
+                jsonrpc: "2.0",
+                id: body.id,
+                result: "0x00000000000000000000000088a2120b7068e78692c8fd12e751d610b6377e4d",
+            });
+        case "eth_getCode":
+            return HttpResponse.json({
+                jsonrpc: "2.0",
+                id: body.id,
+                result: "0x60806040526004361015610011575f80fd5b5f3560e01c806354fd4d50146100e25763d1660f991461002f575f80fd5b346100de5760603660031901126100de576004356001600160a01b038116908181036100de576024356001600160a01b038116908190036100de576020915f91826040518581019263a9059cbb60e01b8452602482015260443560448201526044815261009d606482610188565b51925af1156100d3575f513d6100ca5750803b155b6100b857005b635274afe760e01b5f5260045260245ffd5b600114156100b2565b6040513d5f823e3d90fd5b5f80fd5b346100de575f3660031901126100de57610152604051610103604082610188565b600781526630b6383430971b60c91b6020820152610160604051610128602082610188565b5f8152604051938493600385525f60208601525f604086015260a0606086015260a0850190610164565b908382036080850152610164565b0390f35b805180835260209291819084018484015e5f828201840152601f01601f1916010190565b90601f8019910116810190811067ffffffffffffffff8211176101aa57604052565b634e487b7160e01b5f52604160045260245ffdfea2646970667358221220ae403ff208dba97ef13fbcc7fc44d25ecf65924bd60d5f6193ca7543d170e1ee64736f6c634300081e0033",
+            });
+        default:
+            return createMethodNotFoundResponse(body);
+    }
 };
