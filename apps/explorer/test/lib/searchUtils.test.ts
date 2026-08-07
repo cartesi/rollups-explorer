@@ -23,9 +23,7 @@ describe("searchUtils", () => {
 
     it("builds validated limits, sorting, and offsets", () => {
         expect(buildSearchLimit("30", [10, 30, 50] as const, 50)).toBe(30);
-        expect(buildSearchLimit("30abc", [10, 30, 50] as const, 50)).toBe(
-            50,
-        );
+        expect(buildSearchLimit("30abc", [10, 30, 50] as const, 50)).toBe(50);
         expect(buildSearchSort("DESC")).toEqual({ value: "desc" });
         expect(buildSearchSort(null)).toEqual({ value: "desc" });
         expect(buildSearchOffset("30")).toBe(30);

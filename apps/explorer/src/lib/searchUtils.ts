@@ -18,7 +18,9 @@ export const buildSearchLimit = <Limit extends number>(
     }
 
     const limit = Number(limitValue);
-    return limits.find((allowedLimit) => allowedLimit === limit) ?? defaultLimit;
+    return (
+        limits.find((allowedLimit) => allowedLimit === limit) ?? defaultLimit
+    );
 };
 
 export const buildSearchSort = (sortValue: string | null): SearchSort => {

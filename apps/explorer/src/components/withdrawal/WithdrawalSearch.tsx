@@ -1,10 +1,6 @@
 import { Flex, Group, Select, TextInput } from "@mantine/core";
 import { useEffect, useState, type FC } from "react";
-import {
-    TbArrowsUpDown,
-    TbCaretDownFilled,
-    TbHash,
-} from "react-icons/tb";
+import { TbArrowsUpDown, TbCaretDownFilled, TbHash } from "react-icons/tb";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import {
     withdrawalSearchLimits,
@@ -91,8 +87,7 @@ export const WithdrawalSearch: FC<WithdrawalSearchProps> = ({
                     w="13rem"
                     onChange={(value) => {
                         const selectedLimit = withdrawalSearchLimits.find(
-                            (allowedLimit) =>
-                                allowedLimit.toString() === value,
+                            (allowedLimit) => allowedLimit.toString() === value,
                         );
                         onLimitChange(
                             selectedLimit ?? withdrawalSearchLimits[0],

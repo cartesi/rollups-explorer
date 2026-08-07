@@ -7,9 +7,12 @@ const mocks = vi.hoisted(() => ({
     useVoucherDecoder: vi.fn(),
 }));
 
-vi.mock("../../../src/components/specification/hooks/useVoucherDecoder", () => ({
-    default: mocks.useVoucherDecoder,
-}));
+vi.mock(
+    "../../../src/components/specification/hooks/useVoucherDecoder",
+    () => ({
+        default: mocks.useVoucherDecoder,
+    }),
+);
 
 vi.mock("../../../src/components/output/OutputExecution", () => ({
     default: () => <div data-testid="output-execution" />,
@@ -63,7 +66,9 @@ describe("OutputView", () => {
         );
 
         expect(screen.getByText("hi")).toBeVisible();
-        expect(screen.queryByTestId("output-execution")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("output-execution"),
+        ).not.toBeInTheDocument();
     });
 
     it("renders decoded voucher payloads and execution controls", () => {
