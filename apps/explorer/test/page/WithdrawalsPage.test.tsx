@@ -47,9 +47,7 @@ vi.mock("../../src/components/withdrawal/WithdrawalList", () => ({
     ),
 }));
 
-const renderPage = (
-    withdrawals: { data: Withdrawal[]; isLoading: boolean },
-) =>
+const renderPage = (withdrawals: { data: Withdrawal[]; isLoading: boolean }) =>
     render(
         <WithdrawalsPage
             withdrawals={withdrawals}
@@ -125,9 +123,7 @@ describe("WithdrawalsPage", () => {
     it("updates query parameters immediately for select controls", () => {
         renderPage({ data: [createWithdrawal()], isLoading: false });
 
-        fireEvent.click(
-            screen.getByRole("button", { name: "Sort ascending" }),
-        );
+        fireEvent.click(screen.getByRole("button", { name: "Sort ascending" }));
         expect(mocks.updateUrlQueryString).toHaveBeenLastCalledWith([
             { name: "sv", value: "asc" },
             { name: "offset", value: "0" },

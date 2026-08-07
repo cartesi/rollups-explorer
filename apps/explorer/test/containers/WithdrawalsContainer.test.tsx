@@ -2,7 +2,12 @@ import type { Application, Pagination } from "@cartesi/viem";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WithdrawalsContainer } from "../../src/containers/WithdrawalsContainer";
-import { createApplication, createWithdrawal, render, screen } from "../test-utils";
+import {
+    createApplication,
+    createWithdrawal,
+    render,
+    screen,
+} from "../test-utils";
 
 const mocks = vi.hoisted(() => ({
     replace: vi.fn(),

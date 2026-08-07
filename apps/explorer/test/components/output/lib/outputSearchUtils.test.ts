@@ -38,7 +38,7 @@ describe("outputSearchUtils", () => {
             expect(buildSearchLimit("30")).toBe(30);
         });
 
-        it.each([null, "", "20", "30abc", "1.5", "limit"]) (
+        it.each([null, "", "20", "30abc", "1.5", "limit"])(
             "falls back to the default limit for %s",
             (limitValue) => {
                 expect(buildSearchLimit(limitValue)).toBe(50);
@@ -60,11 +60,16 @@ describe("outputSearchUtils", () => {
             expect(buildSearchOffset("-1")).toBe(0);
         });
 
-        it.each([null, "", "-1", "1.5", "30abc", "9007199254740992", "invalid"]) (
-            "falls back to zero for %s",
-            (offsetValue) => {
-                expect(buildSearchOffset(offsetValue)).toBe(0);
-            },
-        );
+        it.each([
+            null,
+            "",
+            "-1",
+            "1.5",
+            "30abc",
+            "9007199254740992",
+            "invalid",
+        ])("falls back to zero for %s", (offsetValue) => {
+            expect(buildSearchOffset(offsetValue)).toBe(0);
+        });
     });
 });

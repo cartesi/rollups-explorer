@@ -17,7 +17,9 @@ const output = {
 
 describe("OutputCard", () => {
     it("shows output metadata and links to its epoch", () => {
-        render(<OutputCard output={output} application={createApplication()} />);
+        render(
+            <OutputCard output={output} application={createApplication()} />,
+        );
 
         expect(screen.getByText("# 1")).toBeVisible();
         expect(screen.getByText("Input #3")).toBeVisible();
@@ -29,7 +31,9 @@ describe("OutputCard", () => {
     });
 
     it("changes the selected decoder", () => {
-        render(<OutputCard output={output} application={createApplication()} />);
+        render(
+            <OutputCard output={output} application={createApplication()} />,
+        );
 
         fireEvent.click(screen.getByLabelText("Decoded"));
 

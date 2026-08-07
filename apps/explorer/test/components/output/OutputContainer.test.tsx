@@ -11,7 +11,11 @@ vi.mock("@cartesi/wagmi", () => ({
 }));
 
 vi.mock("../../../src/components/output/OutputList", () => ({
-    OutputList: ({ onPaginationChange }: { onPaginationChange?: (offset: number) => void }) => (
+    OutputList: ({
+        onPaginationChange,
+    }: {
+        onPaginationChange?: (offset: number) => void;
+    }) => (
         <button onClick={() => onPaginationChange?.(10)}>
             Rendered output list
         </button>
@@ -27,7 +31,9 @@ describe("OutputContainer", () => {
 
     it("shows loading, error, and empty states", () => {
         mocks.useOutputs.mockReturnValue({ isLoading: true });
-        const { rerender } = render(<OutputContainer application={application} />);
+        const { rerender } = render(
+            <OutputContainer application={application} />,
+        );
         expect(screen.getByText("Checking for outputs...")).toBeVisible();
 
         mocks.useOutputs.mockReturnValue({
@@ -41,7 +47,10 @@ describe("OutputContainer", () => {
         mocks.useOutputs.mockReturnValue({
             isLoading: false,
             isError: false,
-            data: { data: [], pagination: { limit: 50, offset: 0, totalCount: 0 } },
+            data: {
+                data: [],
+                pagination: { limit: 50, offset: 0, totalCount: 0 },
+            },
         });
         rerender(<OutputContainer application={application} />);
         expect(screen.getByText("No outputs generated")).toBeVisible();
@@ -56,7 +65,9 @@ describe("OutputContainer", () => {
                 pagination: { limit: 50, offset: 0, totalCount: 51 },
             },
         });
-        const { rerender } = render(<OutputContainer application={application} />);
+        const { rerender } = render(
+            <OutputContainer application={application} />,
+        );
 
         expect(mocks.useOutputs).toHaveBeenLastCalledWith({
             application,
