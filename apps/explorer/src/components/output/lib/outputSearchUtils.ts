@@ -1,5 +1,9 @@
-import { cond, isNotNil, T } from "ramda";
-import { isNilOrEmpty } from "ramda-adjunct";
+import { cond, T } from "ramda";
+import {
+    buildSearchLimit as buildGenericSearchLimit,
+    buildSearchOffset as buildGenericSearchOffset,
+    buildSearchSort as buildGenericSearchSort,
+} from "../../../lib/searchUtils";
 import { limits, type Filter, type Sort } from "../OutputSearch";
 
 type FilterQueryParams = {
@@ -56,12 +60,7 @@ export const buildSearchFilter = cond<[FilterQueryParams], Filter>([
  * @returns {number} The constructed limit value based on the query parameter.
  */
 export const buildSearchLimit = (limitVal: string | null) => {
-    const defaultLimit = 50;
-    if (isNilOrEmpty(limitVal)) return defaultLimit;
-    const input = parseInt(limitVal ?? "10");
-    const limit = limits.find((allowed) => allowed === input);
-
-    return isNotNil(limit) ? limit : defaultLimit;
+    return buildGenericSearchLimit(limitVal, limits, 50);
 };
 
 /**
@@ -71,11 +70,7 @@ export const buildSearchLimit = (limitVal: string | null) => {
  * @returns {Sort} The constructed sort object based on the query parameter.
  */
 export const buildSearchSort = (sortVal: string | null): Sort => {
-    if (isNilOrEmpty(sortVal)) return { value: "desc" };
-
-    return sortVal?.toLowerCase() === "desc"
-        ? { value: "desc" }
-        : { value: "asc" };
+    return buildGenericSearchSort(sortVal);
 };
 
 /**
@@ -85,8 +80,5 @@ export const buildSearchSort = (sortVal: string | null): Sort => {
  * @returns {number} The constructed offset value based on the query parameter.
  */
 export const buildSearchOffset = (offsetVal: string | null) => {
-    if (isNilOrEmpty(offsetVal)) return 0;
-    const defaultValue = 0;
-    const offset = parseInt(offsetVal ?? "0");
-    return Number.isNaN(offset) ? defaultValue : Math.max(offset, defaultValue);
+    return buildGenericSearchOffset(offsetVal);
 };

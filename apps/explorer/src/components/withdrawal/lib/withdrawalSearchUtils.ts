@@ -1,4 +1,10 @@
-import { isEmpty } from "ramda";
+import {
+    buildSearchLimit,
+    buildSearchOffset,
+    buildSearchSort,
+    isNonNegativeSafeInteger,
+    type SearchSort,
+} from "../../../lib/searchUtils";
 
 export const withdrawalSearchUrlQueryName = {
     accountIndex: "ai",
@@ -11,21 +17,12 @@ export const withdrawalSearchLimits = [10, 30, 50] as const;
 
 export type WithdrawalSearchLimit = (typeof withdrawalSearchLimits)[number];
 
-export type WithdrawalSearchSort = {
-    value: "asc" | "desc";
-};
-
-const isNonNegativeSafeInteger = (value: string) => {
-    if (!/^\d+$/.test(value)) return false;
-
-    const numberValue = Number(value);
-    return Number.isSafeInteger(numberValue);
-};
+export type WithdrawalSearchSort = SearchSort;
 
 export const buildWithdrawalSearchAccountIndex = (
     accountIndex: string | null,
 ) => {
-    if (!accountIndex || isEmpty(accountIndex)) return undefined;
+    if (!accountIndex) return undefined;
 
     if (!isNonNegativeSafeInteger(accountIndex)) return undefined;
 
@@ -35,29 +32,15 @@ export const buildWithdrawalSearchAccountIndex = (
 export const buildWithdrawalSearchLimit = (
     limitValue: string | null,
 ): WithdrawalSearchLimit => {
-    if (!limitValue || isEmpty(limitValue)) return 50;
-    if (!isNonNegativeSafeInteger(limitValue)) return 50;
-
-    const limit = Number(limitValue);
-    return withdrawalSearchLimits.includes(limit as WithdrawalSearchLimit)
-        ? (limit as WithdrawalSearchLimit)
-        : 50;
+    return buildSearchLimit(limitValue, withdrawalSearchLimits, 50);
 };
 
 export const buildWithdrawalSearchSort = (
     sortValue: string | null,
 ): WithdrawalSearchSort => {
-    if (!sortValue || isEmpty(sortValue)) return { value: "desc" };
-
-    return sortValue.toLowerCase() === "desc"
-        ? { value: "desc" }
-        : { value: "asc" };
+    return buildSearchSort(sortValue);
 };
 
 export const buildWithdrawalSearchOffset = (offsetValue: string | null) => {
-    if (!offsetValue || isEmpty(offsetValue)) return 0;
-
-    if (!isNonNegativeSafeInteger(offsetValue)) return 0;
-
-    return Number(offsetValue);
+    return buildSearchOffset(offsetValue);
 };
