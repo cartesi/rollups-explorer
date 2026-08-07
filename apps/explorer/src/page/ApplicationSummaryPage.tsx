@@ -3,6 +3,7 @@ import type {
     GetEpochReturnType,
     GetInputReturnType,
     GetTournamentReturnType,
+    GetWithdrawalReturnType,
 } from "@cartesi/viem";
 import { Anchor, Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
@@ -15,14 +16,18 @@ import {
     TbMail,
     TbMessageReport,
     TbStack2,
+    TbTransferOut,
     TbTrophy,
 } from "react-icons/tb";
 import Address from "../components/Address";
+import { ApplicationForecloseStatus } from "../components/application/ApplicationForecloseStatus";
+import { isForeclosed } from "../components/application/utils";
 import CenteredText from "../components/CenteredText";
 import { EpochList } from "../components/epoch/EpochList";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
 import { SummaryCard } from "../components/SummaryCard";
+import { WithdrawalList } from "../components/withdrawal/WithdrawalList";
 import { pathBuilder } from "../routes/routePathBuilder";
 
 type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] };
@@ -34,10 +39,10 @@ type Meta<T> = OmitNever<{
 }>;
 
 interface Props {
-    application: string;
-    applicationConsensusType: Application["consensusType"];
+    application: Application;
     inputs: Meta<GetInputReturnType[]>;
     epochs: Meta<GetEpochReturnType[]>;
+    withdrawals: Meta<GetWithdrawalReturnType[]>;
     outputs: Meta<never>;
     reports: Meta<never>;
     tournaments: Meta<GetTournamentReturnType[]>;
@@ -59,17 +64,19 @@ export const ApplicationSummaryPage: FC<Props> = ({
     outputs,
     reports,
     tournaments,
-    applicationConsensusType,
+    withdrawals,
 }) => {
+    const appId = application.name ?? application.applicationAddress;
     const latestTournament = head(tournaments.data);
-    const epochsUrls = pathBuilder.epochs({ application });
-
-    const gridSpan = getGridSpan(applicationConsensusType);
+    const epochsUrls = pathBuilder.epochs({ application: appId });
+    const gridSpan = getGridSpan(application.consensusType);
+    const appIsForeclosed = isForeclosed(application);
+    const showWithdrawalsData = appIsForeclosed;
 
     const tournamentUrl =
         latestTournament !== undefined
             ? pathBuilder.tournament({
-                  application,
+                  application: appId,
                   epochIndex: latestTournament.epochIndex,
                   tournamentAddress: latestTournament.address,
               })
@@ -101,7 +108,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
                         value={outputs.totalCount}
                         icon={TbMail}
                         displaySkeleton={outputs.isLoading}
-                        href={pathBuilder.outputs({ application })}
+                        href={pathBuilder.outputs({ application: appId })}
                     />
                 </Grid.Col>
                 <Grid.Col span={gridSpan} mb="sm">
@@ -113,9 +120,20 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     />
                 </Grid.Col>
 
+                <Activity mode={showWithdrawalsData ? "visible" : "hidden"}>
+                    <Grid.Col span={gridSpan} mb="sm">
+                        <SummaryCard
+                            title="Withdrawals"
+                            value={withdrawals.totalCount}
+                            icon={TbTransferOut}
+                            displaySkeleton={withdrawals.isLoading}
+                        />
+                    </Grid.Col>
+                </Activity>
+
                 <Activity
                     mode={
-                        applicationConsensusType === "PRT"
+                        application.consensusType === "PRT"
                             ? "visible"
                             : "hidden"
                     }
@@ -130,6 +148,10 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     </Grid.Col>
                 </Activity>
             </Grid>
+
+            {appIsForeclosed && (
+                <ApplicationForecloseStatus application={application} />
+            )}
 
             {tournamentUrl && (
                 <Stack>
@@ -148,6 +170,44 @@ export const ApplicationSummaryPage: FC<Props> = ({
                             <Text>Epoch #{latestTournament?.epochIndex}</Text>
                         </Group>
                     </Card>
+                </Stack>
+            )}
+
+            {showWithdrawalsData && (
+                <Stack>
+                    <Group justify="space-between" align="baseline">
+                        <Title order={3} c="dimmed">
+                            Latest Withdrawals
+                        </Title>
+                        {withdrawals.totalCount > 0 && (
+                            <Anchor
+                                component={Link}
+                                href={pathBuilder.withdrawals({
+                                    application: appId,
+                                })}
+                            >
+                                <Text tt="uppercase" fw="bold" size="sm">
+                                    view all withdrawals
+                                </Text>
+                            </Anchor>
+                        )}
+                    </Group>
+                    {withdrawals.isLoading ? (
+                        <CenteredText
+                            key="checking-withdrawals-txt"
+                            text="checking latest withdrawals..."
+                        />
+                    ) : isNilOrEmpty(withdrawals.data) ? (
+                        <CenteredText
+                            key="no-withdrawals-txt"
+                            text="no withdrawals."
+                        />
+                    ) : (
+                        <WithdrawalList
+                            key={`${appId}-latest-withdrawals-${withdrawals.data.length}`}
+                            withdrawals={withdrawals.data}
+                        />
+                    )}
                 </Stack>
             )}
 
@@ -171,7 +231,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     <CenteredText key="no-epochs-txt" text="no epochs." />
                 ) : (
                     <EpochList
-                        key={`${application}-latest-epochs-${epochs.data.length}`}
+                        key={`${appId}-latest-epochs-${epochs.data.length}`}
                         epochs={epochs.data}
                     />
                 )}
@@ -191,7 +251,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     <CenteredText key="no-inputs-txt" text="no inputs." />
                 ) : (
                     <InputList
-                        key={`${application}-latest-inputs-${inputs.data.length}`}
+                        key={`${appId}-latest-inputs-${inputs.data.length}`}
                         inputs={inputs.data}
                     />
                 )}
