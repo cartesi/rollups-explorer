@@ -15,7 +15,7 @@ import { type Specification } from "../types";
 import { stringifyContent } from "../utils";
 
 type UseVoucherDecoderProps = {
-    voucher: Voucher | DelegateCallVoucher;
+    voucher: Voucher | DelegateCallVoucher | null;
 };
 const cache = new Map<string, Abi>();
 
@@ -145,13 +145,13 @@ const fetchDestinationABIAndDecode = async ({
     return result;
 };
 
-interface Result {
+export interface UseVoucherDecoderResult {
     status: "loading" | "idle";
     data: string | null;
 }
 
 const useVoucherDecoder = ({ voucher }: UseVoucherDecoderProps) => {
-    const [result, setResult] = useState<Result>({
+    const [result, setResult] = useState<UseVoucherDecoderResult>({
         status: "idle",
         data: null,
     });

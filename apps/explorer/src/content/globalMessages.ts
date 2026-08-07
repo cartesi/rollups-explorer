@@ -12,6 +12,14 @@ export const globalMessages = {
     error: {
         generic: "Something went wrong.",
     },
+    format: {
+        short: "Short format",
+        long: "Long format",
+    },
+    decoded: {
+        show: "Show Decoded",
+        hide: "Hide Decoded",
+    },
     btn: {
         send: "Send",
         cancel: "Cancel",

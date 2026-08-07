@@ -24,6 +24,11 @@ const customTheme = createTheme({
             dark: "gray",
         }),
         info: virtualColor({ name: "info", light: "blue", dark: "blue" }),
+        warning: virtualColor({
+            name: "warning",
+            light: "yellow",
+            dark: "yellow",
+        }),
         foreclosed: virtualColor({
             name: "foreclosed",
             light: "grape",

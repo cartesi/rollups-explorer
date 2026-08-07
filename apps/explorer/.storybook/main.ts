@@ -9,9 +9,10 @@ const config: StorybookConfig = {
         name: getAbsolutePath("@storybook/nextjs"),
         options: {},
     },
+    staticDirs: ["./public"],
 };
 export default config;
 
-function getAbsolutePath(value: string): any {
+function getAbsolutePath(value: string) {
     return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
 }
