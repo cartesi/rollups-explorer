@@ -1,4 +1,4 @@
-import type { Match, MatchAdvanced, Tournament } from "@cartesi/viem";
+import type { Match, MatchAdvanced, Tournament } from "@cartesi/client";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { ClaimText } from "../ClaimText";

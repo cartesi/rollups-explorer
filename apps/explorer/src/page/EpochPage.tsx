@@ -1,4 +1,4 @@
-import type { Application, Epoch, Input, Pagination } from "@cartesi/viem";
+import type { Application, Epoch, Input, Pagination } from "@cartesi/client";
 import {
     Anchor,
     Badge,

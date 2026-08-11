@@ -1,5 +1,5 @@
-import type { DelegateCallVoucher, Voucher, Withdrawal } from "@cartesi/viem";
-import { outputsAbi } from "@cartesi/wagmi";
+import type { DelegateCallVoucher, Voucher, Withdrawal } from "@cartesi/client";
+import { outputsAbi } from "@cartesi/react";
 import {
     Alert,
     Box,

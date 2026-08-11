@@ -1,4 +1,4 @@
-import type { GetOutputReturnType } from "@cartesi/viem";
+import type { GetOutputReturnType } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState } from "react";
 import { OutputList } from "./OutputList";

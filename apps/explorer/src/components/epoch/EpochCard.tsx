@@ -1,4 +1,4 @@
-import type { Epoch } from "@cartesi/viem";
+import type { Epoch } from "@cartesi/client";
 import { Badge, Card, Group, Text, useMantineTheme } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Link from "next/link";

@@ -1,4 +1,4 @@
-import type { Commitment, Match, Tournament } from "@cartesi/viem";
+import type { Commitment, Match, Tournament } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";

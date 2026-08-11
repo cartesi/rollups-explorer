@@ -1,4 +1,4 @@
-import type { Epoch, EpochStatus } from "@cartesi/viem";
+import type { Epoch, EpochStatus } from "@cartesi/client";
 import useRightColorShade from "../../hooks/useRightColorShade";
 
 export const getEpochStatusColor = (state: EpochStatus) => {

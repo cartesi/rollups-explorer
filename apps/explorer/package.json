@@ -20,8 +20,8 @@
         "test:ci": "vitest run --coverage"
     },
     "dependencies": {
-        "@cartesi/viem": "2.0.0-alpha.31",
-        "@cartesi/wagmi": "2.0.0-alpha.35",
+        "@cartesi/client": "2.0.0-alpha.34",
+        "@cartesi/react": "2.0.0-alpha.38",
         "@mantine/code-highlight": "^8.3.15",
         "@mantine/core": "^8.3.15",
         "@mantine/form": "^8.3.15",

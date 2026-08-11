@@ -1,4 +1,4 @@
-import type { EpochStatus } from "@cartesi/viem";
+import type { EpochStatus } from "@cartesi/client";
 import { type Hex } from "viem";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { foundry, mainnet } from "wagmi/chains";
@@ -10,9 +10,9 @@ import { fireEvent, render, screen, waitFor } from "../../test-utils";
 
 const mocks = vi.hoisted(() => ({
     useEpoch: vi.fn(),
-    useReadApplicationWasOutputExecuted: vi.fn(),
-    useSimulateApplicationExecuteOutput: vi.fn(),
-    useWriteApplicationExecuteOutput: vi.fn(),
+    useReadIApplicationWasOutputExecuted: vi.fn(),
+    useSimulateIApplicationExecuteOutput: vi.fn(),
+    useWriteIApplicationExecuteOutput: vi.fn(),
     useConfig: vi.fn(),
     useAccount: vi.fn(),
     useWaitForTransactionReceipt: vi.fn(),
@@ -21,13 +21,13 @@ const mocks = vi.hoisted(() => ({
     useQueryClient: vi.fn(),
 }));
 
-vi.mock("@cartesi/wagmi", () => ({
+vi.mock("@cartesi/react", () => ({
     useEpoch: mocks.useEpoch,
-    useReadApplicationWasOutputExecuted:
-        mocks.useReadApplicationWasOutputExecuted,
-    useSimulateApplicationExecuteOutput:
-        mocks.useSimulateApplicationExecuteOutput,
-    useWriteApplicationExecuteOutput: mocks.useWriteApplicationExecuteOutput,
+    useReadIApplicationWasOutputExecuted:
+        mocks.useReadIApplicationWasOutputExecuted,
+    useSimulateIApplicationExecuteOutput:
+        mocks.useSimulateIApplicationExecuteOutput,
+    useWriteIApplicationExecuteOutput: mocks.useWriteIApplicationExecuteOutput,
     useConfig: mocks.useConfig,
 }));
 
@@ -115,18 +115,18 @@ const setupMocks = ({
     mocks.useEpoch.mockReturnValue({
         data: epochStatus !== undefined ? { status: epochStatus } : undefined,
     });
-    mocks.useReadApplicationWasOutputExecuted.mockReturnValue({
+    mocks.useReadIApplicationWasOutputExecuted.mockReturnValue({
         data: wasOutputExecuted,
         isFetching: checkingOutputExecuted,
         error: checkingOutputExecutedError,
         refetch,
     });
-    mocks.useSimulateApplicationExecuteOutput.mockReturnValue({
+    mocks.useSimulateIApplicationExecuteOutput.mockReturnValue({
         data: simulateData,
         error: simulateError,
         isFetching: simulateIsFetching,
     });
-    mocks.useWriteApplicationExecuteOutput.mockReturnValue({
+    mocks.useWriteIApplicationExecuteOutput.mockReturnValue({
         data: executeTxHash,
         isPending: executeIsPending,
         reset,

@@ -1,4 +1,4 @@
-import type { Match, MatchAdvanced, Tournament } from "@cartesi/viem";
+import type { Match, MatchAdvanced, Tournament } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { TbSwords } from "react-icons/tb";

@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { ApplicationCard } from "./ApplicationCard";

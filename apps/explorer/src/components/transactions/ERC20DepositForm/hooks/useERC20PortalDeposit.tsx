@@ -1,7 +1,7 @@
 import {
     useSimulateErc20PortalDepositErc20Tokens,
     useWriteErc20PortalDepositErc20Tokens,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import { type Hex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 

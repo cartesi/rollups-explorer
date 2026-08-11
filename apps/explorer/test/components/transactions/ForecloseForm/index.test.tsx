@@ -1,8 +1,8 @@
 import {
-    useReadApplicationIsForeclosed,
-    useSimulateApplicationForeclose,
-    useWriteApplicationForeclose,
-} from "@cartesi/wagmi";
+    useReadIApplicationIsForeclosed,
+    useSimulateIApplicationForeclose,
+    useWriteIApplicationForeclose,
+} from "@cartesi/react";
 import type { WriteContractErrorType } from "viem/actions";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -18,17 +18,17 @@ import {
 } from "../../../test-utils";
 
 const mocks = vi.hoisted(() => ({
-    useReadApplicationIsForeclosed: vi.fn(),
-    useSimulateApplicationForeclose: vi.fn(),
-    useWriteApplicationForeclose: vi.fn(),
+    useReadIApplicationIsForeclosed: vi.fn(),
+    useSimulateIApplicationForeclose: vi.fn(),
+    useWriteIApplicationForeclose: vi.fn(),
     useAccount: vi.fn(),
     useWaitForTransactionReceipt: vi.fn(),
 }));
 
-vi.mock("@cartesi/wagmi", () => ({
-    useReadApplicationIsForeclosed: mocks.useReadApplicationIsForeclosed,
-    useSimulateApplicationForeclose: mocks.useSimulateApplicationForeclose,
-    useWriteApplicationForeclose: mocks.useWriteApplicationForeclose,
+vi.mock("@cartesi/react", () => ({
+    useReadIApplicationIsForeclosed: mocks.useReadIApplicationIsForeclosed,
+    useSimulateIApplicationForeclose: mocks.useSimulateIApplicationForeclose,
+    useWriteIApplicationForeclose: mocks.useWriteIApplicationForeclose,
 }));
 
 vi.mock("wagmi", () => ({
@@ -36,13 +36,13 @@ vi.mock("wagmi", () => ({
     useWaitForTransactionReceipt: mocks.useWaitForTransactionReceipt,
 }));
 
-const mockUseReadIsForeclosed = vi.mocked(useReadApplicationIsForeclosed, {
+const mockUseReadIsForeclosed = vi.mocked(useReadIApplicationIsForeclosed, {
     partial: true,
 });
-const mockUseSimulateForeclose = vi.mocked(useSimulateApplicationForeclose, {
+const mockUseSimulateForeclose = vi.mocked(useSimulateIApplicationForeclose, {
     partial: true,
 });
-const mockUseWriteForeclose = vi.mocked(useWriteApplicationForeclose, {
+const mockUseWriteForeclose = vi.mocked(useWriteIApplicationForeclose, {
     partial: true,
 });
 const mockUseAccount = vi.mocked(useAccount, { partial: true });

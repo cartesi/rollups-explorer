@@ -1,4 +1,4 @@
-import type { Application, ApplicationStatus } from "@cartesi/viem";
+import type { Application, ApplicationStatus } from "@cartesi/client";
 import {
     Alert,
     Badge,

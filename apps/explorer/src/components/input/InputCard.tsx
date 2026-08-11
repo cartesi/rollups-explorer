@@ -1,4 +1,4 @@
-import type { Input, InputStatus } from "@cartesi/viem";
+import type { Input, InputStatus } from "@cartesi/client";
 import {
     Badge,
     Card,

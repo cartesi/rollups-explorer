@@ -1,4 +1,4 @@
-import { inputBoxAddress } from "@cartesi/wagmi";
+import { inputBoxAddress } from "@cartesi/react";
 import { describe, expect, it } from "vitest";
 import Address from "../../src/components/Address";
 import { render, screen } from "../test-utils";

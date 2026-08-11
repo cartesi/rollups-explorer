@@ -5,7 +5,7 @@ import {
     erc721PortalAddress,
     etherPortalAddress,
     inputBoxAddress,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import { T, cond } from "ramda";
 import { type Address, getAddress, isAddress } from "viem";
 

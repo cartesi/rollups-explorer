@@ -1,5 +1,5 @@
 "use client";
-import type { Application, Output, Pagination } from "@cartesi/viem";
+import type { Application, Output, Pagination } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import { type FC } from "react";
 import { TbMail } from "react-icons/tb";

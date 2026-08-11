@@ -1,6 +1,6 @@
 "use client";
-import type { Pagination } from "@cartesi/viem";
-import { useApplication, useWithdrawals } from "@cartesi/wagmi";
+import type { Pagination } from "@cartesi/client";
+import { useApplication, useWithdrawals } from "@cartesi/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isNil, isNotNil } from "ramda";
 import { useEffect, useMemo, useRef, type FC } from "react";

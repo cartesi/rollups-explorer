@@ -1,11 +1,11 @@
 "use client";
-import type { EpochStatus } from "@cartesi/viem";
+import type { EpochStatus } from "@cartesi/client";
 import {
     useEpoch,
-    useReadApplicationWasOutputExecuted,
-    useSimulateApplicationExecuteOutput,
-    useWriteApplicationExecuteOutput,
-} from "@cartesi/wagmi";
+    useReadIApplicationWasOutputExecuted,
+    useSimulateIApplicationExecuteOutput,
+    useWriteIApplicationExecuteOutput,
+} from "@cartesi/react";
 import {
     Alert,
     Badge,
@@ -83,7 +83,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
     const hasExecutionTransaction = isNotNil(output.executionTransactionHash);
     const feedback = buildFeedback(epochStatus);
 
-    const wasOutputExecutedQuery = useReadApplicationWasOutputExecuted({
+    const wasOutputExecutedQuery = useReadIApplicationWasOutputExecuted({
         address: application,
         args: [output.index],
         query: {
@@ -111,7 +111,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
         hasHashes &&
         isClaimAccepted;
 
-    const prepare = useSimulateApplicationExecuteOutput({
+    const prepare = useSimulateIApplicationExecuteOutput({
         address: application,
         args: [output.rawData, proof],
         query: {
@@ -119,7 +119,7 @@ const OutputExecution: FC<OutputExecutionProps> = ({
         },
     });
 
-    const execute = useWriteApplicationExecuteOutput();
+    const execute = useWriteIApplicationExecuteOutput();
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,
     });

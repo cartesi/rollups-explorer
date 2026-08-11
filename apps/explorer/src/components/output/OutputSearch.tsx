@@ -1,4 +1,4 @@
-import type { OutputType } from "@cartesi/viem";
+import type { OutputType } from "@cartesi/client";
 import { Flex, Group, Select } from "@mantine/core";
 import { isNotNilOrEmpty } from "ramda-adjunct";
 import { type FC } from "react";

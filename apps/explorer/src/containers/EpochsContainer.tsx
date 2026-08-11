@@ -1,5 +1,5 @@
 "use client";
-import { useEpochs } from "@cartesi/wagmi";
+import { useEpochs } from "@cartesi/react";
 import type { FC } from "react";
 import {
     Hierarchy,

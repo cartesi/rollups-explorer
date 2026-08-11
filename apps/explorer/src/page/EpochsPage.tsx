@@ -1,4 +1,4 @@
-import type { Epoch, Pagination } from "@cartesi/viem";
+import type { Epoch, Pagination } from "@cartesi/client";
 import { Card, Center, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { TbClockFilled } from "react-icons/tb";

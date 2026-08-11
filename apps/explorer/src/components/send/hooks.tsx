@@ -1,5 +1,5 @@
 "use client";
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { useContext } from "react";
 import type { DbSpecification } from "../specification/types";
 import { SendActionContext, SendStateContext } from "./SendContexts";

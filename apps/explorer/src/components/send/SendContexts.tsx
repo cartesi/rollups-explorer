@@ -1,5 +1,5 @@
 "use client";
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { createContext, type ActionDispatch } from "react";
 import type { DbSpecification } from "../specification/types";
 

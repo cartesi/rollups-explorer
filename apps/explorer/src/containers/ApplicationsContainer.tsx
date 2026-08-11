@@ -1,6 +1,6 @@
 "use client";
 
-import { useApplications } from "@cartesi/wagmi";
+import { useApplications } from "@cartesi/react";
 import type { FC } from "react";
 import {
     Hierarchy,

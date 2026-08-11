@@ -1,7 +1,7 @@
 import type {
     GetApplicationReturnType,
     GetOutputReturnType,
-} from "@cartesi/viem";
+} from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { OutputCard } from "./OutputCard";
 

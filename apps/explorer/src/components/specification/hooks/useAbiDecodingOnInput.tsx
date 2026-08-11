@@ -1,5 +1,5 @@
 "use client";
-import type { Input } from "@cartesi/viem";
+import type { Input } from "@cartesi/client";
 import { find } from "ramda";
 import { isNilOrEmpty, isNotNilOrEmpty } from "ramda-adjunct";
 import { findSpecificationFor } from "../conditionals";

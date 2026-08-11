@@ -1,4 +1,4 @@
-import type { Match } from "@cartesi/viem";
+import type { Match } from "@cartesi/client";
 import { Divider, Stack } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import type { FC } from "react";

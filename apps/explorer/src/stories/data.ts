@@ -6,8 +6,8 @@ import type {
     MatchAdvanced,
     SnapshotPolicy,
     Tournament,
-} from "@cartesi/viem";
-import { inputBoxAddress } from "@cartesi/viem/abi";
+} from "@cartesi/client";
+import { inputBoxAddress } from "@cartesi/client/abi";
 import {
     keccak256,
     numberToHex,

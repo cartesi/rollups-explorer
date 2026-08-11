@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import type { Application, Withdrawal } from "@cartesi/viem";
+import type { Application, Withdrawal } from "@cartesi/client";
 import { MantineProvider } from "@mantine/core";
 import { render, type RenderOptions } from "@testing-library/react";
 import { zeroHash } from "viem";

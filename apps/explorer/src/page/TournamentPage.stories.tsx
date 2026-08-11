@@ -1,4 +1,4 @@
-import type { Commitment, Tournament } from "@cartesi/viem";
+import type { Commitment, Tournament } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";

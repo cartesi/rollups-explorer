@@ -1,6 +1,6 @@
 "use client";
-import type { Match, Tournament } from "@cartesi/viem";
-import { useMatch, useTournament } from "@cartesi/wagmi";
+import type { Match, Tournament } from "@cartesi/client";
+import { useMatch, useTournament } from "@cartesi/react";
 import { isNotNil } from "ramda";
 import { useEffect, useRef, useState } from "react";
 import type { Address } from "viem";

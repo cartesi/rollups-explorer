@@ -1,4 +1,4 @@
-import type { Match } from "@cartesi/viem";
+import type { Match } from "@cartesi/client";
 import type { FC } from "react";
 import { MatchBadge, type MatchBadgeProps } from "./MatchBadge";
 

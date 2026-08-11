@@ -1,4 +1,4 @@
-import type { Match } from "@cartesi/viem";
+import type { Match } from "@cartesi/client";
 import { Breadcrumbs, Button, type BreadcrumbsProps } from "@mantine/core";
 import type { FC } from "react";
 import { MatchBadge } from "./MatchBadge";

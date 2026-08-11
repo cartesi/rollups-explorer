@@ -1,5 +1,5 @@
-import type { ListOutputsParams } from "@cartesi/viem";
-import { useOutputs } from "@cartesi/wagmi";
+import type { ListOutputsParams } from "@cartesi/client";
+import { useOutputs } from "@cartesi/react";
 import { Card, Center, Text } from "@mantine/core";
 import { useState, type FC } from "react";
 import type { DecoderType } from "../types";

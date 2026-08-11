@@ -1,4 +1,4 @@
-import type { Match } from "@cartesi/viem";
+import type { Match } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { fn } from "storybook/test";
 import { claim, generateMatchID } from "../../stories/util";

@@ -1,6 +1,6 @@
 "use client";
-import type { Application } from "@cartesi/viem";
-import { inputBoxAddress } from "@cartesi/wagmi";
+import type { Application } from "@cartesi/client";
+import { inputBoxAddress } from "@cartesi/react";
 import {
     Button,
     Collapse,

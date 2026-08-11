@@ -1,5 +1,5 @@
 "use client";
-import type { Pagination, Withdrawal } from "@cartesi/viem";
+import type { Pagination, Withdrawal } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { type FC } from "react";

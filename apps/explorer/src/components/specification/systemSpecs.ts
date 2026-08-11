@@ -8,7 +8,7 @@ import {
     erc20PortalConfig,
     erc721PortalConfig,
     etherPortalConfig,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import type { DbSpecification } from "./types";
 
 const timestamp = 0;

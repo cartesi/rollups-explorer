@@ -5,7 +5,7 @@ import {
     erc721PortalAddress,
     etherPortalAddress,
     inputBoxAddress,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import { type Address, zeroAddress } from "viem";
 import { describe, expect, test } from "vitest";
 import RollupContractResolver from "../../src/lib/rollupContractResolver";

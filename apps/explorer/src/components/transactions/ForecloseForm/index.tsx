@@ -1,9 +1,9 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import {
-    useReadApplicationIsForeclosed,
-    useSimulateApplicationForeclose,
-    useWriteApplicationForeclose,
-} from "@cartesi/wagmi";
+    useReadIApplicationIsForeclosed,
+    useSimulateIApplicationForeclose,
+    useWriteIApplicationForeclose,
+} from "@cartesi/react";
 import {
     Button,
     Collapse,
@@ -36,14 +36,14 @@ export const ForecloseForm: FC<ForecloseFormProps> = (props) => {
         data: isApplicationForeclosed,
         isLoading: isCheckingIfForeclosed,
         refetch: recheckIfForeclosed,
-    } = useReadApplicationIsForeclosed({
+    } = useReadIApplicationIsForeclosed({
         address: application.applicationAddress,
         query: {
             enabled: isNotNil(application.applicationAddress),
         },
     });
 
-    const prepare = useSimulateApplicationForeclose({
+    const prepare = useSimulateIApplicationForeclose({
         address: application.applicationAddress,
         query: {
             enabled:
@@ -54,7 +54,7 @@ export const ForecloseForm: FC<ForecloseFormProps> = (props) => {
         },
     });
 
-    const execute = useWriteApplicationForeclose();
+    const execute = useWriteIApplicationForeclose();
 
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,

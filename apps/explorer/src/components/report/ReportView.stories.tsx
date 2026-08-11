@@ -1,4 +1,4 @@
-import type { GetReportReturnType } from "@cartesi/viem";
+import type { GetReportReturnType } from "@cartesi/client";
 import { SegmentedControl, Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState } from "react";

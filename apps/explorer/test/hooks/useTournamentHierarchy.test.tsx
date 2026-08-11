@@ -1,11 +1,11 @@
-import type { Match, Tournament } from "@cartesi/viem";
-import { useMatch, useTournament } from "@cartesi/wagmi";
+import type { Match, Tournament } from "@cartesi/client";
+import { useMatch, useTournament } from "@cartesi/react";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { Address } from "viem";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTournamentHierarchy } from "../../src/hooks/useTournamentHierarchy";
 
-vi.mock("@cartesi/wagmi", () => ({
+vi.mock("@cartesi/react", () => ({
     useMatch: vi.fn(),
     useTournament: vi.fn(),
 }));

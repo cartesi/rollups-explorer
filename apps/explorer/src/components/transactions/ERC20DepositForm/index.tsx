@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import {
     Autocomplete,
     Button,
@@ -35,7 +35,7 @@ import {
 import { useAccount } from "wagmi";
 import { type TransactionFormSuccessData } from "../DepositFormTypes";
 
-import { erc20PortalAddress } from "@cartesi/wagmi";
+import { erc20PortalAddress } from "@cartesi/react";
 import TransactionDetails from "../TransactionDetails";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";

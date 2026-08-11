@@ -1,4 +1,4 @@
-import { createCartesiPublicClient } from "@cartesi/viem";
+import { createCartesiPublicClient } from "@cartesi/client";
 import { descend, isNil, prop, sort } from "ramda";
 import { http } from "viem";
 import type { DbNodeConnectionConfig } from "./types";

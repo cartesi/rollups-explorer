@@ -1,4 +1,4 @@
-import type { Pagination as PaginationData } from "@cartesi/viem";
+import type { Pagination as PaginationData } from "@cartesi/client";
 import { Pagination, type PaginationProps } from "@mantine/core";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, type FC } from "react";
