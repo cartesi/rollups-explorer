@@ -23,6 +23,7 @@ const validReport: GetReportReturnType = {
     rawData: "0x556e737570706f7274656420616374696f6e20617474656d707465642e",
     createdAt: date,
     updatedAt: date,
+    epochIndex: 0n,
 };
 
 const validReport2: GetReportReturnType = {

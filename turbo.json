@@ -43,6 +43,9 @@
         "clean": {
             "cache": false
         },
+        "typegen": {
+            "outputs": [".next/types/**"]
+        },
         "codegen": {
             "outputs": [
                 "src/graphql/**",
@@ -57,6 +60,9 @@
         },
         "lint": {
             "cache": false
+        },
+        "check:types": {
+            "dependsOn": ["codegen", "typegen"]
         },
         "test": {
             "dependsOn": ["build"],

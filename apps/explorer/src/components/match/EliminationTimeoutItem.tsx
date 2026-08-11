@@ -1,9 +1,4 @@
-import {
-    Group,
-    Text,
-    useComputedColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
+import { Group, Text } from "@mantine/core";
 import { type FC } from "react";
 import { TbClockCancel } from "react-icons/tb";
 import type { Claim } from "../types";
@@ -36,10 +31,6 @@ export const EliminationTimeoutItem: FC<EliminationTimeoutItemProps> = (
     props,
 ) => {
     const { claim1, claim2, now, timestamp } = props;
-
-    const theme = useMantineTheme();
-    const scheme = useComputedColorScheme();
-    const bg = scheme === "light" ? theme.colors.gray[0] : undefined;
 
     return (
         <>
