@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
     useOutputs: vi.fn(),
 }));
 
-vi.mock("@cartesi/wagmi", () => ({
+vi.mock("@cartesi/react", () => ({
     useOutputs: mocks.useOutputs,
 }));
 

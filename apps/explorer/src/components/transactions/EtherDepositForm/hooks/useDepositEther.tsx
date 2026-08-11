@@ -2,7 +2,7 @@
 import {
     useSimulateEtherPortalDepositEther,
     useWriteEtherPortalDepositEther,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import { type Hex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 

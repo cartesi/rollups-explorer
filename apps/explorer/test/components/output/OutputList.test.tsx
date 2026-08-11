@@ -1,4 +1,4 @@
-import type { Output } from "@cartesi/viem";
+import type { Output } from "@cartesi/client";
 import { describe, expect, it, vi } from "vitest";
 import { OutputList } from "../../../src/components/output/OutputList";
 import { fireEvent, render, screen } from "../../test-utils";

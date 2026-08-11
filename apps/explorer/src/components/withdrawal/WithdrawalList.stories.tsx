@@ -1,4 +1,4 @@
-import type { Withdrawal } from "@cartesi/viem";
+import type { Withdrawal } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { http } from "msw";
 import {

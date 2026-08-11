@@ -1,5 +1,5 @@
-import type { Withdrawal } from "@cartesi/viem";
-import { outputsAbi } from "@cartesi/wagmi";
+import type { Withdrawal } from "@cartesi/client";
+import { outputsAbi } from "@cartesi/react";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { http } from "msw";
 import { encodeFunctionData } from "viem";

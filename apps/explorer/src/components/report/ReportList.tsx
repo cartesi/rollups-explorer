@@ -1,4 +1,4 @@
-import type { Pagination as QPagination, Report } from "@cartesi/viem";
+import type { Pagination as QPagination, Report } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import { type FC } from "react";
 import { QueryPagination } from "../QueryPagination";

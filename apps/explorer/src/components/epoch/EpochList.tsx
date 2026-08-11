@@ -1,4 +1,4 @@
-import type { Epoch } from "@cartesi/viem";
+import type { Epoch } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { EpochCard } from "./EpochCard";

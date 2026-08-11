@@ -1,4 +1,4 @@
-import type { Pagination as QPagination } from "@cartesi/viem";
+import type { Pagination as QPagination } from "@cartesi/client";
 import { Group, Pagination, type GroupProps } from "@mantine/core";
 import { isNil } from "ramda";
 import type { FC } from "react";

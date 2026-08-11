@@ -2,7 +2,7 @@
 import {
     useSimulateErc1155BatchPortalDepositBatchErc1155Token,
     useWriteErc1155BatchPortalDepositBatchErc1155Token,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import type { Hex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 

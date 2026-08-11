@@ -1,4 +1,4 @@
-import type { GetReportReturnType } from "@cartesi/viem";
+import type { GetReportReturnType } from "@cartesi/client";
 import { Fieldset, Spoiler, Text } from "@mantine/core";
 import { useEffect, useRef, type FC } from "react";
 import { getDecoder } from "../../lib/decoders";

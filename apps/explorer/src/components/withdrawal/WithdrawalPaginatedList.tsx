@@ -1,4 +1,4 @@
-import type { Pagination, Withdrawal } from "@cartesi/viem";
+import type { Pagination, Withdrawal } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import { type FC } from "react";
 import { v4 } from "uuid";

@@ -1,6 +1,6 @@
 "use client";
-import { type Application } from "@cartesi/viem";
-import { etherPortalAddress } from "@cartesi/wagmi";
+import { type Application } from "@cartesi/client";
+import { etherPortalAddress } from "@cartesi/react";
 import { Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { type FC, useEffect, useMemo } from "react";

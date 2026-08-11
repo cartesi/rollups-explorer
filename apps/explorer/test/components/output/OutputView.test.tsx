@@ -1,4 +1,4 @@
-import type { GetOutputReturnType } from "@cartesi/viem";
+import type { GetOutputReturnType } from "@cartesi/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OutputView } from "../../../src/components/output/OutputView";
 import { render, screen } from "../../test-utils";

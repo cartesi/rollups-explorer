@@ -1,4 +1,4 @@
-import type { Application, Pagination } from "@cartesi/viem";
+import type { Application, Pagination } from "@cartesi/client";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WithdrawalsContainer } from "../../src/containers/WithdrawalsContainer";
@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
     useWithdrawals: vi.fn(),
 }));
 
-vi.mock("@cartesi/wagmi", () => ({
+vi.mock("@cartesi/react", () => ({
     useApplication: mocks.useApplication,
     useWithdrawals: mocks.useWithdrawals,
 }));

@@ -1,4 +1,4 @@
-import type { Commitment, Match } from "@cartesi/viem";
+import type { Commitment, Match } from "@cartesi/client";
 import { Flex } from "@mantine/core";
 import { useMemo, type FC } from "react";
 import type { Hash } from "viem";

@@ -1,4 +1,4 @@
-import type { Tournament } from "@cartesi/viem";
+import type { Tournament } from "@cartesi/client";
 import {
     Button,
     Group,

@@ -1,4 +1,4 @@
-import type { Match, Tournament, WinnerCommitment } from "@cartesi/viem";
+import type { Match, Tournament, WinnerCommitment } from "@cartesi/client";
 import { HttpResponse } from "msw";
 import {
     concat,

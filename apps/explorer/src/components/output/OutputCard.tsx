@@ -1,4 +1,4 @@
-import type { Application, Output } from "@cartesi/viem";
+import type { Application, Output } from "@cartesi/client";
 import {
     Anchor,
     Card,

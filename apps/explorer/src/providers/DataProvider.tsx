@@ -1,4 +1,4 @@
-import { CartesiProvider } from "@cartesi/wagmi";
+import { CartesiProvider } from "@cartesi/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, type FC, type PropsWithChildren } from "react";
 import { useSelectedNodeConnection } from "../components/connection/hooks";

@@ -1,4 +1,4 @@
-import type { Commitment, Match, Tournament } from "@cartesi/viem";
+import type { Commitment, Match, Tournament } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { claim, generateMatchID } from "../../stories/util";

@@ -4,7 +4,7 @@ import type {
     GetInputReturnType,
     GetTournamentReturnType,
     GetWithdrawalReturnType,
-} from "@cartesi/viem";
+} from "@cartesi/client";
 import { Anchor, Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { head } from "ramda";

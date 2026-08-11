@@ -1,4 +1,4 @@
-import type { Input } from "@cartesi/viem";
+import type { Input } from "@cartesi/client";
 import {
     allPass,
     anyPass,

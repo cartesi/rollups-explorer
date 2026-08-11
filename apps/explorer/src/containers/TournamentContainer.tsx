@@ -1,5 +1,5 @@
 "use client";
-import { useCommitments, useMatches, useTournament } from "@cartesi/wagmi";
+import { useCommitments, useMatches, useTournament } from "@cartesi/react";
 import { notFound } from "next/navigation";
 import type { FC } from "react";
 import {

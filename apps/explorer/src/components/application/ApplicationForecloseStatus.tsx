@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { Alert, Card, Group, useMantineTheme } from "@mantine/core";
 import type { FC } from "react";
 import {

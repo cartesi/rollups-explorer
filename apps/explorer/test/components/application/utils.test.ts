@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { zeroHash } from "viem";
 import { describe, expect, test } from "vitest";
 import {

@@ -5,7 +5,7 @@ import type {
     Notice,
     Output,
     Voucher,
-} from "@cartesi/viem";
+} from "@cartesi/client";
 import type { DecoderType } from "../types";
 
 export type VoucherOutput = Omit<Output, "decodedData"> & {

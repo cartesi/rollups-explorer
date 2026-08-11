@@ -1,5 +1,5 @@
 "use client";
-import { useApplication, useEpoch, useInputs } from "@cartesi/wagmi";
+import { useApplication, useEpoch, useInputs } from "@cartesi/react";
 import { notFound } from "next/navigation";
 import { isNotNil } from "ramda";
 import { type FC } from "react";

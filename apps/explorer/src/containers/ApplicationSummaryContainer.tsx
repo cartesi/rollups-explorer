@@ -7,7 +7,7 @@ import {
     useReports,
     useTournaments,
     useWithdrawals,
-} from "@cartesi/wagmi";
+} from "@cartesi/react";
 import { isNotNil } from "ramda";
 import type { FC } from "react";
 import { isForeclosed } from "../components/application/utils";

@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import type { TransactionFormSuccessData } from "../DepositFormTypes";
 
 export interface ERC1155DepositFormProps {

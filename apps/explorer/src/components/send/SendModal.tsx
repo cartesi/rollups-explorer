@@ -1,5 +1,5 @@
 "use client";
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { Group, Modal, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { defaultTo, isNil, isNotNil } from "ramda";

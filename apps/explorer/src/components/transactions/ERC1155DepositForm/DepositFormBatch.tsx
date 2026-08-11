@@ -1,4 +1,4 @@
-import { erc1155BatchPortalAddress } from "@cartesi/wagmi";
+import { erc1155BatchPortalAddress } from "@cartesi/react";
 import {
     Autocomplete,
     Button,

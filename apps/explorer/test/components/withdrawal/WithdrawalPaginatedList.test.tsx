@@ -1,4 +1,4 @@
-import type { Withdrawal } from "@cartesi/viem";
+import type { Withdrawal } from "@cartesi/client";
 import { describe, expect, it, vi } from "vitest";
 import { WithdrawalPaginatedList } from "../../../src/components/withdrawal/WithdrawalPaginatedList";
 import { createWithdrawal, fireEvent, render, screen } from "../../test-utils";

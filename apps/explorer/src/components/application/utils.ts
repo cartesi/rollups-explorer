@@ -1,4 +1,4 @@
-import type { Application } from "@cartesi/viem";
+import type { Application } from "@cartesi/client";
 import { isNil } from "ramda";
 import {
     isAddressEqual,

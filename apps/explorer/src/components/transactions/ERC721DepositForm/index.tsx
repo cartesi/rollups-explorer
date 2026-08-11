@@ -1,5 +1,5 @@
-import type { Application } from "@cartesi/viem";
-import { erc721PortalAddress } from "@cartesi/wagmi";
+import type { Application } from "@cartesi/client";
+import { erc721PortalAddress } from "@cartesi/react";
 import {
     Button,
     Collapse,

@@ -1,5 +1,5 @@
-import type { ListReportsParams } from "@cartesi/viem";
-import { useReports } from "@cartesi/wagmi";
+import type { ListReportsParams } from "@cartesi/client";
+import { useReports } from "@cartesi/react";
 import { Card, Center, Text } from "@mantine/core";
 import { useState, type FC } from "react";
 import type { DecoderType } from "../types";

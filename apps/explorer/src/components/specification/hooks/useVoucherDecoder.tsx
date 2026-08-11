@@ -1,5 +1,5 @@
 "use client";
-import type { DelegateCallVoucher, Voucher } from "@cartesi/viem";
+import type { DelegateCallVoucher, Voucher } from "@cartesi/client";
 import { whatsabi } from "@shazow/whatsabi";
 import { isNil, isNotNil } from "ramda";
 import { isNotNilOrEmpty } from "ramda-adjunct";

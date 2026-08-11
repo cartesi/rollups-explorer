@@ -1,4 +1,4 @@
-import type { Application, Pagination } from "@cartesi/viem";
+import type { Application, Pagination } from "@cartesi/client";
 import { Card, Center, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import { TbCpu } from "react-icons/tb";
