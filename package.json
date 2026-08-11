@@ -8,6 +8,7 @@
         "storybook": "turbo run storybook",
         "dev": "turbo run dev --no-cache --continue",
         "lint": "turbo run lint",
+        "check:types": "turbo run check:types",
         "clean": "turbo run clean && rm -rf node_modules",
         "format:check": "prettier \"**/*.{ts,tsx}\" --check",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",

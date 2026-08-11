@@ -115,10 +115,11 @@ const params: Params = {
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
                 outputsHash:
                     "0x97a8872d473a093269f65e4e14170fcf5d1383cd105d7215688f5e8c55f00553",
-                transactionReference:
+                transactionHash:
                     "0x75e1a936e92309ce05d3592905fb08637e64dab4131440c59ff053880ffde098",
                 createdAt: date,
                 updatedAt: date,
+                logIndex: 0n,
             },
         ],
         totalCount: 1,
@@ -260,10 +261,11 @@ const authorityAppParams: Params = {
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
                 outputsHash:
                     "0x97a8872d473a093269f65e4e14170fcf5d1383cd105d7215688f5e8c55f00553",
-                transactionReference:
+                transactionHash:
                     "0x75e1a936e92309ce05d3592905fb08637e64dab4131440c59ff053880ffde098",
                 createdAt: date,
                 updatedAt: date,
+                logIndex: 0n,
             },
         ],
         totalCount: 1,

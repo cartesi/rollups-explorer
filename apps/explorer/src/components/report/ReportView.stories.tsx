@@ -17,6 +17,7 @@ type Story = StoryObj<typeof meta>;
 const validReport: GetReportReturnType = {
     createdAt: new Date(),
     updatedAt: new Date(),
+    epochIndex: 0n,
     index: 1n,
     inputIndex: 1n,
     rawData:

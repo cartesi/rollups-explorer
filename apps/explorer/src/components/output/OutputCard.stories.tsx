@@ -198,7 +198,8 @@ const application: GetApplicationReturnType = {
         inputBoxAddress: "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac",
     },
     consensusType: "AUTHORITY",
-    state: "ENABLED",
+    status: "OK",
+    enabled: true,
     reason: null,
     inputBoxBlock: 7n,
     lastEpochCheckBlock: 0n,
@@ -223,6 +224,26 @@ const application: GetApplicationReturnType = {
         maxConcurrentInspects: 10,
         createdAt: new Date("2026-04-02T08:46:14.869Z"),
         updatedAt: new Date("2026-04-02T08:46:14.869Z"),
+    },
+    claimStagingPeriod: 0n,
+    accountsDriveMerkleRoot:
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+    accountsDriveProvedBlock: 0n,
+    accountsDriveProvedTransaction:
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+    lastAccountsDriveProvedCheckBlock: 0n,
+    lastForecloseCheckBlock: 0n,
+    lastTournamentCheckBlock: 0n,
+    lastWithdrawalCheckBlock: 0n,
+    forecloseBlock: 0n,
+    forecloseTransaction:
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+    withdrawalConfig: {
+        guardian: "0x0000000000000000000000000000000000000000",
+        log2LeavesPerAccount: 0n,
+        log2MaxNumOfAccounts: 20n,
+        accountsDriveStartIndex: 33554432n,
+        withdrawalOutputBuilder: "0x0000000000000000000000000000000000000000",
     },
 };
 

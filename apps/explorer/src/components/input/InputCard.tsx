@@ -178,7 +178,7 @@ export const InputCard: FC<Props> = ({ input }) => {
                             <TbReceipt size={theme.other.mdIconSize} />
                         </Tooltip>
                         <TransactionHash
-                            transactionHash={input.transactionReference}
+                            transactionHash={input.transactionHash}
                         />
                     </Group>
                     {isNotNil(millis) && (
