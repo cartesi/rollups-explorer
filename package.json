@@ -32,7 +32,7 @@
         "typescript": "catalog:"
     },
     "engines": {
-        "node": ">=22.x"
+        "node": ">=24.19.0 <25"
     },
-    "packageManager": "pnpm@10.25.0"
+    "packageManager": "pnpm@11.21.0"
 }

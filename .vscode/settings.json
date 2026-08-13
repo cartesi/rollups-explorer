@@ -10,6 +10,10 @@
     "[terraform]": {
         "editor.defaultFormatter": "hashicorp.terraform"
     },
+    "[hcl]": {
+        "editor.defaultFormatter": "fredwangwang.vscode-hcl-format",
+        "editor.formatOnSave": true
+    },
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
