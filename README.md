@@ -19,8 +19,30 @@ Rollups Explorer is a web application that facilitates interacting with [Cartesi
 
 ## Dependencies
 
-- NodeJS 22
-- pnpm (package manager)
+- NodeJS 24.19.0
+- pnpm 11.21.0 (package manager)
+
+Enable Corepack to activate the repository's declared pnpm version
+
+```shell
+corepack enable
+```
+
+## Package Management
+
+This repository uses pnpm 11.21.0 with supply-chain protections enabled:
+
+- Dependency lifecycle/build scripts are blocked unless explicitly approved in `allowBuilds` in `pnpm-workspace.yaml`.
+- `strictDepBuilds` makes installs fail when a dependency requests an unapproved build script.
+- Dependencies must normally be at least seven days old (`minimumReleaseAge: 10080`, in minutes).
+- `trustPolicy: no-downgrade` rejects package versions whose publishing trust evidence is weaker than an earlier release.
+- Transitive dependencies cannot use git repositories or direct tarball URLs (`blockExoticSubdeps: true`).
+
+Use the lockfile exactly as committed:
+
+```shell
+pnpm install --frozen-lockfile
+```
 
 ## Build
 
