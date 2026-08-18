@@ -1,8 +1,7 @@
+import { encodeDelegateCallVoucher, encodeNotice } from "@cartesi/codec";
 import type { Withdrawal } from "@cartesi/client";
-import { outputsAbi } from "@cartesi/react";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { http } from "msw";
-import { encodeFunctionData } from "viem";
 import {
     createMethodNotFoundResponse,
     getMockResponse,
@@ -36,12 +35,9 @@ const validWithdrawal = {
     updatedAt: new Date("2026-07-29T13:37:31.516Z"),
 } as Withdrawal;
 
-const genericEncodedNotice = encodeFunctionData({
-    abi: outputsAbi,
-    functionName: "Notice",
-    args: [
+const genericEncodedNotice = encodeNotice({
+    payload:
         "0x00000000000000000000000088a2120b7068e78692c8fd12e751d610b6377e4d",
-    ],
 });
 
 const invalidOutputWithdrawal = {
@@ -79,13 +75,10 @@ export const NonExecutableWarning: Story = {
     },
 };
 
-const outputWithDifferentDestination = encodeFunctionData({
-    abi: outputsAbi,
-    functionName: "DelegateCallVoucher",
-    args: [
-        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+const outputWithDifferentDestination = encodeDelegateCallVoucher({
+    destination: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    payload:
         "0xd1660f9900000000000000000000000088a2120b7068e78692c8fd12e751d610b6377e4d000000000000000000000000a074683b5be015f053b5dceb064c41fc9d11b6e500000000000000000000000000000000000000000000000000000000001e8480",
-    ],
 });
 
 export const NonDecodableWarning: Story = {

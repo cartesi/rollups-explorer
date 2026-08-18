@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@cartesi/client": "2.0.0-alpha.34",
+        "@cartesi/codec": "1.0.0-alpha.1",
         "@cartesi/react": "2.0.0-alpha.38",
         "@mantine/code-highlight": "^8.3.15",
         "@mantine/core": "^8.3.15",
