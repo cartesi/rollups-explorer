@@ -1,5 +1,5 @@
+import { decodeOutput } from "@cartesi/codec";
 import type { DelegateCallVoucher, Voucher, Withdrawal } from "@cartesi/client";
-import { outputsAbi } from "@cartesi/react";
 import {
     Alert,
     Box,
@@ -14,7 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { cond, isNotNil } from "ramda";
 import { useMemo, useState, type FC } from "react";
 import { TbExclamationCircleFilled } from "react-icons/tb";
-import { decodeFunctionData, isHex, type Hex } from "viem";
+import { isHex, type Hex } from "viem";
 import { content } from "../../content";
 import JSONViewer from "../JSONViewer";
 import { LongText } from "../LongText";
@@ -40,39 +40,22 @@ type DecodeOutputDataResult =
 
 const decodeOutputData = (output: Hex): DecodeOutputDataResult => {
     try {
-        const { functionName, args } = decodeFunctionData({
-            abi: outputsAbi,
-            data: output,
-        });
-        switch (functionName) {
-            case "DelegateCallVoucher":
-                return {
-                    status: "success",
-                    data: {
-                        type: "DelegateCallVoucher",
-                        destination: args[0],
-                        payload: args[1],
-                    } as DelegateCallVoucher,
-                };
-            case "Voucher":
-                return {
-                    status: "success",
-                    data: {
-                        type: "Voucher",
-                        destination: args[0],
-                        value: args[1],
-                        payload: args[2],
-                    } as Voucher,
-                };
-            default:
-                return {
-                    status: "error",
-                    error: new Error(
-                        content.withdrawal.error.output.nonExecutable +
-                            ` ${functionName}`,
-                    ),
-                };
+        const decoded = decodeOutput(output);
+
+        if (decoded.type === "Notice") {
+            return {
+                status: "error",
+                error: new Error(
+                    content.withdrawal.error.output.nonExecutable +
+                        ` ${decoded.type}`,
+                ),
+            };
         }
+
+        return {
+            status: "success",
+            data: decoded,
+        };
     } catch (error) {
         return {
             status: "error",
