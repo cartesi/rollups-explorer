@@ -71,7 +71,7 @@ describe("Decoding Specification", () => {
             expect(envelope.error?.message).toEqual(
                 `Encoded function signature "0x24d15c67" not found on ABI.
 Make sure you are using the correct ABI and that the function exists on it.
-You can look up the signature here: https://openchain.xyz/signatures?query=0x24d15c67.`,
+You can look up the signature here: https://4byte.sourcify.dev/?q=0x24d15c67.`,
             );
             expect(envelope.result).toEqual({});
         });
