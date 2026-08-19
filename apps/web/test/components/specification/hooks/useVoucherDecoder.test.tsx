@@ -212,7 +212,7 @@ describe("useVoucherDecoder hook", () => {
             expect(logSpy)
                 .toHaveBeenCalledWith(`Skipping voucher decoding. Reason: Encoded function signature \"0xa9059cbb\" not found on ABI.
 Make sure you are using the correct ABI and that the function exists on it.
-You can look up the signature here: https://openchain.xyz/signatures?query=0xa9059cbb.`);
+You can look up the signature here: https://4byte.sourcify.dev/?q=0xa9059cbb.`);
 
             logSpy.mockRestore();
         });
