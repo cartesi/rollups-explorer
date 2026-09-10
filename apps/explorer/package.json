@@ -87,7 +87,7 @@
         "prettier": "catalog:",
         "storybook": "^10.1.5",
         "typescript": "catalog:",
-        "vitest": "4.1.4"
+        "vitest": "4.1.11"
     },
     "msw": {
         "workerDirectory": [
