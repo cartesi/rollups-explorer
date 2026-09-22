@@ -37,17 +37,17 @@ describe("RollupContractResolver", () => {
             "depositEther",
         );
         expect(RollupContractResolver.resolveMethod(erc20PortalAddress)).toBe(
-            "depositERC20Tokens",
+            "depositErc20Tokens",
         );
         expect(RollupContractResolver.resolveMethod(erc721PortalAddress)).toBe(
-            "depositERC721Tokens",
+            "depositErc721Token",
         );
         expect(
             RollupContractResolver.resolveMethod(erc1155SinglePortalAddress),
-        ).toBe("depositERC1155SingleTokens");
+        ).toBe("depositSingleErc1155Token");
         expect(
             RollupContractResolver.resolveMethod(erc1155BatchPortalAddress),
-        ).toBe("depositERC1155BatchToken");
+        ).toBe("depositBatchErc1155Token");
         expect(RollupContractResolver.resolveMethod(inputBoxAddress)).toBe(
             "addInput",
         );
