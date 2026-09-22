@@ -118,3 +118,38 @@ export const Rejected: Story = {
         },
     },
 };
+
+/**
+ * Card for an input the machine rejected with a CMIO exception. The exception
+ * payload is the guest's own bytes, here the UTF-8 text "invalid action".
+ */
+export const Exception: Story = {
+    args: {
+        input: {
+            index: 3n,
+            status: "EXCEPTION",
+            exceptionData: "0x696e76616c696420616374696f6e",
+            epochIndex: 0n,
+            machineHash: null,
+            outputsHash: null,
+            decodedData: {
+                payload:
+                    "0x7b22616374696f6e223a226a616d2e7365744e465441646472657373222c2261646472657373223a22307865376631373235453737333443453238384638333637653142623134334539306262334630353132227d",
+                sender: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                applicationContract:
+                    "0x7d6bcf9b5bb5bfb0ae793082c271931ec333e35d",
+                blockNumber: 1n,
+                blockTimestamp: 1n,
+                chainId: 13370n,
+                index: 0n,
+                prevRandao: 1n,
+            },
+            blockNumber: 1n,
+            rawData: "0x",
+            transactionHash: keccak256("0x1"),
+            logIndex: 0n,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        },
+    },
+};
