@@ -1,5 +1,5 @@
 import { createCartesiPublicClient } from "@cartesi/client";
-import { descend, isNil, prop, sort } from "ramda";
+import { descend, prop, sort } from "ramda";
 import { http } from "viem";
 import type { DbNodeConnectionConfig } from "./types";
 
@@ -20,7 +20,7 @@ type NodeMetaResult =
 
 /**
  *
- * Request both rollups node's version and chain-id.
+ * Request the rollups node's version and chain-id.
  * the returned object has status and adjacents properties based on it.
  *
  * @param cartesiNodeUrl
@@ -32,47 +32,14 @@ export const fetchRollupsNodeMeta = async (
         transport: http(cartesiNodeUrl, { timeout: 5000 }),
     });
 
-    const promises: [chainId: Promise<number>, nodeVersion: Promise<string>] = [
-        cartesiClient.getChainId(),
-        cartesiClient.getNodeVersion(),
-    ];
-
     try {
-        const [chainIdSettled, nodeVersionSettled] =
-            await Promise.allSettled(promises);
-        const bothFailed =
-            chainIdSettled.status === "rejected" &&
-            nodeVersionSettled.status === "rejected";
-        if (bothFailed) {
-            return {
-                status: "error",
-                error: new Error("Looks like the node is not responding."),
-            };
-        }
+        const { version, chainId } = await cartesiClient.getNodeInfo();
 
-        const nodeVersion =
-            nodeVersionSettled.status === "fulfilled"
-                ? nodeVersionSettled.value
-                : null;
-        const chainId =
-            chainIdSettled.status === "fulfilled" ? chainIdSettled.value : null;
-        const errorMessages: string[] = [];
-
-        if (isNil(nodeVersion))
-            errorMessages.push("does not provide a node-version.");
-
-        if (isNil(chainId)) errorMessages.push("does not provide a chain-id.");
-
-        if (isNil(nodeVersion) || isNil(chainId))
-            return {
-                status: "error",
-                error: new Error(
-                    `${cartesiNodeUrl} ${errorMessages.join(" and ")}`,
-                ),
-            };
-
-        return { status: "success", nodeVersion, chainId };
-    } catch (error) {
-        return { status: "error", error: error as Error };
+        return { status: "success", nodeVersion: version, chainId };
+    } catch {
+        return {
+            status: "error",
+            error: new Error("Looks like the node is not responding."),
+        };
     }
 };
