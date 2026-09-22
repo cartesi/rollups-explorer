@@ -44,6 +44,7 @@ export const Open: Story = {
             {
                 index: 2n,
                 status: "ACCEPTED",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -73,6 +74,7 @@ export const Open: Story = {
             {
                 index: 1n,
                 status: "NONE",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -102,6 +104,7 @@ export const Open: Story = {
             {
                 index: 0n,
                 status: "REJECTED",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -141,6 +144,7 @@ export const ClosedInDispute: Story = {
             {
                 index: 2n,
                 status: "ACCEPTED",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -169,6 +173,7 @@ export const ClosedInDispute: Story = {
             {
                 index: 1n,
                 status: "NONE",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -197,6 +202,7 @@ export const ClosedInDispute: Story = {
             {
                 index: 0n,
                 status: "REJECTED",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -256,6 +262,7 @@ export const AuthorityOpenEpoch: Story = {
             {
                 index: 3n,
                 status: "ACCEPTED",
+                exceptionData: null,
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
