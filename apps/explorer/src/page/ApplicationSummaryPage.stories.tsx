@@ -111,6 +111,7 @@ const params: Params = {
                         "0xa074683b5be015f053b5dceb064c41fc9d11b6e50000000000000000000000000000000000000000000000001bc16d674ec80000",
                 },
                 status: "ACCEPTED",
+                exceptionData: null,
                 machineHash:
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
                 outputsHash:
@@ -257,6 +258,7 @@ const authorityAppParams: Params = {
                         "0xa074683b5be015f053b5dceb064c41fc9d11b6e50000000000000000000000000000000000000000000000001bc16d674ec80000",
                 },
                 status: "ACCEPTED",
+                exceptionData: null,
                 machineHash:
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
                 outputsHash:

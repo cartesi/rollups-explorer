@@ -19,6 +19,7 @@ export const Default: Story = {
         input: {
             index: 2n,
             status: "ACCEPTED",
+            exceptionData: null,
             epochIndex: 0n,
             machineHash:
                 "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -54,6 +55,7 @@ export const Unprocessed: Story = {
         input: {
             index: 1n,
             status: "NONE",
+            exceptionData: null,
             epochIndex: 0n,
             machineHash:
                 "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
@@ -89,6 +91,7 @@ export const Rejected: Story = {
         input: {
             index: 0n,
             status: "REJECTED",
+            exceptionData: null,
             epochIndex: 0n,
             machineHash:
                 "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",

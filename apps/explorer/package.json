@@ -22,9 +22,9 @@
         "test:ci": "vitest run --coverage"
     },
     "dependencies": {
-        "@cartesi/client": "2.0.0-alpha.34",
-        "@cartesi/codec": "1.0.0-alpha.1",
-        "@cartesi/react": "2.0.0-alpha.38",
+        "@cartesi/client": "2.0.0-alpha.37",
+        "@cartesi/codec": "1.0.0-alpha.4",
+        "@cartesi/react": "2.0.0-alpha.41",
         "@mantine/code-highlight": "^8.3.15",
         "@mantine/core": "^8.3.15",
         "@mantine/form": "^8.3.15",
