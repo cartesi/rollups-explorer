@@ -30,24 +30,24 @@ const resolver: Resolver = cond([
     ],
     [
         isOneOf(erc20PortalAddresses),
-        () => ({ name: "ERC20Portal", method: "depositERC20Tokens" }),
+        () => ({ name: "ERC20Portal", method: "depositErc20Tokens" }),
     ],
     [
         isOneOf(erc721PortalAddresses),
-        () => ({ name: "ERC721Portal", method: "depositERC721Tokens" }),
+        () => ({ name: "ERC721Portal", method: "depositErc721Token" }),
     ],
     [
         isOneOf(erc1155SinglePortalAddresses),
         () => ({
             name: "ERC1155SinglePortal",
-            method: "depositERC1155SingleTokens",
+            method: "depositSingleErc1155Token",
         }),
     ],
     [
         isOneOf(erc1155BatchPortalAddresses),
         () => ({
             name: "ERC1155BatchPortal",
-            method: "depositERC1155BatchToken",
+            method: "depositBatchErc1155Token",
         }),
     ],
     [
