@@ -8,7 +8,15 @@ export default [
     ...reactInternal,
     // ...nextJsConfig,
 
-    { ignores: ["coverage/**", ".turbo/**", "public/**", ".next/**"] },
+    {
+        ignores: [
+            "coverage/**",
+            ".turbo/**",
+            "public/**",
+            ".next/**",
+            "storybook-static/**",
+        ],
+    },
     {
         files: ["**/*.{ts,tsx}"],
         languageOptions: {
