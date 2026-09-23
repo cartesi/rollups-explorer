@@ -1,6 +1,6 @@
 import { createCartesiPublicClient } from "@cartesi/client";
 import { descend, prop, sort } from "ramda";
-import { http } from "viem";
+import { BaseError, http } from "viem";
 import type { DbNodeConnectionConfig } from "./types";
 
 export const sortByTimestampDesc = sort<DbNodeConnectionConfig>(
@@ -17,6 +17,13 @@ type NodeMetaResult =
           nodeVersion: string;
           chainId: number;
       };
+
+/** Viem's `message` is multi-line; `shortMessage` is the single sentence. */
+const describeError = (error: unknown): string => {
+    if (error instanceof BaseError) return error.shortMessage;
+    if (error instanceof Error) return error.message;
+    return String(error);
+};
 
 /**
  *
@@ -36,10 +43,10 @@ export const fetchRollupsNodeMeta = async (
         const { version, chainId } = await cartesiClient.getNodeInfo();
 
         return { status: "success", nodeVersion: version, chainId };
-    } catch {
+    } catch (error) {
         return {
             status: "error",
-            error: new Error("Looks like the node is not responding."),
+            error: new Error(`${cartesiNodeUrl}: ${describeError(error)}`),
         };
     }
 };
