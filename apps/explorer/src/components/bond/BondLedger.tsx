@@ -71,7 +71,23 @@ const BondEventRow: FC<{ application?: string; event: BondEvent }> = ({
     event,
 }) => (
     <Table.Tr>
-        <Table.Td>{event.blockNumber.toString()}</Table.Td>
+        <Table.Td>
+            {application ? (
+                <Anchor
+                    component={Link}
+                    href={pathBuilder.bondEvent({
+                        application,
+                        txHash: event.txHash,
+                        logIndex: event.logIndex,
+                    })}
+                    size="sm"
+                >
+                    {event.blockNumber.toString()}
+                </Anchor>
+            ) : (
+                event.blockNumber.toString()
+            )}
+        </Table.Td>
         {application && (
             <Table.Td>
                 <Anchor
