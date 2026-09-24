@@ -1,6 +1,7 @@
 "use client";
 import { useCommitments, useMatches, useTournament } from "@cartesi/react";
 import { notFound } from "next/navigation";
+import { isNotNil } from "ramda";
 import type { FC } from "react";
 import {
     Hierarchy,
@@ -8,23 +9,35 @@ import {
 } from "../components/navigation/Hierarchy";
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
+import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { isTournamentSettled } from "../lib/prtUtils";
 import { TournamentPage } from "../page/TournamentPage";
 import { pathBuilder, type TournamentParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
 import ContainerStack from "./ContainerStack";
 
 export const TournamentContainer: FC<TournamentParams> = (params) => {
-    const { data: tournament, isLoading } = useTournament({
+    const tournamentQuery = useTournament({
         application: params.application,
         address: params.tournamentAddress,
     });
+    const { data: tournament, isLoading } = tournamentQuery;
 
-    // fetch tournament matches
-    const { data: matches } = useMatches(params);
+    const matchesQuery = useMatches(params);
+    const matches = matchesQuery.data;
 
-    // fetch tournament commitments
-    const { data: commitments } = useCommitments(params);
+    const commitmentsQuery = useCommitments(params);
+    const commitments = commitmentsQuery.data;
+
+    useRefetchOnFinalizedBlock(
+        isNotNil(tournament) && !isTournamentSettled(tournament),
+        [
+            tournamentQuery.refetch,
+            matchesQuery.refetch,
+            commitmentsQuery.refetch,
+        ],
+    );
 
     // tournament hierarchy
     const { matches: parentMatches, tournaments: parentTournaments } =

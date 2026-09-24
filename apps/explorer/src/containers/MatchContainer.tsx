@@ -16,7 +16,9 @@ import {
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import { useBlockTimestamps } from "../hooks/useBlockTimestamps";
+import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { isTournamentSettled } from "../lib/prtUtils";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
@@ -57,6 +59,19 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         commitmentOneQuery.data,
         commitmentTwoQuery.data,
     ].filter(isNotNil);
+
+    useRefetchOnFinalizedBlock(
+        isNotNil(tournamentQuery.data) &&
+            !isTournamentSettled(tournamentQuery.data),
+        [
+            tournamentQuery.refetch,
+            matchQuery.refetch,
+            advancesQuery.refetch,
+            subTournamentQuery.refetch,
+            commitmentOneQuery.refetch,
+            commitmentTwoQuery.refetch,
+        ],
+    );
 
     const isLoading =
         tournamentQuery.isLoading ||
