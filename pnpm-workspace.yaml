@@ -30,3 +30,8 @@ allowBuilds:
     secp256k1: true
     sharp: true
     utf-8-validate: true
+
+overrides:
+    "@cartesi/client": file:vendor/cartesi-client.tgz
+    "@cartesi/react": file:vendor/cartesi-react.tgz
+    "@cartesi/rpc": file:vendor/cartesi-rpc.tgz
