@@ -35,7 +35,12 @@ export interface SubTournamentItemProps {
     /**
      * Timestamp
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 
     /**
      * Level of the sub tournament
@@ -44,7 +49,8 @@ export interface SubTournamentItemProps {
 }
 
 export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
-    const { claim, now, range, timestamp, tournament } = props;
+    const { claim, now, range, timestamp, timestampLoading, tournament } =
+        props;
     const params =
         useParams<ParamsOf<"/apps/[application]/epochs/[epochIndex]">>();
     const url = `/apps/${params.application}/epochs/${params.epochIndex}/tournaments/${tournament.address}`;
@@ -54,7 +60,12 @@ export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
     const labels = ["none", "middle", "bottom"];
 
     return (
-        <ClaimTimelineItem claim={claim} now={now} timestamp={timestamp}>
+        <ClaimTimelineItem
+            claim={claim}
+            now={now}
+            timestamp={timestamp}
+            timestampLoading={timestampLoading}
+        >
             <Paper withBorder radius="lg" p={16} bg={bg}>
                 <Group justify="space-between">
                     <Stack gap="xs">

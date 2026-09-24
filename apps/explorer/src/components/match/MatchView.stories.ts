@@ -1,13 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
+import { createElement } from "react";
 import * as TournamentStories from "../tournament/TournamentView.stories";
 import { randomAdvances } from "../../stories/data";
 import { createCommitment, createMatchState } from "../../stories/prt";
 import * as MatchActionsStories from "./MatchActions.stories";
 import { MatchView } from "./MatchView";
+import { toBlockTimestamps } from "../../stories/util";
 
 const meta = {
     title: "Components/Match/MatchView",
     component: MatchView,
+    render: (args) =>
+        createElement(MatchView, {
+            ...args,
+            timestamps:
+                args.timestamps ??
+                toBlockTimestamps(
+                    args.advances,
+                    args.match,
+                    args.subTournament,
+                ),
+        }),
 } satisfies Meta<typeof MatchView>;
 
 export default meta;
@@ -95,5 +108,28 @@ export const Sealed: Story = {
                 sealed: {},
             }),
         },
+    },
+};
+
+/**
+ * Block timestamps are still loading, so each time shows a skeleton.
+ */
+export const TimestampsLoading: Story = {
+    args: {
+        ...Ongoing.args,
+        timestamps: new Map(),
+        timestampsLoading: true,
+    },
+};
+
+/**
+ * Block timestamps could not be resolved, so the timeline keeps only the
+ * bisection counters, without an empty time cell.
+ */
+export const TimestampsUnavailable: Story = {
+    args: {
+        ...Ongoing.args,
+        timestamps: new Map(),
+        timestampsLoading: false,
     },
 };

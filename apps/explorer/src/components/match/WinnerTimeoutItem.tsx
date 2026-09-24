@@ -25,7 +25,12 @@ interface WinnerTimeoutItemProps {
     /**
      * Item timestamp
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 
     /**
      * Winner claim
@@ -34,7 +39,7 @@ interface WinnerTimeoutItemProps {
 }
 
 export const WinnerTimeoutItem: FC<WinnerTimeoutItemProps> = (props) => {
-    const { loser, now, timestamp, winner } = props;
+    const { loser, now, timestamp, timestampLoading, winner } = props;
 
     const theme = useMantineTheme();
     const gold = theme.colors.yellow[5];
@@ -50,7 +55,12 @@ export const WinnerTimeoutItem: FC<WinnerTimeoutItemProps> = (props) => {
                     <Text>no action taken</Text>
                 </Group>
             </ClaimTimelineItem>
-            <ClaimTimelineItem claim={winner} now={now} timestamp={timestamp}>
+            <ClaimTimelineItem
+                claim={winner}
+                now={now}
+                timestamp={timestamp}
+                timestampLoading={timestampLoading}
+            >
                 <Paper withBorder p={16} radius="lg" bg={bg}>
                     <Group gap="xs">
                         <TbTrophyFilled size={24} color={gold} />

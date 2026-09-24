@@ -40,7 +40,12 @@ export interface BisectionItemProps extends TimelineItemProps {
     /**
      * Timestamp of the bisection
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 
     /**
      * Total number of bisections
@@ -52,8 +57,17 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
     HTMLDivElement,
     BisectionItemProps
 >((props, ref) => {
-    const { claim, domain, expand, index, now, range, timestamp, total } =
-        props;
+    const {
+        claim,
+        domain,
+        expand,
+        index,
+        now,
+        range,
+        timestamp,
+        timestampLoading,
+        total,
+    } = props;
 
     // percentage of the middle of the range relative to the bar
     const p = useMemo(() => {
@@ -76,6 +90,7 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                 </Text>
             }
             timestamp={timestamp}
+            timestampLoading={timestampLoading}
         >
             <Stack gap="xs">
                 <RangeIndicator

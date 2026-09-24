@@ -72,3 +72,14 @@ export const Expand: Story = {
         total: 20,
     },
 };
+
+/**
+ * The block timestamp of the bisection is still loading.
+ */
+export const TimestampLoading: Story = {
+    args: {
+        ...Middle.args,
+        timestamp: undefined,
+        timestampLoading: true,
+    },
+};

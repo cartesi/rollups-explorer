@@ -42,11 +42,29 @@ export interface MatchViewProps {
      * The current timestamp.
      */
     now: number;
+
+    /**
+     * Timestamps in milliseconds of the blocks the match events happened in.
+     */
+    timestamps?: Map<bigint, number>;
+
+    /**
+     * Whether the block timestamps are still being fetched.
+     */
+    timestampsLoading?: boolean;
 }
 
 export const MatchView: FC<MatchViewProps> = (props) => {
-    const { advances, commitments, tournament, match, subTournament, now } =
-        props;
+    const {
+        advances,
+        commitments,
+        tournament,
+        match,
+        subTournament,
+        now,
+        timestamps,
+        timestampsLoading,
+    } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
 
@@ -77,6 +95,8 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 match={match}
                 now={now}
                 subTournament={subTournament}
+                timestamps={timestamps}
+                timestampsLoading={timestampsLoading}
                 tournament={tournament}
             />
         </Stack>

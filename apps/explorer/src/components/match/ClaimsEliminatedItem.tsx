@@ -18,19 +18,29 @@ type ClaimsEliminatedItemProps = {
     /**
      * Timestamp
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 };
 
 export const ClaimsEliminatedItem: FC<ClaimsEliminatedItemProps> = ({
     now,
     timestamp,
+    timestampLoading,
 }) => {
     const theme = useMantineTheme();
     const scheme = useComputedColorScheme();
     const bg = scheme === "light" ? theme.colors.gray[0] : undefined;
 
     return (
-        <ClaimTimelineItem now={now} timestamp={timestamp}>
+        <ClaimTimelineItem
+            now={now}
+            timestamp={timestamp}
+            timestampLoading={timestampLoading}
+        >
             <Paper withBorder p={16} radius="lg" bg={bg}>
                 <Group gap="xs">
                     <TbSwordOff size={24} />
