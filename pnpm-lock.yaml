@@ -44,6 +44,9 @@ importers:
       '@octokit/rest':
         specifier: ^22.0.1
         version: 22.0.1
+      '@types/node':
+        specifier: ^24.10.2
+        version: 24.10.3
       '@vercel/sdk':
         specifier: ^1.19.6
         version: 1.19.6(supports-color@8.1.1)
