@@ -1,11 +1,13 @@
 "use client";
 import {
+    useCommitment,
     useMatch,
     useMatchAdvances,
     useTournament,
     useTournaments,
 } from "@cartesi/react";
 import { notFound } from "next/navigation";
+import { isNotNil } from "ramda";
 import type { FC } from "react";
 import {
     Hierarchy,
@@ -34,6 +36,26 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         parentTournamentAddress: params.tournamentAddress,
         parentMatchIdHash: params.idHash,
     });
+
+    const commitmentParams = {
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: params.tournamentAddress,
+    };
+    const commitmentOneQuery = useCommitment({
+        ...commitmentParams,
+        commitment: matchQuery.data?.commitmentOne,
+        enabled: isNotNil(matchQuery.data),
+    });
+    const commitmentTwoQuery = useCommitment({
+        ...commitmentParams,
+        commitment: matchQuery.data?.commitmentTwo,
+        enabled: isNotNil(matchQuery.data),
+    });
+    const commitments = [
+        commitmentOneQuery.data,
+        commitmentTwoQuery.data,
+    ].filter(isNotNil);
 
     const isLoading =
         tournamentQuery.isLoading ||
@@ -122,6 +144,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
             {tournament !== null && match !== null && (
                 <MatchPage
                     advances={advancesQuery.data?.data ?? []}
+                    commitments={commitments}
                     tournament={tournament}
                     subTournament={subTournament}
                     match={match}
