@@ -5,6 +5,7 @@ import { keccak256 } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { applications } from "../stories/data";
 import { EpochPage } from "./EpochPage";
+import { createTournament } from "../stories/prt";
 
 const meta = {
     title: "Pages/Epoch Details",
@@ -229,6 +230,23 @@ export const ClosedInDispute: Story = {
                 logIndex: 0n,
             },
         ],
+    },
+};
+
+/**
+ * An epoch whose root tournament has active matches.
+ */
+export const Disputed: Story = {
+    render: WithBreadcrumb,
+    args: {
+        ...Open.args,
+        epoch: applications[0].epochs[3],
+        tournament: createTournament({
+            baseCycle: 0n,
+            log2step: 44n,
+            height: 48n,
+            snapshot: { standing: "MATCHES_ACTIVE" },
+        }),
     },
 };
 

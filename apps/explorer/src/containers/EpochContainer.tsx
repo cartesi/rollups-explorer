@@ -1,5 +1,10 @@
 "use client";
-import { useApplication, useEpoch, useInputs } from "@cartesi/react";
+import {
+    useApplication,
+    useEpoch,
+    useInputs,
+    useTournament,
+} from "@cartesi/react";
 import { notFound } from "next/navigation";
 import { isNotNil } from "ramda";
 import { type FC } from "react";
@@ -25,6 +30,12 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
     const { data: inputs, isLoading: isInputsLoading } = useInputs(props);
     const { data: application, isLoading: isApplicationLoading } =
         useApplication({ application: props.application });
+
+    const { data: tournament } = useTournament({
+        application: props.application,
+        address: epoch?.tournamentAddress ?? undefined,
+        enabled: isNotNil(epoch?.tournamentAddress),
+    });
 
     const isLoading = isEpochLoading || isInputsLoading || isApplicationLoading;
     const showPage = isNotNil(epoch) && isNotNil(application);
@@ -59,6 +70,7 @@ export const EpochContainer: FC<EpochContainerProps> = (props) => {
                     application={application}
                     inputs={inputs?.data ?? []}
                     pagination={inputs?.pagination}
+                    tournament={tournament}
                 />
             )}
         </ContainerStack>
