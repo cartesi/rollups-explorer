@@ -105,13 +105,7 @@ const tournament: Tournament = createTournament({
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(timestamp),
-    snapshot: {
-        standing: "ROOT_FAILED",
-        asOfBlock: 2n,
-        finalStateHash: null,
-        finishedAtBlock: 2n,
-        winnerCommitment: null,
-    },
+    snapshot: { standing: "MATCHES_ACTIVE" },
 });
 
 const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) =>
@@ -149,13 +143,7 @@ export const NoChallengerYet: Story = {
             updatedAt: new Date(timestamp),
             height: 48n,
             level: 0n,
-            snapshot: {
-                standing: "ROOT_FAILED",
-                asOfBlock: 2n,
-                finalStateHash: null,
-                finishedAtBlock: 2n,
-                winnerCommitment: null,
-            },
+            snapshot: { standing: "MATCHES_ACTIVE" },
         }),
         matches: [],
         commitments: [
@@ -265,20 +253,14 @@ export const MidLevelDispute: Story = {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
             epochIndex,
-            log2step: 0x2cn,
+            log2step: 27n,
             maxLevel: 3n,
             parentMatchIdHash: null,
             parentTournamentAddress: null,
             updatedAt: new Date(timestamp),
-            height: 27n,
+            height: 17n,
             level: 1n,
-            snapshot: {
-                standing: "INNER_ELIMINABLE_NO_WINNER",
-                asOfBlock: 2n,
-                finalStateHash: null,
-                finishedAtBlock: 2n,
-                winnerCommitment: null,
-            },
+            snapshot: { standing: "MATCHES_ACTIVE" },
         }),
         matches: [
             createMatch({
@@ -316,5 +298,38 @@ export const MidLevelDispute: Story = {
                 winnerCommitment: "NONE",
             }),
         ],
+    },
+};
+
+export const ProvisionalInnerWinner: Story = {
+    args: {
+        ...MidLevelDispute.args,
+        tournament: {
+            ...MidLevelDispute.args.tournament,
+            snapshot: {
+                ...MidLevelDispute.args.tournament.snapshot,
+                standing: "INNER_WINNER",
+                candidate: claim(7, 5).hash,
+                winnerCommitment: claim(7, 5).hash,
+                finalStateHash: zeroHash,
+                finishedAtBlock: 90n,
+                winnerExpiresAt: 180n,
+            },
+        },
+    },
+};
+
+export const ExpiredInnerWinner: Story = {
+    args: {
+        ...MidLevelDispute.args,
+        tournament: {
+            ...MidLevelDispute.args.tournament,
+            snapshot: {
+                ...MidLevelDispute.args.tournament.snapshot,
+                standing: "INNER_ELIMINABLE_WINNER_EXPIRED",
+                candidate: claim(7, 5).hash,
+                finishedAtBlock: 90n,
+            },
+        },
     },
 };
