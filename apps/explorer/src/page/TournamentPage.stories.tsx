@@ -101,13 +101,7 @@ const randomTournament: Tournament = createTournament({
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(now),
-    snapshot: {
-        standing: "ROOT_FAILED",
-        asOfBlock: 1n,
-        finalStateHash: null,
-        finishedAtBlock: 1n,
-        winnerCommitment: null,
-    },
+    snapshot: { standing: "MATCHES_ACTIVE" },
 });
 
 const commitments: Commitment[] = claims.map((claim, i) =>

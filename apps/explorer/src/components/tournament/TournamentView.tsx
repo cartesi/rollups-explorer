@@ -1,21 +1,12 @@
 import type { Commitment, Match, Tournament } from "@cartesi/client";
-import {
-    Card,
-    Center,
-    Group,
-    Stack,
-    Switch,
-    Text,
-    Title,
-    useMantineTheme,
-} from "@mantine/core";
+import { Card, Center, Group, Stack, Switch, Text, Title } from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
-import { TbTrophyFilled } from "react-icons/tb";
+import { content } from "../../content";
+import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import { LongText } from "../LongText";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
-import type { CycleRange } from "../types";
+import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
 
 export interface TournamentViewProps {
@@ -38,14 +29,6 @@ export interface TournamentViewProps {
 export const TournamentView: FC<TournamentViewProps> = (props) => {
     const { commitments, matches, tournament } = props;
 
-    const theme = useMantineTheme();
-    const gold = theme.colors.yellow[5];
-
-    // XXX: where the range is coming from?
-    const range: CycleRange = [0n, 0n];
-    const winner = tournament.snapshot.winnerCommitment
-        ? { hash: tournament.snapshot.winnerCommitment }
-        : undefined;
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);
 
@@ -59,19 +42,12 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 />
             </Group>
             <Group>
-                <Text>Mcycle range</Text>
-                <CycleRangeFormatted range={range} />
+                <Text>{content.tournament.cycleRangeTxt}</Text>
+                <CycleRangeFormatted
+                    range={getTournamentCycleRange(tournament)}
+                />
             </Group>
-            <Group>
-                <Text>Winner</Text>
-                {!winner && <TbTrophyFilled size={24} color="lightgray" />}
-                {winner && (
-                    <Group gap="xs">
-                        <TbTrophyFilled size={24} color={gold} />
-                        <LongText value={winner.hash} ff="monospace" />
-                    </Group>
-                )}
-            </Group>
+            <TournamentOutcome snapshot={tournament.snapshot} />
             <Switch
                 label="Show only eliminated and pending matches"
                 labelPosition="left"
