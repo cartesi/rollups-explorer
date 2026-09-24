@@ -132,13 +132,35 @@ const queries = [
             level: "$bigint:0",
             log2step: "$bigint:44",
             height: "$bigint:48",
-            winnerCommitment:
-                "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
-            finalStateHash:
-                "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-            finishedAtBlock: "$bigint:331",
             createdAt: "2025-12-19T17:43:05.969Z",
             updatedAt: "2025-12-19T17:43:05.969Z",
+            initialHash:
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+            baseCycle: "$bigint:0",
+            kind: "NON_LEAF",
+            startInstant: "$bigint:1",
+            allowance: "$bigint:1000",
+            creationEvent: null,
+            snapshot: {
+                asOfBlock: "$bigint:331",
+                standing: "ROOT_WINNER",
+                acceptsJoins: false,
+                candidate:
+                    "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
+                winnerCommitment:
+                    "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
+                finalStateHash:
+                    "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
+                parentCommitment: null,
+                finishedAtBlock: "$bigint:331",
+                winnerExpiresAt: "$bigint:0",
+                innerResult: null,
+                bondRecovery: {
+                    disposition: "TOURNAMENT_RUNNING",
+                    claimer: null,
+                    payment: null,
+                },
+            },
         },
     },
     {
@@ -184,6 +206,14 @@ const queries = [
                     txHash: "0xe205ab55143dd5617fa65ebefdd8aac6cd8502e049b3963d79d9bae118195edb",
                     createdAt: "2025-12-18T14:17:01.400Z",
                     updatedAt: "2025-12-18T14:17:01.400Z",
+                    logIndex: "$bigint:0",
+                    snapshot: {
+                        asOfBlock: "$bigint:100",
+                        claimer: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+                        clockRunning: false,
+                        clockDeadline: "$bigint:0",
+                        clockAllowance: "$bigint:1000",
+                    },
                 },
             ],
             pagination: {
