@@ -59,7 +59,7 @@ export const CompleteTop: Story = {
             updatedAt: new Date(now),
             winnerCommitment: "ONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -152,7 +152,7 @@ export const Bisections: Story = {
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -180,7 +180,7 @@ export const Timeout: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "TWO",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -222,7 +222,7 @@ export const TimeoutSecond: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -250,7 +250,7 @@ export const Elimination: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -285,7 +285,7 @@ export const EliminationAfterBisections: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -296,6 +296,7 @@ export const EliminationAfterBisections: Story = {
 export const SubTournament: Story = {
     args: {
         advances: randomAdvances({
+            height: 5n,
             count: 4,
             epochIndex,
             idHash,
@@ -320,7 +321,7 @@ export const SubTournament: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
         }),
-        height: 5n,
+        tournament: createTournament({ height: 5n }),
         now,
     },
 };
@@ -331,6 +332,7 @@ export const SubTournament: Story = {
 export const WinnerBottom: Story = {
     args: {
         advances: randomAdvances({
+            height: 5n,
             count: 4,
             epochIndex,
             idHash,
@@ -355,7 +357,7 @@ export const WinnerBottom: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         }),
-        height: 5n,
+        tournament: createTournament({ height: 5n }),
         now,
     },
 };
@@ -366,6 +368,7 @@ export const WinnerBottom: Story = {
 export const WinnerTop: Story = {
     args: {
         advances: randomAdvances({
+            height: 5n,
             count: 4,
             epochIndex,
             idHash,
@@ -390,7 +393,7 @@ export const WinnerTop: Story = {
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
         }),
-        height: 5n,
+        tournament: createTournament({ height: 5n }),
         now,
     },
 };
@@ -418,7 +421,7 @@ export const NoActions: Story = {
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
     },
 };
@@ -456,7 +459,7 @@ export const NoWinnerAfterSubTournamentDispute: Story = {
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
         }),
-        height: 48n,
+        tournament: createTournament({ height: 48n }),
         now,
         subTournament: createTournament({
             epochIndex: 0n,
