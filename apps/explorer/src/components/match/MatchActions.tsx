@@ -13,12 +13,21 @@ import {
     useMergedRef,
     useScrollIntoView,
 } from "@mantine/hooks";
-import { useEffect, useMemo, useState, type FC } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+    type FC,
+    type ReactElement,
+} from "react";
 import { TbArrowUp } from "react-icons/tb";
 import {
     getAdvanceRanges,
     getAdvanceSide,
+    getLoser,
     getMatchProgress,
+    getTournamentCycleRange,
+    getWinner,
 } from "../../lib/prtUtils";
 import { BisectionItem } from "./BisectionItem";
 import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
@@ -108,6 +117,67 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const theme = useMantineTheme();
     const color = theme.primaryColor;
 
+    const winner = getWinner(match);
+    const loser = getLoser(match);
+    const nextClaim =
+        getAdvanceSide(advances.length) === "ONE" ? claim1 : claim2;
+    const waitingClaim = nextClaim === claim1 ? claim2 : claim1;
+    const closedAt = match.updatedAt.getTime();
+
+    const getOutcomeItems = (): ReactElement[] => {
+        switch (match.deletionReason) {
+            case "TIMEOUT":
+                return winner && loser
+                    ? [
+                          <WinnerTimeoutItem
+                              key="timeout"
+                              loser={{ hash: loser }}
+                              now={now}
+                              timestamp={closedAt}
+                              winner={{ hash: winner }}
+                          />,
+                      ]
+                    : [
+                          <EliminationTimeoutItem
+                              key="elimination-timeout"
+                              claim1={nextClaim}
+                              claim2={waitingClaim}
+                              now={now}
+                              timestamp={closedAt}
+                          />,
+                      ];
+            case "CHILD_TOURNAMENT":
+            case "STEP":
+                if (winner && loser) {
+                    return [
+                        <WinnerItem
+                            key="winner"
+                            claim={{ hash: winner }}
+                            now={now}
+                            timestamp={closedAt}
+                            proof={"0x0"} // XXX: need to get proof from somewhere
+                        />,
+                        <LoserItem
+                            key="loser"
+                            claim={{ hash: loser }}
+                            now={now}
+                        />,
+                    ];
+                }
+                return match.deletionReason === "CHILD_TOURNAMENT"
+                    ? [
+                          <ClaimsEliminatedItem
+                              key="eliminated"
+                              now={now}
+                              timestamp={closedAt}
+                          />,
+                      ]
+                    : [];
+            case "NOT_DELETED":
+                return [];
+        }
+    };
+
     return (
         <Stack>
             <Timeline ref={ref} bulletSize={24} lineWidth={2}>
@@ -134,106 +204,17 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         total={total}
                     />
                 ))}
-                {match.deletionReason === "TIMEOUT" &&
-                    match.winnerCommitment === "NONE" && (
-                        <EliminationTimeoutItem
-                            key="elimination-timeout"
-                            claim1={advances.length % 2 === 0 ? claim1 : claim2}
-                            claim2={advances.length % 2 === 0 ? claim2 : claim1}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                        />
-                    )}
-                {match.deletionReason === "TIMEOUT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerTimeoutItem
-                            key="timeout"
-                            loser={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            winner={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                        />
-                    )}
                 {subTournament && (
                     <SubTournamentItem
-                        claim={advances.length % 2 === 0 ? claim1 : claim2}
+                        claim={nextClaim}
                         key="sub-tournament"
                         tournament={subTournament}
                         now={now}
-                        range={[0n, 0n]} // XXX: need to get range from somewhere
+                        range={getTournamentCycleRange(subTournament)}
                         timestamp={subTournament.updatedAt.getTime()}
                     />
                 )}
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerItem
-                            key="winner"
-                            claim={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
-                        />
-                    )}
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <LoserItem
-                            claim={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                        />
-                    )}
-
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment === "NONE" && (
-                        <ClaimsEliminatedItem
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                        />
-                    )}
-
-                {match.deletionReason === "STEP" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerItem
-                            key="winner"
-                            claim={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
-                        />
-                    )}
-                {match.deletionReason === "STEP" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <LoserItem
-                            claim={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                        />
-                    )}
+                {getOutcomeItems()}
             </Timeline>
             <Group justify="flex-end" ref={bottomRef}>
                 {!topInViewport && (

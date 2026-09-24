@@ -40,4 +40,33 @@ describe("MatchActions", () => {
             screen.getAllByRole("progressbar")[0].getAttribute("aria-valuenow"),
         ).toBe("50");
     });
+
+    it("should show both claims eliminated after a timeout without winner", () => {
+        render(
+            <MatchActions
+                advances={[]}
+                match={createMatch({ deletionReason: "TIMEOUT" })}
+                now={Date.now()}
+                tournament={tournament}
+            />,
+        );
+
+        expect(screen.getByText("both claims eliminated")).toBeInTheDocument();
+    });
+
+    it("should show the timeout winner", () => {
+        render(
+            <MatchActions
+                advances={[]}
+                match={createMatch({
+                    deletionReason: "TIMEOUT",
+                    winnerCommitment: "TWO",
+                })}
+                now={Date.now()}
+                tournament={tournament}
+            />,
+        );
+
+        expect(screen.getByText("(by timeout)")).toBeInTheDocument();
+    });
 });

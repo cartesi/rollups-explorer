@@ -1,16 +1,27 @@
-import type { Match, MatchAdvanced, Tournament } from "@cartesi/client";
+import type {
+    Commitment,
+    Match,
+    MatchAdvanced,
+    Tournament,
+} from "@cartesi/client";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
+import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import type { CycleRange } from "../types";
 import { MatchActions } from "./MatchActions";
+import { MatchState } from "./MatchState";
 
 export interface MatchViewProps {
     /**
      * List of advances (bisections) of the match
      */
     advances: MatchAdvanced[];
+
+    /**
+     * Current snapshots of the two match commitments.
+     */
+    commitments?: Commitment[];
 
     /**
      * The match to display.
@@ -31,23 +42,21 @@ export interface MatchViewProps {
      * The current timestamp.
      */
     now: number;
-
-    /**
-     * The cycle range of the match tournament.
-     */
-    range: CycleRange;
 }
 
 export const MatchView: FC<MatchViewProps> = (props) => {
-    const { advances, tournament, match, subTournament, now, range } = props;
+    const { advances, commitments, tournament, match, subTournament, now } =
+        props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
 
     return (
         <Stack>
             <Group>
-                <Text>Mcycle range</Text>
-                <CycleRangeFormatted range={range} />
+                <Text>Cycle range</Text>
+                <CycleRangeFormatted
+                    range={getTournamentCycleRange(tournament)}
+                />
             </Group>
             <Group>
                 <Text>Claims</Text>
@@ -57,6 +66,11 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                     <ClaimText claim={claim2} />
                 </Group>
             </Group>
+            <MatchState
+                commitments={commitments}
+                match={match}
+                tournament={tournament}
+            />
             <Divider label="Actions" />
             <MatchActions
                 advances={advances}
