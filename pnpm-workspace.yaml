@@ -15,6 +15,10 @@ catalog:
 strictDepBuilds: true
 blockExoticSubdeps: true
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+    - "@cartesi/client@2.0.0-alpha.38"
+    - "@cartesi/react@2.0.0-alpha.42"
+    - "@cartesi/rpc@2.0.0-alpha.27"
 trustPolicy: no-downgrade
 trustPolicyIgnoreAfter: 43200
 
