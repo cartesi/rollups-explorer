@@ -3,13 +3,20 @@ import { Card, Center, Group, Stack, Switch, Text, Title } from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { content } from "../../content";
+import type { BondRecoveredEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
+import { BondRecoveryCard } from "../bond/BondRecoveryCard";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
 
 export interface TournamentViewProps {
+    /**
+     * The event that recovered the tournament bond, once recovered.
+     */
+    bondRecovery?: BondRecoveredEvent;
+
     /**
      * The list of all commitments.
      */
@@ -27,7 +34,7 @@ export interface TournamentViewProps {
 }
 
 export const TournamentView: FC<TournamentViewProps> = (props) => {
-    const { commitments, matches, tournament } = props;
+    const { bondRecovery, commitments, matches, tournament } = props;
 
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);
@@ -48,6 +55,10 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 />
             </Group>
             <TournamentOutcome snapshot={tournament.snapshot} />
+            <BondRecoveryCard
+                bondRecovery={tournament.snapshot.bondRecovery}
+                recovery={bondRecovery}
+            />
             <Switch
                 label="Show only eliminated and pending matches"
                 labelPosition="left"
