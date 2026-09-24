@@ -64,9 +64,11 @@ export const randomAdvances = (options: {
     leftOfTwo?: Hash;
     now: number;
     seed?: number;
+    height?: bigint;
     tournamentAddress: Address;
 }) => {
     const rng = mulberry32(options.seed ?? 0);
+    const height = options.height ?? 48n;
     const { count, epochIndex, now, tournamentAddress } = options;
     const idHash =
         options.idHash ??
@@ -75,25 +77,33 @@ export const randomAdvances = (options: {
         options.leftOfTwo ??
         "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002";
     return Array.from<number>({ length: count }).reduce<MatchAdvanced[]>(
-        (array, _, i) => [
-            ...array,
-            createMatchAdvanced({
-                blockNumber: BigInt(i),
-                createdAt: new Date(now + i * 60),
-                epochIndex: epochIndex ?? 0n,
-                idHash,
-                leftNode: keccak256(numberToHex(i)),
-                otherParent:
-                    i === 0
-                        ? leftOfTwo
-                        : rng() < 0.5
-                          ? array[i - 1].leftNode
-                          : zeroHash,
-                tournamentAddress,
-                txHash: keccak256(numberToHex(i)),
-                updatedAt: new Date(now + i * 60),
-            }),
-        ],
+        (array, _, i) => {
+            const right = rng() >= 0.5;
+            const previous = array[i - 1];
+            const segmentStartPosition =
+                (previous?.segmentStartPosition ?? 0n) +
+                (right ? 1n << (height - BigInt(i) - 1n) : 0n);
+            return [
+                ...array,
+                createMatchAdvanced({
+                    blockNumber: BigInt(i),
+                    createdAt: new Date(now + i * 60),
+                    epochIndex: epochIndex ?? 0n,
+                    idHash,
+                    leftNode: keccak256(numberToHex(i)),
+                    otherParent:
+                        i === 0
+                            ? leftOfTwo
+                            : right
+                              ? zeroHash
+                              : previous.leftNode,
+                    segmentStartPosition,
+                    tournamentAddress,
+                    txHash: keccak256(numberToHex(i)),
+                    updatedAt: new Date(now + i * 60),
+                }),
+            ];
+        },
         [],
     );
 };
@@ -400,7 +410,8 @@ export const applications: ApplicationEpochs[] = [
                                             commitmentTwo: keccak256("0x7"),
                                         }),
                                         advances: randomAdvances({
-                                            count: 27,
+                                            count: 26,
+                                            height: 27n,
                                             now: currentDate.getTime(),
                                             tournamentAddress:
                                                 generateTournamentAddress(

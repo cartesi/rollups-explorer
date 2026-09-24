@@ -42,7 +42,6 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     const { advances, tournament, match, subTournament, now, range } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
-    const { height } = tournament;
 
     return (
         <Stack>
@@ -61,10 +60,10 @@ export const MatchView: FC<MatchViewProps> = (props) => {
             <Divider label="Actions" />
             <MatchActions
                 advances={advances}
-                height={height}
                 match={match}
                 now={now}
                 subTournament={subTournament}
+                tournament={tournament}
             />
         </Stack>
     );
