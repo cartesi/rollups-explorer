@@ -105,7 +105,7 @@ const tournament: Tournament = createTournament({
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(timestamp),
-    snapshot: { standing: "MATCHES_ACTIVE" },
+    snapshot: { standing: "MATCHES_ACTIVE", candidate: claim(6).hash },
 });
 
 const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) =>
@@ -143,7 +143,7 @@ export const NoChallengerYet: Story = {
             updatedAt: new Date(timestamp),
             height: 48n,
             level: 0n,
-            snapshot: { standing: "MATCHES_ACTIVE" },
+            snapshot: { standing: "MATCHES_ACTIVE", candidate: claim(0).hash },
         }),
         matches: [],
         commitments: [

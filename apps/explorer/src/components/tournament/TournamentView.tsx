@@ -58,8 +58,8 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 }
             />
             <TournamentTable
+                candidate={tournament.snapshot.candidate}
                 matches={matches}
-                commitments={commitments}
                 hideWinners={hideWinners}
             />
             {noCommitments && (

@@ -1,4 +1,4 @@
-import type { Commitment, Match } from "@cartesi/client";
+import type { Match } from "@cartesi/client";
 import { Flex } from "@mantine/core";
 import { useMemo, type FC } from "react";
 import type { Hash } from "viem";
@@ -6,24 +6,17 @@ import { TournamentRound } from "./TournamentRound";
 import style from "./TournamentTable.module.css";
 
 export interface TournamentTableProps {
-    hideWinners?: boolean;
-
     /**
-     * Simulated current time.
-     * When not provided, all matches are shown.
-     * When provided, the match timestamps are used to filter out events that did not happen yet based on the simulated time.
+     * The commitment waiting for an opponent.
      */
-    now?: number;
+    candidate?: Hash | null;
+
+    hideWinners?: boolean;
 
     /**
      * The matches to display.
      */
     matches: Match[];
-
-    /**
-     * The list of all commitments.
-     */
-    commitments: Commitment[];
 }
 
 function lazyArray<T>(factory: () => T): T[] {
@@ -52,19 +45,9 @@ type Round = {
     matches: Match[];
     dangling?: Hash;
 };
-const roundify = (
-    matches: Match[],
-    danglingClaim?: Commitment,
-    now?: number,
-): Round[] => {
+const roundify = (matches: Match[], candidate?: Hash | null): Round[] => {
     const sets = lazyArray(() => new Set<Hash>());
-    const rounds: Round[] = lazyArray(() => ({
-        matches: [],
-        now,
-    }));
-    const dangling: Set<Hash> = new Set(
-        danglingClaim ? [danglingClaim.commitment] : [],
-    );
+    const rounds: Round[] = lazyArray(() => ({ matches: [] }));
     for (const match of matches) {
         for (let i = 0; i < matches.length; i++) {
             if (
@@ -74,62 +57,29 @@ const roundify = (
                 sets[i].add(match.commitmentOne);
                 sets[i].add(match.commitmentTwo);
                 rounds[i].matches.push(match);
-
-                if (match.winnerCommitment !== "NONE") {
-                    // add winner to dangling set
-                    dangling.add(
-                        match.winnerCommitment === "ONE"
-                            ? match.commitmentOne
-                            : match.commitmentTwo,
-                    );
-                } else {
-                    // remove both from dangling set
-                    dangling.delete(match.commitmentOne);
-                    dangling.delete(match.commitmentTwo);
-                }
                 break;
             }
         }
     }
-    if (rounds.length === 0 && dangling.size > 0) {
-        // add a round for the dangling claim
-        rounds.push({
-            matches: [],
-            dangling: dangling.values().next().value,
-        });
-    } else {
-        // put dangling claim into last round
-        rounds[rounds.length - 1].dangling = dangling.values().next().value;
+    if (!candidate) return rounds;
+    if (rounds.length === 0) {
+        return [{ matches: [], dangling: candidate }];
     }
+    rounds[rounds.length - 1].dangling = candidate;
     return rounds;
 };
 
 export const TournamentTable: FC<TournamentTableProps> = (props) => {
-    const { commitments, hideWinners, now } = props;
+    const { candidate, hideWinners } = props;
 
     const rounds = useMemo(() => {
-        // create a unique set of commitments in matches
-        const commitmentsInMatches = new Set(
-            props.matches.flatMap((match) => [
-                match.commitmentOne,
-                match.commitmentTwo,
-            ]),
+        const matches = [...props.matches].sort((a, b) =>
+            a.blockNumber === b.blockNumber
+                ? Number(a.logIndex - b.logIndex)
+                : Number(a.blockNumber - b.blockNumber),
         );
-
-        // among all commitments, find the one that is not part of any matches
-        // that one is the dangling claim
-        // XXX: there should be only one. do what if there are more?
-        const danglingClaim = commitments.filter(
-            ({ commitment }) => !commitmentsInMatches.has(commitment),
-        );
-
-        // sort matches by timestamp
-        // XXX: maybe we should assume that the matches are already sorted by timestamp?
-        const matches = [...props.matches].sort(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-        );
-        return roundify(matches, danglingClaim[0], now);
-    }, [props.matches, commitments, now]);
+        return roundify(matches, candidate);
+    }, [props.matches, candidate]);
 
     return (
         <Flex gap="md" className={style.container} px="xs" py="sm">

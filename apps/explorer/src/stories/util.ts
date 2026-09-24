@@ -196,6 +196,13 @@ export const randomMatches = (
         claim = claims.shift();
     }
 
+    if (danglingClaim) {
+        tournament.snapshot = {
+            ...tournament.snapshot,
+            candidate: danglingClaim,
+        };
+    }
+
     // define tournament winner
     const pending = matches.filter(
         (match) => match.winnerCommitment === "NONE",
