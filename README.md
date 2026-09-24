@@ -67,6 +67,28 @@ pnpm storybook --filter=explorer
 > [!NOTE]  
 > To build all apps/ and packages/ you can remove the --filter=explorer from the commands above.
 
+### Unreleased rollups-ts packages
+
+To develop/test the explorer against unreleased [rollups-ts](https://github.com/cartesi/rollups-ts) changes, build and pack them from a local checkout into `vendor/` (defaults to `client`, `react`, `rpc` and `codec`):
+
+```shell
+pnpm dev:vendor:rollups-ts ../rollups-ts [package ...]
+```
+
+Point the dependencies at the tarballs in `pnpm-workspace.yaml` (overrides also cover transitive ones such as `@cartesi/rpc`), then run `pnpm install`:
+
+```yaml
+overrides:
+ "@cartesi/client": file:vendor/cartesi-client.tgz
+ "@cartesi/react": file:vendor/cartesi-react.tgz
+ "@cartesi/rpc": file:vendor/cartesi-rpc.tgz
+```
+
+Commit `vendor/`, `pnpm-workspace.yaml` and `pnpm-lock.yaml` in a dedicated commit.
+
+> [!IMPORTANT]
+> Vendored tarballs must not be merged. Once the rollups-ts packages are published, add a fixup to the vendoring commit that removes `vendor/` and the overrides and bumps `apps/explorer` to the published versions, then autosquash it before merging.
+
 For Docker image build check [here](./docs/DOCKER.md)
 
 For CartesiScan information check [here](./docs/CARTESISCAN.md)

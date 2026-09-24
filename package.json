@@ -18,9 +18,11 @@
         "changeset": "changeset",
         "version-packages": "changeset version",
         "release": "turbo run build && changeset publish",
-        "coveralls": "mkdir coverage && ./node_modules/.bin/lcov-result-merger './!(node_modules)**/**/coverage/lcov.info' './coverage/lcov.info' --prepend-source-files"
+        "coveralls": "mkdir coverage && ./node_modules/.bin/lcov-result-merger './!(node_modules)**/**/coverage/lcov.info' './coverage/lcov.info' --prepend-source-files",
+        "dev:vendor:rollups-ts": "node scripts/vendor-rollups-ts.mts"
     },
     "devDependencies": {
+        "@types/node": "^24.10.2",
         "@changesets/cli": "^2.29.8",
         "@octokit/auth-action": "^6.0.2",
         "@octokit/rest": "^22.0.1",
