@@ -88,7 +88,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     }, [bisectionWidth]);
 
     // dynamic domain, based on first visible item
-    const maxRange: CycleRange = [0, 2 ** Number(height - 1n)];
+    const maxRange: CycleRange = [0n, 2n ** (height - 1n)];
 
     // progress bar, based on last visible item
     const progress = (bisections.length / Number(height - 1n)) * 100;
@@ -101,7 +101,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                     const { direction } = bisection;
                     const l = r[i];
                     const [s, e] = l;
-                    const mid = Math.floor((s + e) / 2);
+                    const mid = (s + e) / 2n;
                     r.push(direction === 0 ? [s, mid] : [mid, e]);
                     return r;
                 },
@@ -146,7 +146,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         key={i}
                         claim={i % 2 === 0 ? claim1 : claim2}
                         color={theme.colors.gray[6]}
-                        domain={ranges[Math.floor(i / bars) * bars] ?? [0, 1]} //xxx : a default to avoid unstable undefined error and division by zero.
+                        domain={ranges[Math.floor(i / bars) * bars] ?? [0n, 1n]} //xxx : a default to avoid unstable undefined error and division by zero.
                         expand={
                             i % bars === bars - 1 && i < bisections.length - 1
                         }
@@ -196,7 +196,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         key="sub-tournament"
                         tournament={subTournament}
                         now={now}
-                        range={[0, 0]} // XXX: need to get range from somewhere
+                        range={[0n, 0n]} // XXX: need to get range from somewhere
                         timestamp={subTournament.updatedAt.getTime()}
                     />
                 )}

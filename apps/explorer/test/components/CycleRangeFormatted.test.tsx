@@ -4,7 +4,7 @@ import { render, screen } from "../test-utils";
 
 describe("CycleRangeFormatted", () => {
     it("formats cycle ranges with thousands separator", () => {
-        render(<CycleRangeFormatted range={[1000, 2000]} />);
+        render(<CycleRangeFormatted range={[1000n, 2000n]} />);
 
         expect(screen.getByText("1,000 → 2,000")).toBeInTheDocument();
     });

@@ -22,7 +22,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const now = Math.floor(Date.now() / 1000);
-const range = [1837880065, 2453987565] as CycleRange;
+const range: CycleRange = [1837880065n, 2453987565n];
 
 const middle = applications[0].epochs[3].tournament?.matches?.[0].tournament!;
 const bottom = middle.matches?.[0].tournament!;

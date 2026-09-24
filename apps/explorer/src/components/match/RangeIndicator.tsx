@@ -6,6 +6,7 @@ import {
     type ProgressRootProps,
 } from "@mantine/core";
 import { useEffect, useState, type FC } from "react";
+import { toRatio } from "../../util";
 import type { CycleRange } from "../types";
 
 interface RangeIndicatorProps extends Omit<ProgressRootProps, "value"> {
@@ -35,17 +36,17 @@ export const RangeIndicator: FC<RangeIndicatorProps> = (props) => {
 
     useEffect(() => {
         // box percentage calculation
-        const denominator = Math.max(domainEnd - domainStart, 1);
-        setWidth((end - start) / denominator);
-        setLeft((start - domainStart) / denominator);
+        const denominator = domainEnd - domainStart;
+        setWidth(toRatio(end - start, denominator));
+        setLeft(toRatio(start - domainStart, denominator));
     }, [domain, value]);
 
     return (
         <Stack gap={0}>
             {withLabels && (
                 <Group gap="xs" justify="space-between">
-                    <Text size="xs">{start}</Text>
-                    <Text size="xs">{end}</Text>
+                    <Text size="xs">{start.toString()}</Text>
+                    <Text size="xs">{end.toString()}</Text>
                 </Group>
             )}
             <Progress.Root {...progressProps}>
