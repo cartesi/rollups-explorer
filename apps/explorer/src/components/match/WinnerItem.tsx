@@ -35,11 +35,16 @@ export interface WinnerItemProps {
     /**
      * Timestamp
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 }
 
 export const WinnerItem: FC<WinnerItemProps> = (props) => {
-    const { claim, now, proof, timestamp } = props;
+    const { claim, now, proof, timestamp, timestampLoading } = props;
 
     const [opened, { toggle }] = useDisclosure(false);
 
@@ -50,7 +55,12 @@ export const WinnerItem: FC<WinnerItemProps> = (props) => {
     const bg = scheme === "light" ? theme.colors.yellow[0] : undefined;
 
     return (
-        <ClaimTimelineItem claim={claim} now={now} timestamp={timestamp}>
+        <ClaimTimelineItem
+            claim={claim}
+            now={now}
+            timestamp={timestamp}
+            timestampLoading={timestampLoading}
+        >
             <Paper withBorder p={16} radius="lg" bg={bg}>
                 <Stack gap="xs">
                     <Group gap="xs">

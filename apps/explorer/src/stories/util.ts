@@ -1,4 +1,9 @@
-import type { Match, Tournament, WinnerCommitment } from "@cartesi/client";
+import type {
+    Match,
+    MatchAdvanced,
+    Tournament,
+    WinnerCommitment,
+} from "@cartesi/client";
 import { HttpResponse } from "msw";
 import {
     concat,
@@ -212,6 +217,33 @@ export const randomMatches = (
 
     return matches;
 };
+
+/**
+ * Use the record dates as the timestamps of the blocks the match events
+ * happened in: advances, the match deletion and the sub-tournament creation.
+ */
+export const toBlockTimestamps = (
+    advances: MatchAdvanced[],
+    match?: Match,
+    subTournament?: Tournament,
+) =>
+    new Map<bigint, number>([
+        ...advances.map(
+            (advance) =>
+                [advance.blockNumber, advance.createdAt.getTime()] as const,
+        ),
+        ...(match?.deletionBlockNumber
+            ? [[match.deletionBlockNumber, match.updatedAt.getTime()] as const]
+            : []),
+        ...(subTournament
+            ? [
+                  [
+                      subTournament.startInstant,
+                      subTournament.createdAt.getTime(),
+                  ] as const,
+              ]
+            : []),
+    ]);
 
 export const STORIES_RPC_URL = "http://127.0.0.1:8545";
 

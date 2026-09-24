@@ -40,11 +40,29 @@ export interface MatchPageProps {
      * The current timestamp.
      */
     now: number;
+
+    /**
+     * Timestamps in milliseconds of the blocks the match events happened in.
+     */
+    timestamps?: Map<bigint, number>;
+
+    /**
+     * Whether the block timestamps are still being fetched.
+     */
+    timestampsLoading?: boolean;
 }
 
 export const MatchPage: FC<MatchPageProps> = (props) => {
-    const { advances, commitments, tournament, match, subTournament, now } =
-        props;
+    const {
+        advances,
+        commitments,
+        tournament,
+        match,
+        subTournament,
+        now,
+        timestamps,
+        timestampsLoading,
+    } = props;
 
     return (
         <Stack>
@@ -55,6 +73,8 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
                 match={match}
                 now={now}
                 subTournament={subTournament}
+                timestamps={timestamps}
+                timestampsLoading={timestampsLoading}
                 tournament={tournament}
             />
         </Stack>

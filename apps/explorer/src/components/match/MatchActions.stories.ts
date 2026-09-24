@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
+import { createElement } from "react";
 import { randomAdvances } from "../../stories/data";
-import { claim } from "../../stories/util";
+import { claim, toBlockTimestamps } from "../../stories/util";
 import { MatchActions } from "./MatchActions";
 import {
     createMatch,
@@ -12,6 +13,17 @@ const meta = {
     title: "Components/Match/MatchActions",
     component: MatchActions,
     tags: ["autodocs"],
+    render: (args) =>
+        createElement(MatchActions, {
+            ...args,
+            timestamps:
+                args.timestamps ??
+                toBlockTimestamps(
+                    args.advances,
+                    args.match,
+                    args.subTournament,
+                ),
+        }),
 } satisfies Meta<typeof MatchActions>;
 
 export default meta;

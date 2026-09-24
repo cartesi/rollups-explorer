@@ -1,12 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
+import { createElement } from "react";
 import { Ongoing } from "../components/tournament/TournamentView.stories";
 import * as MatchStateStories from "../components/match/MatchState.stories";
 import { MatchPage } from "./MatchPage";
 import { randomAdvances } from "../stories/data";
+import { toBlockTimestamps } from "../stories/util";
 
 const meta = {
     title: "Pages/Match",
     component: MatchPage,
+    render: (args) =>
+        createElement(MatchPage, {
+            ...args,
+            timestamps:
+                args.timestamps ??
+                toBlockTimestamps(
+                    args.advances,
+                    args.match,
+                    args.subTournament,
+                ),
+        }),
     tags: ["autodocs"],
 } satisfies Meta<typeof MatchPage>;
 

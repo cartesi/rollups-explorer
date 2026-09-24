@@ -15,6 +15,7 @@ import {
 } from "../components/navigation/Hierarchy";
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
+import { useBlockTimestamps } from "../hooks/useBlockTimestamps";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
@@ -65,6 +66,14 @@ export const MatchContainer: FC<MatchParams> = (params) => {
     const match = matchQuery.data ?? null;
     const tournament = tournamentQuery.data ?? null;
     const subTournament = subTournamentQuery.data?.data[0];
+
+    const { timestamps, isLoading: timestampsLoading } = useBlockTimestamps([
+        ...(advancesQuery.data?.data ?? []).map(
+            ({ blockNumber }) => blockNumber,
+        ),
+        match?.deletionBlockNumber,
+        subTournament?.startInstant,
+    ]);
 
     const { matches: parentMatches, tournaments: parentTournaments } =
         useTournamentHierarchy({
@@ -147,6 +156,8 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     commitments={commitments}
                     tournament={tournament}
                     subTournament={subTournament}
+                    timestamps={timestamps}
+                    timestampsLoading={timestampsLoading}
                     match={match}
                     now={now}
                 />

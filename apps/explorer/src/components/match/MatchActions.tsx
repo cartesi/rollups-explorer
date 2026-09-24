@@ -64,13 +64,33 @@ interface MatchActionsProps {
     subTournament?: Tournament;
 
     /**
+     * Timestamps in milliseconds of the blocks the match events happened in.
+     */
+    timestamps?: Map<bigint, number>;
+
+    /**
+     * Whether the block timestamps are still being fetched.
+     */
+    timestampsLoading?: boolean;
+
+    /**
      * The tournament the match belongs to.
      */
     tournament: Tournament;
 }
 
 export const MatchActions: FC<MatchActionsProps> = (props) => {
-    const { advances, match, now, subTournament, tournament } = props;
+    const {
+        advances,
+        match,
+        now,
+        subTournament,
+        timestamps,
+        timestampsLoading,
+        tournament,
+    } = props;
+    const isTimestampLoading = (timestamp?: number) =>
+        Boolean(timestampsLoading) && timestamp === undefined;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
     const total = Number(tournament.height - 1n);
@@ -122,7 +142,9 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const nextClaim =
         getAdvanceSide(advances.length) === "ONE" ? claim1 : claim2;
     const waitingClaim = nextClaim === claim1 ? claim2 : claim1;
-    const closedAt = match.updatedAt.getTime();
+    const closedAt = match.deletionBlockNumber
+        ? timestamps?.get(match.deletionBlockNumber)
+        : undefined;
 
     const getOutcomeItems = (): ReactElement[] => {
         switch (match.deletionReason) {
@@ -134,6 +156,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                               loser={{ hash: loser }}
                               now={now}
                               timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
                               winner={{ hash: winner }}
                           />,
                       ]
@@ -144,6 +167,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                               claim2={waitingClaim}
                               now={now}
                               timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
                           />,
                       ];
             case "CHILD_TOURNAMENT":
@@ -155,6 +179,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                             claim={{ hash: winner }}
                             now={now}
                             timestamp={closedAt}
+                            timestampLoading={isTimestampLoading(closedAt)}
                             proof={"0x0"} // XXX: need to get proof from somewhere
                         />,
                         <LoserItem
@@ -170,6 +195,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                               key="eliminated"
                               now={now}
                               timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
                           />,
                       ]
                     : [];
@@ -200,7 +226,10 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         index={i + 1}
                         now={now}
                         range={ranges[i + 1]}
-                        timestamp={advance.updatedAt.getTime()}
+                        timestamp={timestamps?.get(advance.blockNumber)}
+                        timestampLoading={isTimestampLoading(
+                            timestamps?.get(advance.blockNumber),
+                        )}
                         total={total}
                     />
                 ))}
@@ -211,7 +240,10 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         tournament={subTournament}
                         now={now}
                         range={getTournamentCycleRange(subTournament)}
-                        timestamp={subTournament.updatedAt.getTime()}
+                        timestamp={timestamps?.get(subTournament.startInstant)}
+                        timestampLoading={isTimestampLoading(
+                            timestamps?.get(subTournament.startInstant),
+                        )}
                     />
                 )}
                 {getOutcomeItems()}

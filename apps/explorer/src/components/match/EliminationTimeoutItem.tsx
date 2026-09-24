@@ -24,13 +24,18 @@ interface EliminationTimeoutItemProps {
     /**
      * Timestamp
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 }
 
 export const EliminationTimeoutItem: FC<EliminationTimeoutItemProps> = (
     props,
 ) => {
-    const { claim1, claim2, now, timestamp } = props;
+    const { claim1, claim2, now, timestamp, timestampLoading } = props;
 
     return (
         <>
@@ -46,7 +51,11 @@ export const EliminationTimeoutItem: FC<EliminationTimeoutItemProps> = (
                     <Text c="dimmed">no action taken</Text>
                 </Group>
             </ClaimTimelineItem>
-            <ClaimsEliminatedItem now={now} timestamp={timestamp} />
+            <ClaimsEliminatedItem
+                now={now}
+                timestamp={timestamp}
+                timestampLoading={timestampLoading}
+            />
         </>
     );
 };
