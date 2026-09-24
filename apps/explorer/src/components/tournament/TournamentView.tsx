@@ -43,8 +43,8 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
 
     // XXX: where the range is coming from?
     const range = [0, 0] as CycleRange;
-    const winner = tournament.winnerCommitment
-        ? { hash: tournament.winnerCommitment }
+    const winner = tournament.snapshot.winnerCommitment
+        ? { hash: tournament.snapshot.winnerCommitment }
         : undefined;
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);

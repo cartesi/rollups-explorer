@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";
+import {
+    createCommitment,
+    createMatch,
+    createTournament,
+} from "../../stories/prt";
 
 const meta = {
     title: "Components/Tournament/TournamentView",
@@ -18,7 +23,7 @@ const epochIndex = 0n;
 const tournamentAddress = "0x61bcab9d0d8b554009824292d2d6855dfa3aab86";
 
 const matches: Match[] = [
-    {
+    createMatch({
         blockNumber: 1n,
         commitmentOne: claim(0).hash,
         commitmentTwo: claim(1).hash,
@@ -35,8 +40,8 @@ const matches: Match[] = [
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 1),
         winnerCommitment: "ONE",
-    },
-    {
+    }),
+    createMatch({
         blockNumber: 2n,
         commitmentOne: claim(2).hash,
         commitmentTwo: claim(3).hash,
@@ -52,8 +57,8 @@ const matches: Match[] = [
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 2),
         winnerCommitment: "NONE",
-    },
-    {
+    }),
+    createMatch({
         blockNumber: 3n,
         commitmentOne: claim(4).hash,
         commitmentTwo: claim(5).hash,
@@ -69,8 +74,8 @@ const matches: Match[] = [
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 3),
         winnerCommitment: "ONE",
-    },
-    {
+    }),
+    createMatch({
         blockNumber: 4n,
         commitmentOne: claim(6).hash,
         commitmentTwo: claim(4).hash,
@@ -86,15 +91,13 @@ const matches: Match[] = [
         txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
         updatedAt: new Date(timestamp + 4),
         winnerCommitment: "NONE",
-    },
+    }),
 ];
 
-const tournament: Tournament = {
+const tournament: Tournament = createTournament({
     address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
     createdAt: new Date(timestamp),
     epochIndex,
-    finalStateHash: null,
-    finishedAtBlock: 2n,
     height: 48n,
     level: 0n,
     log2step: 0x2cn,
@@ -102,20 +105,28 @@ const tournament: Tournament = {
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(timestamp),
-    winnerCommitment: null,
-};
+    snapshot: {
+        standing: "ROOT_FAILED",
+        asOfBlock: 2n,
+        finalStateHash: null,
+        finishedAtBlock: 2n,
+        winnerCommitment: null,
+    },
+});
 
-const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) => ({
-    blockNumber: BigInt(i + 1),
-    commitment: claim(i).hash,
-    createdAt: new Date(timestamp + i),
-    epochIndex,
-    finalStateHash: zeroHash,
-    submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    tournamentAddress,
-    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-    updatedAt: new Date(timestamp + i),
-}));
+const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) =>
+    createCommitment({
+        blockNumber: BigInt(i + 1),
+        commitment: claim(i).hash,
+        createdAt: new Date(timestamp + i),
+        epochIndex,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        tournamentAddress,
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp + i),
+    }),
+);
 
 export const Ongoing: Story = {
     args: {
@@ -127,12 +138,10 @@ export const Ongoing: Story = {
 
 export const NoChallengerYet: Story = {
     args: {
-        tournament: {
+        tournament: createTournament({
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
             epochIndex,
-            finalStateHash: null,
-            finishedAtBlock: 2n,
             log2step: 0x2cn,
             maxLevel: 3n,
             parentMatchIdHash: null,
@@ -140,11 +149,17 @@ export const NoChallengerYet: Story = {
             updatedAt: new Date(timestamp),
             height: 48n,
             level: 0n,
-            winnerCommitment: null,
-        },
+            snapshot: {
+                standing: "ROOT_FAILED",
+                asOfBlock: 2n,
+                finalStateHash: null,
+                finishedAtBlock: 2n,
+                winnerCommitment: null,
+            },
+        }),
         matches: [],
         commitments: [
-            {
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(0).hash,
                 createdAt: new Date(timestamp),
@@ -154,19 +169,17 @@ export const NoChallengerYet: Story = {
                 tournamentAddress,
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
+            }),
         ],
     },
 };
 
 export const Finalized: Story = {
     args: {
-        tournament: {
+        tournament: createTournament({
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
             epochIndex,
-            finalStateHash: zeroHash,
-            finishedAtBlock: 2n,
             log2step: 0x2cn,
             maxLevel: 3n,
             parentMatchIdHash: null,
@@ -174,11 +187,18 @@ export const Finalized: Story = {
             updatedAt: new Date(timestamp),
             height: 48n,
             level: 0n,
-            winnerCommitment: claim(0).hash,
-        },
+            snapshot: {
+                standing: "ROOT_WINNER",
+                candidate: claim(0).hash,
+                asOfBlock: 2n,
+                finalStateHash: zeroHash,
+                finishedAtBlock: 2n,
+                winnerCommitment: claim(0).hash,
+            },
+        }),
         matches: [],
         commitments: [
-            {
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(0).hash,
                 createdAt: new Date(timestamp),
@@ -188,7 +208,7 @@ export const Finalized: Story = {
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
+            }),
         ],
     },
 };
@@ -196,7 +216,7 @@ export const Finalized: Story = {
 export const MidLevelDispute: Story = {
     args: {
         commitments: [
-            {
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(7).hash,
                 createdAt: new Date(timestamp),
@@ -206,8 +226,8 @@ export const MidLevelDispute: Story = {
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
-            {
+            }),
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(8).hash,
                 createdAt: new Date(timestamp),
@@ -217,8 +237,8 @@ export const MidLevelDispute: Story = {
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
-            {
+            }),
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(9).hash,
                 createdAt: new Date(timestamp),
@@ -228,8 +248,8 @@ export const MidLevelDispute: Story = {
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
-            {
+            }),
+            createCommitment({
                 blockNumber: 1n,
                 commitment: claim(10).hash,
                 createdAt: new Date(timestamp),
@@ -239,14 +259,12 @@ export const MidLevelDispute: Story = {
                 submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
-            },
+            }),
         ],
-        tournament: {
+        tournament: createTournament({
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
             epochIndex,
-            finalStateHash: null,
-            finishedAtBlock: 2n,
             log2step: 0x2cn,
             maxLevel: 3n,
             parentMatchIdHash: null,
@@ -254,10 +272,16 @@ export const MidLevelDispute: Story = {
             updatedAt: new Date(timestamp),
             height: 27n,
             level: 1n,
-            winnerCommitment: null,
-        },
+            snapshot: {
+                standing: "INNER_ELIMINABLE_NO_WINNER",
+                asOfBlock: 2n,
+                finalStateHash: null,
+                finishedAtBlock: 2n,
+                winnerCommitment: null,
+            },
+        }),
         matches: [
-            {
+            createMatch({
                 idHash: generateMatchID(claim(7, 5).hash, claim(8, 4).hash),
                 commitmentOne: claim(7, 5).hash,
                 commitmentTwo: claim(8, 4).hash,
@@ -273,8 +297,8 @@ export const MidLevelDispute: Story = {
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
                 winnerCommitment: "NONE",
-            },
-            {
+            }),
+            createMatch({
                 idHash: generateMatchID(claim(9, 5).hash, claim(10, 4).hash),
                 commitmentOne: claim(9, 5).hash,
                 commitmentTwo: claim(10, 4).hash,
@@ -290,7 +314,7 @@ export const MidLevelDispute: Story = {
                 txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                 updatedAt: new Date(timestamp),
                 winnerCommitment: "NONE",
-            },
+            }),
         ],
     },
 };

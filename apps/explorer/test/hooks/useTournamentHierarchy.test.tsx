@@ -4,6 +4,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import type { Address } from "viem";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTournamentHierarchy } from "../../src/hooks/useTournamentHierarchy";
+import { createMatch, createTournament } from "../../src/stories/prt";
 
 vi.mock("@cartesi/react", () => ({
     useMatch: vi.fn(),
@@ -23,42 +24,26 @@ const parentTournamentAddress =
 const parentMatchIdHash =
     "0xcccc000000000000000000000000000000000000000000000000000000000003" as `0x${string}`;
 
-const makeTournament = (overrides: Partial<Tournament> = {}): Tournament => ({
-    address: rootTournamentAddress,
-    createdAt: new Date(),
-    epochIndex,
-    finalStateHash: null,
-    finishedAtBlock: 0n,
-    height: 48n,
-    level: 0n,
-    log2step: 44n,
-    maxLevel: 3n,
-    parentMatchIdHash: null,
-    parentTournamentAddress: null,
-    updatedAt: new Date(),
-    winnerCommitment: null,
-    ...overrides,
-});
+const makeTournament = (overrides: Partial<Tournament> = {}): Tournament =>
+    createTournament({
+        address: rootTournamentAddress,
+        epochIndex,
+        ...overrides,
+    });
 
-const makeMatch = (overrides: Partial<Match> = {}): Match => ({
-    blockNumber: 1n,
-    commitmentOne:
-        "0x1111111111111111111111111111111111111111111111111111111111111111",
-    commitmentTwo:
-        "0x2222222222222222222222222222222222222222222222222222222222222222",
-    createdAt: new Date(),
-    deletionBlockNumber: null,
-    deletionReason: "NOT_DELETED",
-    deletionTxHash: null,
-    epochIndex,
-    idHash: parentMatchIdHash,
-    leftOfTwo: "0x01" as `0x${string}`,
-    tournamentAddress: rootTournamentAddress,
-    txHash: "0xdeadbeef" as `0x${string}`,
-    updatedAt: new Date(),
-    winnerCommitment: "NONE" as const,
-    ...overrides,
-});
+const makeMatch = (overrides: Partial<Match> = {}): Match =>
+    createMatch({
+        commitmentOne:
+            "0x1111111111111111111111111111111111111111111111111111111111111111",
+        commitmentTwo:
+            "0x2222222222222222222222222222222222222222222222222222222222222222",
+        epochIndex,
+        idHash: parentMatchIdHash,
+        leftOfTwo: "0x01" as `0x${string}`,
+        tournamentAddress: rootTournamentAddress,
+        txHash: "0xdeadbeef" as `0x${string}`,
+        ...overrides,
+    });
 
 const idleQuery = { data: undefined, isFetching: false };
 const loadingQuery = { data: undefined, isFetching: true };

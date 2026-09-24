@@ -7,6 +7,7 @@ import {
     type GenericJSONRPCRequest,
 } from "../stories/util";
 import { ApplicationSummaryPage } from "./ApplicationSummaryPage";
+import { createTournament } from "../stories/prt";
 
 const meta = {
     title: "Pages/Application/summary",
@@ -132,7 +133,7 @@ const params: Params = {
     },
     tournaments: {
         data: [
-            {
+            createTournament({
                 epochIndex: 51n,
                 address: "0xBFCCffb1AE21227f49009540C5ac45BA45d96149",
                 parentTournamentAddress: null,
@@ -141,13 +142,16 @@ const params: Params = {
                 level: 0n,
                 log2step: 44n,
                 height: 48n,
-                winnerCommitment: null,
-                finalStateHash: null,
-                finishedAtBlock: 0n,
                 createdAt: date,
                 updatedAt: date,
-            },
-            {
+                snapshot: {
+                    standing: "MATCHES_ACTIVE",
+                    winnerCommitment: null,
+                    finalStateHash: null,
+                    finishedAtBlock: 0n,
+                },
+            }),
+            createTournament({
                 epochIndex: 50n,
                 address: "0x5267E8d41d9c6C1386DBfee95e00B8c6C5503Ba0",
                 parentTournamentAddress: null,
@@ -156,14 +160,20 @@ const params: Params = {
                 level: 0n,
                 log2step: 44n,
                 height: 48n,
-                winnerCommitment:
-                    "0x725e9d3febbdd79841345f187aacf343ee497214277f3cb330aca90319cbdd92",
-                finalStateHash:
-                    "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
-                finishedAtBlock: 15390n,
                 createdAt: date,
                 updatedAt: date,
-            },
+                snapshot: {
+                    standing: "ROOT_WINNER",
+                    candidate:
+                        "0x725e9d3febbdd79841345f187aacf343ee497214277f3cb330aca90319cbdd92",
+                    asOfBlock: 15390n,
+                    winnerCommitment:
+                        "0x725e9d3febbdd79841345f187aacf343ee497214277f3cb330aca90319cbdd92",
+                    finalStateHash:
+                        "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
+                    finishedAtBlock: 15390n,
+                },
+            }),
         ],
         totalCount: 52,
         isLoading: false,
