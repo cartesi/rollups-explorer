@@ -2,6 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs";
 import { randomAdvances } from "../../stories/data";
 import { claim } from "../../stories/util";
 import { MatchActions } from "./MatchActions";
+import {
+    createMatch,
+    createMatchAdvanced,
+    createTournament,
+} from "../../stories/prt";
 
 const meta = {
     title: "Components/Match/MatchActions",
@@ -37,7 +42,7 @@ export const CompleteTop: Story = {
             now: now - 7966,
             tournamentAddress,
         }),
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -53,7 +58,7 @@ export const CompleteTop: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
             winnerCommitment: "ONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -65,7 +70,7 @@ export const CompleteTop: Story = {
 export const Bisections: Story = {
     args: {
         advances: [
-            {
+            createMatchAdvanced({
                 blockNumber: 1n,
                 createdAt: new Date(now - 3453),
                 epochIndex,
@@ -77,8 +82,8 @@ export const Bisections: Story = {
                 tournamentAddress,
                 txHash: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 updatedAt: new Date(now - 3453),
-            },
-            {
+            }),
+            createMatchAdvanced({
                 blockNumber: 2n,
                 createdAt: new Date(now - 2134),
                 epochIndex,
@@ -90,8 +95,8 @@ export const Bisections: Story = {
                 tournamentAddress,
                 txHash: "0x89f986df6290a9157862849a6a0b92df8b170bcaca15a7c4ac8ba15886d53bd3",
                 updatedAt: new Date(now - 2134),
-            },
-            {
+            }),
+            createMatchAdvanced({
                 blockNumber: 3n,
                 createdAt: new Date(now - 1452),
                 epochIndex,
@@ -103,8 +108,8 @@ export const Bisections: Story = {
                 tournamentAddress,
                 txHash: "0x75ea44f31192dd174cb1834ca1f41deea2d33f22cfd3841f6ad799099ed76d96",
                 updatedAt: new Date(now - 1452),
-            },
-            {
+            }),
+            createMatchAdvanced({
                 blockNumber: 4n,
                 createdAt: new Date(now - 345),
                 epochIndex,
@@ -116,8 +121,8 @@ export const Bisections: Story = {
                 tournamentAddress,
                 txHash: "0x7adac1a62f3e5fd04f096f7c6fb233a6e8dd2a96bcc3463e16ff2927431d623a",
                 updatedAt: new Date(now - 345),
-            },
-            {
+            }),
+            createMatchAdvanced({
                 blockNumber: 5n,
                 createdAt: new Date(now - 28),
                 epochIndex,
@@ -129,9 +134,9 @@ export const Bisections: Story = {
                 tournamentAddress,
                 txHash: "0xb8df76d2cfad6edbea139ea38afce747fff297fa8172ff33d0facfdb07319aaf",
                 updatedAt: new Date(now - 28),
-            },
+            }),
         ],
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -146,7 +151,7 @@ export const Bisections: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -158,7 +163,7 @@ export const Bisections: Story = {
 export const Timeout: Story = {
     args: {
         advances: [],
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -174,7 +179,7 @@ export const Timeout: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "TWO",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -186,7 +191,7 @@ export const Timeout: Story = {
 export const TimeoutSecond: Story = {
     args: {
         advances: [
-            {
+            createMatchAdvanced({
                 blockNumber: 1n,
                 createdAt: new Date(now - 3453),
                 epochIndex: 0n,
@@ -198,9 +203,9 @@ export const TimeoutSecond: Story = {
                 tournamentAddress,
                 txHash: "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
                 updatedAt: new Date(now - 3453),
-            },
+            }),
         ],
-        match: {
+        match: createMatch({
             blockNumber: 2n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -216,7 +221,7 @@ export const TimeoutSecond: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -228,7 +233,7 @@ export const TimeoutSecond: Story = {
 export const Elimination: Story = {
     args: {
         advances: [],
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -244,7 +249,7 @@ export const Elimination: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -263,7 +268,7 @@ export const EliminationAfterBisections: Story = {
             now: now - 7966,
             tournamentAddress,
         }),
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -279,7 +284,7 @@ export const EliminationAfterBisections: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -298,7 +303,7 @@ export const SubTournament: Story = {
             now: now - 7966,
             tournamentAddress,
         }),
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -314,7 +319,7 @@ export const SubTournament: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 5n,
         now,
     },
@@ -333,7 +338,7 @@ export const WinnerBottom: Story = {
             now: now - 7966,
             tournamentAddress,
         }),
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -349,7 +354,7 @@ export const WinnerBottom: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
-        },
+        }),
         height: 5n,
         now,
     },
@@ -368,7 +373,7 @@ export const WinnerTop: Story = {
             now: now - 7966,
             tournamentAddress,
         }),
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -384,7 +389,7 @@ export const WinnerTop: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now - 1000),
             winnerCommitment: "ONE",
-        },
+        }),
         height: 5n,
         now,
     },
@@ -396,7 +401,7 @@ export const WinnerTop: Story = {
 export const NoActions: Story = {
     args: {
         advances: [],
-        match: {
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -412,7 +417,7 @@ export const NoActions: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 48n,
         now,
     },
@@ -422,17 +427,19 @@ export const NoActions: Story = {
  * No winners after sub-tournament completion.
  */
 
+const disputedAdvances = randomAdvances({
+    count: 47,
+    epochIndex,
+    idHash,
+    leftOfTwo,
+    now: now - 7966,
+    tournamentAddress,
+});
+
 export const NoWinnerAfterSubTournamentDispute: Story = {
     args: {
-        advances: randomAdvances({
-            count: 47,
-            epochIndex,
-            idHash,
-            leftOfTwo,
-            now: now - 7966,
-            tournamentAddress,
-        }),
-        match: {
+        advances: disputedAdvances,
+        match: createMatch({
             blockNumber: 1n,
             commitmentOne: claim(0).hash,
             commitmentTwo: claim(1).hash,
@@ -448,23 +455,30 @@ export const NoWinnerAfterSubTournamentDispute: Story = {
             txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
             updatedAt: new Date(now),
             winnerCommitment: "NONE",
-        },
+        }),
         height: 48n,
         now,
-        subTournament: {
+        subTournament: createTournament({
             epochIndex: 0n,
-            address: "0x61bCAb9d0D8b554009824292d2d6855DfA3AAB86",
-            parentTournamentAddress: null,
-            parentMatchIdHash: null,
+            address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+            parentTournamentAddress: tournamentAddress,
+            parentMatchIdHash: idHash,
             maxLevel: 3n,
             level: 1n,
-            log2step: 44n,
-            height: 48n,
-            winnerCommitment: null,
-            finalStateHash: null,
-            finishedAtBlock: 1504n,
+            log2step: 27n,
+            height: 17n,
+            baseCycle:
+                disputedAdvances[disputedAdvances.length - 1]
+                    .segmentStartPosition << 44n,
             createdAt: new Date(now - 7966),
             updatedAt: new Date(now - 4000),
-        },
+            snapshot: {
+                standing: "INNER_ELIMINABLE_NO_WINNER",
+                asOfBlock: 1504n,
+                winnerCommitment: null,
+                finalStateHash: null,
+                finishedAtBlock: 1504n,
+            },
+        }),
     },
 };

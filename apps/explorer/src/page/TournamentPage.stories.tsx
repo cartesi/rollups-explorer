@@ -14,6 +14,7 @@ import {
     randomMatches,
 } from "../stories/util";
 import { TournamentPage } from "./TournamentPage";
+import { createCommitment, createTournament } from "../stories/prt";
 
 const meta = {
     title: "Pages/Tournament",
@@ -89,12 +90,10 @@ const claims: Claim[] = Array.from({ length: 128 }).map((_, i) => claim(i));
 const startCycle = 1837880065;
 const endCycle = 2453987565;
 
-const randomTournament: Tournament = {
+const randomTournament: Tournament = createTournament({
     address: generateTournamentAddress(startCycle, endCycle),
     createdAt: new Date(now),
     epochIndex: 0n,
-    finalStateHash: null,
-    finishedAtBlock: 1n,
     height: 48n,
     level: 0n,
     log2step: 1n,
@@ -102,20 +101,28 @@ const randomTournament: Tournament = {
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(now),
-    winnerCommitment: null,
-};
+    snapshot: {
+        standing: "ROOT_FAILED",
+        asOfBlock: 1n,
+        finalStateHash: null,
+        finishedAtBlock: 1n,
+        winnerCommitment: null,
+    },
+});
 
-const commitments: Commitment[] = claims.map((claim, i) => ({
-    blockNumber: BigInt(i),
-    commitment: claim.hash,
-    createdAt: new Date(now + i),
-    epochIndex: 0n,
-    finalStateHash: zeroHash,
-    submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    tournamentAddress: randomTournament.address,
-    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-    updatedAt: new Date(now + i),
-}));
+const commitments: Commitment[] = claims.map((claim, i) =>
+    createCommitment({
+        blockNumber: BigInt(i),
+        commitment: claim.hash,
+        createdAt: new Date(now + i),
+        epochIndex: 0n,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        tournamentAddress: randomTournament.address,
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(now + i),
+    }),
+);
 
 const matches = randomMatches(
     now,
