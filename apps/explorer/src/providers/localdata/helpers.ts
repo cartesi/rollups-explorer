@@ -41,11 +41,6 @@ export const createApplication = (cfg: Partial<Application>) => {
         templateHash:
             "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
         epochLength: "$bigint:0",
-        dataAvailability: {
-            type: "InputBox",
-            inputBoxAddress: "0xBB655FfBee3Cf2dc4f5809Cdaba18f357278427D",
-            ...cfg.dataAvailability,
-        },
         consensusType: "PRT",
         state: "ENABLED",
         reason: null,
