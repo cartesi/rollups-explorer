@@ -39,10 +39,6 @@ const params: Params = {
         status: "OK",
         enabled: true,
         processedInputs: 1n,
-        dataAvailability: {
-            type: "InputBox",
-            inputBoxAddress: "0x0000000000000000000000000000000000000000",
-        },
         executionParameters: {
             advanceIncCycles: 0x400000n,
             advanceMaxCycles: 0x3fffffffffffffffn,
@@ -114,7 +110,7 @@ const params: Params = {
                 exceptionData: null,
                 machineHash:
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
-                outputsHash:
+                txBufferDataBlock:
                     "0x97a8872d473a093269f65e4e14170fcf5d1383cd105d7215688f5e8c55f00553",
                 transactionHash:
                     "0x75e1a936e92309ce05d3592905fb08637e64dab4131440c59ff053880ffde098",
@@ -190,8 +186,12 @@ const params: Params = {
                 createdAt: date,
                 updatedAt: date,
                 commitmentProof: null,
-                outputsMerkleProof: null,
-                outputsMerkleRoot: null,
+                txBufferDataBlock: null,
+                txBufferProof: null,
+                iflagsYDataBlock: null,
+                iflagsYProof: null,
+                htifTohostDataBlock: null,
+                htifTohostProof: null,
                 stagedAtBlock: 0n,
             },
             {
@@ -211,8 +211,12 @@ const params: Params = {
                 createdAt: date,
                 updatedAt: date,
                 commitmentProof: null,
-                outputsMerkleProof: null,
-                outputsMerkleRoot: null,
+                txBufferDataBlock: null,
+                txBufferProof: null,
+                iflagsYDataBlock: null,
+                iflagsYProof: null,
+                htifTohostDataBlock: null,
+                htifTohostProof: null,
                 stagedAtBlock: 0n,
             },
         ],
@@ -261,7 +265,7 @@ const authorityAppParams: Params = {
                 exceptionData: null,
                 machineHash:
                     "0x227d685f612568ed2d5b34fb8e3c19eef80097430498fd2b4a60e73c59e75e8a",
-                outputsHash:
+                txBufferDataBlock:
                     "0x97a8872d473a093269f65e4e14170fcf5d1383cd105d7215688f5e8c55f00553",
                 transactionHash:
                     "0x75e1a936e92309ce05d3592905fb08637e64dab4131440c59ff053880ffde098",
@@ -304,8 +308,12 @@ const authorityAppParams: Params = {
                 createdAt: date,
                 updatedAt: date,
                 commitmentProof: null,
-                outputsMerkleProof: null,
-                outputsMerkleRoot: null,
+                txBufferDataBlock: null,
+                txBufferProof: null,
+                iflagsYDataBlock: null,
+                iflagsYProof: null,
+                htifTohostDataBlock: null,
+                htifTohostProof: null,
                 stagedAtBlock: 0n,
             },
             {
@@ -325,8 +333,12 @@ const authorityAppParams: Params = {
                 createdAt: date,
                 updatedAt: date,
                 commitmentProof: null,
-                outputsMerkleProof: null,
-                outputsMerkleRoot: null,
+                txBufferDataBlock: null,
+                txBufferProof: null,
+                iflagsYDataBlock: null,
+                iflagsYProof: null,
+                htifTohostDataBlock: null,
+                htifTohostProof: null,
                 stagedAtBlock: 0n,
             },
         ],
