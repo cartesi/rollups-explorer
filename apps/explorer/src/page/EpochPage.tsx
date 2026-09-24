@@ -52,8 +52,8 @@ export const EpochPage: FC<Props> = ({
         : null;
     const inDispute = false; // XXX: how to know if an epoch is in dispute?
     const tournamentColor = inDispute ? epochStatusColor : "";
-    const startCycle = 0; // XXX: how to know the startCycle?
-    const endCycle = 0; // XXX: how to know the endCycle?
+    const startCycle = 0n; // XXX: how to know the startCycle?
+    const endCycle = 0n; // XXX: how to know the endCycle?
 
     return (
         <Stack>

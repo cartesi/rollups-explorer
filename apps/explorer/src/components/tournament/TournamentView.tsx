@@ -42,7 +42,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
     const gold = theme.colors.yellow[5];
 
     // XXX: where the range is coming from?
-    const range = [0, 0] as CycleRange;
+    const range: CycleRange = [0n, 0n];
     const winner = tournament.snapshot.winnerCommitment
         ? { hash: tournament.snapshot.winnerCommitment }
         : undefined;

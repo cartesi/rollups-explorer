@@ -1,5 +1,6 @@
 import { Stack, Text, type TimelineItemProps } from "@mantine/core";
 import { forwardRef, useMemo, type FC } from "react";
+import { toRatio } from "../../util";
 import type { Claim, CycleRange } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
 import { CurlyBracket } from "./CurlyBracket";
@@ -58,9 +59,10 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
     const p = useMemo(() => {
         const [start, end] = range;
         const [domainStart, domainEnd] = domain;
-        const numerator = start + end - 2 * domainStart;
-        const denominator = Math.max(2 * (domainEnd - domainStart), 1);
-        return numerator / denominator;
+        return toRatio(
+            start + end - 2n * domainStart,
+            2n * (domainEnd - domainStart),
+        );
     }, [domain, range]);
 
     return (
@@ -91,8 +93,8 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                             tip={p}
                         />
                         <RangeIndicator
-                            domain={[0, 1]}
-                            value={[0, 1]}
+                            domain={[0n, 1n]}
+                            value={[0n, 1n]}
                             h={16}
                             color={props.color}
                         />

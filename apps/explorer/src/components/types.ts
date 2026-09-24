@@ -5,7 +5,7 @@ export interface Claim {
     parentClaims?: Hash[];
 }
 
-export type Cycle = number; // XXX: should be bigint, but leaving it as number for now for compatibility with storybook
+export type Cycle = bigint;
 export type CycleRange = [Cycle, Cycle];
 
 export const contentDisplayOptions = [

@@ -19,7 +19,7 @@ export const Ongoing: Story = {
         match: TournamentStories.Ongoing.args.matches[1],
         advances: MatchActionsStories.Bisections.args.advances,
         now,
-        range: [1837880065, 2453987565],
+        range: [1837880065n, 2453987565n],
     },
 };
 
@@ -32,6 +32,6 @@ export const NoActions: Story = {
         match: TournamentStories.Ongoing.args.matches[1],
         advances: [],
         now,
-        range: [1837880065, 2453987565],
+        range: [1837880065n, 2453987565n],
     },
 };

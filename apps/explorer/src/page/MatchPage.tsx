@@ -37,7 +37,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
     const { advances, tournament, match, subTournament, now } = props;
     // XXX: where the range is coming from?
     // const range = [tournament.startCycle, tournament.endCycle] as CycleRange;
-    const range = [0, 0] as CycleRange;
+    const range: CycleRange = [0n, 0n];
 
     return (
         <Stack>
