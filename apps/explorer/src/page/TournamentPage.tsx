@@ -17,6 +17,11 @@ export interface TournamentPageProps {
     commitments: Commitment[];
 
     /**
+     * Called once a bond recovery sent from the page is confirmed.
+     */
+    onBondRecovered?: () => void;
+
+    /**
      * The matches to display.
      */
     matches: Match[];
@@ -28,12 +33,14 @@ export interface TournamentPageProps {
 }
 
 export const TournamentPage: FC<TournamentPageProps> = (props) => {
-    const { bondEvents, commitments, matches, tournament } = props;
+    const { bondEvents, commitments, matches, onBondRecovered, tournament } =
+        props;
     return (
         <Stack>
             <PageTitle Icon={TbTrophyFilled} title="Tournament" />
             <TournamentView
                 bondEvents={bondEvents}
+                onBondRecovered={onBondRecovered}
                 commitments={commitments}
                 matches={matches}
                 tournament={tournament}

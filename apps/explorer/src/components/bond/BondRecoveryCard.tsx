@@ -8,10 +8,12 @@ import {
     type MantineColor,
 } from "@mantine/core";
 import type { FC } from "react";
+import type { Address as EthAddress } from "viem";
 import { formatBondValue, type BondRecoveredEvent } from "../../lib/bondUtils";
 import { content } from "../../content";
 import Address from "../Address";
 import { InfoHint } from "../InfoHint";
+import { BondRecoveryAction } from "./BondRecoveryAction";
 import TransactionHash from "../TransactionHash";
 
 const text = content.bond;
@@ -34,14 +36,27 @@ export interface BondRecoveryCardProps {
     bondRecovery: TournamentBondRecovery;
 
     /**
+     * Called once a recovery sent from the card is confirmed.
+     */
+    onRecovered?: () => void;
+
+    /**
      * The event that recovered the bond, once recovered.
      */
     recovery?: BondRecoveredEvent;
+
+    /**
+     * The tournament holding the bond. Without it the card cannot send a
+     * recovery.
+     */
+    tournamentAddress?: EthAddress;
 }
 
 export const BondRecoveryCard: FC<BondRecoveryCardProps> = ({
     bondRecovery,
+    onRecovered,
     recovery,
+    tournamentAddress,
 }) => {
     const { disposition } = bondRecovery;
     if (disposition === "TOURNAMENT_RUNNING") return null;
@@ -73,6 +88,12 @@ export const BondRecoveryCard: FC<BondRecoveryCardProps> = ({
                                     {formatBondValue(bondRecovery.payment)}
                                 </Text>
                             </Group>
+                        )}
+                        {tournamentAddress && (
+                            <BondRecoveryAction
+                                tournamentAddress={tournamentAddress}
+                                onRecovered={onRecovered}
+                            />
                         )}
                     </>
                 )}
