@@ -10,7 +10,7 @@ import {
 } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
 
-const tournament = createTournament({ height: 48n });
+const tournament = createTournament({ height: 48n, log2step: 44n });
 
 const bisecting = createMatch({
     snapshot: createMatchSnapshot({
@@ -18,8 +18,11 @@ const bisecting = createMatch({
         timeoutOutcome: "ONE_WINS",
         phase: "BISECTING",
         bisection: {
-            ...createBisection({ responder: "TWO", segmentStartCycle: 512n }),
-            currentHeight: 40n,
+            ...createBisection({
+                responder: "TWO",
+                segmentStartCycle: 5n << 68n,
+            }),
+            currentHeight: 4n,
         },
         sealed: null,
     }),
@@ -31,8 +34,11 @@ describe("MatchState", () => {
 
         expect(screen.getByText("bisecting")).toBeInTheDocument();
         expect(screen.getByText("as of block 1200")).toBeInTheDocument();
-        expect(screen.getByText("40 / 48")).toBeInTheDocument();
-        expect(screen.getByText("512")).toBeInTheDocument();
+        expect(screen.getByText("4 / 48")).toBeInTheDocument();
+        expect(
+            screen.getByText("Input #5 · mcycle 0 – 268,435,455"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("268,435,456 mcycles")).toBeInTheDocument();
         expect(screen.getByText("Responder")).toBeInTheDocument();
         expect(
             screen.getByText("Commitment one can win by timeout"),

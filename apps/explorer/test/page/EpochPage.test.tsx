@@ -35,7 +35,9 @@ describe("EpochPage", () => {
         );
 
         expect(screen.getByText("disputed")).toBeInTheDocument();
-        expect(screen.getByText("0 → 32")).toBeInTheDocument();
+        expect(
+            screen.getByText("Input #0 · mcycle 0 · ucycle 0 – 31"),
+        ).toBeInTheDocument();
     });
 
     it("should not flag the epoch once the root tournament has no matches", () => {

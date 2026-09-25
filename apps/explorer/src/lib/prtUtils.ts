@@ -158,3 +158,61 @@ export const getResponder = (match: Match): CommitmentSide | null =>
 
 export const getBlocksLeft = (deadline: bigint, asOfBlock: bigint) =>
     deadline > asOfBlock ? deadline - asOfBlock : 0n;
+
+/**
+ * Dave meta-cycle layout: a 92-bit position made of the input index (24 bits),
+ * the big-machine cycle within that input (48 bits) and the uarch cycle within
+ * that big cycle (20 bits).
+ */
+export const LOG2_UCYCLES_PER_MCYCLE = 20n;
+export const LOG2_MCYCLES_PER_INPUT = 48n;
+export const LOG2_INPUTS_PER_EPOCH = 24n;
+
+const LOG2_UCYCLES_PER_INPUT = LOG2_MCYCLES_PER_INPUT + LOG2_UCYCLES_PER_MCYCLE;
+
+export const UCYCLE_MASK = (1n << LOG2_UCYCLES_PER_MCYCLE) - 1n;
+export const MCYCLE_MASK = (1n << LOG2_MCYCLES_PER_INPUT) - 1n;
+export const LAST_INPUT = (1n << LOG2_INPUTS_PER_EPOCH) - 1n;
+
+export type MetaCycleParts = { input: bigint; mcycle: bigint; ucycle: bigint };
+
+export const decomposeMetaCycle = (metaCycle: bigint): MetaCycleParts => ({
+    input: metaCycle >> LOG2_UCYCLES_PER_INPUT,
+    mcycle: (metaCycle >> LOG2_UCYCLES_PER_MCYCLE) & MCYCLE_MASK,
+    ucycle: metaCycle & UCYCLE_MASK,
+});
+
+export type MetaSpan = { count: bigint; unit: "input" | "mcycle" | "ucycle" };
+
+/**
+ * Express a span of `2^log2` meta-cycles in its largest whole unit.
+ */
+export const getMetaSpan = (log2: bigint): MetaSpan => {
+    if (log2 >= LOG2_UCYCLES_PER_INPUT) {
+        return { count: 1n << (log2 - LOG2_UCYCLES_PER_INPUT), unit: "input" };
+    }
+    if (log2 >= LOG2_UCYCLES_PER_MCYCLE) {
+        return {
+            count: 1n << (log2 - LOG2_UCYCLES_PER_MCYCLE),
+            unit: "mcycle",
+        };
+    }
+    return { count: 1n << log2, unit: "ucycle" };
+};
+
+/**
+ * Meta-cycle range of the current divergence segment of a match, or null when
+ * the match has no bisection frontier.
+ */
+export const getSegmentRange = (
+    match: Match,
+    tournament: Tournament,
+): [bigint, bigint] | null => {
+    const { snapshot } = match;
+    if (snapshot.phase !== "BISECTING" && snapshot.phase !== "READY_TO_SEAL") {
+        return null;
+    }
+    const height = snapshot.bisection.currentHeight ?? 1n;
+    const start = snapshot.bisection.segmentStartCycle;
+    return [start, start + (1n << (tournament.log2step + height))];
+};

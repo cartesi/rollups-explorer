@@ -375,3 +375,38 @@ export const BondRecovered: Story = {
         bondEvents: BondLedgerStories.Recovered.args.events,
     },
 };
+
+/**
+ * A middle-level tournament covers one root leaf: 16,777,216 mcycles of one
+ * input, with 128-mcycle leaves.
+ */
+export const MiddleLevelGeometry: Story = {
+    args: {
+        ...MidLevelDispute.args,
+        tournament: {
+            ...MidLevelDispute.args.tournament,
+            level: 1n,
+            log2step: 27n,
+            height: 17n,
+            baseCycle: (3n << 68n) + (21_990_349_996_032n << 20n),
+        },
+    },
+};
+
+/**
+ * A bottom-level tournament covers one middle leaf: 128 mcycles resolved to
+ * single ucycles.
+ */
+export const BottomLevelGeometry: Story = {
+    args: {
+        ...MidLevelDispute.args,
+        tournament: {
+            ...MidLevelDispute.args.tournament,
+            level: 2n,
+            log2step: 0n,
+            height: 27n,
+            kind: "LEAF",
+            baseCycle: (3n << 68n) + (21_990_354_846_080n << 20n),
+        },
+    },
+};

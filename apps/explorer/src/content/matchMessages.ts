@@ -4,9 +4,10 @@
 export const matchMessages = {
     phaseTxt: "Phase",
     heightTxt: "Height",
-    segmentStartCycleTxt: "Segment start cycle",
+    segmentTxt: "Segment",
+    segmentSizeTxt: "Segment size",
     responderTxt: "Responder",
-    divergenceCycleTxt: "Divergence cycle",
+    divergenceTxt: "Divergence",
     agreeStateTxt: "Agree state",
     leafSealedTxt: "Leaf sealed",
     clocksTxt: "Clocks",
