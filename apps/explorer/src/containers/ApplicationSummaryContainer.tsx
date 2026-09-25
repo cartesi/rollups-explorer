@@ -1,5 +1,6 @@
 "use client";
 import {
+    useBondEvents,
     useApplication,
     useEpochs,
     useInputs,
@@ -58,6 +59,12 @@ export const ApplicationSummaryContainer: FC<
         ...defaultParams,
     });
 
+    const bondEventsResult = useBondEvents({
+        application: props.application,
+        limit: 1,
+        enabled: application?.consensusType === "PRT",
+    });
+
     const tournamentsResult = useTournaments({
         application: props.application,
         level: 0n,
@@ -97,6 +104,10 @@ export const ApplicationSummaryContainer: FC<
         totalCount: inputsResult.data?.pagination.totalCount ?? 0,
         isLoading: inputsResult.isLoading,
     };
+    const bondEvents = {
+        totalCount: bondEventsResult.data?.pagination.totalCount ?? 0,
+        isLoading: bondEventsResult.isLoading,
+    };
     const tournaments = {
         data: tournamentsResult.data?.data ?? [],
         totalCount: tournamentsResult.data?.pagination.totalCount ?? 0,
@@ -127,6 +138,7 @@ export const ApplicationSummaryContainer: FC<
             ) : showPage ? (
                 <ApplicationSummaryPage
                     application={application}
+                    bondEvents={bondEvents}
                     epochs={epochs}
                     inputs={inputs}
                     outputs={outputs}

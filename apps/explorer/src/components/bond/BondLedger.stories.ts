@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
+import { getBondTotals } from "../../lib/bondUtils";
 import { createBondEvent } from "../../stories/prt";
 import { BondLedger } from "./BondLedger";
 
@@ -72,5 +73,17 @@ export const AllRefundsFailed: Story = {
                 },
             }),
         ).reverse(),
+    },
+};
+
+/**
+ * One page served by the node, with the totals of every event.
+ */
+export const ServerPaginated: Story = {
+    args: {
+        events: refunds.slice(0, 5),
+        pagination: { limit: 5, offset: 0, totalCount: refunds.length },
+        onPaginationChange: () => {},
+        totals: getBondTotals(refunds),
     },
 };
