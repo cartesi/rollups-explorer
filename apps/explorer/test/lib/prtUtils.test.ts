@@ -7,6 +7,9 @@ import {
     getLoser,
     getMatchProgress,
     getResponder,
+    getSegmentRange,
+    getMetaSpan,
+    decomposeMetaCycle,
     getTournamentCycleRange,
     getTournamentOutcome,
     getWinner,
@@ -263,6 +266,53 @@ describe("prtUtils", () => {
 
         it("should not go below zero after the deadline", () => {
             expect(getBlocksLeft(90n, 100n)).toBe(0n);
+        });
+    });
+
+    describe("meta-cycles", () => {
+        it("should split a meta-cycle into input, mcycle and ucycle", () => {
+            expect(decomposeMetaCycle((5n << 68n) + (7n << 20n) + 3n)).toEqual({
+                input: 5n,
+                mcycle: 7n,
+                ucycle: 3n,
+            });
+        });
+
+        it("should express spans in their largest whole unit", () => {
+            expect(getMetaSpan(44n)).toEqual({
+                count: 1n << 24n,
+                unit: "mcycle",
+            });
+            expect(getMetaSpan(0n)).toEqual({ count: 1n, unit: "ucycle" });
+            expect(getMetaSpan(92n)).toEqual({
+                count: 1n << 24n,
+                unit: "input",
+            });
+        });
+
+        it("should compute the current segment of a bisecting match", () => {
+            const tournament = createTournament({ log2step: 44n });
+            const match = createMatch({
+                snapshot: createMatchSnapshot({
+                    phase: "BISECTING",
+                    bisection: {
+                        ...createBisection({ segmentStartCycle: 1n << 68n }),
+                        currentHeight: 4n,
+                    },
+                    sealed: null,
+                }),
+            });
+
+            expect(getSegmentRange(match, tournament)).toEqual([
+                1n << 68n,
+                (1n << 68n) + (1n << 48n),
+            ]);
+        });
+
+        it("should have no segment once the match is sealed", () => {
+            const match = createMatch({ deletionReason: "STEP" });
+
+            expect(getSegmentRange(match, createTournament())).toBeNull();
         });
     });
 });

@@ -13,10 +13,12 @@ import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { content } from "../../content";
 import { isBondRecovery } from "../../lib/bondUtils";
+import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { BondLedger } from "../bond/BondLedger";
 import { BondRecoveryCard } from "../bond/BondRecoveryCard";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
+import { InfoHint } from "../InfoHint";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
@@ -63,6 +65,17 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 <CycleRangeFormatted
                     range={getTournamentCycleRange(tournament)}
                 />
+                <InfoHint label={content.tournament.cycle.rangeHint} />
+            </Group>
+            <Group>
+                <Text>{content.tournament.leafSizeTxt}</Text>
+                <Text>{formatMetaSpan(tournament.log2step)}</Text>
+            </Group>
+            <Group>
+                <Text>{content.tournament.spanTxt}</Text>
+                <Text>
+                    {formatMetaSpan(tournament.log2step + tournament.height)}
+                </Text>
             </Group>
             <TournamentOutcome snapshot={tournament.snapshot} />
             <BondRecoveryCard

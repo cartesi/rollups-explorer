@@ -3,10 +3,18 @@ import { Badge, Group, Stack, Text, type MantineColor } from "@mantine/core";
 import type { FC } from "react";
 import { zeroAddress } from "viem";
 import { content } from "../../content";
-import { getBlocksLeft, getCommitment, getResponder } from "../../lib/prtUtils";
+import { formatMetaSpan } from "../../lib/metaCycleFormat";
+import {
+    getBlocksLeft,
+    getCommitment,
+    getResponder,
+    getSegmentRange,
+} from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
+import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { InfoHint } from "../InfoHint";
 import { LongText } from "../LongText";
+import { MetaCycle } from "../MetaCycle";
 
 export interface MatchStateProps {
     /**
@@ -77,6 +85,7 @@ export const MatchState: FC<MatchStateProps> = ({
     const { snapshot } = match;
     const deleted = match.deletionReason !== "NOT_DELETED";
     const responder = getResponder(match);
+    const segment = getSegmentRange(match, tournament);
 
     return (
         <Stack gap="sm">
@@ -98,14 +107,22 @@ export const MatchState: FC<MatchStateProps> = ({
                     </Text>
                 </Group>
             )}
-            {(snapshot.phase === "BISECTING" ||
-                snapshot.phase === "READY_TO_SEAL") && (
-                <Group>
-                    <Text>{text.segmentStartCycleTxt}</Text>
-                    <Text>
-                        {snapshot.bisection.segmentStartCycle.toString()}
-                    </Text>
-                </Group>
+            {segment && (
+                <>
+                    <Group>
+                        <Text>{text.segmentTxt}</Text>
+                        <CycleRangeFormatted range={segment} />
+                    </Group>
+                    <Group>
+                        <Text>{text.segmentSizeTxt}</Text>
+                        <Text>
+                            {formatMetaSpan(
+                                tournament.log2step +
+                                    (snapshot.bisection?.currentHeight ?? 1n),
+                            )}
+                        </Text>
+                    </Group>
+                </>
             )}
             {responder && (
                 <Group>
@@ -119,10 +136,8 @@ export const MatchState: FC<MatchStateProps> = ({
             {snapshot.phase === "SEALED" && (
                 <>
                     <Group>
-                        <Text>{text.divergenceCycleTxt}</Text>
-                        <Text>
-                            {snapshot.sealed.divergenceCycle.toString()}
-                        </Text>
+                        <Text>{text.divergenceTxt}</Text>
+                        <MetaCycle value={snapshot.sealed.divergenceCycle} />
                     </Group>
                     <Group>
                         <Text>{text.agreeStateTxt}</Text>

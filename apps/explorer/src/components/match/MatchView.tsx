@@ -7,10 +7,12 @@ import type {
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
 import type { Hash } from "viem";
+import { content } from "../../content";
 import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
+import { InfoHint } from "../InfoHint";
 import { MatchActions } from "./MatchActions";
 import { MatchState } from "./MatchState";
 
@@ -79,10 +81,11 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     return (
         <Stack>
             <Group>
-                <Text>Cycle range</Text>
+                <Text>{content.tournament.cycleRangeTxt}</Text>
                 <CycleRangeFormatted
                     range={getTournamentCycleRange(tournament)}
                 />
+                <InfoHint label={content.tournament.cycle.rangeHint} />
             </Group>
             <Group>
                 <Text>Claims</Text>
