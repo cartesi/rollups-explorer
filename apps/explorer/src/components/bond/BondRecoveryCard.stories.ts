@@ -63,3 +63,15 @@ export const RecoverableZeroPayment: Story = {
         bondRecovery: { disposition: "RECOVERABLE", claimer, payment: 0n },
     },
 };
+
+/**
+ * A recoverable bond that anyone can recover from the explorer. The story
+ * uses a regular connection, as the action is hidden for mocked data.
+ */
+export const RecoverableWithAction: Story = {
+    parameters: { connectionType: "system" },
+    args: {
+        ...Recoverable.args,
+        tournamentAddress: "0xA2835312696Afa86c969e40831857dbB1412627f",
+    },
+};

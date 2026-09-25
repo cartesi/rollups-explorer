@@ -87,6 +87,13 @@ export const bondMessages = {
         gasRefundTxt: "gas refund",
         gasRefundNotPaidTxt: "gas refund not paid",
     },
+    recovery: {
+        recoverTxt: "Recover bond",
+        recoveredTxt: "Bond recovered",
+        successTxt: "Bond recovery confirmed.",
+        recoverHint:
+            "Anyone can trigger the recovery. The contract pays the winning claimer, never the caller, who only pays the gas.",
+    },
     dispositionHint: {
         NO_WINNER:
             "The tournament finished without a winner. Its balance stays locked in the contract; it is not burned.",

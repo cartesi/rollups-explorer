@@ -35,6 +35,11 @@ export interface TournamentViewProps {
     commitments: Commitment[];
 
     /**
+     * Called once a bond recovery sent from the page is confirmed.
+     */
+    onBondRecovered?: () => void;
+
+    /**
      * The matches to display.
      */
     matches: Match[];
@@ -46,7 +51,13 @@ export interface TournamentViewProps {
 }
 
 export const TournamentView: FC<TournamentViewProps> = (props) => {
-    const { bondEvents = [], commitments, matches, tournament } = props;
+    const {
+        bondEvents = [],
+        commitments,
+        matches,
+        onBondRecovered,
+        tournament,
+    } = props;
 
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);
@@ -81,6 +92,8 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
             <BondRecoveryCard
                 bondRecovery={tournament.snapshot.bondRecovery}
                 recovery={bondEvents.find(isBondRecovery)}
+                tournamentAddress={tournament.address}
+                onRecovered={onBondRecovered}
             />
             <Switch
                 label="Show only eliminated and pending matches"

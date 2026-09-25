@@ -136,6 +136,10 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             {!!tournament && (
                 <TournamentPage
                     bondEvents={bondEventsQuery.data?.data}
+                    onBondRecovered={() => {
+                        tournamentQuery.refetch();
+                        bondEventsQuery.refetch();
+                    }}
                     commitments={commitments?.data ?? []}
                     matches={matches?.data ?? []}
                     tournament={tournament}
