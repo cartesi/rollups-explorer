@@ -6,7 +6,7 @@ import type {
 } from "@cartesi/client";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
-import type { Hash } from "viem";
+import type { Hash, Hex } from "viem";
 import { content } from "../../content";
 import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
@@ -53,6 +53,11 @@ export interface MatchViewProps {
     now: number;
 
     /**
+     * Proof of a leaf step win, `null` when it cannot be read.
+     */
+    stepProof?: Hex | null;
+
+    /**
      * Timestamps in milliseconds of the blocks the match events happened in.
      */
     timestamps?: Map<bigint, number>;
@@ -70,6 +75,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
         tournament,
         match,
         refunds,
+        stepProof,
         subTournament,
         now,
         timestamps,
@@ -107,6 +113,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 now={now}
                 refunds={refunds}
                 subTournament={subTournament}
+                stepProof={stepProof}
                 timestamps={timestamps}
                 timestampsLoading={timestampsLoading}
                 tournament={tournament}

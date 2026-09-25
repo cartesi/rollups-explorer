@@ -7,7 +7,7 @@ import type {
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { TbSwords } from "react-icons/tb";
-import type { Hash } from "viem";
+import type { Hash, Hex } from "viem";
 import PageTitle from "../components/layout/PageTitle";
 import { MatchView } from "../components/match/MatchView";
 import type { PartialBondRefundEvent } from "../lib/bondUtils";
@@ -49,6 +49,11 @@ export interface MatchPageProps {
     now: number;
 
     /**
+     * Proof of a leaf step win, `null` when it cannot be read.
+     */
+    stepProof?: Hex | null;
+
+    /**
      * Timestamps in milliseconds of the blocks the match events happened in.
      */
     timestamps?: Map<bigint, number>;
@@ -66,6 +71,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
         tournament,
         match,
         refunds,
+        stepProof,
         subTournament,
         now,
         timestamps,
@@ -82,6 +88,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
                 now={now}
                 refunds={refunds}
                 subTournament={subTournament}
+                stepProof={stepProof}
                 timestamps={timestamps}
                 timestampsLoading={timestampsLoading}
                 tournament={tournament}
