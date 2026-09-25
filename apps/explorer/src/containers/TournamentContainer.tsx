@@ -16,7 +16,6 @@ import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumb
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
-import { isBondRecovery } from "../lib/bondUtils";
 import { isTournamentSettled } from "../lib/prtUtils";
 import { TournamentPage } from "../page/TournamentPage";
 import { pathBuilder, type TournamentParams } from "../routes/routePathBuilder";
@@ -36,15 +35,13 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
     const commitmentsQuery = useCommitments(params);
     const commitments = commitmentsQuery.data;
 
-    const bondRecoveryQuery = useBondEvents({
+    const bondEventsQuery = useBondEvents({
         application: params.application,
         epochIndex: params.epochIndex,
         tournamentAddress: params.tournamentAddress,
+        limit: 10_000,
         descending: true,
-        limit: 10,
-        enabled: tournament?.snapshot.bondRecovery.disposition === "RECOVERED",
     });
-    const bondRecovery = bondRecoveryQuery.data?.data.find(isBondRecovery);
 
     useRefetchOnFinalizedBlock(
         isNotNil(tournament) && !isTournamentSettled(tournament),
@@ -52,6 +49,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             tournamentQuery.refetch,
             matchesQuery.refetch,
             commitmentsQuery.refetch,
+            bondEventsQuery.refetch,
         ],
     );
 
@@ -137,7 +135,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             {isLoading && <ContainerSkeleton />}
             {!!tournament && (
                 <TournamentPage
-                    bondRecovery={bondRecovery}
+                    bondEvents={bondEventsQuery.data?.data}
                     commitments={commitments?.data ?? []}
                     matches={matches?.data ?? []}
                     tournament={tournament}

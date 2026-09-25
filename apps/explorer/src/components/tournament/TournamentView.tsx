@@ -1,10 +1,20 @@
-import type { Commitment, Match, Tournament } from "@cartesi/client";
-import { Card, Center, Group, Stack, Switch, Text, Title } from "@mantine/core";
+import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
+import {
+    Card,
+    Center,
+    Divider,
+    Group,
+    Stack,
+    Switch,
+    Text,
+    Title,
+} from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { content } from "../../content";
-import type { BondRecoveredEvent } from "../../lib/bondUtils";
+import { isBondRecovery } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
+import { BondLedger } from "../bond/BondLedger";
 import { BondRecoveryCard } from "../bond/BondRecoveryCard";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
@@ -13,9 +23,9 @@ import { TournamentTable } from "./TournamentTable";
 
 export interface TournamentViewProps {
     /**
-     * The event that recovered the tournament bond, once recovered.
+     * Bond refund and recovery events of the tournament.
      */
-    bondRecovery?: BondRecoveredEvent;
+    bondEvents?: BondEvent[];
 
     /**
      * The list of all commitments.
@@ -34,7 +44,7 @@ export interface TournamentViewProps {
 }
 
 export const TournamentView: FC<TournamentViewProps> = (props) => {
-    const { bondRecovery, commitments, matches, tournament } = props;
+    const { bondEvents = [], commitments, matches, tournament } = props;
 
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);
@@ -57,7 +67,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
             <TournamentOutcome snapshot={tournament.snapshot} />
             <BondRecoveryCard
                 bondRecovery={tournament.snapshot.bondRecovery}
-                recovery={bondRecovery}
+                recovery={bondEvents.find(isBondRecovery)}
             />
             <Switch
                 label="Show only eliminated and pending matches"
@@ -80,6 +90,8 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                     </Center>
                 </Card>
             )}
+            <Divider label={content.tournament.bondEventsTxt} />
+            <BondLedger events={bondEvents} />
         </Stack>
     );
 };
