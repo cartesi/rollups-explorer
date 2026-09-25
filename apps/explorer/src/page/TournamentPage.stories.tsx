@@ -141,3 +141,23 @@ export const MidLevelDispute: Story = {
         tournament: TournamentViewStories.MidLevelDispute.args.tournament,
     },
 };
+
+export const TopLevelDisputeWithRefunds: Story = {
+    render: WithBreadcrumb,
+    args: {
+        bondEvents: TournamentViewStories.RefundsOngoing.args.bondEvents,
+        commitments: TournamentViewStories.RefundsOngoing.args.commitments,
+        matches: TournamentViewStories.RefundsOngoing.args.matches,
+        tournament: TournamentViewStories.RefundsOngoing.args.tournament,
+    },
+};
+
+export const TopLevelBondRecovered: Story = {
+    render: WithBreadcrumb,
+    args: {
+        bondEvents: TournamentViewStories.BondRecovered.args.bondEvents,
+        commitments: TournamentViewStories.BondRecovered.args.commitments,
+        matches: TournamentViewStories.BondRecovered.args.matches,
+        tournament: TournamentViewStories.BondRecovered.args.tournament,
+    },
+};

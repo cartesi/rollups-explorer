@@ -3,6 +3,7 @@
  */
 export const tournamentMessages = {
     cycleRangeTxt: "Cycle range",
+    bondEventsTxt: "Bond events",
     standingTxt: "Standing",
     winnerTxt: "Winner",
     finalStateTxt: "Final state",

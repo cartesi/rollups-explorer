@@ -8,6 +8,7 @@ import {
     createMatch,
     createTournament,
 } from "../../stories/prt";
+import * as BondLedgerStories from "../bond/BondLedger.stories";
 
 const meta = {
     title: "Components/Tournament/TournamentView",
@@ -331,5 +332,46 @@ export const ExpiredInnerWinner: Story = {
                 finishedAtBlock: 90n,
             },
         },
+    },
+};
+
+/**
+ * An ongoing dispute with gas refunds paid for each move.
+ */
+export const RefundsOngoing: Story = {
+    args: {
+        ...Ongoing.args,
+        bondEvents: BondLedgerStories.Ongoing.args.events,
+    },
+};
+
+/**
+ * An ongoing dispute where every gas refund payment failed.
+ */
+export const WithFailedRefunds: Story = {
+    args: {
+        ...Ongoing.args,
+        bondEvents: BondLedgerStories.AllRefundsFailed.args.events,
+    },
+};
+
+/**
+ * A finalized tournament whose winner already recovered the bond.
+ */
+export const BondRecovered: Story = {
+    args: {
+        ...Finalized.args,
+        tournament: {
+            ...Finalized.args.tournament,
+            snapshot: {
+                ...Finalized.args.tournament.snapshot,
+                bondRecovery: {
+                    disposition: "RECOVERED",
+                    claimer: null,
+                    payment: null,
+                },
+            },
+        },
+        bondEvents: BondLedgerStories.Recovered.args.events,
     },
 };
