@@ -33,6 +33,7 @@ describe("pathBuilder", () => {
         expect(pathBuilder.outputs(params)).toBe(
             `/apps/${application}/outputs`,
         );
+        expect(pathBuilder.bonds(params)).toBe(`/apps/${application}/bonds`);
         expect(pathBuilder.epochs(params)).toBe(`/apps/${application}/epochs`);
     });
 
@@ -64,6 +65,7 @@ describe("pathBuilder", () => {
         expect(methodNames).toEqual([
             "application",
             "applications",
+            "bonds",
             "epoch",
             "epochs",
             "home",

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     formatBondValue,
+    getBondAccounts,
     getBondTotals,
     isBondRecovery,
     isBondRefund,
@@ -51,5 +52,37 @@ describe("bondUtils", () => {
 
     it("should format wei values as ether", () => {
         expect(formatBondValue(1_500_000_000_000_000_000n)).toBe("1.5 ETH");
+    });
+
+    it("should group bond movements by the receiving account", () => {
+        const other = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+        const accounts = getBondAccounts([
+            refund(10n, true),
+            createBondEvent({
+                refund: { recipient: other, value: 3n, success: false },
+            }),
+            recovery,
+        ]);
+
+        expect(accounts).toEqual([
+            {
+                account: recipient,
+                events: 2,
+                refunded: 10n,
+                failedRefunds: 0n,
+                failedRefundCount: 0,
+                paid: 30n,
+                burned: 5n,
+            },
+            {
+                account: other,
+                events: 1,
+                refunded: 0n,
+                failedRefunds: 3n,
+                failedRefundCount: 1,
+                paid: 0n,
+                burned: 0n,
+            },
+        ]);
     });
 });

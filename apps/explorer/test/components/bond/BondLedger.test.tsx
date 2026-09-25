@@ -57,4 +57,19 @@ describe("BondLedger", () => {
 
         expect(screen.getByText("No bond events")).toBeInTheDocument();
     });
+
+    it("should render a server page as is with its totals", () => {
+        const onPaginationChange = vi.fn();
+        render(
+            <BondLedger
+                events={refunds.slice(0, 3)}
+                pagination={{ limit: 3, offset: 0, totalCount: 12 }}
+                onPaginationChange={onPaginationChange}
+            />,
+        );
+
+        expect(screen.getAllByRole("row")).toHaveLength(4);
+        expect(screen.queryByText("not paid (1)")).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+    });
 });

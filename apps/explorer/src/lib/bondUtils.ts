@@ -1,5 +1,6 @@
 import type { BondEvent } from "@cartesi/client";
-import { formatEther } from "viem";
+import { groupBy } from "ramda";
+import { formatEther, getAddress, type Address } from "viem";
 
 export type PartialBondRefundEvent = Extract<
     BondEvent,
@@ -51,3 +52,26 @@ export const getBondTotals = (events: BondEvent[]): BondTotals =>
             burned: 0n,
         },
     );
+
+export type BondAccount = BondTotals & { account: Address; events: number };
+
+/**
+ * Group the bond movements by the account that received them: the refund
+ * recipient or the recovering claimer.
+ */
+export const getBondAccounts = (events: BondEvent[]): BondAccount[] => {
+    const byAccount = groupBy(
+        (event: BondEvent) =>
+            getAddress(
+                isBondRecovery(event)
+                    ? event.recovery.claimer
+                    : event.refund.recipient,
+            ),
+        events,
+    );
+    return Object.entries(byAccount).map(([account, accountEvents = []]) => ({
+        account: account as Address,
+        events: accountEvents.length,
+        ...getBondTotals(accountEvents),
+    }));
+};

@@ -30,6 +30,8 @@ export const pathBuilder = {
         `${pathBuilder.application(params)}/withdrawals` as const,
     outputs: (params: ApplicationParams) =>
         `${pathBuilder.application(params)}/outputs` as const,
+    bonds: (params: ApplicationParams) =>
+        `${pathBuilder.application(params)}/bonds` as const,
     epochs: (params: ApplicationParams) =>
         `${pathBuilder.application(params)}/epochs` as const,
     epoch: (params: EpochParams) =>

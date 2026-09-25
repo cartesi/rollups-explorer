@@ -22,6 +22,30 @@ export const bondMessages = {
             "The refund payment failed. The value was requested but never paid, and it stays in the tournament balance.",
         hint: "Paid from the tournament's pooled bonds to the account that sent the move (contract event PartialBondRefund). Capped, so it may not cover the full gas cost.",
     },
+    summaryCardTxt: "Bond events",
+    page: {
+        titleTxt: "Bonds",
+        epochTxt: "Epoch",
+        allEpochsTxt: "All epochs",
+        limitTxt: "Events per page",
+        accountsTxt: "Accounts",
+        eventsTxt: "Events",
+        loadingTxt: "Loading bond events...",
+        loadingTotalsTxt: "Loading totals...",
+        selectEpochHint: "Select an epoch to see its totals by account.",
+        errorTxt:
+            "Something went wrong while fetching the bond events for application",
+    },
+    accounts: {
+        columns: {
+            accountTxt: "Account",
+            eventsTxt: "Events",
+            gasRefundedTxt: "Gas refunded",
+            notPaidTxt: "Not paid",
+            recoveredTxt: "Recovered",
+            burnedTxt: "Burned",
+        },
+    },
     ledger: {
         noEventsTxt: "No bond events",
         recoveryTxt: "recovery",
@@ -37,6 +61,7 @@ export const bondMessages = {
         },
         columns: {
             blockTxt: "Block",
+            tournamentTxt: "Tournament",
             typeTxt: "Type",
             accountTxt: "Account",
             valueTxt: "Value",

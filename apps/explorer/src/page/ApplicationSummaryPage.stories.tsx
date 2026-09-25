@@ -127,6 +127,10 @@ const params: Params = {
         totalCount: 2,
         isLoading: false,
     },
+    bondEvents: {
+        totalCount: 96,
+        isLoading: false,
+    },
     reports: {
         totalCount: 0,
         isLoading: false,
@@ -289,6 +293,10 @@ const authorityAppParams: Params = {
     },
     outputs: {
         totalCount: 2,
+        isLoading: false,
+    },
+    bondEvents: {
+        totalCount: 0,
         isLoading: false,
     },
     reports: {
