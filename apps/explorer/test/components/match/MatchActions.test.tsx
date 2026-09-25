@@ -169,4 +169,64 @@ describe("MatchActions", () => {
             screen.getByText("gas refunded 0.002 ETH to"),
         ).toBeInTheDocument();
     });
+
+    it("should show the proof of a leaf step winner", () => {
+        render(
+            <MatchActions
+                advances={[]}
+                match={createMatch({
+                    deletionReason: "STEP",
+                    winnerCommitment: "ONE",
+                })}
+                now={Date.now()}
+                stepProof="0xdeadbeef"
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.getByRole("button", { name: "View proof" }),
+        ).toBeInTheDocument();
+    });
+
+    it("should say when a leaf step proof cannot be read", () => {
+        render(
+            <MatchActions
+                advances={[]}
+                match={createMatch({
+                    deletionReason: "STEP",
+                    winnerCommitment: "ONE",
+                })}
+                now={Date.now()}
+                stepProof={null}
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.getByText("Step proof not available"),
+        ).toBeInTheDocument();
+    });
+
+    it("should show no proof for a sub-tournament winner", () => {
+        render(
+            <MatchActions
+                advances={[]}
+                match={createMatch({
+                    deletionReason: "CHILD_TOURNAMENT",
+                    winnerCommitment: "ONE",
+                })}
+                now={Date.now()}
+                stepProof="0xdeadbeef"
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.queryByRole("button", { name: "View proof" }),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("Step proof not available"),
+        ).not.toBeInTheDocument();
+    });
 });

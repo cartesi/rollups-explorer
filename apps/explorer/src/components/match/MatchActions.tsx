@@ -29,7 +29,7 @@ import {
     getTournamentCycleRange,
     getWinner,
 } from "../../lib/prtUtils";
-import type { Hash } from "viem";
+import type { Hash, Hex } from "viem";
 import { content } from "../../content";
 import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { BisectionItem } from "./BisectionItem";
@@ -73,6 +73,11 @@ interface MatchActionsProps {
     subTournament?: Tournament;
 
     /**
+     * Proof of a leaf step win, `null` when it cannot be read.
+     */
+    stepProof?: Hex | null;
+
+    /**
      * Timestamps in milliseconds of the blocks the match events happened in.
      */
     timestamps?: Map<bigint, number>;
@@ -94,6 +99,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
         match,
         now,
         refunds,
+        stepProof,
         subTournament,
         timestamps,
         timestampsLoading,
@@ -208,7 +214,11 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                             now={now}
                             timestamp={closedAt}
                             timestampLoading={isTimestampLoading(closedAt)}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
+                            proof={
+                                match.deletionReason === "STEP"
+                                    ? stepProof
+                                    : undefined
+                            }
                         />,
                         <LoserItem
                             key="loser"

@@ -39,6 +39,12 @@ export const matchMessages = {
         subTournamentCreationTxt: "Sub-tournament creation gas refund",
         matchClosingTxt: "Match closing gas refund",
     },
+    proof: {
+        viewTxt: "View proof",
+        unavailableTxt: "Step proof not available",
+        unavailableHint:
+            "The winning transaction is not a direct winLeafMatch call, for example it went through another contract, so the proof cannot be read from it.",
+    },
     clock: {
         runningTxt: "clock running",
         pausedTxt: "clock paused",

@@ -515,3 +515,22 @@ export const WithRefunds: Story = {
         ),
     },
 };
+
+/**
+ * A leaf match won by an on-chain step, with the proof read from the
+ * winning transaction.
+ */
+export const StepWinnerWithProof: Story = {
+    args: {
+        ...WinnerBottom.args,
+        match: { ...WinnerBottom.args.match, deletionReason: "STEP" },
+        stepProof: `0x${"ab".repeat(512)}`,
+    },
+};
+
+/**
+ * A leaf step win whose transaction could not be decoded.
+ */
+export const StepWinnerProofUnavailable: Story = {
+    args: { ...StepWinnerWithProof.args, stepProof: null },
+};

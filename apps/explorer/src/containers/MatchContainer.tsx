@@ -17,6 +17,7 @@ import {
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import { useBlockTimestamps } from "../hooks/useBlockTimestamps";
+import { useLeafStepProof } from "../hooks/useLeafStepProof";
 import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { isBondRefund } from "../lib/bondUtils";
@@ -101,6 +102,8 @@ export const MatchContainer: FC<MatchParams> = (params) => {
     const match = matchQuery.data ?? null;
     const tournament = tournamentQuery.data ?? null;
     const subTournament = subTournamentQuery.data?.data[0];
+
+    const stepProof = useLeafStepProof(match);
 
     const { timestamps, isLoading: timestampsLoading } = useBlockTimestamps([
         ...(advancesQuery.data?.data ?? []).map(
@@ -192,6 +195,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     tournament={tournament}
                     refunds={refunds}
                     subTournament={subTournament}
+                    stepProof={stepProof}
                     timestamps={timestamps}
                     timestampsLoading={timestampsLoading}
                     match={match}

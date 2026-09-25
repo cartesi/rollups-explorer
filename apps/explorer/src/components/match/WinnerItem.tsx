@@ -4,6 +4,7 @@ import {
     Group,
     Paper,
     Stack,
+    Text,
     Textarea,
     useComputedColorScheme,
     useMantineTheme,
@@ -12,7 +13,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { type FC } from "react";
 import { TbFile, TbFileText, TbTrophyFilled } from "react-icons/tb";
 import type { Hex } from "viem";
+import { content } from "../../content";
 import { ClaimText } from "../ClaimText";
+import { InfoHint } from "../InfoHint";
 import type { Claim } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
 
@@ -28,9 +31,10 @@ export interface WinnerItemProps {
     now: number;
 
     /**
-     * Proof of the winner
+     * State-transition proof of a leaf step win. `null` when it cannot be
+     * read; omitted when the win needs no proof.
      */
-    proof: Hex;
+    proof?: Hex | null;
 
     /**
      * Timestamp
@@ -42,6 +46,8 @@ export interface WinnerItemProps {
      */
     timestampLoading?: boolean;
 }
+
+const text = content.match.proof;
 
 export const WinnerItem: FC<WinnerItemProps> = (props) => {
     const { claim, now, proof, timestamp, timestampLoading } = props;
@@ -66,30 +72,42 @@ export const WinnerItem: FC<WinnerItemProps> = (props) => {
                     <Group gap="xs">
                         <TbTrophyFilled size={24} color={gold} />
                         <ClaimText claim={claim} withIcon={false} />
-                        <Button
-                            variant="transparent"
-                            rightSection={
-                                opened ? (
-                                    <TbFile size={16} />
-                                ) : (
-                                    <TbFileText size={16} />
-                                )
-                            }
-                            size="compact-xs"
-                            onClick={toggle}
-                        >
-                            View proof
-                        </Button>
+                        {proof && (
+                            <Button
+                                variant="transparent"
+                                rightSection={
+                                    opened ? (
+                                        <TbFile size={16} />
+                                    ) : (
+                                        <TbFileText size={16} />
+                                    )
+                                }
+                                size="compact-xs"
+                                onClick={toggle}
+                            >
+                                {text.viewTxt}
+                            </Button>
+                        )}
+                        {proof === null && (
+                            <Group gap={4}>
+                                <Text size="xs" c="dimmed">
+                                    {text.unavailableTxt}
+                                </Text>
+                                <InfoHint label={text.unavailableHint} />
+                            </Group>
+                        )}
                     </Group>
-                    <Collapse in={opened}>
-                        <Textarea
-                            readOnly
-                            rows={10}
-                            autosize
-                            maxRows={10}
-                            value={proof}
-                        />
-                    </Collapse>
+                    {proof && (
+                        <Collapse in={opened}>
+                            <Textarea
+                                readOnly
+                                rows={10}
+                                autosize
+                                maxRows={10}
+                                value={proof}
+                            />
+                        </Collapse>
+                    )}
                 </Stack>
             </Paper>
         </ClaimTimelineItem>

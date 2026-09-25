@@ -48,3 +48,17 @@ export const SmallProof: Story = {
         timestamp: now - 3452,
     },
 };
+
+/**
+ * The winning transaction did not call winLeafMatch directly.
+ */
+export const ProofUnavailable: Story = {
+    args: { ...Default.args, proof: null },
+};
+
+/**
+ * A win that needs no step proof, such as a sub-tournament result.
+ */
+export const WithoutProof: Story = {
+    args: { ...Default.args, proof: undefined },
+};
