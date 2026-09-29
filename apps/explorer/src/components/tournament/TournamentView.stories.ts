@@ -1,10 +1,13 @@
-import type { Commitment, Match, Tournament } from "@cartesi/client";
+import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";
+import { getBondTotals } from "../../lib/bondUtils";
 import {
+    createBondEvent,
     createCommitment,
+    createJoinBond,
     createMatch,
     createTournament,
 } from "../../stories/prt";
@@ -22,6 +25,33 @@ type Story = StoryObj<typeof meta>;
 const timestamp = Date.now();
 const epochIndex = 0n;
 const tournamentAddress = "0x61bcab9d0d8b554009824292d2d6855dfa3aab86";
+const bondValue = 21_300_000_000_000_000n;
+
+/**
+ * Bond values by tournament level, proportional to the work of a full match at
+ * each level's height.
+ */
+const levelBondValues = [
+    bondValue,
+    7_500_000_000_000_000n,
+    12_000_000_000_000_000n,
+];
+
+/**
+ * The bond pool of the joined commitments: every join posted the level bond
+ * value, and the balance is what is left after the given bond events.
+ */
+const poolFor = (joined: Commitment[], events: BondEvent[] = [], level = 0) => {
+    const value = levelBondValues[level];
+    const { refunded, paid, burned } = getBondTotals(events);
+    return {
+        balance: BigInt(joined.length) * value - refunded - paid - burned,
+        bondValue: value,
+        bonds: joined.map((commitment) =>
+            createJoinBond(commitment, { value }),
+        ),
+    };
+};
 
 const matches: Match[] = [
     createMatch({
@@ -125,11 +155,26 @@ const commitments: Commitment[] = Array.from({ length: 7 }, (_, i) =>
 
 export const Ongoing: Story = {
     args: {
+        bondPool: poolFor(commitments),
         commitments,
         matches,
         tournament,
     },
 };
+
+const soloCommitments: Commitment[] = [
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(0).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        tournamentAddress,
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+];
 
 export const NoChallengerYet: Story = {
     args: {
@@ -147,21 +192,24 @@ export const NoChallengerYet: Story = {
             snapshot: { standing: "MATCHES_ACTIVE", candidate: claim(0).hash },
         }),
         matches: [],
-        commitments: [
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(0).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                tournamentAddress,
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-        ],
+        commitments: soloCommitments,
+        bondPool: poolFor(soloCommitments),
     },
 };
+
+const winnerCommitments: Commitment[] = [
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(0).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        tournamentAddress,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+];
 
 export const Finalized: Story = {
     args: {
@@ -183,73 +231,70 @@ export const Finalized: Story = {
                 finalStateHash: zeroHash,
                 finishedAtBlock: 2n,
                 winnerCommitment: claim(0).hash,
+                bondRecovery: {
+                    disposition: "RECOVERABLE",
+                    claimer: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                    payment: bondValue,
+                },
             },
         }),
         matches: [],
-        commitments: [
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(0).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                tournamentAddress,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-        ],
+        commitments: winnerCommitments,
+        bondPool: poolFor(winnerCommitments),
     },
 };
 
+const midCommitments: Commitment[] = [
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(7).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        tournamentAddress,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(8).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        tournamentAddress,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(9).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        tournamentAddress,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+    createCommitment({
+        blockNumber: 1n,
+        commitment: claim(10).hash,
+        createdAt: new Date(timestamp),
+        epochIndex,
+        tournamentAddress,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(timestamp),
+    }),
+];
+
 export const MidLevelDispute: Story = {
     args: {
-        commitments: [
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(7).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                tournamentAddress,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(8).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                tournamentAddress,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(9).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                tournamentAddress,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-            createCommitment({
-                blockNumber: 1n,
-                commitment: claim(10).hash,
-                createdAt: new Date(timestamp),
-                epochIndex,
-                tournamentAddress,
-                finalStateHash: zeroHash,
-                submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-            }),
-        ],
+        commitments: midCommitments,
+        bondPool: poolFor(midCommitments, [], 1),
         tournament: createTournament({
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
@@ -342,6 +387,7 @@ export const RefundsOngoing: Story = {
     args: {
         ...Ongoing.args,
         bondEvents: BondLedgerStories.Ongoing.args.events,
+        bondPool: poolFor(commitments, BondLedgerStories.Ongoing.args.events),
     },
 };
 
@@ -352,11 +398,34 @@ export const WithFailedRefunds: Story = {
     args: {
         ...Ongoing.args,
         bondEvents: BondLedgerStories.AllRefundsFailed.args.events,
+        bondPool: poolFor(
+            commitments,
+            BondLedgerStories.AllRefundsFailed.args.events,
+        ),
     },
 };
 
 /**
  * A finalized tournament whose winner already recovered the bond.
+ */
+const uncontestedRecovery = [
+    createBondEvent({
+        blockNumber: 3n,
+        logIndex: 0n,
+        type: "BOND_RECOVERED",
+        refund: null,
+        recovery: {
+            commitment: claim(0).hash,
+            claimer: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            payment: bondValue,
+            burned: 0n,
+        },
+    }),
+];
+
+/**
+ * Uncontested, the pool still held exactly one bond, so the winner's claimer
+ * got all of it back and nothing was burned.
  */
 export const BondRecovered: Story = {
     args: {
@@ -372,7 +441,8 @@ export const BondRecovered: Story = {
                 },
             },
         },
-        bondEvents: BondLedgerStories.Recovered.args.events,
+        bondEvents: uncontestedRecovery,
+        bondPool: poolFor(winnerCommitments, uncontestedRecovery),
     },
 };
 
@@ -408,6 +478,7 @@ export const BottomLevelGeometry: Story = {
             kind: "LEAF",
             baseCycle: (3n << 68n) + (21_990_354_846_080n << 20n),
         },
+        bondPool: poolFor(midCommitments, [], 2),
     },
 };
 
@@ -427,9 +498,157 @@ export const RecoverableBond: Story = {
                 bondRecovery: {
                     disposition: "RECOVERABLE",
                     claimer: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                    payment: 250_000_000_000_000_000n,
+                    payment: bondValue,
                 },
             },
+        },
+        bondPool: {
+            balance: bondValue,
+            bondValue,
+            bonds: Finalized.args.commitments.map((commitment) =>
+                createJoinBond(commitment, { value: bondValue }),
+            ),
+        },
+    },
+};
+
+const joinBonds = (joined: Commitment[]) =>
+    joined.map((commitment) =>
+        createJoinBond(commitment, { value: bondValue }),
+    );
+
+const balanceAfter = (joins: number, events = Ongoing.args.bondEvents ?? []) =>
+    BigInt(joins) * bondValue - getBondTotals(events).refunded;
+
+/**
+ * A running tournament shows only its bond pool: what the joins deposited,
+ * the gas refunds paid from it and the balance left.
+ */
+export const BondPoolRunning: Story = {
+    args: {
+        ...RefundsOngoing.args,
+        bondPool: {
+            balance: balanceAfter(
+                commitments.length,
+                RefundsOngoing.args.bondEvents,
+            ),
+            bondValue,
+            bonds: joinBonds(commitments),
+        },
+    },
+};
+
+/**
+ * One claim joined through another contract, so the deposited total is only
+ * a minimum.
+ */
+export const BondPoolRelayedJoin: Story = {
+    args: {
+        ...BondPoolRunning.args,
+        bondPool: {
+            ...BondPoolRunning.args.bondPool!,
+            bonds: joinBonds(commitments).map((bond, index) =>
+                index === 1 ? { ...bond, exact: false } : bond,
+            ),
+        },
+    },
+};
+
+/**
+ * The bond value, join bonds and balance are still loading.
+ */
+export const BondPoolLoading: Story = {
+    args: {
+        ...RefundsOngoing.args,
+        bondPool: { bonds: [], loading: true },
+    },
+};
+
+const disputed = [
+    Finalized.args.commitments[0],
+    createCommitment({
+        blockNumber: 2n,
+        commitment: claim(1).hash,
+        epochIndex,
+        tournamentAddress,
+        submitterAddress: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    }),
+];
+
+const disputeRefunds = Array.from({ length: 10 }, (_, index) =>
+    createBondEvent({
+        blockNumber: BigInt(index + 3),
+        logIndex: BigInt(index),
+        refund: {
+            recipient: disputed[index % 2].submitterAddress,
+            value: 310_000_000_000_000n,
+            success: true,
+        },
+    }),
+);
+
+const disputedBalance = balanceAfter(disputed.length, disputeRefunds);
+const winnerPayment = bondValue + (disputedBalance - bondValue) / 10n;
+
+/**
+ * After a dispute, the winner's claimer got one bond plus a tenth of the
+ * residual, and the rest was burned, leaving the tournament empty.
+ */
+export const BondPoolRecovered: Story = {
+    args: {
+        ...BondRecovered.args,
+        commitments: disputed,
+        bondEvents: [
+            ...disputeRefunds,
+            createBondEvent({
+                blockNumber: 20n,
+                logIndex: 0n,
+                type: "BOND_RECOVERED",
+                refund: null,
+                recovery: {
+                    commitment: claim(0).hash,
+                    claimer: disputed[0].submitterAddress,
+                    payment: winnerPayment,
+                    burned: disputedBalance - winnerPayment,
+                },
+            }),
+        ],
+        bondPool: {
+            balance: 0n,
+            bondValue,
+            bonds: joinBonds(disputed),
+        },
+    },
+};
+
+/**
+ * The root tournament finished without a winner, so its balance stays locked
+ * in the contract.
+ */
+export const BondPoolNoWinner: Story = {
+    args: {
+        ...Finalized.args,
+        tournament: {
+            ...Finalized.args.tournament,
+            snapshot: {
+                ...Finalized.args.tournament.snapshot,
+                standing: "ROOT_FAILED",
+                candidate: null,
+                winnerCommitment: null,
+                finalStateHash: null,
+                bondRecovery: {
+                    disposition: "NO_WINNER",
+                    claimer: null,
+                    payment: null,
+                },
+            },
+        },
+        commitments: disputed,
+        bondEvents: disputeRefunds,
+        bondPool: {
+            balance: disputedBalance,
+            bondValue,
+            bonds: joinBonds(disputed),
         },
     },
 };

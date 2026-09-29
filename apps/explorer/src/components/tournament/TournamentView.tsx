@@ -3,10 +3,15 @@ import { Card, Center, Stack, Switch, Text, Title } from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { content } from "../../content";
-import { isBondRecovery } from "../../lib/bondUtils";
+import {
+    getBondPool,
+    isBondRecovery,
+    type JoinBond,
+} from "../../lib/bondUtils";
 import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { BondLedger } from "../bond/BondLedger";
+import { BondPool } from "../bond/BondPool";
 import { BondRecoveryDetails } from "../bond/BondRecoveryDetails";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
@@ -14,11 +19,38 @@ import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbS
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
 
+export type TournamentBondPool = {
+    /**
+     * Current balance of the tournament contract.
+     */
+    balance?: bigint;
+
+    /**
+     * Minimum bond each join must post.
+     */
+    bondValue?: bigint;
+
+    /**
+     * Bonds the commitments posted on join, as they resolve.
+     */
+    bonds: JoinBond[];
+
+    /**
+     * Whether the bond value, join bonds or balance are still being fetched.
+     */
+    loading?: boolean;
+};
+
 export interface TournamentViewProps {
     /**
      * Bond refund and recovery events of the tournament.
      */
     bondEvents?: BondEvent[];
+
+    /**
+     * Bonds deposited into the tournament and its balance.
+     */
+    bondPool?: TournamentBondPool;
 
     /**
      * The list of all commitments.
@@ -44,6 +76,7 @@ export interface TournamentViewProps {
 export const TournamentView: FC<TournamentViewProps> = (props) => {
     const {
         bondEvents = [],
+        bondPool,
         commitments,
         matches,
         onBondRecovered,
@@ -86,7 +119,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 <TournamentOutcome snapshot={tournament.snapshot} />
             </Stack>
 
-            {bondSettled && (
+            {(bondSettled || bondPool) && (
                 <Stack gap="sm">
                     <Title order={3} c="dimmed">
                         {content.bond.bondTxt}
@@ -97,6 +130,18 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                         tournamentAddress={tournament.address}
                         onRecovered={onBondRecovered}
                     />
+                    {bondPool && (
+                        <BondPool
+                            balance={bondPool.balance}
+                            bondValue={bondPool.bondValue}
+                            loading={bondPool.loading}
+                            pool={getBondPool(
+                                bondPool.bonds,
+                                commitments.length,
+                                bondEvents,
+                            )}
+                        />
+                    )}
                 </Stack>
             )}
 
