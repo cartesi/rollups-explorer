@@ -1,7 +1,7 @@
 import { isBlank } from "ramda-adjunct";
 import { isAddress, isHex, parseAbi, parseAbiParameters } from "viem";
-import type { FormValues } from "./types";
-import { prepareSignatures } from "./utils";
+import type { AbiParamShape, AbiParamValue, FormValues } from "./types";
+import { getArrayItemParam, parseArrayType, prepareSignatures } from "./utils";
 
 export const validateApplication = (value: string) =>
     value !== "" && isAddress(value) ? null : "Invalid application";
@@ -28,8 +28,99 @@ export const validateAbiFunctionName = (value: string, values: FormValues) =>
         ? null
         : "Invalid ABI function";
 
+const isValidPrimitiveValue = (type: string, value: string) => {
+    switch (type) {
+        case "uint":
+        case "uint8":
+        case "uint16":
+        case "uint32":
+        case "uint64":
+        case "uint128":
+        case "uint256":
+            try {
+                BigInt(value);
+                return true;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (e: unknown) {
+                return false;
+            }
+        case "bool":
+            return value === "true" || value === "false";
+        case "bytes":
+            return isHex(value);
+        case "address":
+            return isAddress(value);
+        // All other types like 'string' are only validated for non-empty content
+        default:
+            return true;
+    }
+};
+
+export const getParamValueError = (
+    param: AbiParamShape,
+    value: AbiParamValue,
+    position = "",
+): string | null => {
+    const message = `Invalid ${param.type} value${position ? ` at ${position}` : ""}`;
+    const arrayType = parseArrayType(param.type);
+
+    if (arrayType) {
+        if (
+            !Array.isArray(value) ||
+            (arrayType.length !== undefined &&
+                value.length !== arrayType.length)
+        ) {
+            return message;
+        }
+
+        const itemParam = getArrayItemParam(param);
+
+        for (const [index, item] of value.entries()) {
+            const error = getParamValueError(
+                itemParam,
+                item,
+                `${position}[${index}]`,
+            );
+
+            if (error) {
+                return error;
+            }
+        }
+
+        return null;
+    }
+
+    if (param.type === "tuple") {
+        const components = param.components ?? [];
+
+        if (!Array.isArray(value) || value.length !== components.length) {
+            return message;
+        }
+
+        for (const [index, component] of components.entries()) {
+            const error = getParamValueError(
+                component,
+                value[index],
+                `${position}.${component.name || index}`,
+            );
+
+            if (error) {
+                return error;
+            }
+        }
+
+        return null;
+    }
+
+    return typeof value === "string" &&
+        value !== "" &&
+        isValidPrimitiveValue(param.type, value)
+        ? null
+        : message;
+};
+
 export const validateAbiFunctionParamValue = (
-    value: string,
+    value: AbiParamValue,
     values: FormValues,
     key: string,
 ) => {
@@ -47,45 +138,7 @@ export const validateAbiFunctionParamValue = (
         return null;
     }
 
-    const message = `Invalid ${param.type} value`;
-    let error: string | null = null;
-
-    // Validate the field for non-empty content
-    if (value === "") {
-        return message;
-    }
-
-    // Otherwise, if some content exists, validate it based on the type
-    switch (param.type) {
-        case "uint":
-        case "uint8":
-        case "uint16":
-        case "uint32":
-        case "uint64":
-        case "uint128":
-        case "uint256":
-            try {
-                BigInt(value);
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (e: unknown) {
-                error = message;
-            }
-            break;
-        case "bool":
-            error = value === "true" || value === "false" ? null : message;
-            break;
-        case "bytes":
-            error = isHex(value) ? null : message;
-            break;
-        case "address":
-            error = isAddress(value) ? null : message;
-            break;
-        // All other types like 'string' are handled in the non-empty content check above
-        default:
-            break;
-    }
-
-    return error;
+    return getParamValueError(param, value);
 };
 
 export const validateHumanAbi = (value: string, values: FormValues) => {
