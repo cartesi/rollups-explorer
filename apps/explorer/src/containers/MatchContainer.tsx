@@ -1,5 +1,6 @@
 "use client";
 import {
+    useBondEvents,
     useCommitment,
     useMatch,
     useMatchAdvances,
@@ -8,7 +9,7 @@ import {
 } from "@cartesi/react";
 import { notFound } from "next/navigation";
 import { isNotNil } from "ramda";
-import type { FC } from "react";
+import { useMemo, type FC } from "react";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -18,6 +19,7 @@ import { TournamentBreadcrumbSegment } from "../components/navigation/Tournament
 import { useBlockTimestamps } from "../hooks/useBlockTimestamps";
 import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { isBondRefund } from "../lib/bondUtils";
 import { isTournamentSettled } from "../lib/prtUtils";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
@@ -60,6 +62,23 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         commitmentTwoQuery.data,
     ].filter(isNotNil);
 
+    const bondEventsQuery = useBondEvents({
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: params.tournamentAddress,
+        limit: 10_000,
+        descending: true,
+    });
+    const refunds = useMemo(
+        () =>
+            new Map(
+                (bondEventsQuery.data?.data ?? [])
+                    .filter(isBondRefund)
+                    .map((refund) => [refund.txHash, refund]),
+            ),
+        [bondEventsQuery.data],
+    );
+
     useRefetchOnFinalizedBlock(
         isNotNil(tournamentQuery.data) &&
             !isTournamentSettled(tournamentQuery.data),
@@ -70,6 +89,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
             subTournamentQuery.refetch,
             commitmentOneQuery.refetch,
             commitmentTwoQuery.refetch,
+            bondEventsQuery.refetch,
         ],
     );
 
@@ -170,6 +190,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     advances={advancesQuery.data?.data ?? []}
                     commitments={commitments}
                     tournament={tournament}
+                    refunds={refunds}
                     subTournament={subTournament}
                     timestamps={timestamps}
                     timestampsLoading={timestampsLoading}

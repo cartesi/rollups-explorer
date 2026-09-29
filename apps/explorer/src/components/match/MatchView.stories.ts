@@ -2,7 +2,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs";
 import { createElement } from "react";
 import * as TournamentStories from "../tournament/TournamentView.stories";
 import { randomAdvances } from "../../stories/data";
-import { createCommitment, createMatchState } from "../../stories/prt";
+import {
+    createCommitment,
+    createMatchState,
+    createRefunds,
+} from "../../stories/prt";
 import * as MatchActionsStories from "./MatchActions.stories";
 import { MatchView } from "./MatchView";
 import { toBlockTimestamps } from "../../stories/util";
@@ -131,5 +135,18 @@ export const TimestampsUnavailable: Story = {
         ...Ongoing.args,
         timestamps: new Map(),
         timestampsLoading: false,
+    },
+};
+
+/**
+ * Gas refunds paid for the advances of the match.
+ */
+export const WithRefunds: Story = {
+    args: {
+        ...Ongoing.args,
+        refunds: createRefunds(
+            Ongoing.args.advances.map(({ txHash }) => txHash),
+            3,
+        ),
     },
 };

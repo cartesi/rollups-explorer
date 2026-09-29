@@ -33,6 +33,11 @@ export const matchMessages = {
         prefixTxt: "Deferred charge of",
         suffixTxt: "blocks",
     },
+    gasRefund: {
+        leafSealTxt: "Leaf seal gas refund",
+        subTournamentCreationTxt: "Sub-tournament creation gas refund",
+        matchClosingTxt: "Match closing gas refund",
+    },
     clock: {
         runningTxt: "clock running",
         pausedTxt: "clock paused",

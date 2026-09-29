@@ -6,6 +6,7 @@ import { MatchActions } from "./MatchActions";
 import {
     createMatch,
     createMatchAdvanced,
+    createRefunds,
     createTournament,
 } from "../../stories/prt";
 
@@ -495,5 +496,22 @@ export const NoWinnerAfterSubTournamentDispute: Story = {
                 finishedAtBlock: 1504n,
             },
         }),
+    },
+};
+
+/**
+ * Gas refunds paid in the same transactions as each advance and the match
+ * closing, with every fifth refund not paid.
+ */
+export const WithRefunds: Story = {
+    args: {
+        ...CompleteTop.args,
+        refunds: createRefunds(
+            [
+                ...CompleteTop.args.advances.map(({ txHash }) => txHash),
+                CompleteTop.args.match.deletionTxHash,
+            ],
+            5,
+        ),
     },
 };

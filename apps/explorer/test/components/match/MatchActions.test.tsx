@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { MatchActions } from "../../../src/components/match/MatchActions";
+import type { PartialBondRefundEvent } from "../../../src/lib/bondUtils";
 import {
     createBisection,
+    createBondEvent,
     createMatch,
     createMatchAdvanced,
     createMatchSnapshot,
@@ -115,5 +117,56 @@ describe("MatchActions", () => {
         );
 
         expect(screen.getByText("1 minute ago")).toBeInTheDocument();
+    });
+
+    it("should attach the refunds paid in the same transactions", () => {
+        const advanceTx =
+            "0x1111111111111111111111111111111111111111111111111111111111111111";
+        const closingTx =
+            "0x2222222222222222222222222222222222222222222222222222222222222222";
+        const refundOf = (txHash: `0x${string}`, value: bigint) =>
+            createBondEvent({
+                txHash,
+                refund: {
+                    recipient: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                    value,
+                    success: true,
+                },
+            }) as PartialBondRefundEvent;
+
+        render(
+            <MatchActions
+                advances={[createMatchAdvanced({ txHash: advanceTx })]}
+                match={createMatch({
+                    deletionReason: "STEP",
+                    deletionTxHash: closingTx,
+                    winnerCommitment: "ONE",
+                })}
+                now={Date.now()}
+                refunds={
+                    new Map([
+                        [
+                            advanceTx,
+                            refundOf(advanceTx, 1_000_000_000_000_000n),
+                        ],
+                        [
+                            closingTx,
+                            refundOf(closingTx, 2_000_000_000_000_000n),
+                        ],
+                    ])
+                }
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.getByText("gas refunded 0.001 ETH to"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Match closing gas refund"),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("gas refunded 0.002 ETH to"),
+        ).toBeInTheDocument();
     });
 });

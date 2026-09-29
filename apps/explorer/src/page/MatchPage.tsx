@@ -7,8 +7,10 @@ import type {
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { TbSwords } from "react-icons/tb";
+import type { Hash } from "viem";
 import PageTitle from "../components/layout/PageTitle";
 import { MatchView } from "../components/match/MatchView";
+import type { PartialBondRefundEvent } from "../lib/bondUtils";
 
 export interface MatchPageProps {
     /**
@@ -25,6 +27,11 @@ export interface MatchPageProps {
      * The match to display.
      */
     match: Match;
+
+    /**
+     * Partial bond refunds of the tournament, by transaction hash.
+     */
+    refunds?: Map<Hash, PartialBondRefundEvent>;
 
     /**
      * The sub tournament to display.
@@ -58,6 +65,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
         commitments,
         tournament,
         match,
+        refunds,
         subTournament,
         now,
         timestamps,
@@ -72,6 +80,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
                 commitments={commitments}
                 match={match}
                 now={now}
+                refunds={refunds}
                 subTournament={subTournament}
                 timestamps={timestamps}
                 timestampsLoading={timestampsLoading}
