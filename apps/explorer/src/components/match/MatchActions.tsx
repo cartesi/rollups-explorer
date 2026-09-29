@@ -29,7 +29,11 @@ import {
     getTournamentCycleRange,
     getWinner,
 } from "../../lib/prtUtils";
+import type { Hash } from "viem";
+import { content } from "../../content";
+import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { BisectionItem } from "./BisectionItem";
+import { BondRefundItem } from "./BondRefundItem";
 import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
 import { EliminationTimeoutItem } from "./EliminationTimeoutItem";
 import { LoserItem } from "./LoserItem";
@@ -59,6 +63,11 @@ interface MatchActionsProps {
     now: number;
 
     /**
+     * Partial bond refunds of the tournament, by transaction hash.
+     */
+    refunds?: Map<Hash, PartialBondRefundEvent>;
+
+    /**
      * The sub tournament to display.
      */
     subTournament?: Tournament;
@@ -84,6 +93,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
         advances,
         match,
         now,
+        refunds,
         subTournament,
         timestamps,
         timestampsLoading,
@@ -145,6 +155,24 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const closedAt = match.deletionBlockNumber
         ? timestamps?.get(match.deletionBlockNumber)
         : undefined;
+
+    const refundItems = [
+        {
+            label: content.match.gasRefund.leafSealTxt,
+            txHash: match.leafSeal?.txHash,
+        },
+        {
+            label: content.match.gasRefund.subTournamentCreationTxt,
+            txHash: subTournament?.creationEvent?.txHash,
+        },
+        {
+            label: content.match.gasRefund.matchClosingTxt,
+            txHash: match.deletionTxHash,
+        },
+    ].flatMap(({ label, txHash }) => {
+        const refund = txHash ? refunds?.get(txHash) : undefined;
+        return refund ? [{ label, refund }] : [];
+    });
 
     const getOutcomeItems = (): ReactElement[] => {
         switch (match.deletionReason) {
@@ -226,6 +254,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         index={i + 1}
                         now={now}
                         range={ranges[i + 1]}
+                        refund={refunds?.get(advance.txHash)}
                         timestamp={timestamps?.get(advance.blockNumber)}
                         timestampLoading={isTimestampLoading(
                             timestamps?.get(advance.blockNumber),
@@ -247,6 +276,14 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                     />
                 )}
                 {getOutcomeItems()}
+                {refundItems.map(({ label, refund }) => (
+                    <BondRefundItem
+                        key={`${refund.txHash}-${refund.logIndex}`}
+                        label={label}
+                        now={now}
+                        refund={refund}
+                    />
+                ))}
             </Timeline>
             <Group justify="flex-end" ref={bottomRef}>
                 {!topInViewport && (

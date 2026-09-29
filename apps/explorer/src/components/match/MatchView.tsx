@@ -6,6 +6,8 @@ import type {
 } from "@cartesi/client";
 import { Divider, Group, Stack, Text } from "@mantine/core";
 import { type FC } from "react";
+import type { Hash } from "viem";
+import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
@@ -27,6 +29,11 @@ export interface MatchViewProps {
      * The match to display.
      */
     match: Match;
+
+    /**
+     * Partial bond refunds of the tournament, by transaction hash.
+     */
+    refunds?: Map<Hash, PartialBondRefundEvent>;
 
     /**
      * The sub tournament to display.
@@ -60,6 +67,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
         commitments,
         tournament,
         match,
+        refunds,
         subTournament,
         now,
         timestamps,
@@ -94,6 +102,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 advances={advances}
                 match={match}
                 now={now}
+                refunds={refunds}
                 subTournament={subTournament}
                 timestamps={timestamps}
                 timestampsLoading={timestampsLoading}

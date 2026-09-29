@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { createElement } from "react";
 import { Ongoing } from "../components/tournament/TournamentView.stories";
+import * as MatchActionsStories from "../components/match/MatchActions.stories";
 import * as MatchStateStories from "../components/match/MatchState.stories";
 import { MatchPage } from "./MatchPage";
 import { randomAdvances } from "../stories/data";
@@ -65,5 +66,15 @@ export const Closed: Story = {
     args: {
         ...TopLevelMatch.args,
         match: MatchStateStories.Closed.args.match,
+    },
+};
+
+export const WithRefunds: Story = {
+    args: {
+        ...TopLevelMatch.args,
+        advances: MatchActionsStories.WithRefunds.args.advances,
+        match: MatchActionsStories.WithRefunds.args.match,
+        refunds: MatchActionsStories.WithRefunds.args.refunds,
+        tournament: MatchActionsStories.WithRefunds.args.tournament,
     },
 };

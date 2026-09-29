@@ -1,6 +1,8 @@
 import { Stack, Text, type TimelineItemProps } from "@mantine/core";
 import { forwardRef, useMemo, type FC } from "react";
+import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { toRatio } from "../../util";
+import { BondRefund } from "../bond/BondRefund";
 import type { Claim, CycleRange } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
 import { CurlyBracket } from "./CurlyBracket";
@@ -38,6 +40,11 @@ export interface BisectionItemProps extends TimelineItemProps {
     range: CycleRange;
 
     /**
+     * Bond refund paid for the bisection
+     */
+    refund?: PartialBondRefundEvent;
+
+    /**
      * Timestamp of the bisection
      */
     timestamp?: number;
@@ -64,6 +71,7 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
         index,
         now,
         range,
+        refund,
         timestamp,
         timestampLoading,
         total,
@@ -115,6 +123,7 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                         />
                     </>
                 )}
+                {refund && <BondRefund refund={refund} />}
             </Stack>
         </ClaimTimelineItem>
     );
