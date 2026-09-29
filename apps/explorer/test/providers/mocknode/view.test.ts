@@ -388,7 +388,7 @@ describe("PRT scenario views", () => {
             createNodeSource(
                 () => clock,
                 () => now,
-            ),
+            ).node,
         );
         const client = createCartesiPublicClient({
             transport: custom({

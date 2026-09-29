@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { setupWorker } from "msw/browser";
 import { createClockState } from "./clock";
+import { createEthHandlers } from "./eth";
 import { createNodeSource, getScenarioSchedules } from "./node";
 import { createCartesiHandlers, handleRpcBody } from "./rpc";
 import { MOCK_RPC_PATH, MOCK_WORKER_URL } from "./url";
@@ -13,7 +14,12 @@ const clock = createClockState(
     getScenarioSchedules(),
 );
 
-const handlers = createCartesiHandlers(createNodeSource(() => clock));
+const source = createNodeSource(() => clock);
+
+const handlers = {
+    ...createCartesiHandlers(source.node),
+    ...createEthHandlers(source.chain),
+};
 
 const worker = setupWorker(
     http.post(MOCK_RPC_PATH, async ({ request }) =>

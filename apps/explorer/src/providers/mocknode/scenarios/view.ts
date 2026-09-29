@@ -13,7 +13,17 @@ import type {
     TournamentSnapshot,
     TournamentStandingState,
 } from "@cartesi/client";
-import { zeroAddress, zeroHash, type Hash } from "viem";
+import { iApplicationAbi, iTournamentAbi } from "@cartesi/client/abi";
+import {
+    decodeFunctionData,
+    encodeFunctionResult,
+    isAddressEqual,
+    zeroAddress,
+    zeroHash,
+    type Address,
+    type Hash,
+    type Hex,
+} from "viem";
 import {
     createBondEvent,
     createCommitment,
@@ -953,3 +963,103 @@ export const viewRollupsApplication = (
         bondEvents: [],
     };
 };
+
+export type ScenarioChain = {
+    balance: (address: Address) => bigint | undefined;
+    call: (to: Address, data: Hex) => Hex | undefined;
+};
+
+const decodeCall = <T>(decode: () => T) => {
+    try {
+        return decode();
+    } catch {
+        return undefined;
+    }
+};
+
+const applicationCall = (
+    data: Hex,
+    wasOutputExecuted: (index: bigint) => boolean,
+    isForeclosed: boolean,
+) => {
+    const call = decodeCall(() =>
+        decodeFunctionData({ abi: iApplicationAbi, data }),
+    );
+    switch (call?.functionName) {
+        case "wasOutputExecuted":
+            return encodeFunctionResult({
+                abi: iApplicationAbi,
+                functionName: "wasOutputExecuted",
+                result: wasOutputExecuted(call.args[0]),
+            });
+        case "isForeclosed":
+            return encodeFunctionResult({
+                abi: iApplicationAbi,
+                functionName: "isForeclosed",
+                result: isForeclosed,
+            });
+        default:
+            return undefined;
+    }
+};
+
+/**
+ * Chain values of a PRT scenario at the head: the bond pool balance and bond
+ * value of each tournament.
+ */
+export const viewPrtChain = (
+    timeline: PrtTimeline,
+    head: bigint,
+): ScenarioChain => {
+    const tournamentAt = (address: Address) =>
+        timeline.tournaments.find(
+            (tournament) =>
+                isAddressEqual(tournament.address, address) &&
+                reached(tournament.created, head),
+        );
+    return {
+        balance: (address) => {
+            const tournament = tournamentAt(address);
+            return tournament && getBondBalance(tournament, head);
+        },
+        call: (to, data) => {
+            if (isAddressEqual(to, timeline.address)) {
+                return applicationCall(data, () => false, false);
+            }
+            const tournament = tournamentAt(to);
+            if (!tournament) return undefined;
+            return decodeCall(() =>
+                decodeFunctionData({ abi: iTournamentAbi, data }),
+            )?.functionName === "bondValue"
+                ? encodeFunctionResult({
+                      abi: iTournamentAbi,
+                      functionName: "bondValue",
+                      result: tournament.bondValue,
+                  })
+                : undefined;
+        },
+    };
+};
+
+export const viewRollupsChain = (
+    timeline: RollupsTimeline,
+    head: bigint,
+): ScenarioChain => ({
+    balance: () => undefined,
+    call: (to, data) =>
+        isAddressEqual(to, timeline.address)
+            ? applicationCall(
+                  data,
+                  (index) => {
+                      const executed =
+                          timeline.outputs[Number(index)]?.executed;
+                      return (
+                          executed !== null &&
+                          executed !== undefined &&
+                          executed.block <= head
+                      );
+                  },
+                  reached(timeline.foreclosure, head),
+              )
+            : undefined,
+});
