@@ -37,6 +37,29 @@ export const bondMessages = {
         otherAccountTxt: "other account",
         otherAccountHint: "Sent by an account that didn't deposit either bond.",
     },
+    pool: {
+        bondValueTxt: "Bond value",
+        bondValueHint:
+            "The minimum each claim must post to join this tournament. Every tournament level sets its own.",
+        perJoinTxt: "per join",
+        depositedTxt: "Deposited",
+        atLeastTxt: "at least",
+        joinTxt: "join",
+        joinsTxt: "joins",
+        gasRefundedTxt: "Gas refunded",
+        refundTxt: "refund",
+        refundsTxt: "refunds",
+        balanceTxt: "Balance",
+        balanceHint:
+            "What the tournament contract holds now. Unpaid refunds stay in it, and without a winner it stays locked.",
+        splitTxt: "Where the bonds went",
+        split: {
+            balanceTxt: "Balance",
+            refundedTxt: "Gas refunded",
+            paidTxt: "Paid to winner",
+            burnedTxt: "Burned",
+        },
+    },
     summaryCardTxt: "Bond events",
     page: {
         titleTxt: "Bonds",

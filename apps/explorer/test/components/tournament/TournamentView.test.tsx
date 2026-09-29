@@ -1,12 +1,22 @@
+import { foundry } from "viem/chains";
 import { describe, expect, it, vi } from "vitest";
 import { TournamentView } from "../../../src/components/tournament/TournamentView";
-import { createTournament } from "../../../src/stories/prt";
+import {
+    createCommitment,
+    createJoinBond,
+    createTournament,
+} from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
 
 vi.mock("next/navigation", () => ({
     usePathname: () => "/tournament",
     useRouter: () => ({ push: vi.fn() }),
 }));
+
+vi.mock("wagmi", async () => {
+    const actual = await vi.importActual("wagmi");
+    return { ...actual, useConfig: () => ({ chains: [foundry] }) };
+});
 
 vi.mock("../../../src/components/bond/BondRecoveryAction", () => ({
     BondRecoveryAction: () => <button type="button">Recover bond</button>,
@@ -64,5 +74,26 @@ describe("TournamentView", () => {
         expect(
             screen.getByRole("button", { name: "Recover bond" }),
         ).toBeInTheDocument();
+    });
+
+    it("should show only the bond pool while the tournament runs", () => {
+        const commitment = createCommitment();
+        render(
+            <TournamentView
+                bondPool={{
+                    balance: 20_000_000_000_000_000n,
+                    bondValue: 21_000_000_000_000_000n,
+                    bonds: [createJoinBond(commitment)],
+                }}
+                commitments={[commitment]}
+                matches={[]}
+                tournament={createTournament()}
+            />,
+        );
+
+        expect(screen.getByText("Bond")).toBeInTheDocument();
+        expect(screen.getByText("Deposited")).toBeInTheDocument();
+        expect(screen.getByText("0.02 ETH")).toBeInTheDocument();
+        expect(screen.queryByText("Status")).not.toBeInTheDocument();
     });
 });

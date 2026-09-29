@@ -8,12 +8,14 @@ import {
 import { notFound } from "next/navigation";
 import { isNotNil } from "ramda";
 import type { FC } from "react";
+import { useBalance } from "wagmi";
 import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
+import { useJoinBonds } from "../hooks/useJoinBonds";
 import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { isTournamentSettled } from "../lib/prtUtils";
@@ -43,6 +45,12 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
         descending: true,
     });
 
+    const joinBonds = useJoinBonds(tournament, commitments?.data ?? []);
+    const balanceQuery = useBalance({
+        address: tournament?.address,
+        query: { enabled: isNotNil(tournament) },
+    });
+
     useRefetchOnFinalizedBlock(
         isNotNil(tournament) && !isTournamentSettled(tournament),
         [
@@ -50,6 +58,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             matchesQuery.refetch,
             commitmentsQuery.refetch,
             bondEventsQuery.refetch,
+            balanceQuery.refetch,
         ],
     );
 
@@ -136,9 +145,16 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             {!!tournament && (
                 <TournamentPage
                     bondEvents={bondEventsQuery.data?.data}
+                    bondPool={{
+                        balance: balanceQuery.data?.value,
+                        bondValue: joinBonds.bondValue,
+                        bonds: [...joinBonds.bonds.values()],
+                        loading: joinBonds.isLoading || balanceQuery.isPending,
+                    }}
                     onBondRecovered={() => {
                         tournamentQuery.refetch();
                         bondEventsQuery.refetch();
+                        balanceQuery.refetch();
                     }}
                     commitments={commitments?.data ?? []}
                     matches={matches?.data ?? []}

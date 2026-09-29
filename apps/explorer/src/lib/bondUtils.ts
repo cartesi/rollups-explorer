@@ -137,3 +137,37 @@ export const toJoinBond = (
         exact,
     };
 };
+
+export type BondPool = {
+    deposited: bigint;
+    exact: boolean;
+    joins: number;
+    refunded: bigint;
+    refunds: number;
+    paid: bigint;
+    burned: bigint;
+};
+
+/**
+ * Money in and out of a tournament: the bonds posted by its joins, the gas
+ * refunds paid from them, and the recovery payment and burn.
+ * @param joins number of commitments that joined the tournament.
+ */
+export const getBondPool = (
+    bonds: JoinBond[],
+    joins: number,
+    events: BondEvent[],
+): BondPool => {
+    const { refunded, paid, burned } = getBondTotals(events);
+    return {
+        deposited: bonds.reduce((sum, bond) => sum + bond.value, 0n),
+        exact: bonds.length === joins && bonds.every((bond) => bond.exact),
+        joins,
+        refunded,
+        refunds: events.filter(
+            (event) => isBondRefund(event) && event.refund.success,
+        ).length,
+        paid,
+        burned,
+    };
+};

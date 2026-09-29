@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
     formatBondValue,
     getBondAccounts,
+    getBondPool,
     getBondTotals,
     isBondRecovery,
     isBondRefund,
@@ -12,6 +13,7 @@ import {
 import {
     createBondEvent,
     createCommitment,
+    createJoinBond,
     createTournament,
 } from "../../src/stories/prt";
 
@@ -142,5 +144,38 @@ describe("toJoinBond", () => {
 
     it("should resolve nothing while no amount is known", () => {
         expect(toJoinBond(tournament, commitment)).toBeUndefined();
+    });
+});
+
+describe("getBondPool", () => {
+    const bond = createJoinBond(createCommitment());
+    const events = [
+        refund(1_000_000_000_000_000n, true),
+        refund(2_000_000_000_000_000n, false),
+        recovery,
+    ];
+
+    it("should sum the deposits, paid refunds and recovery", () => {
+        const { refunded, paid, burned } = getBondTotals(events);
+
+        expect(getBondPool([bond, bond], 2, events)).toEqual({
+            deposited: 42_000_000_000_000_000n,
+            exact: true,
+            joins: 2,
+            refunded,
+            refunds: 1,
+            paid,
+            burned,
+        });
+    });
+
+    it("should mark the deposits as a minimum when a join is relayed", () => {
+        expect(
+            getBondPool([bond, { ...bond, exact: false }], 2, []).exact,
+        ).toBe(false);
+    });
+
+    it("should mark the deposits as a minimum while a bond is unknown", () => {
+        expect(getBondPool([bond], 2, []).exact).toBe(false);
     });
 });
