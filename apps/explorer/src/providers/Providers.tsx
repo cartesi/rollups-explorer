@@ -71,6 +71,8 @@ export function Providers({ children }: ProviderProps) {
         value.isMockEnabled,
     );
 
+    const [isMockReady, setMockReady] = useState(false);
+
     useEffect(() => {
         if (getConfiguredIsContainer()) {
             loadConfig()
@@ -79,9 +81,18 @@ export function Providers({ children }: ProviderProps) {
         }
     }, []);
 
+    useEffect(() => {
+        if (!value.isMockEnabled) return;
+        import("./mocknode/worker")
+            .then(({ startMockNode }) => startMockNode())
+            .then(() => setMockReady(true))
+            .catch((reason) => console.error(reason));
+    }, [value.isMockEnabled]);
+
     return (
         <StyleProvider>
-            {systemNodeResult.isFetching ? (
+            {systemNodeResult.isFetching ||
+            (value.isMockEnabled && !isMockReady) ? (
                 <PageLoader />
             ) : (
                 <AppConfigProvider value={value}>

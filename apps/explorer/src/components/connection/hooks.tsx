@@ -6,6 +6,7 @@ import {
     supportedChains,
     type SupportedChainId,
 } from "../../lib/supportedChains";
+import { getMockRpcUrl } from "../../providers/mocknode/url";
 import {
     ConnectionActionContext,
     ConnectionStateContext,
@@ -442,12 +443,14 @@ export const useBuildSystemNodeConnection = (
     const [result] = useGetNodeInformation(url);
 
     if (isMockEnabled) {
+        const mockRpcUrl = getMockRpcUrl();
         return {
             config: {
                 ...defaultVal,
+                chain: { ...defaultVal.chain, rpcUrl: mockRpcUrl },
                 name: "mocked-system-setup",
                 type: "system_mock",
-                url: "local://in-memory",
+                url: mockRpcUrl,
             },
         };
     }

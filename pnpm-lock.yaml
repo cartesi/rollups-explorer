@@ -128,6 +128,9 @@ importers:
       jotai:
         specifier: ^2.12.5
         version: 2.12.5(@types/react@19.2.7)(react@19.2.3)
+      msw:
+        specifier: ^2.15.0
+        version: 2.15.0(@types/node@24.10.3)(typescript@5.9.3)
       next:
         specifier: ^16.2.3
         version: 16.2.3(@babel/core@7.28.4(supports-color@8.1.1))(@playwright/test@1.57.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -231,9 +234,6 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
-      msw:
-        specifier: ^2.15.0
-        version: 2.15.0(@types/node@24.10.3)(typescript@5.9.3)
       msw-storybook-addon:
         specifier: ^3.0.0
         version: 3.0.0(msw@2.15.0(@types/node@24.10.3)(typescript@5.9.3))(storybook@10.1.7(@testing-library/dom@10.4.1)(bufferutil@4.0.8)(prettier@3.7.4)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(utf-8-validate@5.0.10))

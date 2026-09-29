@@ -15,12 +15,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { useQueryClient, type QueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { Activity, type FC, type PropsWithChildren } from "react";
 import { TbCode, TbHome } from "react-icons/tb";
 import { useIsSmallDevice } from "../../hooks/useIsSmallDevice";
 import { useAppConfig } from "../../providers/AppConfigProvider";
-import queryClient from "../../providers/queryClient";
 import { pathBuilder } from "../../routes/routePathBuilder";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
@@ -31,7 +31,7 @@ import { ConnectionSettings } from "../settings/ConnectionSettings";
 import SettingsMenu from "../settings/SettingsMenu";
 import { ThemeToggle } from "../ThemeToggle";
 
-const printQueryInfo = () => {
+const printQueryInfo = (queryClient: QueryClient) => {
     const defaultOpts = queryClient.getDefaultOptions();
     const queryCache = queryClient.getQueryCache();
     console.log(defaultOpts);
@@ -43,7 +43,7 @@ const printQueryInfo = () => {
     });
 };
 
-const logQueries = () => {
+const logQueries = (queryClient: QueryClient) => {
     const queries = queryClient.getQueryCache().getAll();
     const obj: object[] = [];
     // @ts-expect-error saving whatever is the original to reset.
@@ -81,6 +81,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
         useDisclosure();
     const selectedNodeConnection = useSelectedNodeConnection();
+    const queryClient = useQueryClient();
     const { isSmallDevice, viewport } = useIsSmallDevice();
     const { height } = viewport;
     const { isDebugEnabled } = useAppConfig();
@@ -132,10 +133,16 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                                 <Activity
                                     mode={isDebugEnabled ? "visible" : "hidden"}
                                 >
-                                    <Button onClick={printQueryInfo}>
+                                    <Button
+                                        onClick={() =>
+                                            printQueryInfo(queryClient)
+                                        }
+                                    >
                                         Show cache
                                     </Button>
-                                    <Button onClick={logQueries}>
+                                    <Button
+                                        onClick={() => logQueries(queryClient)}
+                                    >
                                         Export queries
                                     </Button>
                                 </Activity>
