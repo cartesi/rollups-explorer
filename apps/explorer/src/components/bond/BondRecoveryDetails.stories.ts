@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import type { BondRecoveredEvent } from "../../lib/bondUtils";
 import { createBondEvent } from "../../stories/prt";
-import { BondRecoveryCard } from "./BondRecoveryCard";
+import { BondRecoveryDetails } from "./BondRecoveryDetails";
 
 const meta = {
-    title: "Components/Bond/BondRecoveryCard",
-    component: BondRecoveryCard,
+    title: "Components/Bond/BondRecoveryDetails",
+    component: BondRecoveryDetails,
     tags: ["autodocs"],
-} satisfies Meta<typeof BondRecoveryCard>;
+} satisfies Meta<typeof BondRecoveryDetails>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

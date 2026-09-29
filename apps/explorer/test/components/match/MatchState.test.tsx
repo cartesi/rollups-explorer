@@ -45,6 +45,14 @@ describe("MatchState", () => {
         ).toBeInTheDocument();
     });
 
+    it("should explain the input slots of the segment", () => {
+        render(<MatchState match={bisecting} tournament={tournament} />);
+
+        expect(
+            screen.getByLabelText(/An input slot within the epoch/),
+        ).toBeInTheDocument();
+    });
+
     it("should display the commitment clocks", () => {
         render(
             <MatchState

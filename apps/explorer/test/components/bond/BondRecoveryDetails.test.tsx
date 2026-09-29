@@ -1,6 +1,6 @@
 import { foundry } from "viem/chains";
 import { describe, expect, it, vi } from "vitest";
-import { BondRecoveryCard } from "../../../src/components/bond/BondRecoveryCard";
+import { BondRecoveryDetails } from "../../../src/components/bond/BondRecoveryDetails";
 import type { BondRecoveredEvent } from "../../../src/lib/bondUtils";
 import { createBondEvent } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
@@ -12,10 +12,10 @@ vi.mock("wagmi", async () => {
 
 const claimer = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
-describe("BondRecoveryCard", () => {
+describe("BondRecoveryDetails", () => {
     it("should show the unclaimed payment of a recoverable bond", () => {
         render(
-            <BondRecoveryCard
+            <BondRecoveryDetails
                 bondRecovery={{
                     disposition: "RECOVERABLE",
                     claimer,
@@ -30,7 +30,7 @@ describe("BondRecoveryCard", () => {
 
     it("should show a present zero payment", () => {
         render(
-            <BondRecoveryCard
+            <BondRecoveryDetails
                 bondRecovery={{
                     disposition: "RECOVERABLE",
                     claimer,
@@ -44,7 +44,7 @@ describe("BondRecoveryCard", () => {
 
     it("should split the recovered bond into paid and burned", () => {
         render(
-            <BondRecoveryCard
+            <BondRecoveryDetails
                 bondRecovery={{
                     disposition: "RECOVERED",
                     claimer: null,
@@ -73,7 +73,7 @@ describe("BondRecoveryCard", () => {
 
     it("should render nothing while the tournament runs", () => {
         render(
-            <BondRecoveryCard
+            <BondRecoveryDetails
                 bondRecovery={{
                     disposition: "TOURNAMENT_RUNNING",
                     claimer: null,
@@ -82,12 +82,12 @@ describe("BondRecoveryCard", () => {
             />,
         );
 
-        expect(screen.queryByText("Bond")).not.toBeInTheDocument();
+        expect(screen.queryByText("Status")).not.toBeInTheDocument();
     });
 
     it("should explain that a balance without winner stays locked", () => {
         render(
-            <BondRecoveryCard
+            <BondRecoveryDetails
                 bondRecovery={{
                     disposition: "NO_WINNER",
                     claimer: null,

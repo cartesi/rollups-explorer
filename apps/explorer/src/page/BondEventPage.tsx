@@ -1,9 +1,10 @@
 import type { BondEvent } from "@cartesi/client";
-import { Anchor, Badge, Card, Group, Stack, Text } from "@mantine/core";
+import { Anchor, Badge, Card, Stack, Text } from "@mantine/core";
 import Link from "next/link";
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
 import { TbCoins } from "react-icons/tb";
 import Address from "../components/Address";
+import { DetailRow } from "../components/DetailRow";
 import PageTitle from "../components/layout/PageTitle";
 import { LongText } from "../components/LongText";
 import TransactionHash from "../components/TransactionHash";
@@ -18,18 +19,6 @@ export interface BondEventPageProps {
     event: BondEvent;
 }
 
-const Field: FC<{ label: string; children: ReactNode }> = ({
-    label,
-    children,
-}) => (
-    <Group>
-        <Text w={140} c="dimmed">
-            {label}
-        </Text>
-        {children}
-    </Group>
-);
-
 export const BondEventPage: FC<BondEventPageProps> = ({
     application,
     event,
@@ -38,7 +27,14 @@ export const BondEventPage: FC<BondEventPageProps> = ({
         <PageTitle Icon={TbCoins} title={text.titleTxt} />
         <Card withBorder>
             <Stack gap="sm">
-                <Field label={text.typeTxt}>
+                <DetailRow
+                    label={text.typeTxt}
+                    hint={
+                        isBondRecovery(event)
+                            ? undefined
+                            : content.bond.gasRefund.hint
+                    }
+                >
                     {isBondRecovery(event) ? (
                         <Badge color="green">{text.bondRecoveredTxt}</Badge>
                     ) : (
@@ -48,8 +44,8 @@ export const BondEventPage: FC<BondEventPageProps> = ({
                                 : text.gasRefundNotPaidTxt}
                         </Badge>
                     )}
-                </Field>
-                <Field label={text.tournamentTxt}>
+                </DetailRow>
+                <DetailRow label={text.tournamentTxt}>
                     <Anchor
                         component={Link}
                         href={pathBuilder.tournament({
@@ -61,44 +57,44 @@ export const BondEventPage: FC<BondEventPageProps> = ({
                         {`${text.epochTxt}${event.epochIndex}`}
                     </Anchor>
                     <Address value={event.tournamentAddress} shorten />
-                </Field>
-                <Field label={text.blockTxt}>
+                </DetailRow>
+                <DetailRow label={text.blockTxt}>
                     <Text>{event.blockNumber.toString()}</Text>
-                </Field>
-                <Field label={text.transactionTxt}>
+                </DetailRow>
+                <DetailRow label={text.transactionTxt}>
                     <TransactionHash transactionHash={event.txHash} />
-                </Field>
-                <Field label={text.logIndexTxt}>
+                </DetailRow>
+                <DetailRow label={text.logIndexTxt}>
                     <Text>{event.logIndex.toString()}</Text>
-                </Field>
+                </DetailRow>
                 {isBondRecovery(event) ? (
                     <>
-                        <Field label={text.commitmentTxt}>
+                        <DetailRow label={text.commitmentTxt}>
                             <LongText
                                 value={event.recovery.commitment}
                                 ff="monospace"
                             />
-                        </Field>
-                        <Field label={text.claimerTxt}>
+                        </DetailRow>
+                        <DetailRow label={text.claimerTxt}>
                             <Address value={event.recovery.claimer} />
-                        </Field>
-                        <Field label={text.paidTxt}>
+                        </DetailRow>
+                        <DetailRow label={text.paidTxt}>
                             <Text>
                                 {formatBondValue(event.recovery.payment)}
                             </Text>
-                        </Field>
-                        <Field label={text.burnedTxt}>
+                        </DetailRow>
+                        <DetailRow label={text.burnedTxt}>
                             <Text>
                                 {formatBondValue(event.recovery.burned)}
                             </Text>
-                        </Field>
+                        </DetailRow>
                     </>
                 ) : (
                     <>
-                        <Field label={text.recipientTxt}>
+                        <DetailRow label={text.recipientTxt}>
                             <Address value={event.refund.recipient} />
-                        </Field>
-                        <Field
+                        </DetailRow>
+                        <DetailRow
                             label={
                                 event.refund.success
                                     ? text.refundedTxt
@@ -106,7 +102,7 @@ export const BondEventPage: FC<BondEventPageProps> = ({
                             }
                         >
                             <Text>{formatBondValue(event.refund.value)}</Text>
-                        </Field>
+                        </DetailRow>
                     </>
                 )}
             </Stack>

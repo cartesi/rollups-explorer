@@ -3,6 +3,7 @@
  */
 export const bondMessages = {
     bondTxt: "Bond",
+    statusTxt: "Status",
     claimerTxt: "Claimer",
     unclaimedPaymentTxt: "Unclaimed payment",
     paidTxt: "Paid",

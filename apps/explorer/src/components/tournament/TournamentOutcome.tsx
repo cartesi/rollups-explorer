@@ -14,7 +14,7 @@ import type { FC } from "react";
 import { TbTrophyFilled } from "react-icons/tb";
 import { content } from "../../content";
 import { getTournamentOutcome } from "../../lib/prtUtils";
-import { InfoHint } from "../InfoHint";
+import { DetailRow } from "../DetailRow";
 import { LongText } from "../LongText";
 
 const standingColors: Record<TournamentStandingState, MantineColor> = {
@@ -41,19 +41,16 @@ export const TournamentOutcome: FC<TournamentOutcomeProps> = ({ snapshot }) => {
     const hint = standingHints[snapshot.standing];
 
     return (
-        <Stack gap="sm">
-            <Group>
-                <Text>{content.tournament.standingTxt}</Text>
+        <Stack gap="xs">
+            <DetailRow label={content.tournament.standingTxt} hint={hint}>
                 <Badge color={standingColors[snapshot.standing]}>
                     {content.tournament.standing[snapshot.standing]}
                 </Badge>
-                {hint && <InfoHint label={hint} />}
                 <Text size="xs" c="dimmed">
                     {`${content.tournament.asOfBlockTxt} ${snapshot.asOfBlock}`}
                 </Text>
-            </Group>
-            <Group>
-                <Text>{content.tournament.winnerTxt}</Text>
+            </DetailRow>
+            <DetailRow label={content.tournament.winnerTxt}>
                 {outcome.status === "winner" && (
                     <Group gap="xs">
                         <TbTrophyFilled size={24} color={gold} />
@@ -103,12 +100,11 @@ export const TournamentOutcome: FC<TournamentOutcomeProps> = ({ snapshot }) => {
                         )}
                     </Group>
                 )}
-            </Group>
+            </DetailRow>
             {snapshot.finalStateHash && (
-                <Group>
-                    <Text>{content.tournament.finalStateTxt}</Text>
+                <DetailRow label={content.tournament.finalStateTxt}>
                     <LongText value={snapshot.finalStateHash} ff="monospace" />
-                </Group>
+                </DetailRow>
             )}
         </Stack>
     );
