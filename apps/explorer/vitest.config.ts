@@ -13,7 +13,6 @@ export default defineConfig({
             exclude: [
                 "**/generated/**",
                 "**/app/**",
-                "**/providers/localdata/**",
                 "**/stories/**",
                 "**.stories.*",
                 "**.DS_Store",

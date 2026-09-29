@@ -6,6 +6,7 @@
     "scripts": {
         "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules && rm -rf dist && rm -rf src/generated",
         "dev": "next dev",
+        "dev:mock": "NEXT_PUBLIC_MOCK_ENABLED=true next dev",
         "build": "next build",
         "start": "next start",
         "typegen": "next typegen",
