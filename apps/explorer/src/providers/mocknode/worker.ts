@@ -1,20 +1,18 @@
 import { http, HttpResponse } from "msw";
 import { setupWorker } from "msw/browser";
-import { createClockState } from "./clock";
 import { createEthHandlers } from "./eth";
 import { createNodeSource, getScenarioSchedules } from "./node";
 import { createCartesiHandlers, handleRpcBody } from "./rpc";
+import { clockAtom, initMockNodeStore, mockNodeStore } from "./store";
 import { MOCK_RPC_PATH, MOCK_WORKER_URL } from "./url";
 
-const SESSION_HEAD = 25_000n;
+initMockNodeStore(getScenarioSchedules(), Date.now());
 
-const clock = createClockState(
-    SESSION_HEAD,
-    Date.now(),
-    getScenarioSchedules(),
-);
-
-const source = createNodeSource(() => clock);
+const source = createNodeSource(() => {
+    const clock = mockNodeStore.get(clockAtom);
+    if (!clock) throw new Error("The mock node clock is not set");
+    return clock;
+});
 
 const handlers = {
     ...createCartesiHandlers(source.node),

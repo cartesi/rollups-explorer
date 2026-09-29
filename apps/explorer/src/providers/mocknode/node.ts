@@ -1,10 +1,11 @@
 import { safeErc20TransferAddress } from "@cartesi/client/abi";
-import { isAddressEqual, type Hash } from "viem";
+import { isAddressEqual, type Address, type Hash } from "viem";
 import { SAFE_ERC20_TRANSFER_BYTECODE } from "../../stories/util";
 import { getBlockTime, getHead, type ClockState } from "./clock";
 import type { ChainSnapshot } from "./eth";
 import type { ApplicationData, NodeSnapshot } from "./rpc";
 import type { TxRecord } from "./scenarios/chain";
+import type { MockScenario } from "./store";
 import { buildRollupsTimeline } from "./scenarios/rollups";
 import { prtScenarios, rollupsScenarios } from "./scenarios/specs";
 import { buildPrtTimeline } from "./scenarios/timeline";
@@ -25,7 +26,11 @@ type View = { head: bigint; time: BlockTime };
 type Scenario = {
     name: string;
     presentAt?: number;
-    build: (anchor: bigint) => { endsAt: bigint; txs: TxRecord[] };
+    build: (anchor: bigint) => {
+        address: Address;
+        endsAt: bigint;
+        txs: TxRecord[];
+    };
     view: (anchor: bigint, view: View) => ApplicationData;
     chain: (anchor: bigint, head: bigint) => ScenarioChain;
 };
@@ -72,12 +77,16 @@ export const scenarios: Scenario[] = [
 /**
  * Relative length of every scenario, to anchor them in the chain history.
  */
-export const getScenarioSchedules = () =>
-    scenarios.map((scenario) => ({
-        name: scenario.name,
-        duration: scenario.build(0n).endsAt,
-        presentAt: scenario.presentAt,
-    }));
+export const getScenarioSchedules = (): MockScenario[] =>
+    scenarios.map((scenario) => {
+        const { address, endsAt } = scenario.build(0n);
+        return {
+            name: scenario.name,
+            address,
+            duration: endsAt,
+            presentAt: scenario.presentAt,
+        };
+    });
 
 const byBlock = (txs: TxRecord[]) => {
     const blocks = new Map<bigint, TxRecord[]>();

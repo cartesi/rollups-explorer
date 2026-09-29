@@ -4,6 +4,13 @@ import {
     createClockState,
     getBlockTime,
     getHead,
+    getSpeed,
+    isPlaying,
+    pause,
+    replay,
+    reset,
+    setSpeed,
+    step,
     type ClockState,
 } from "../../../src/providers/mocknode/clock";
 
@@ -46,5 +53,49 @@ describe("mock node clock", () => {
         ]);
         expect(state.anchors.done).toBe(10_000n - 430n);
         expect(state.anchors.live).toBe(10_000n - 110n);
+    });
+});
+
+describe("mock node clock controls", () => {
+    const initial = createClockState(1_000n, start, [
+        { name: "done", duration: 400n },
+    ]);
+
+    it("should pause, keep the head and resume from the time it resumes", () => {
+        const paused = pause(initial, start + 5 * BLOCK_TIME);
+        expect(isPlaying(paused)).toBe(false);
+        expect(getHead(paused, start + 50 * BLOCK_TIME)).toBe(1_005n);
+        const resumed = setSpeed(paused, start + 50 * BLOCK_TIME, 10);
+        expect(getHead(resumed, start + 51 * BLOCK_TIME)).toBe(1_015n);
+        expect(getBlockTime(resumed, 1_005n)).toBe(start + 5 * BLOCK_TIME);
+        expect(getBlockTime(resumed, 1_006n)).toBe(
+            start + 50 * BLOCK_TIME + BLOCK_TIME / 10,
+        );
+    });
+
+    it("should keep block times when changing the speed while playing", () => {
+        const fast = setSpeed(initial, start + 2.5 * BLOCK_TIME, 60);
+        expect(getSpeed(fast)).toBe(60);
+        expect(getBlockTime(fast, 1_002n)).toBe(start + 2 * BLOCK_TIME);
+        expect(getHead(fast, start + 3 * BLOCK_TIME)).toBe(1_002n + 60n);
+    });
+
+    it("should step one block at a time", () => {
+        const paused = pause(initial, start);
+        const stepped = step(step(paused, start + 1000), start + 2000);
+        expect(getHead(stepped, start + 60_000)).toBe(1_002n);
+        expect(getBlockTime(stepped, 1_002n)).toBe(start + 2000);
+    });
+
+    it("should replay a scenario from the current head and reset the anchors", () => {
+        const later = start + 100 * BLOCK_TIME;
+        const replayed = replay(initial, later, "done");
+        expect(replayed.anchors.done).toBe(1_100n);
+        const restored = reset(pause(replayed, later), later, [
+            { name: "done", duration: 400n },
+        ]);
+        expect(restored.anchors.done).toBe(1_100n - 430n);
+        expect(getSpeed(restored)).toBe(1);
+        expect(getHead(restored, later)).toBe(1_100n);
     });
 });

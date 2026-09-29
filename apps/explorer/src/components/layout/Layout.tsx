@@ -25,6 +25,8 @@ import { pathBuilder } from "../../routes/routePathBuilder";
 import { useSelectedNodeConnection } from "../connection/hooks";
 import { ConnectWallet } from "../ConnectWallet";
 import CartesiLogo from "../icons/CartesiLogo";
+import { MockNodeLiveRefresh } from "../mock/MockNodeLiveRefresh";
+import { MockNodeToolbar } from "../mock/MockNodeToolbar";
 import PageLinks from "../navigation/PageLinks";
 import SendModal from "../send/SendModal";
 import { ConnectionSettings } from "../settings/ConnectionSettings";
@@ -90,6 +92,9 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
 
     return (
         <>
+            {selectedNodeConnection?.type === "system_mock" && (
+                <MockNodeLiveRefresh />
+            )}
             <SendModal />
             <AppShell
                 navbar={{
@@ -119,6 +124,8 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                             <PageLinks />
 
                             <Group gap="3">
+                                {selectedNodeConnection?.type ===
+                                    "system_mock" && <MockNodeToolbar />}
                                 <Activity
                                     mode={
                                         selectedNodeConnection?.type ===
