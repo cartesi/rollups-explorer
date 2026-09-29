@@ -1,6 +1,6 @@
 import { Stack, Text, type TimelineItemProps } from "@mantine/core";
 import { forwardRef, useMemo, type FC } from "react";
-import type { PartialBondRefundEvent } from "../../lib/bondUtils";
+import type { Depositor, PartialBondRefundEvent } from "../../lib/bondUtils";
 import { toRatio } from "../../util";
 import { BondRefund } from "../bond/BondRefund";
 import type { Claim, CycleRange } from "../types";
@@ -13,6 +13,11 @@ export interface BisectionItemProps extends TimelineItemProps {
      * Claim that performed the bisection
      */
     claim: Claim;
+
+    /**
+     * Accounts that deposited the bonds of the match claims.
+     */
+    depositors?: Depositor[];
 
     /**
      * Domain of the bisection
@@ -66,6 +71,7 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
 >((props, ref) => {
     const {
         claim,
+        depositors,
         domain,
         expand,
         index,
@@ -123,7 +129,9 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                         />
                     </>
                 )}
-                {refund && <BondRefund refund={refund} />}
+                {refund && (
+                    <BondRefund depositors={depositors} refund={refund} />
+                )}
             </Stack>
         </ClaimTimelineItem>
     );

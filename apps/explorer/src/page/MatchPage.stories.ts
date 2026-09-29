@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { Ongoing } from "../components/tournament/TournamentView.stories";
 import * as MatchActionsStories from "../components/match/MatchActions.stories";
 import * as MatchStateStories from "../components/match/MatchState.stories";
+import * as MatchViewStories from "../components/match/MatchView.stories";
 import { MatchPage } from "./MatchPage";
 import { randomAdvances } from "../stories/data";
 import { toBlockTimestamps } from "../stories/util";
@@ -77,4 +78,8 @@ export const WithRefunds: Story = {
         refunds: MatchActionsStories.WithRefunds.args.refunds,
         tournament: MatchActionsStories.WithRefunds.args.tournament,
     },
+};
+
+export const WithJoinBonds: Story = {
+    args: MatchViewStories.WithJoinBonds.args,
 };

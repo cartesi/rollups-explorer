@@ -31,7 +31,7 @@ import {
 } from "../../lib/prtUtils";
 import type { Hash, Hex } from "viem";
 import { content } from "../../content";
-import type { PartialBondRefundEvent } from "../../lib/bondUtils";
+import type { Depositor, PartialBondRefundEvent } from "../../lib/bondUtils";
 import { BisectionItem } from "./BisectionItem";
 import { BondRefundItem } from "./BondRefundItem";
 import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
@@ -51,6 +51,11 @@ interface MatchActionsProps {
      * Whether to auto-adjust the ranges of the bisection items as user scrolls
      */
     autoAdjustRanges?: boolean;
+
+    /**
+     * Accounts that deposited the bonds of the match claims.
+     */
+    depositors?: Depositor[];
 
     /**
      * The match to display actions for
@@ -96,6 +101,7 @@ interface MatchActionsProps {
 export const MatchActions: FC<MatchActionsProps> = (props) => {
     const {
         advances,
+        depositors,
         match,
         now,
         refunds,
@@ -264,6 +270,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                         index={i + 1}
                         now={now}
                         range={ranges[i + 1]}
+                        depositors={depositors}
                         refund={refunds?.get(advance.txHash)}
                         timestamp={timestamps?.get(advance.blockNumber)}
                         timestampLoading={isTimestampLoading(
@@ -289,6 +296,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                 {refundItems.map(({ label, refund }) => (
                     <BondRefundItem
                         key={`${refund.txHash}-${refund.logIndex}`}
+                        depositors={depositors}
                         label={label}
                         now={now}
                         refund={refund}

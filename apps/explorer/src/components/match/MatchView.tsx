@@ -8,8 +8,9 @@ import { Stack, Text, Title } from "@mantine/core";
 import { type FC } from "react";
 import type { Hash, Hex } from "viem";
 import { content } from "../../content";
-import type { PartialBondRefundEvent } from "../../lib/bondUtils";
+import type { JoinBond, PartialBondRefundEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
+import { JoinBonds } from "../bond/JoinBonds";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
@@ -26,6 +27,16 @@ export interface MatchViewProps {
      * Current snapshots of the two match commitments.
      */
     commitments?: Commitment[];
+
+    /**
+     * Bonds the two commitments posted on join, by commitment.
+     */
+    joinBonds?: Map<Hash, JoinBond>;
+
+    /**
+     * Whether the join bonds are still being fetched.
+     */
+    joinBondsLoading?: boolean;
 
     /**
      * The match to display.
@@ -71,7 +82,9 @@ export interface MatchViewProps {
 export const MatchView: FC<MatchViewProps> = (props) => {
     const {
         advances,
-        commitments,
+        commitments = [],
+        joinBonds,
+        joinBondsLoading,
         tournament,
         match,
         refunds,
@@ -83,6 +96,10 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
+    const depositors = commitments.map((commitment) => ({
+        commitment: commitment.commitment,
+        depositor: commitment.submitterAddress,
+    }));
 
     return (
         <Stack gap="xl">
@@ -100,6 +117,18 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                     <Text>vs</Text>
                     <ClaimText claim={claim2} />
                 </DetailRow>
+                {commitments.length > 0 && (
+                    <DetailRow
+                        label={content.bond.join.bondsTxt}
+                        hint={content.bond.join.bondsHint}
+                    >
+                        <JoinBonds
+                            bonds={joinBonds}
+                            commitments={commitments}
+                            loading={joinBondsLoading}
+                        />
+                    </DetailRow>
+                )}
                 <MatchState
                     commitments={commitments}
                     match={match}
@@ -112,6 +141,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 </Title>
                 <MatchActions
                     advances={advances}
+                    depositors={depositors}
                     match={match}
                     now={now}
                     refunds={refunds}

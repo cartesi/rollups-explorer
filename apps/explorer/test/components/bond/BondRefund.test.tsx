@@ -1,3 +1,4 @@
+import { keccak256, toHex } from "viem";
 import { describe, expect, it } from "vitest";
 import { BondRefund } from "../../../src/components/bond/BondRefund";
 import type { PartialBondRefundEvent } from "../../../src/lib/bondUtils";
@@ -38,5 +39,48 @@ describe("BondRefund", () => {
             screen.getByText("gas refund requested 0.001 ETH to"),
         ).toBeInTheDocument();
         expect(screen.getByText("not paid")).toBeInTheDocument();
+    });
+
+    it("should label a refund sent by a depositor", () => {
+        render(
+            <BondRefund
+                refund={refund(true)}
+                depositors={[
+                    {
+                        commitment: keccak256(toHex("claim")),
+                        depositor: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                    },
+                ]}
+            />,
+        );
+
+        expect(screen.getByText("depositor")).toBeInTheDocument();
+        expect(screen.queryByText("other account")).not.toBeInTheDocument();
+    });
+
+    it("should label a refund sent by another account", () => {
+        render(
+            <BondRefund
+                refund={refund(true)}
+                depositors={[
+                    {
+                        commitment: keccak256(toHex("claim")),
+                        depositor: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                    },
+                ]}
+            />,
+        );
+
+        expect(screen.getByText("other account")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText(/didn't deposit either bond/),
+        ).toBeInTheDocument();
+    });
+
+    it("should not label the sender without depositors", () => {
+        render(<BondRefund refund={refund(true)} />);
+
+        expect(screen.queryByText("depositor")).not.toBeInTheDocument();
+        expect(screen.queryByText("other account")).not.toBeInTheDocument();
     });
 });
