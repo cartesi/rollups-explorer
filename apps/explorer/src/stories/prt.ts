@@ -11,7 +11,7 @@ import type {
     TournamentSnapshot,
 } from "@cartesi/client";
 import { keccak256, toHex, zeroHash, type Address, type Hash } from "viem";
-import type { PartialBondRefundEvent } from "../lib/bondUtils";
+import type { JoinBond, PartialBondRefundEvent } from "../lib/bondUtils";
 
 const defaultDate = new Date("2026-01-01T00:00:00.000Z");
 const defaultTournamentAddress: Address =
@@ -284,11 +284,13 @@ export const createBondEvent = (
 
 /**
  * Build the partial refunds a match timeline joins by transaction hash, one
- * per transaction. Every `failEvery`-th refund is recorded as not paid.
+ * per transaction. Every `failEvery`-th refund is recorded as not paid, and
+ * the recipients take turns sending the moves.
  */
 export const createRefunds = (
     txHashes: (Hash | null | undefined)[],
     failEvery = 0,
+    recipients: Address[] = [defaultSubmitter],
 ): Map<Hash, PartialBondRefundEvent> =>
     new Map(
         txHashes
@@ -299,7 +301,7 @@ export const createRefunds = (
                     txHash,
                     logIndex: BigInt(index + 1),
                     refund: {
-                        recipient: defaultSubmitter,
+                        recipient: recipients[index % recipients.length],
                         value:
                             1_200_000_000_000_000n + BigInt(index) * 10n ** 13n,
                         success:
@@ -308,3 +310,15 @@ export const createRefunds = (
                 }) as PartialBondRefundEvent,
             ]),
     );
+
+export const createJoinBond = (
+    commitment: Commitment,
+    overrides: Partial<JoinBond> = {},
+): JoinBond => ({
+    commitment: commitment.commitment,
+    depositor: commitment.submitterAddress,
+    txHash: commitment.txHash,
+    value: 21_000_000_000_000_000n,
+    exact: true,
+    ...overrides,
+});

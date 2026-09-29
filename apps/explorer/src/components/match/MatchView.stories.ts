@@ -4,6 +4,7 @@ import * as TournamentStories from "../tournament/TournamentView.stories";
 import { randomAdvances } from "../../stories/data";
 import {
     createCommitment,
+    createJoinBond,
     createMatchState,
     createRefunds,
 } from "../../stories/prt";
@@ -148,5 +149,61 @@ export const WithRefunds: Story = {
             Ongoing.args.advances.map(({ txHash }) => txHash),
             3,
         ),
+    },
+};
+
+const depositorOne = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+const depositorTwo = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+const otherAccount = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC";
+const joinedCommitments = [
+    createCommitment({
+        commitment: match.commitmentOne,
+        submitterAddress: depositorOne,
+        txHash: "0x3f1a2b8c9d0e4f5a6b7c8d9e0f1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c",
+    }),
+    createCommitment({
+        commitment: match.commitmentTwo,
+        submitterAddress: depositorTwo,
+        txHash: "0x9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d",
+    }),
+];
+
+/**
+ * Each claim's depositor, and gas refunds for moves sent by the depositors
+ * and by an account that deposited neither bond. The second claim joined
+ * through another contract, so only its minimum bond is known.
+ */
+export const WithJoinBonds: Story = {
+    args: {
+        ...Ongoing.args,
+        commitments: joinedCommitments,
+        joinBonds: new Map([
+            [
+                match.commitmentOne,
+                createJoinBond(joinedCommitments[0], {
+                    value: 25_000_000_000_000_000n,
+                }),
+            ],
+            [
+                match.commitmentTwo,
+                createJoinBond(joinedCommitments[1], { exact: false }),
+            ],
+        ]),
+        refunds: createRefunds(
+            Ongoing.args.advances.map(({ txHash }) => txHash),
+            0,
+            [depositorOne, depositorTwo, otherAccount],
+        ),
+    },
+};
+
+/**
+ * The depositors show while the bond amounts load.
+ */
+export const JoinBondsLoading: Story = {
+    args: {
+        ...WithJoinBonds.args,
+        joinBonds: new Map(),
+        joinBondsLoading: true,
     },
 };

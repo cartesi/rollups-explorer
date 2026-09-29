@@ -10,7 +10,7 @@ import { TbSwords } from "react-icons/tb";
 import type { Hash, Hex } from "viem";
 import PageTitle from "../components/layout/PageTitle";
 import { MatchView } from "../components/match/MatchView";
-import type { PartialBondRefundEvent } from "../lib/bondUtils";
+import type { JoinBond, PartialBondRefundEvent } from "../lib/bondUtils";
 
 export interface MatchPageProps {
     /**
@@ -22,6 +22,16 @@ export interface MatchPageProps {
      * Current snapshots of the two match commitments.
      */
     commitments?: Commitment[];
+
+    /**
+     * Bonds the two commitments posted on join, by commitment.
+     */
+    joinBonds?: Map<Hash, JoinBond>;
+
+    /**
+     * Whether the join bonds are still being fetched.
+     */
+    joinBondsLoading?: boolean;
 
     /**
      * The match to display.
@@ -68,6 +78,8 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
     const {
         advances,
         commitments,
+        joinBonds,
+        joinBondsLoading,
         tournament,
         match,
         refunds,
@@ -84,6 +96,8 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
             <MatchView
                 advances={advances}
                 commitments={commitments}
+                joinBonds={joinBonds}
+                joinBondsLoading={joinBondsLoading}
                 match={match}
                 now={now}
                 refunds={refunds}

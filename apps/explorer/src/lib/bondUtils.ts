@@ -1,6 +1,15 @@
-import type { BondEvent } from "@cartesi/client";
+import type { BondEvent, Commitment, Tournament } from "@cartesi/client";
+import { iTournamentAbi } from "@cartesi/client/abi";
 import { groupBy } from "ramda";
-import { formatEther, getAddress, type Address } from "viem";
+import {
+    decodeFunctionData,
+    formatEther,
+    getAddress,
+    isAddressEqual,
+    type Address,
+    type Hash,
+    type Transaction,
+} from "viem";
 
 export type PartialBondRefundEvent = Extract<
     BondEvent,
@@ -74,4 +83,57 @@ export const getBondAccounts = (events: BondEvent[]): BondAccount[] => {
         events: accountEvents.length,
         ...getBondTotals(accountEvents),
     }));
+};
+
+export type JoinBond = {
+    commitment: Hash;
+    depositor: Address;
+    txHash: Hash;
+    value: bigint;
+    exact: boolean;
+};
+
+export type Depositor = Pick<JoinBond, "commitment" | "depositor">;
+
+const isDirectJoin = (
+    tournament: Address,
+    transaction: Pick<Transaction, "to" | "input">,
+) => {
+    if (!transaction.to || !isAddressEqual(transaction.to, tournament)) {
+        return false;
+    }
+    try {
+        return (
+            decodeFunctionData({ abi: iTournamentAbi, data: transaction.input })
+                .functionName === "joinTournament"
+        );
+    } catch {
+        return false;
+    }
+};
+
+/**
+ * The bond a commitment posted on join. A direct `joinTournament` call carries
+ * the exact amount; a join sent through another contract only guarantees the
+ * tournament bond value.
+ * @returns the bond, or `undefined` while neither amount is known.
+ */
+export const toJoinBond = (
+    tournament: Pick<Tournament, "address">,
+    commitment: Pick<Commitment, "commitment" | "submitterAddress" | "txHash">,
+    transaction?: Pick<Transaction, "to" | "input" | "value">,
+    bondValue?: bigint,
+): JoinBond | undefined => {
+    const exact =
+        transaction !== undefined &&
+        isDirectJoin(tournament.address, transaction);
+    const value = exact ? transaction.value : bondValue;
+    if (value === undefined) return undefined;
+    return {
+        commitment: commitment.commitment,
+        depositor: commitment.submitterAddress,
+        txHash: commitment.txHash,
+        value,
+        exact,
+    };
 };

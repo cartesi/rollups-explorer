@@ -1,10 +1,15 @@
 import { Stack, Text } from "@mantine/core";
 import type { FC } from "react";
-import type { PartialBondRefundEvent } from "../../lib/bondUtils";
+import type { Depositor, PartialBondRefundEvent } from "../../lib/bondUtils";
 import { BondRefund } from "../bond/BondRefund";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
 
 export interface BondRefundItemProps {
+    /**
+     * Accounts that deposited the bonds of the match claims.
+     */
+    depositors?: Depositor[];
+
     /**
      * The action the refund was paid for.
      */
@@ -19,13 +24,13 @@ export interface BondRefundItemProps {
 }
 
 export const BondRefundItem: FC<BondRefundItemProps> = (props) => {
-    const { label, now, refund } = props;
+    const { depositors, label, now, refund } = props;
 
     return (
         <ClaimTimelineItem now={now}>
             <Stack gap={2}>
                 <Text size="sm">{label}</Text>
-                <BondRefund refund={refund} />
+                <BondRefund depositors={depositors} refund={refund} />
             </Stack>
         </ClaimTimelineItem>
     );
