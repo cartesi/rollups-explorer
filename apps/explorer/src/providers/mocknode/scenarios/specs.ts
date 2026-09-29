@@ -1,7 +1,7 @@
 import { getAddress } from "viem";
+import { accounts, addressOf } from "./chain";
+import type { RollupsScenarioSpec } from "./rollups";
 import {
-    accounts,
-    addressOf,
     type ClaimSpec,
     type MatchSpec,
     type PrtScenarioSpec,
@@ -301,4 +301,58 @@ export const prtScenarios: PrtScenarioSpec[] = [
             recovered: true,
         },
     }),
+];
+
+export const rollupsScenarios: RollupsScenarioSpec[] = [
+    {
+        name: "EchoAuthority",
+        consensusType: "AUTHORITY",
+        epochLength: 25n,
+        claimStagingPeriod: 0n,
+        epochs: [
+            ["notice", "ether"],
+            ["notice"],
+            [],
+            ["erc20", "notice", "withdraw"],
+            ["exception", "notice"],
+            [],
+            ["ether", "withdraw"],
+            ["notice", "rejected", "notice"],
+            ["erc20", "notice"],
+            ["notice", "withdraw", "notice"],
+        ],
+        presentAt: 212,
+    },
+    {
+        name: "EchoQuorum",
+        consensusType: "QUORUM",
+        epochLength: 30n,
+        claimStagingPeriod: 40n,
+        epochs: [
+            ["notice", "notice"],
+            ["ether"],
+            ["notice", "withdraw"],
+            ["erc20"],
+            ["notice", "rejected"],
+            ["ether", "notice"],
+            ["withdraw", "notice"],
+            ["notice"],
+        ],
+        rejectedEpochs: [2],
+        presentAt: 205,
+    },
+    {
+        name: "ForeclosedWallet",
+        consensusType: "AUTHORITY",
+        epochLength: 20n,
+        claimStagingPeriod: 10n,
+        epochs: [
+            ["erc20", "erc20"],
+            ["erc20", "notice"],
+            ["erc20", "withdraw"],
+            ["erc20", "erc20"],
+        ],
+        forecloseIn: 3,
+        presentAt: 80,
+    },
 ];

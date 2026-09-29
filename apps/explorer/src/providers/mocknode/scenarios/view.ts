@@ -13,7 +13,7 @@ import type {
     TournamentSnapshot,
     TournamentStandingState,
 } from "@cartesi/client";
-import { zeroAddress, type Hash } from "viem";
+import { zeroAddress, zeroHash, type Hash } from "viem";
 import {
     createBondEvent,
     createCommitment,
@@ -27,8 +27,19 @@ import {
     createApplication,
     createEpoch,
     createInput,
+    createOutput,
+    createReport,
+    createWithdrawal,
+    encodeAccount,
+    encodeWithdrawalOutput,
 } from "../../../stories/rollups";
 import type { ApplicationData } from "../rpc";
+import { hashOf, type LogRecord } from "./chain";
+import type {
+    EpochRecord,
+    RollupsInputRecord,
+    RollupsTimeline,
+} from "./rollups";
 import {
     CLAIM_STAGING_PERIOD,
     MAX_LEVEL,
@@ -36,11 +47,9 @@ import {
     commitmentOf,
     getBondBalance,
     getRecoveryPayment,
-    hashOf,
     machineAfter,
     type ClockChange,
     type CommitmentRecord,
-    type LogRecord,
     type MatchRecord,
     type PrtEpochRecord,
     type PrtTimeline,
@@ -705,5 +714,242 @@ export const viewPrtApplication = (
         reports: [],
         withdrawals: [],
         ...viewDispute(timeline, view),
+    };
+};
+
+const getRollupsEpochStatus = (
+    epoch: EpochRecord,
+    head: bigint,
+): EpochStatus => {
+    if (head >= epoch.settledAt) return epoch.settlement;
+    if (epoch.stagedAt !== null && head >= epoch.stagedAt) {
+        return "CLAIM_STAGED";
+    }
+    if (epoch.submitted && head >= epoch.submitted.block) {
+        return "CLAIM_SUBMITTED";
+    }
+    if (head >= epoch.computedAt) return "CLAIM_COMPUTED";
+    if (head >= epoch.processedAt) return "INPUTS_PROCESSED";
+    if (head > epoch.lastBlock) return "CLOSED";
+    return "OPEN";
+};
+
+const viewRollupsEpoch = (
+    timeline: RollupsTimeline,
+    epoch: EpochRecord,
+    { head, time }: View,
+): Epoch => {
+    const status = getRollupsEpochStatus(epoch, head);
+    const computed = head >= epoch.computedAt && epoch.submitted !== null;
+    const claim = hashOf(timeline.name, "claim", epoch.index);
+    const proof = (name: string) =>
+        computed
+            ? Array.from({ length: 3 }, (_, level) =>
+                  hashOf(claim, name, level),
+              )
+            : null;
+    const changes = [
+        epoch.openedAt,
+        epoch.lastBlock + 1n,
+        epoch.processedAt,
+        epoch.computedAt,
+        epoch.submitted?.block ?? epoch.computedAt,
+        epoch.stagedAt ?? epoch.computedAt,
+        epoch.settledAt,
+    ].filter((block) => block <= head);
+    const [lower, upper] = epoch.inputs;
+    const received = timeline.inputs.filter(
+        (input) =>
+            input.epochIndex === epoch.index && input.log.tx.block <= head,
+    ).length;
+    return createEpoch({
+        index: epoch.index,
+        virtualIndex: epoch.virtualIndex,
+        firstBlock: epoch.firstBlock,
+        lastBlock: epoch.lastBlock,
+        inputIndexLowerBound: lower,
+        inputIndexUpperBound:
+            status === "OPEN" ? lower + BigInt(received) : upper,
+        machineHash: computed ? hashOf(claim, "machine") : null,
+        txBufferDataBlock: computed ? hashOf(claim, "tx buffer") : null,
+        txBufferProof: proof("tx buffer proof"),
+        iflagsYDataBlock: computed ? hashOf(claim, "iflags") : null,
+        iflagsYProof: proof("iflags proof"),
+        htifTohostDataBlock: computed ? hashOf(claim, "tohost") : null,
+        htifTohostProof: proof("tohost proof"),
+        commitment: computed ? claim : null,
+        commitmentProof: proof("commitment proof"),
+        claimTransactionHash:
+            epoch.submitted && head >= epoch.submitted.block
+                ? epoch.submitted.hash
+                : null,
+        status,
+        stagedAtBlock:
+            epoch.stagedAt !== null && head >= epoch.stagedAt
+                ? epoch.stagedAt
+                : null,
+        createdAt: time(epoch.openedAt),
+        updatedAt: time(changes.reduce((a, b) => (b > a ? b : a))),
+    });
+};
+
+export const viewRollupsApplication = (
+    timeline: RollupsTimeline,
+    view: View,
+): ApplicationData => {
+    const { head, time } = view;
+    const processed = (input: RollupsInputRecord) => input.processedAt <= head;
+    const inputRecords = timeline.inputs.filter(
+        (input) => input.log.tx.block <= head,
+    );
+    const processedInputs = new Map(
+        inputRecords.filter(processed).map((input) => [input.index, input]),
+    );
+    const computedAt = new Map(
+        timeline.epochs.map((epoch) => [epoch.index, epoch.computedAt]),
+    );
+    const foreclosure = reached(timeline.foreclosure, head)
+        ? timeline.foreclosure
+        : null;
+    const drive = reached(timeline.accountsDrive?.log, head)
+        ? timeline.accountsDrive
+        : null;
+
+    const inputs = inputRecords.map((input) => {
+        const block = input.log.tx.block;
+        const done = processed(input);
+        return createInput({
+            epochIndex: input.epochIndex,
+            index: input.index,
+            blockNumber: block,
+            decodedData: {
+                chainId: BigInt(CHAIN_ID),
+                applicationContract: timeline.address,
+                sender: input.sender,
+                blockNumber: block,
+                blockTimestamp: BigInt(
+                    Math.floor(time(block).getTime() / 1000),
+                ),
+                prevRandao: BigInt(hashOf(timeline.name, "randao", block)),
+                index: input.index,
+                payload: input.payload,
+            },
+            status: done ? input.status : "NONE",
+            exceptionData: done ? input.exceptionData : null,
+            machineHash: done
+                ? hashOf(timeline.name, "machine", input.index)
+                : null,
+            txBufferDataBlock: done
+                ? hashOf(timeline.name, "tx buffer", input.index)
+                : null,
+            transactionHash: input.log.tx.hash,
+            logIndex: input.log.index,
+            createdAt: time(block),
+            updatedAt: time(done ? input.processedAt : block),
+        });
+    });
+
+    const outputs = timeline.outputs
+        .filter((output) => processedInputs.has(output.inputIndex))
+        .map((output) => {
+            const producedAt =
+                processedInputs.get(output.inputIndex)?.processedAt ?? head;
+            const proved = (computedAt.get(output.epochIndex) ?? head) <= head;
+            const executed =
+                output.executed && output.executed.block <= head
+                    ? output.executed
+                    : null;
+            return createOutput({
+                epochIndex: output.epochIndex,
+                inputIndex: output.inputIndex,
+                index: output.index,
+                decodedData: output.decoded,
+                outputHashesSiblings: proved ? output.siblings : null,
+                executionTransactionHash: executed?.hash ?? null,
+                createdAt: time(producedAt),
+                updatedAt: time(executed?.block ?? producedAt),
+            });
+        });
+
+    const reports = timeline.reports
+        .filter((report) => processedInputs.has(report.inputIndex))
+        .map((report) => {
+            const producedAt =
+                processedInputs.get(report.inputIndex)?.processedAt ?? head;
+            return createReport({
+                epochIndex: report.epochIndex,
+                inputIndex: report.inputIndex,
+                index: report.index,
+                rawData: report.payload,
+                createdAt: time(producedAt),
+                updatedAt: time(producedAt),
+            });
+        });
+
+    const withdrawals = timeline.withdrawals
+        .filter((withdrawal) => reached(withdrawal.log, head))
+        .map((withdrawal) =>
+            createWithdrawal({
+                accountIndex: withdrawal.accountIndex,
+                account: encodeAccount(withdrawal.owner, withdrawal.balance),
+                output: encodeWithdrawalOutput(
+                    withdrawal.owner,
+                    withdrawal.balance,
+                ),
+                blockNumber: withdrawal.log.tx.block,
+                transactionHash: withdrawal.log.tx.hash,
+                logIndex: withdrawal.log.index,
+                createdAt: time(withdrawal.log.tx.block),
+                updatedAt: time(withdrawal.log.tx.block),
+            }),
+        );
+
+    const application = createApplication({
+        name: timeline.name,
+        applicationAddress: timeline.address,
+        consensusAddress: timeline.consensus,
+        templateHash: hashOf(timeline.name, "template"),
+        consensusType: timeline.consensusType,
+        epochLength: timeline.epochLength,
+        claimStagingPeriod: timeline.claimStagingPeriod,
+        inputBoxBlock: timeline.anchor,
+        lastEpochCheckBlock: head,
+        lastInputCheckBlock: head,
+        lastOutputCheckBlock: head,
+        lastTournamentCheckBlock: head,
+        lastForecloseCheckBlock: head,
+        lastAccountsDriveProvedCheckBlock: head,
+        lastWithdrawalCheckBlock: head,
+        processedInputs: BigInt(processedInputs.size),
+        forecloseBlock: foreclosure?.tx.block ?? 0n,
+        forecloseTransaction: foreclosure?.tx.hash ?? zeroHash,
+        accountsDriveProvedBlock: drive?.log.tx.block ?? 0n,
+        accountsDriveProvedTransaction: drive?.log.tx.hash ?? zeroHash,
+        accountsDriveMerkleRoot: drive?.root ?? zeroHash,
+        withdrawalConfig: {
+            guardian: timeline.guardian,
+            log2LeavesPerAccount: 0n,
+            log2MaxNumOfAccounts: 16n,
+            accountsDriveStartIndex: 1n << 24n,
+            withdrawalOutputBuilder: timeline.withdrawalOutputBuilder,
+        },
+        createdAt: time(timeline.anchor),
+        updatedAt: time(head),
+    });
+
+    return {
+        application,
+        epochs: timeline.epochs
+            .filter((epoch) => epoch.openedAt <= head)
+            .map((epoch) => viewRollupsEpoch(timeline, epoch, view)),
+        inputs,
+        outputs,
+        reports,
+        withdrawals,
+        tournaments: [],
+        commitments: [],
+        matches: [],
+        matchAdvances: [],
+        bondEvents: [],
     };
 };

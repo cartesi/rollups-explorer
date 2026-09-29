@@ -16,7 +16,10 @@ import {
     dispatch,
     type JsonRpcRequest,
 } from "../../../src/providers/mocknode/rpc";
-import { prtScenarios } from "../../../src/providers/mocknode/scenarios/specs";
+import {
+    prtScenarios,
+    rollupsScenarios,
+} from "../../../src/providers/mocknode/scenarios/specs";
 import {
     allowanceAt,
     buildPrtTimeline,
@@ -400,7 +403,9 @@ describe("PRT scenario views", () => {
             }),
         });
         const applications = await client.listApplications();
-        expect(applications.pagination.totalCount).toBe(prtScenarios.length);
+        expect(applications.pagination.totalCount).toBe(
+            prtScenarios.length + rollupsScenarios.length,
+        );
         const application = "AppFourteen";
         const tournaments = await client.listTournaments({
             application,
