@@ -29,6 +29,9 @@ describe("BondEventPage", () => {
         );
 
         expect(screen.getByText("gas refund not paid")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText(/Paid from the tournament's pooled bonds/),
+        ).toBeInTheDocument();
         expect(screen.getByText("Requested")).toBeInTheDocument();
         expect(screen.getByText("0.001 ETH")).toBeInTheDocument();
         expect(screen.getByText("Epoch #4")).toHaveAttribute(
@@ -56,6 +59,9 @@ describe("BondEventPage", () => {
         );
 
         expect(screen.getByText("bond recovered")).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText(/Paid from the tournament's pooled bonds/),
+        ).not.toBeInTheDocument();
         expect(screen.getByText("0.2 ETH")).toBeInTheDocument();
         expect(screen.getByText("0.05 ETH")).toBeInTheDocument();
     });

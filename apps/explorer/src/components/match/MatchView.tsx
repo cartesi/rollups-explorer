@@ -4,7 +4,7 @@ import type {
     MatchAdvanced,
     Tournament,
 } from "@cartesi/client";
-import { Divider, Group, Stack, Text } from "@mantine/core";
+import { Stack, Text, Title } from "@mantine/core";
 import { type FC } from "react";
 import type { Hash, Hex } from "viem";
 import { content } from "../../content";
@@ -12,7 +12,7 @@ import type { PartialBondRefundEvent } from "../../lib/bondUtils";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import { InfoHint } from "../InfoHint";
+import { DetailRow } from "../DetailRow";
 import { MatchActions } from "./MatchActions";
 import { MatchState } from "./MatchState";
 
@@ -85,39 +85,43 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     const claim2 = { hash: match.commitmentTwo };
 
     return (
-        <Stack>
-            <Group>
-                <Text>{content.tournament.cycleRangeTxt}</Text>
-                <CycleRangeFormatted
-                    range={getTournamentCycleRange(tournament)}
-                />
-                <InfoHint label={content.tournament.cycle.rangeHint} />
-            </Group>
-            <Group>
-                <Text>Claims</Text>
-                <Group gap="xs">
+        <Stack gap="xl">
+            <Stack gap="xs">
+                <DetailRow
+                    label={content.tournament.cycleRangeTxt}
+                    hint={content.tournament.cycle.rangeHint}
+                >
+                    <CycleRangeFormatted
+                        range={getTournamentCycleRange(tournament)}
+                    />
+                </DetailRow>
+                <DetailRow label={content.match.claimsTxt}>
                     <ClaimText claim={claim1} />
                     <Text>vs</Text>
                     <ClaimText claim={claim2} />
-                </Group>
-            </Group>
-            <MatchState
-                commitments={commitments}
-                match={match}
-                tournament={tournament}
-            />
-            <Divider label="Actions" />
-            <MatchActions
-                advances={advances}
-                match={match}
-                now={now}
-                refunds={refunds}
-                subTournament={subTournament}
-                stepProof={stepProof}
-                timestamps={timestamps}
-                timestampsLoading={timestampsLoading}
-                tournament={tournament}
-            />
+                </DetailRow>
+                <MatchState
+                    commitments={commitments}
+                    match={match}
+                    tournament={tournament}
+                />
+            </Stack>
+            <Stack gap="sm">
+                <Title order={3} c="dimmed">
+                    {content.match.actionsTxt}
+                </Title>
+                <MatchActions
+                    advances={advances}
+                    match={match}
+                    now={now}
+                    refunds={refunds}
+                    subTournament={subTournament}
+                    stepProof={stepProof}
+                    timestamps={timestamps}
+                    timestampsLoading={timestampsLoading}
+                    tournament={tournament}
+                />
+            </Stack>
         </Stack>
     );
 };

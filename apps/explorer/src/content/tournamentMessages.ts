@@ -2,7 +2,11 @@
  * Content/copy for tournament related messages.
  */
 export const tournamentMessages = {
+    levelTxt: "Level",
     cycleRangeTxt: "Cycle range",
+    matchesTxt: "Matches",
+    showPendingMatchesTxt: "Show only eliminated and pending matches",
+    noClaimsTxt: "No claims submitted",
     leafSizeTxt: "Leaf size",
     spanTxt: "Span",
     cycle: {
@@ -21,7 +25,9 @@ export const tournamentMessages = {
             ucycles: "ucycles",
         },
         rangeHint:
-            "Positions on the epoch's meta-cycle grid: the input, the machine cycle within that input and the uarch cycle within that machine cycle. The state at the start is agreed and the range runs up to its end, inclusive. It is a position, not the amount of work the machine did.",
+            "Positions on the epoch's meta-cycle grid: the input, the machine cycle within that input and the uarch cycle within that machine cycle. The state at the start is agreed and the range runs up to its end, inclusive. It is a position, not the amount of work the machine did. The input is an input slot within the epoch: slot 0 holds the epoch's first input.",
+        inputSlotHint:
+            "An input slot within the epoch: slot 0 holds the epoch's first input. Every slot has the same fixed capacity, and slots after the epoch's last input are padding with no input.",
     },
     bondEventsTxt: "Bond events",
     standingTxt: "Standing",

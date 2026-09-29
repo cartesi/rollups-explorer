@@ -410,3 +410,26 @@ export const BottomLevelGeometry: Story = {
         },
     },
 };
+
+/**
+ * A finished tournament whose winner has not recovered the bond yet. The
+ * story uses a regular connection, as the recover action is hidden for
+ * mocked data.
+ */
+export const RecoverableBond: Story = {
+    parameters: { connectionType: "system" },
+    args: {
+        ...Finalized.args,
+        tournament: {
+            ...Finalized.args.tournament,
+            snapshot: {
+                ...Finalized.args.tournament.snapshot,
+                bondRecovery: {
+                    disposition: "RECOVERABLE",
+                    claimer: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                    payment: 250_000_000_000_000_000n,
+                },
+            },
+        },
+    },
+};

@@ -12,6 +12,7 @@ import {
 } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
+import { DetailRow } from "../DetailRow";
 import { InfoHint } from "../InfoHint";
 import { LongText } from "../LongText";
 import { MetaCycle } from "../MetaCycle";
@@ -88,94 +89,99 @@ export const MatchState: FC<MatchStateProps> = ({
     const segment = getSegmentRange(match, tournament);
 
     return (
-        <Stack gap="sm">
-            <Group>
-                <Text>{text.phaseTxt}</Text>
+        <Stack gap="xs">
+            <DetailRow
+                label={text.phaseTxt}
+                hint={deleted ? text.closedHint : undefined}
+            >
                 <Badge color={deleted ? "gray" : phaseColors[snapshot.phase]}>
                     {deleted ? text.phase.closed : text.phase[snapshot.phase]}
                 </Badge>
                 <Text size="xs" c="dimmed">
                     {`${text.asOfBlockTxt} ${snapshot.asOfBlock}`}
                 </Text>
-                {deleted && <InfoHint label={text.closedHint} />}
-            </Group>
+            </DetailRow>
             {snapshot.phase === "BISECTING" && (
-                <Group>
-                    <Text>{text.heightTxt}</Text>
+                <DetailRow label={text.heightTxt}>
                     <Text>
                         {`${snapshot.bisection.currentHeight} / ${tournament.height}`}
                     </Text>
-                </Group>
+                </DetailRow>
             )}
             {segment && (
                 <>
-                    <Group>
-                        <Text>{text.segmentTxt}</Text>
+                    <DetailRow
+                        label={text.segmentTxt}
+                        hint={content.tournament.cycle.inputSlotHint}
+                    >
                         <CycleRangeFormatted range={segment} />
-                    </Group>
-                    <Group>
-                        <Text>{text.segmentSizeTxt}</Text>
+                    </DetailRow>
+                    <DetailRow label={text.segmentSizeTxt}>
                         <Text>
                             {formatMetaSpan(
                                 tournament.log2step +
                                     (snapshot.bisection?.currentHeight ?? 1n),
                             )}
                         </Text>
-                    </Group>
+                    </DetailRow>
                 </>
             )}
             {responder && (
-                <Group>
-                    <Text>{text.responderTxt}</Text>
+                <DetailRow label={text.responderTxt}>
                     <ClaimText
                         claim={{ hash: getCommitment(match, responder) }}
                         iconSize={24}
                     />
-                </Group>
+                </DetailRow>
             )}
             {snapshot.phase === "SEALED" && (
                 <>
-                    <Group>
-                        <Text>{text.divergenceTxt}</Text>
+                    <DetailRow
+                        label={text.divergenceTxt}
+                        hint={content.tournament.cycle.inputSlotHint}
+                    >
                         <MetaCycle value={snapshot.sealed.divergenceCycle} />
-                    </Group>
-                    <Group>
-                        <Text>{text.agreeStateTxt}</Text>
+                    </DetailRow>
+                    <DetailRow label={text.agreeStateTxt}>
                         <LongText
                             value={snapshot.sealed.agreeState}
                             ff="monospace"
                         />
-                    </Group>
+                    </DetailRow>
                 </>
             )}
             {match.leafSeal && (
-                <Group>
-                    <Text>{text.leafSealedTxt}</Text>
+                <DetailRow label={text.leafSealedTxt}>
                     <Text size="sm" c="dimmed">
                         {`${text.leafSeal.atBlockTxt} ${match.leafSeal.blockNumber}, ${text.leafSeal.eliminableAtBlockTxt} ${match.leafSeal.eliminableAt}`}
                     </Text>
-                </Group>
+                </DetailRow>
             )}
             {!deleted && snapshot.timeoutOutcome !== "NONE" && (
-                <Text c="orange">
-                    {text.timeoutOutcome[snapshot.timeoutOutcome]}
-                </Text>
+                <DetailRow label="">
+                    <Text c="orange">
+                        {text.timeoutOutcome[snapshot.timeoutOutcome]}
+                    </Text>
+                </DetailRow>
             )}
             {!deleted && snapshot.deferredCharge > 0n && (
-                <Text size="sm" c="dimmed">
-                    {`${text.deferredCharge.prefixTxt} ${snapshot.deferredCharge} ${text.deferredCharge.suffixTxt}`}
-                </Text>
+                <DetailRow label="">
+                    <Text size="sm" c="dimmed">
+                        {`${text.deferredCharge.prefixTxt} ${snapshot.deferredCharge} ${text.deferredCharge.suffixTxt}`}
+                    </Text>
+                </DetailRow>
             )}
             {!deleted && commitments.length > 0 && (
-                <Stack gap="xs">
-                    <Text>{text.clocksTxt}</Text>
-                    {commitments.map((commitment) => (
-                        <CommitmentClock
-                            key={commitment.commitment}
-                            commitment={commitment}
-                        />
-                    ))}
-                </Stack>
+                <DetailRow label={text.clocksTxt}>
+                    <Stack gap="xs">
+                        {commitments.map((commitment) => (
+                            <CommitmentClock
+                                key={commitment.commitment}
+                                commitment={commitment}
+                            />
+                        ))}
+                    </Stack>
+                </DetailRow>
             )}
         </Stack>
     );

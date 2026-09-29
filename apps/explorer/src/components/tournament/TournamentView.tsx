@@ -1,14 +1,5 @@
 import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
-import {
-    Card,
-    Center,
-    Divider,
-    Group,
-    Stack,
-    Switch,
-    Text,
-    Title,
-} from "@mantine/core";
+import { Card, Center, Stack, Switch, Text, Title } from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
 import { content } from "../../content";
@@ -16,9 +7,9 @@ import { isBondRecovery } from "../../lib/bondUtils";
 import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { BondLedger } from "../bond/BondLedger";
-import { BondRecoveryCard } from "../bond/BondRecoveryCard";
+import { BondRecoveryDetails } from "../bond/BondRecoveryDetails";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
-import { InfoHint } from "../InfoHint";
+import { DetailRow } from "../DetailRow";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
@@ -61,63 +52,87 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
 
     const [hideWinners, setHideWinners] = useState(false);
     const noCommitments = isEmpty(commitments);
+    const text = content.tournament;
+    const bondSettled =
+        tournament.snapshot.bondRecovery.disposition !== "TOURNAMENT_RUNNING";
 
     return (
-        <Stack>
-            <Group>
-                <Text>Level</Text>
-                <TournamentBreadcrumbSegment
-                    level={tournament.level}
-                    variant="filled"
-                />
-            </Group>
-            <Group>
-                <Text>{content.tournament.cycleRangeTxt}</Text>
-                <CycleRangeFormatted
-                    range={getTournamentCycleRange(tournament)}
-                />
-                <InfoHint label={content.tournament.cycle.rangeHint} />
-            </Group>
-            <Group>
-                <Text>{content.tournament.leafSizeTxt}</Text>
-                <Text>{formatMetaSpan(tournament.log2step)}</Text>
-            </Group>
-            <Group>
-                <Text>{content.tournament.spanTxt}</Text>
-                <Text>
-                    {formatMetaSpan(tournament.log2step + tournament.height)}
-                </Text>
-            </Group>
-            <TournamentOutcome snapshot={tournament.snapshot} />
-            <BondRecoveryCard
-                bondRecovery={tournament.snapshot.bondRecovery}
-                recovery={bondEvents.find(isBondRecovery)}
-                tournamentAddress={tournament.address}
-                onRecovered={onBondRecovered}
-            />
-            <Switch
-                label="Show only eliminated and pending matches"
-                labelPosition="left"
-                size="md"
-                checked={hideWinners}
-                onChange={(event) =>
-                    setHideWinners(event.currentTarget.checked)
-                }
-            />
-            <TournamentTable
-                candidate={tournament.snapshot.candidate}
-                matches={matches}
-                hideWinners={hideWinners}
-            />
-            {noCommitments && (
-                <Card>
-                    <Center>
-                        <Title order={3}>No claims submitted</Title>
-                    </Center>
-                </Card>
+        <Stack gap="xl">
+            <Stack gap="xs">
+                <DetailRow label={text.levelTxt}>
+                    <TournamentBreadcrumbSegment
+                        level={tournament.level}
+                        variant="filled"
+                    />
+                </DetailRow>
+                <DetailRow
+                    label={text.cycleRangeTxt}
+                    hint={text.cycle.rangeHint}
+                >
+                    <CycleRangeFormatted
+                        range={getTournamentCycleRange(tournament)}
+                    />
+                </DetailRow>
+                <DetailRow label={text.leafSizeTxt}>
+                    <Text>{formatMetaSpan(tournament.log2step)}</Text>
+                </DetailRow>
+                <DetailRow label={text.spanTxt}>
+                    <Text>
+                        {formatMetaSpan(
+                            tournament.log2step + tournament.height,
+                        )}
+                    </Text>
+                </DetailRow>
+                <TournamentOutcome snapshot={tournament.snapshot} />
+            </Stack>
+
+            {bondSettled && (
+                <Stack gap="sm">
+                    <Title order={3} c="dimmed">
+                        {content.bond.bondTxt}
+                    </Title>
+                    <BondRecoveryDetails
+                        bondRecovery={tournament.snapshot.bondRecovery}
+                        recovery={bondEvents.find(isBondRecovery)}
+                        tournamentAddress={tournament.address}
+                        onRecovered={onBondRecovered}
+                    />
+                </Stack>
             )}
-            <Divider label={content.tournament.bondEventsTxt} />
-            <BondLedger events={bondEvents} />
+
+            <Stack gap="sm">
+                <Title order={3} c="dimmed">
+                    {text.matchesTxt}
+                </Title>
+                <Switch
+                    label={text.showPendingMatchesTxt}
+                    labelPosition="left"
+                    size="md"
+                    checked={hideWinners}
+                    onChange={(event) =>
+                        setHideWinners(event.currentTarget.checked)
+                    }
+                />
+                <TournamentTable
+                    candidate={tournament.snapshot.candidate}
+                    matches={matches}
+                    hideWinners={hideWinners}
+                />
+                {noCommitments && (
+                    <Card>
+                        <Center>
+                            <Title order={3}>{text.noClaimsTxt}</Title>
+                        </Center>
+                    </Card>
+                )}
+            </Stack>
+
+            <Stack gap="sm">
+                <Title order={3} c="dimmed">
+                    {text.bondEventsTxt}
+                </Title>
+                <BondLedger events={bondEvents} />
+            </Stack>
         </Stack>
     );
 };
