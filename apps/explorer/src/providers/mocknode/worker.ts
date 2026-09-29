@@ -1,15 +1,19 @@
 import { http, HttpResponse } from "msw";
 import { setupWorker } from "msw/browser";
-import { createCartesiHandlers, handleRpcBody, type NodeSnapshot } from "./rpc";
+import { createClockState } from "./clock";
+import { createNodeSource, getScenarioSchedules } from "./node";
+import { createCartesiHandlers, handleRpcBody } from "./rpc";
 import { MOCK_RPC_PATH, MOCK_WORKER_URL } from "./url";
 
-const snapshot = (): NodeSnapshot => ({
-    chainId: 13370,
-    version: "2.0.0-alpha.12",
-    applications: [],
-});
+const SESSION_HEAD = 25_000n;
 
-const handlers = createCartesiHandlers(snapshot);
+const clock = createClockState(
+    SESSION_HEAD,
+    Date.now(),
+    getScenarioSchedules(),
+);
+
+const handlers = createCartesiHandlers(createNodeSource(() => clock));
 
 const worker = setupWorker(
     http.post(MOCK_RPC_PATH, async ({ request }) =>
