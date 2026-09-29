@@ -12,8 +12,14 @@ export type SpecificationMode = "json_abi" | "abi_params";
 
 export type FormAbiMethod = "new" | "existing";
 
+export type AbiParamValue = string | AbiParamValue[];
+
+export type AbiParamShape = Pick<AbiParameter, "type" | "name"> & {
+    components?: readonly AbiParamShape[];
+};
+
 export type AbiValueParameter = Pick<AbiParameter, "type" | "name"> & {
-    value: string;
+    value: AbiParamValue;
     tupleName?: string;
 };
 
@@ -39,7 +45,7 @@ export interface FormValues {
     savedAbiParam: string;
     specificationId: string;
     abiFunctionName: string;
-    abiFunctionParams: AbiValueParameter[];
+    abiFunctionParams: AbiInputParam[];
 }
 
 export interface FormTransformedValues {
