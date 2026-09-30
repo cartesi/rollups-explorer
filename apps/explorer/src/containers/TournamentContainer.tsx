@@ -1,7 +1,9 @@
 "use client";
 import {
     useBondEvents,
+    useCommitment,
     useCommitments,
+    useMatch,
     useMatches,
     useTournament,
 } from "@cartesi/react";
@@ -46,6 +48,28 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
     });
 
     const joinBonds = useJoinBonds(tournament, commitments?.data ?? []);
+
+    const parentTournamentAddress = tournament?.parentTournamentAddress;
+    const parentMatchQuery = useMatch({
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: parentTournamentAddress ?? undefined,
+        idHash: tournament?.parentMatchIdHash ?? undefined,
+        enabled: isNotNil(parentTournamentAddress),
+    });
+    const parentCommitment = tournament?.snapshot.innerResult?.parentCommitment;
+    const parentCommitmentQuery = useCommitment({
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: parentTournamentAddress ?? undefined,
+        commitment: parentCommitment ?? undefined,
+        enabled:
+            isNotNil(parentTournamentAddress) && isNotNil(parentCommitment),
+    });
+    const parentJoin = useJoinBonds(
+        parentTournamentAddress ? { address: parentTournamentAddress } : null,
+        parentCommitmentQuery.data ? [parentCommitmentQuery.data] : [],
+    );
     const balanceQuery = useBalance({
         address: tournament?.address,
         query: { enabled: isNotNil(tournament) },
@@ -59,6 +83,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             commitmentsQuery.refetch,
             bondEventsQuery.refetch,
             balanceQuery.refetch,
+            parentMatchQuery.refetch,
         ],
     );
 
@@ -150,6 +175,19 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                         bondValue: joinBonds.bondValue,
                         bonds: [...joinBonds.bonds.values()],
                         loading: joinBonds.isLoading || balanceQuery.isPending,
+                    }}
+                    parent={{
+                        match: parentMatchQuery.data,
+                        winnerChildren: parentCommitment
+                            ? parentJoin.bonds.get(parentCommitment)?.children
+                            : undefined,
+                        winnerChildrenLoading:
+                            parentCommitmentQuery.isLoading ||
+                            parentJoin.isLoading,
+                        onActionConfirmed: () => {
+                            tournamentQuery.refetch();
+                            parentMatchQuery.refetch();
+                        },
                     }}
                     onBondRecovered={() => {
                         tournamentQuery.refetch();

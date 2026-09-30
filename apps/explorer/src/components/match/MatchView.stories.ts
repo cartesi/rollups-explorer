@@ -8,6 +8,7 @@ import {
     createJoinBond,
     createMatchState,
     createRefunds,
+    createTournament,
 } from "../../stories/prt";
 import * as MatchActionsStories from "./MatchActions.stories";
 import { MatchView } from "./MatchView";
@@ -222,5 +223,77 @@ export const JoinBondsLoading: Story = {
         ...WithJoinBonds.args,
         joinBonds: new Map(),
         joinBondsLoading: true,
+    },
+};
+
+const sealedMatch = Sealed.args.match;
+const divergence =
+    sealedMatch.snapshot.phase === "SEALED"
+        ? sealedMatch.snapshot.sealed.divergencePosition
+        : 0n;
+
+const innerTournament = (
+    disposition: "WINNER" | "ELIMINABLE",
+    standing: "INNER_WINNER" | "INNER_ELIMINABLE_NO_WINNER",
+) =>
+    createTournament({
+        address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        level: 1n,
+        log2step: 27n,
+        height: 17n,
+        baseCycle: tournament.baseCycle + (divergence << tournament.log2step),
+        parentTournamentAddress: tournament.address,
+        parentMatchIdHash: sealedMatch.idHash,
+        startInstant: 60n,
+        snapshot: {
+            asOfBlock: 100n,
+            standing,
+            finishedAtBlock: 90n,
+            winnerExpiresAt: disposition === "WINNER" ? 180n : 0n,
+            innerResult: {
+                disposition,
+                parentCommitment:
+                    disposition === "WINNER" ? sealedMatch.commitmentOne : null,
+                pausedAllowance: disposition === "WINNER" ? 500n : 0n,
+            },
+        },
+    });
+
+/**
+ * The sealed match's sub-tournament has a live winner, and anyone can
+ * propagate it to this match from its timeline.
+ */
+export const SubTournamentWinner: Story = {
+    parameters: { connectionType: "system" },
+    args: {
+        ...Sealed.args,
+        subTournament: innerTournament("WINNER", "INNER_WINNER"),
+        commitments: joinedCommitments,
+        joinBonds: new Map([
+            [
+                sealedMatch.commitmentOne,
+                createJoinBond(joinedCommitments[0], {
+                    children: [
+                        keccak256(toHex("one-left")),
+                        keccak256(toHex("one-right")),
+                    ],
+                }),
+            ],
+        ]),
+    },
+};
+
+/**
+ * The sub-tournament finished without a winner, so anyone can close this
+ * match.
+ */
+export const SubTournamentEliminable: Story = {
+    parameters: { connectionType: "system" },
+    args: {
+        ...Sealed.args,
+        subTournament: innerTournament(
+            "ELIMINABLE",
+            "INNER_ELIMINABLE_NO_WINNER",
+        ),
     },
 };

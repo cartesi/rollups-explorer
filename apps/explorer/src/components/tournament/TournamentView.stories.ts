@@ -1,6 +1,6 @@
 import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
-import { zeroHash } from "viem";
+import { zeroHash, type Address } from "viem";
 import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";
 import { getBondTotals } from "../../lib/bondUtils";
@@ -9,6 +9,7 @@ import {
     createCommitment,
     createJoinBond,
     createMatch,
+    createMatchSnapshot,
     createTournament,
 } from "../../stories/prt";
 import * as BondLedgerStories from "../bond/BondLedger.stories";
@@ -347,11 +348,42 @@ export const MidLevelDispute: Story = {
     },
 };
 
+const rootTournamentAddress: Address =
+    "0xA2835312696Afa86c969e40831857dbB1412627f";
+
+const parentMatch = createMatch({
+    commitmentOne: claim(0).hash,
+    commitmentTwo: claim(1).hash,
+    tournamentAddress: rootTournamentAddress,
+    snapshot: createMatchSnapshot({
+        phase: "SEALED",
+        bisection: null,
+        sealed: {
+            agreeState: zeroHash,
+            divergencePosition: 1024n,
+            divergenceCycle: 1024n << 44n,
+            finalStateOne: zeroHash,
+            finalStateTwo: zeroHash,
+        },
+    }),
+});
+
+const innerTournament = {
+    ...MidLevelDispute.args.tournament,
+    parentTournamentAddress: rootTournamentAddress,
+    parentMatchIdHash: parentMatch.idHash,
+};
+
+/**
+ * The inner tournament has a live winner until block 180. Anyone can
+ * propagate it to the parent match before then.
+ */
 export const ProvisionalInnerWinner: Story = {
+    parameters: { connectionType: "system" },
     args: {
         ...MidLevelDispute.args,
         tournament: {
-            ...MidLevelDispute.args.tournament,
+            ...innerTournament,
             snapshot: {
                 ...MidLevelDispute.args.tournament.snapshot,
                 standing: "INNER_WINNER",
@@ -360,23 +392,43 @@ export const ProvisionalInnerWinner: Story = {
                 finalStateHash: zeroHash,
                 finishedAtBlock: 90n,
                 winnerExpiresAt: 180n,
+                innerResult: {
+                    disposition: "WINNER",
+                    parentCommitment: parentMatch.commitmentOne,
+                    pausedAllowance: 500n,
+                },
             },
+        },
+        parent: {
+            match: parentMatch,
+            winnerChildren: [claim(0, 1).hash, claim(0, 2).hash],
         },
     },
 };
 
+/**
+ * The inner winner expired before anyone propagated it, so the only call left
+ * closes the parent match without a winner.
+ */
 export const ExpiredInnerWinner: Story = {
+    parameters: { connectionType: "system" },
     args: {
         ...MidLevelDispute.args,
         tournament: {
-            ...MidLevelDispute.args.tournament,
+            ...innerTournament,
             snapshot: {
                 ...MidLevelDispute.args.tournament.snapshot,
                 standing: "INNER_ELIMINABLE_WINNER_EXPIRED",
                 candidate: claim(7, 5).hash,
                 finishedAtBlock: 90n,
+                innerResult: {
+                    disposition: "ELIMINABLE",
+                    parentCommitment: null,
+                    pausedAllowance: 0n,
+                },
             },
         },
+        parent: { match: parentMatch },
     },
 };
 

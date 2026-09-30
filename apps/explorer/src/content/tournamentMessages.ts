@@ -54,4 +54,22 @@ export const tournamentMessages = {
         INNER_ELIMINABLE_WINNER_EXPIRED:
             "The inner winner expired before the parent match used it, so it is no longer a winner.",
     },
+    innerAction: {
+        labelTxt: "Parent match",
+        winTxt: "Propagate win to parent",
+        wonTxt: "Win propagated",
+        eliminateTxt: "Close parent match",
+        eliminatedTxt: "Parent match closed",
+        winHint:
+            "Anyone can send this call to the parent tournament. It closes the parent match with this tournament's winner, and the caller gets a capped gas refund from the parent's bonds.",
+        eliminateHint:
+            "Anyone can send this call to the parent tournament. It closes the parent match without a winner, and the caller gets a capped gas refund from the parent's bonds.",
+        expiresInTxt: "Call will expire in",
+        blocksTxt: "blocks",
+        unavailableTxt: "Win propagation not available here",
+        relayedJoinHint:
+            "The winner joined the parent tournament through another contract, so its commitment root children can't be read from the join transaction. The call needs them.",
+        winSuccessTxt: "Win propagated to the parent tournament.",
+        eliminateSuccessTxt: "Parent match closed.",
+    },
 } as const;

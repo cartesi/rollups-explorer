@@ -17,7 +17,7 @@ import { toJoinBond, type JoinBond } from "../lib/bondUtils";
  * and whether anything is still being fetched.
  */
 export const useJoinBonds = (
-    tournament: Tournament | null | undefined,
+    tournament: Pick<Tournament, "address"> | null | undefined,
     commitments: Commitment[],
 ) => {
     const config = useConfig();

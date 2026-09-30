@@ -2,6 +2,7 @@ import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
 import { Card, Center, Stack, Switch, Text, Title } from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
+import type { Hash } from "viem";
 import { content } from "../../content";
 import {
     getBondPool,
@@ -9,6 +10,7 @@ import {
     type JoinBond,
 } from "../../lib/bondUtils";
 import { formatMetaSpan } from "../../lib/metaCycleFormat";
+import { getInnerTournamentAction } from "../../lib/disputeActions";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { BondLedger } from "../bond/BondLedger";
 import { BondPool } from "../bond/BondPool";
@@ -16,6 +18,7 @@ import { BondRecoveryDetails } from "../bond/BondRecoveryDetails";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
+import { InnerTournamentAction } from "./InnerTournamentAction";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
 
@@ -39,6 +42,28 @@ export type TournamentBondPool = {
      * Whether the bond value, join bonds or balance are still being fetched.
      */
     loading?: boolean;
+};
+
+export type TournamentParentMatch = {
+    /**
+     * The sealed parent match this inner tournament settles.
+     */
+    match?: Match | null;
+
+    /**
+     * Called once a call settling the parent match is confirmed.
+     */
+    onActionConfirmed?: () => void;
+
+    /**
+     * Root children of the inner winner's parent commitment.
+     */
+    winnerChildren?: readonly [Hash, Hash];
+
+    /**
+     * Whether the winner's root children are still being read.
+     */
+    winnerChildrenLoading?: boolean;
 };
 
 export interface TournamentViewProps {
@@ -68,6 +93,11 @@ export interface TournamentViewProps {
     matches: Match[];
 
     /**
+     * Parent match of an inner tournament, to settle it once finished.
+     */
+    parent?: TournamentParentMatch;
+
+    /**
      * The tournament to display.
      */
     tournament: Tournament;
@@ -80,6 +110,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
         commitments,
         matches,
         onBondRecovered,
+        parent,
         tournament,
     } = props;
 
@@ -117,6 +148,19 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                     </Text>
                 </DetailRow>
                 <TournamentOutcome snapshot={tournament.snapshot} />
+                {getInnerTournamentAction(tournament, parent?.match) && (
+                    <DetailRow label={text.innerAction.labelTxt}>
+                        <InnerTournamentAction
+                            child={tournament}
+                            parentMatch={parent?.match}
+                            winnerChildren={parent?.winnerChildren}
+                            winnerChildrenLoading={
+                                parent?.winnerChildrenLoading
+                            }
+                            onConfirmed={parent?.onActionConfirmed}
+                        />
+                    </DetailRow>
+                )}
             </Stack>
 
             {(bondSettled || bondPool) && (
