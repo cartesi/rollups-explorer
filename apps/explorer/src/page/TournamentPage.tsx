@@ -6,6 +6,7 @@ import PageTitle from "../components/layout/PageTitle";
 import {
     TournamentView,
     type TournamentBondPool,
+    type TournamentParentMatch,
 } from "../components/tournament/TournamentView";
 
 export interface TournamentPageProps {
@@ -35,6 +36,11 @@ export interface TournamentPageProps {
     matches: Match[];
 
     /**
+     * Parent match of an inner tournament, to settle it once finished.
+     */
+    parent?: TournamentParentMatch;
+
+    /**
      * Tournament to display.
      */
     tournament: Tournament;
@@ -47,6 +53,7 @@ export const TournamentPage: FC<TournamentPageProps> = (props) => {
         commitments,
         matches,
         onBondRecovered,
+        parent,
         tournament,
     } = props;
     return (
@@ -55,6 +62,7 @@ export const TournamentPage: FC<TournamentPageProps> = (props) => {
             <TournamentView
                 bondEvents={bondEvents}
                 bondPool={bondPool}
+                parent={parent}
                 onBondRecovered={onBondRecovered}
                 commitments={commitments}
                 matches={matches}

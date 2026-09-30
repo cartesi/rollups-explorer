@@ -11,6 +11,16 @@ import {
 } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
 
+vi.mock("next/navigation", () => ({
+    useParams: () => ({ application: "app", epochIndex: "0" }),
+}));
+
+vi.mock("../../../src/components/tournament/InnerTournamentAction", () => ({
+    InnerTournamentAction: () => (
+        <button type="button">Close parent match</button>
+    ),
+}));
+
 vi.mock("wagmi", async () => {
     const actual = await vi.importActual("wagmi");
     return { ...actual, useConfig: () => ({ chains: [foundry] }) };
@@ -93,5 +103,38 @@ describe("MatchView", () => {
         );
 
         expect(screen.queryByText("Bonds")).not.toBeInTheDocument();
+    });
+
+    it("should offer closing the match once its sub tournament is eliminable", () => {
+        const subTournament = createTournament({
+            address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+            level: 1n,
+            parentTournamentAddress: tournament.address,
+            parentMatchIdHash: match.idHash,
+            log2step: 27n,
+            height: 17n,
+            snapshot: {
+                standing: "INNER_ELIMINABLE_NO_WINNER",
+                innerResult: {
+                    disposition: "ELIMINABLE",
+                    parentCommitment: null,
+                    pausedAllowance: 0n,
+                },
+            },
+        });
+
+        render(
+            <MatchView
+                advances={[]}
+                match={match}
+                now={Date.now()}
+                subTournament={subTournament}
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.getByRole("button", { name: "Close parent match" }),
+        ).toBeInTheDocument();
     });
 });

@@ -19,6 +19,7 @@ import {
     useState,
     type FC,
     type ReactElement,
+    type ReactNode,
 } from "react";
 import { TbArrowUp } from "react-icons/tb";
 import {
@@ -56,6 +57,11 @@ interface MatchActionsProps {
      * Accounts that deposited the bonds of the match claims.
      */
     depositors?: Depositor[];
+
+    /**
+     * Call settling the match once its sub tournament finished.
+     */
+    innerAction?: ReactNode;
 
     /**
      * The match to display actions for
@@ -102,6 +108,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const {
         advances,
         depositors,
+        innerAction,
         match,
         now,
         refunds,
@@ -281,6 +288,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                 ))}
                 {subTournament && (
                     <SubTournamentItem
+                        action={innerAction}
                         claim={nextClaim}
                         key="sub-tournament"
                         tournament={subTournament}

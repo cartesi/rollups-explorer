@@ -14,6 +14,8 @@ import { JoinBonds } from "../bond/JoinBonds";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
+import { getInnerTournamentAction } from "../../lib/disputeActions";
+import { InnerTournamentAction } from "../tournament/InnerTournamentAction";
 import { MatchActions } from "./MatchActions";
 import { MatchState } from "./MatchState";
 
@@ -102,6 +104,11 @@ export const MatchView: FC<MatchViewProps> = (props) => {
     } = props;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
+    const innerAction = subTournament
+        ? getInnerTournamentAction(subTournament, match)
+        : null;
+    const innerWinner =
+        innerAction?.kind === "win" ? innerAction.parentCommitment : undefined;
     const depositors = commitments.map((commitment) => ({
         commitment: commitment.commitment,
         depositor: commitment.submitterAddress,
@@ -151,6 +158,22 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 <MatchActions
                     advances={advances}
                     depositors={depositors}
+                    innerAction={
+                        subTournament &&
+                        innerAction && (
+                            <InnerTournamentAction
+                                child={subTournament}
+                                parentMatch={match}
+                                winnerChildren={
+                                    innerWinner
+                                        ? joinBonds?.get(innerWinner)?.children
+                                        : undefined
+                                }
+                                winnerChildrenLoading={joinBondsLoading}
+                                onConfirmed={onActionConfirmed}
+                            />
+                        )
+                    }
                     match={match}
                     now={now}
                     refunds={refunds}

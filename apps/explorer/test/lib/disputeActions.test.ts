@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { keccak256, toHex } from "viem";
 import {
+    getInnerTournamentAction,
+    getInnerWinExpiry,
     getMatchTimeoutAction,
     getTimeoutWinExpiry,
 } from "../../src/lib/disputeActions";
@@ -7,6 +10,7 @@ import {
     createCommitment,
     createMatch,
     createMatchSnapshot,
+    createTournament,
 } from "../../src/stories/prt";
 
 const withOutcome = (
@@ -79,5 +83,74 @@ describe("getTimeoutWinExpiry", () => {
                 createCommitment({ snapshot: { clockAllowance: 320n } }),
             ),
         ).toBeUndefined();
+    });
+});
+
+const parentCommitment = keccak256(toHex("parent"));
+const child = (
+    disposition: "UNSETTLED" | "WINNER" | "ELIMINABLE",
+    winnerExpiresAt = 180n,
+) =>
+    createTournament({
+        level: 1n,
+        parentTournamentAddress: "0x61bCAb9d0D8b554009824292d2d6855DfA3AAB86",
+        parentMatchIdHash: keccak256(toHex("match")),
+        snapshot: {
+            asOfBlock: 100n,
+            winnerExpiresAt,
+            innerResult: {
+                disposition,
+                parentCommitment:
+                    disposition === "WINNER" ? parentCommitment : null,
+                pausedAllowance: 500n,
+            },
+        },
+    });
+const sealed = createMatch({
+    snapshot: createMatchSnapshot({ phase: "UNINITIALIZED" }),
+});
+
+describe("getInnerTournamentAction", () => {
+    it("should propagate a live winner to the parent", () => {
+        expect(getInnerTournamentAction(child("WINNER"), sealed)).toEqual({
+            kind: "win",
+            parentCommitment,
+        });
+    });
+
+    it("should close the parent match when the inner tournament is eliminable", () => {
+        expect(getInnerTournamentAction(child("ELIMINABLE"), sealed)).toEqual({
+            kind: "eliminate",
+        });
+    });
+
+    it("should offer nothing for an expired, unsettled or already settled result", () => {
+        expect(
+            getInnerTournamentAction(child("WINNER", 100n), sealed),
+        ).toBeNull();
+        expect(getInnerTournamentAction(child("UNSETTLED"), sealed)).toBeNull();
+        expect(
+            getInnerTournamentAction(child("WINNER"), {
+                ...sealed,
+                deletionReason: "CHILD_TOURNAMENT",
+            }),
+        ).toBeNull();
+    });
+
+    it("should offer nothing without the parent match or for a root", () => {
+        expect(getInnerTournamentAction(child("WINNER"))).toBeNull();
+        expect(
+            getInnerTournamentAction(
+                { ...child("WINNER"), parentTournamentAddress: null },
+                sealed,
+            ),
+        ).toBeNull();
+    });
+});
+
+describe("getInnerWinExpiry", () => {
+    it("should count the blocks left before the winner expires", () => {
+        expect(getInnerWinExpiry(child("WINNER"))).toBe(80n);
+        expect(getInnerWinExpiry(child("WINNER", 100n))).toBeUndefined();
     });
 });

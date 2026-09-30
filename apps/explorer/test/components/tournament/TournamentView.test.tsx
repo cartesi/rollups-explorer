@@ -4,6 +4,7 @@ import { TournamentView } from "../../../src/components/tournament/TournamentVie
 import {
     createCommitment,
     createJoinBond,
+    createMatch,
     createTournament,
 } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
@@ -17,6 +18,12 @@ vi.mock("wagmi", async () => {
     const actual = await vi.importActual("wagmi");
     return { ...actual, useConfig: () => ({ chains: [foundry] }) };
 });
+
+vi.mock("../../../src/components/tournament/InnerTournamentAction", () => ({
+    InnerTournamentAction: () => (
+        <button type="button">Propagate win to parent</button>
+    ),
+}));
 
 vi.mock("../../../src/components/bond/BondRecoveryAction", () => ({
     BondRecoveryAction: () => <button type="button">Recover bond</button>,
@@ -95,5 +102,54 @@ describe("TournamentView", () => {
         expect(screen.getByText("Deposited")).toBeInTheDocument();
         expect(screen.getByText("0.02 ETH")).toBeInTheDocument();
         expect(screen.queryByText("Status")).not.toBeInTheDocument();
+    });
+
+    it("should offer settling the parent match of a finished inner tournament", () => {
+        const parentMatch = createMatch();
+        const inner = createTournament({
+            level: 1n,
+            parentTournamentAddress:
+                "0x61bCAb9d0D8b554009824292d2d6855DfA3AAB86",
+            parentMatchIdHash: parentMatch.idHash,
+            snapshot: {
+                standing: "INNER_WINNER",
+                winnerExpiresAt: 180n,
+                innerResult: {
+                    disposition: "WINNER",
+                    parentCommitment: parentMatch.commitmentOne,
+                    pausedAllowance: 500n,
+                },
+            },
+        });
+
+        const { rerender } = render(
+            <TournamentView
+                commitments={[]}
+                matches={[]}
+                parent={{ match: parentMatch }}
+                tournament={inner}
+            />,
+        );
+
+        expect(screen.getByText("Parent match")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Propagate win to parent" }),
+        ).toBeInTheDocument();
+
+        rerender(
+            <TournamentView
+                commitments={[]}
+                matches={[]}
+                parent={{
+                    match: {
+                        ...parentMatch,
+                        deletionReason: "CHILD_TOURNAMENT",
+                    },
+                }}
+                tournament={inner}
+            />,
+        );
+
+        expect(screen.queryByText("Parent match")).not.toBeInTheDocument();
     });
 });
