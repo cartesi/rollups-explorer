@@ -28,6 +28,20 @@ export const matchMessages = {
         TWO_WINS: "Commitment two can win by timeout",
         ELIMINATE_BOTH: "Both commitments can be eliminated by timeout",
     },
+    timeoutAction: {
+        winTxt: "Claim win by timeout",
+        wonTxt: "Win claimed",
+        eliminateTxt: "Eliminate both claims",
+        eliminatedTxt: "Claims eliminated",
+        hint: "Anyone can send this call. The contract checks the timeout itself, and the caller gets a capped gas refund from the tournament's bonds.",
+        expiresInTxt: "Call will expire in",
+        blocksTxt: "blocks",
+        unavailableTxt: "Timeout win not available here",
+        relayedJoinHint:
+            "The winner joined through another contract, so its commitment root children can't be read from the join transaction. The win needs them.",
+        winSuccessTxt: "Timeout win confirmed.",
+        eliminateSuccessTxt: "Elimination confirmed.",
+    },
     leafSeal: {
         atBlockTxt: "at block",
         eliminableAtBlockTxt: "both eliminable at block",

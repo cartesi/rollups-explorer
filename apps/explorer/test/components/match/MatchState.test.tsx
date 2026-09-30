@@ -1,14 +1,24 @@
-import { zeroAddress } from "viem";
-import { describe, expect, it } from "vitest";
+import { keccak256, toHex, zeroAddress } from "viem";
+import { describe, expect, it, vi } from "vitest";
 import { MatchState } from "../../../src/components/match/MatchState";
 import {
     createBisection,
     createCommitment,
+    createJoinBond,
     createMatch,
     createMatchSnapshot,
     createTournament,
 } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
+
+const mocks = vi.hoisted(() => ({ MatchTimeoutAction: vi.fn() }));
+
+vi.mock("../../../src/components/match/MatchTimeoutAction", () => ({
+    MatchTimeoutAction: (props: unknown) => {
+        mocks.MatchTimeoutAction(props);
+        return <button type="button">Claim win by timeout</button>;
+    },
+}));
 
 const tournament = createTournament({ height: 48n, log2step: 44n });
 
@@ -117,5 +127,45 @@ describe("MatchState", () => {
         ).toBeInTheDocument();
         expect(screen.queryByText("Clocks")).not.toBeInTheDocument();
         expect(screen.queryByText("Responder")).not.toBeInTheDocument();
+    });
+
+    it("should offer the timeout call with the winner's root children", () => {
+        const survivor = createCommitment({
+            commitment: bisecting.commitmentOne,
+            snapshot: { asOfBlock: 1200n, clockAllowance: 320n },
+        });
+        const children = [
+            keccak256(toHex("left")),
+            keccak256(toHex("right")),
+        ] as const;
+        render(
+            <MatchState
+                commitments={[survivor]}
+                joinBonds={
+                    new Map([
+                        [
+                            bisecting.commitmentOne,
+                            createJoinBond(survivor, { children }),
+                        ],
+                    ])
+                }
+                match={{
+                    ...bisecting,
+                    snapshot: { ...bisecting.snapshot, deferredCharge: 20n },
+                }}
+                tournament={tournament}
+            />,
+        );
+
+        expect(
+            screen.getByRole("button", { name: "Claim win by timeout" }),
+        ).toBeInTheDocument();
+        expect(mocks.MatchTimeoutAction).toHaveBeenCalledWith(
+            expect.objectContaining({
+                winnerChildren: children,
+                expiresIn: 300n,
+                tournamentAddress: tournament.address,
+            }),
+        );
     });
 });
