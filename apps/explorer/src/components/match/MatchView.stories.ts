@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { createElement } from "react";
 import * as TournamentStories from "../tournament/TournamentView.stories";
+import { keccak256, toHex } from "viem";
 import { randomAdvances } from "../../stories/data";
 import {
     createCommitment,
@@ -60,10 +61,27 @@ export const NoActions: Story = {
     },
 };
 
+const timeoutCommitments = [
+    createCommitment({
+        commitment: match.commitmentOne,
+        snapshot: { asOfBlock: 1200n, clockAllowance: 320n },
+    }),
+    createCommitment({
+        commitment: match.commitmentTwo,
+        snapshot: {
+            asOfBlock: 1200n,
+            clockRunning: true,
+            clockDeadline: 1180n,
+        },
+    }),
+];
+
 /**
- * Commitment two ran out of time and commitment one can claim the win.
+ * Commitment two ran out of time 20 blocks ago, and anyone can claim the win
+ * for commitment one before its own 320 blocks are used up.
  */
 export const TimeoutPending: Story = {
+    parameters: { connectionType: "system" },
     args: {
         ...Ongoing.args,
         match: {
@@ -73,22 +91,21 @@ export const TimeoutPending: Story = {
                 advances,
                 asOfBlock: 1200n,
                 timeoutOutcome: "ONE_WINS",
+                deferredCharge: 20n,
             }),
         },
-        commitments: [
-            createCommitment({
-                commitment: match.commitmentOne,
-                snapshot: { asOfBlock: 1200n, clockAllowance: 320n },
-            }),
-            createCommitment({
-                commitment: match.commitmentTwo,
-                snapshot: {
-                    asOfBlock: 1200n,
-                    clockRunning: true,
-                    clockDeadline: 1180n,
-                },
-            }),
-        ],
+        commitments: timeoutCommitments,
+        joinBonds: new Map([
+            [
+                match.commitmentOne,
+                createJoinBond(timeoutCommitments[0], {
+                    children: [
+                        keccak256(toHex("one-left")),
+                        keccak256(toHex("one-right")),
+                    ],
+                }),
+            ],
+        ]),
     },
 };
 

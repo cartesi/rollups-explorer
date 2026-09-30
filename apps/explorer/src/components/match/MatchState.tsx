@@ -1,8 +1,13 @@
 import type { Commitment, Match, Tournament } from "@cartesi/client";
 import { Badge, Group, Stack, Text, type MantineColor } from "@mantine/core";
 import type { FC } from "react";
-import { zeroAddress } from "viem";
+import { zeroAddress, type Hash } from "viem";
 import { content } from "../../content";
+import type { JoinBond } from "../../lib/bondUtils";
+import {
+    getMatchTimeoutAction,
+    getTimeoutWinExpiry,
+} from "../../lib/disputeActions";
 import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import {
     getBlocksLeft,
@@ -16,6 +21,7 @@ import { DetailRow } from "../DetailRow";
 import { InfoHint } from "../InfoHint";
 import { LongText } from "../LongText";
 import { MetaCycle } from "../MetaCycle";
+import { MatchTimeoutAction } from "./MatchTimeoutAction";
 
 export interface MatchStateProps {
     /**
@@ -24,9 +30,24 @@ export interface MatchStateProps {
     commitments?: Commitment[];
 
     /**
+     * Bonds the two commitments posted on join, with their root children.
+     */
+    joinBonds?: Map<Hash, JoinBond>;
+
+    /**
+     * Whether the join bonds are still being read.
+     */
+    joinBondsLoading?: boolean;
+
+    /**
      * The match to display the state for.
      */
     match: Match;
+
+    /**
+     * Called once a timeout call sent from the match is confirmed.
+     */
+    onActionConfirmed?: () => void;
 
     /**
      * The tournament the match belongs to.
@@ -80,13 +101,21 @@ const CommitmentClock: FC<{ commitment: Commitment }> = ({ commitment }) => {
 
 export const MatchState: FC<MatchStateProps> = ({
     commitments = [],
+    joinBonds,
+    joinBondsLoading,
     match,
+    onActionConfirmed,
     tournament,
 }) => {
     const { snapshot } = match;
     const deleted = match.deletionReason !== "NOT_DELETED";
     const responder = getResponder(match);
     const segment = getSegmentRange(match, tournament);
+    const timeoutAction = getMatchTimeoutAction(match);
+    const winner =
+        timeoutAction?.kind === "win"
+            ? getCommitment(match, timeoutAction.side)
+            : undefined;
 
     return (
         <Stack gap="xs">
@@ -159,9 +188,28 @@ export const MatchState: FC<MatchStateProps> = ({
             )}
             {!deleted && snapshot.timeoutOutcome !== "NONE" && (
                 <DetailRow label="">
-                    <Text c="orange">
-                        {text.timeoutOutcome[snapshot.timeoutOutcome]}
-                    </Text>
+                    <Stack gap="xs">
+                        <Text c="orange">
+                            {text.timeoutOutcome[snapshot.timeoutOutcome]}
+                        </Text>
+                        <MatchTimeoutAction
+                            match={match}
+                            tournamentAddress={tournament.address}
+                            winnerChildren={
+                                winner
+                                    ? joinBonds?.get(winner)?.children
+                                    : undefined
+                            }
+                            winnerChildrenLoading={joinBondsLoading}
+                            expiresIn={getTimeoutWinExpiry(
+                                match,
+                                commitments.find(
+                                    ({ commitment }) => commitment === winner,
+                                ),
+                            )}
+                            onConfirmed={onActionConfirmed}
+                        />
+                    </Stack>
                 </DetailRow>
             )}
             {!deleted && snapshot.deferredCharge > 0n && (

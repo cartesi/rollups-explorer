@@ -196,6 +196,15 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     commitments={commitments}
                     joinBonds={joinBonds.bonds}
                     joinBondsLoading={joinBonds.isLoading}
+                    onActionConfirmed={() => {
+                        tournamentQuery.refetch();
+                        matchQuery.refetch();
+                        advancesQuery.refetch();
+                        subTournamentQuery.refetch();
+                        commitmentOneQuery.refetch();
+                        commitmentTwoQuery.refetch();
+                        bondEventsQuery.refetch();
+                    }}
                     tournament={tournament}
                     refunds={refunds}
                     subTournament={subTournament}

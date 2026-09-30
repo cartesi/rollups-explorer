@@ -39,6 +39,11 @@ export interface MatchPageProps {
     match: Match;
 
     /**
+     * Called once a dispute call sent from the match is confirmed.
+     */
+    onActionConfirmed?: () => void;
+
+    /**
      * Partial bond refunds of the tournament, by transaction hash.
      */
     refunds?: Map<Hash, PartialBondRefundEvent>;
@@ -80,6 +85,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
         commitments,
         joinBonds,
         joinBondsLoading,
+        onActionConfirmed,
         tournament,
         match,
         refunds,
@@ -98,6 +104,7 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
                 commitments={commitments}
                 joinBonds={joinBonds}
                 joinBondsLoading={joinBondsLoading}
+                onActionConfirmed={onActionConfirmed}
                 match={match}
                 now={now}
                 refunds={refunds}

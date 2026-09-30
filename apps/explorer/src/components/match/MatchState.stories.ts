@@ -4,6 +4,7 @@ import { keccak256, toHex, zeroAddress } from "viem";
 import { randomAdvances } from "../../stories/data";
 import {
     createCommitment,
+    createJoinBond,
     createMatch,
     createMatchSnapshot,
     createMatchState,
@@ -117,35 +118,96 @@ export const LeafSealed: Story = {
     },
 };
 
+const children = (side: string) =>
+    [
+        keccak256(toHex(`${side}-left`)),
+        keccak256(toHex(`${side}-right`)),
+    ] as const;
+
+const joinBonds = new Map(
+    clocks.map((commitment, index) => [
+        commitment.commitment,
+        createJoinBond(commitment, { children: children(`${index}`) }),
+    ]),
+);
+
+const timeoutClocks = (expired: "ONE" | "TWO", deadline: bigint) =>
+    [match.commitmentOne, match.commitmentTwo].map((commitment, index) =>
+        createCommitment({
+            commitment,
+            snapshot:
+                (index === 0) === (expired === "ONE")
+                    ? {
+                          asOfBlock: 1200n,
+                          clockRunning: true,
+                          clockDeadline: deadline,
+                      }
+                    : { asOfBlock: 1200n, clockAllowance: 320n },
+        }),
+    );
+
+/**
+ * Commitment two's deadline passed 20 blocks ago. Anyone can claim the win
+ * for commitment one, charged those 20 blocks, before its own 320 run out.
+ */
 export const TimeoutOneWins: Story = {
+    parameters: { connectionType: "system" },
     args: {
         tournament,
         match: {
             ...match,
-            snapshot: bisecting({ timeoutOutcome: "ONE_WINS" }),
+            snapshot: bisecting({
+                timeoutOutcome: "ONE_WINS",
+                deferredCharge: 20n,
+            }),
         },
-        commitments: clocks,
+        commitments: timeoutClocks("TWO", 1180n),
+        joinBonds,
     },
 };
 
+/**
+ * Commitment one's deadline passed, and the win goes to commitment two.
+ */
 export const TimeoutTwoWins: Story = {
+    parameters: { connectionType: "system" },
     args: {
         tournament,
         match: {
             ...match,
-            snapshot: bisecting({ timeoutOutcome: "TWO_WINS" }, "ONE"),
+            snapshot: bisecting(
+                { timeoutOutcome: "TWO_WINS", deferredCharge: 20n },
+                "ONE",
+            ),
         },
+        commitments: timeoutClocks("ONE", 1180n),
+        joinBonds,
     },
 };
 
+/**
+ * Commitment two is 400 blocks overdue, more than commitment one's 320 left,
+ * so neither can survive and anyone can eliminate both.
+ */
 export const EliminateBoth: Story = {
+    parameters: { connectionType: "system" },
     args: {
         tournament,
         match: {
             ...match,
             snapshot: bisecting({ timeoutOutcome: "ELIMINATE_BOTH" }),
         },
+        commitments: timeoutClocks("TWO", 800n),
     },
+};
+
+/**
+ * The winner joined through another contract, so the win cannot be sent from
+ * the explorer.
+ */
+export const TimeoutWinRelayedJoin: Story = {
+    ...TimeoutOneWins,
+    args: { ...TimeoutOneWins.args, joinBonds: undefined },
 };
 
 export const DeferredCharge: Story = {

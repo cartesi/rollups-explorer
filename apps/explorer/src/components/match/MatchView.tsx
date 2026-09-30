@@ -44,6 +44,11 @@ export interface MatchViewProps {
     match: Match;
 
     /**
+     * Called once a dispute call sent from the match is confirmed.
+     */
+    onActionConfirmed?: () => void;
+
+    /**
      * Partial bond refunds of the tournament, by transaction hash.
      */
     refunds?: Map<Hash, PartialBondRefundEvent>;
@@ -85,6 +90,7 @@ export const MatchView: FC<MatchViewProps> = (props) => {
         commitments = [],
         joinBonds,
         joinBondsLoading,
+        onActionConfirmed,
         tournament,
         match,
         refunds,
@@ -131,6 +137,9 @@ export const MatchView: FC<MatchViewProps> = (props) => {
                 )}
                 <MatchState
                     commitments={commitments}
+                    joinBonds={joinBonds}
+                    joinBondsLoading={joinBondsLoading}
+                    onActionConfirmed={onActionConfirmed}
                     match={match}
                     tournament={tournament}
                 />
