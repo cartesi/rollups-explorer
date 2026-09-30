@@ -1,7 +1,18 @@
 import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
-import { Card, Center, Stack, Switch, Text, Title } from "@mantine/core";
+import {
+    Badge,
+    Card,
+    Center,
+    Stack,
+    Switch,
+    Tabs,
+    Text,
+    Title,
+    useMantineTheme,
+} from "@mantine/core";
 import { isEmpty } from "ramda";
 import { useState, type FC } from "react";
+import { TbCoins, TbSwords } from "react-icons/tb";
 import type { Hash } from "viem";
 import { content } from "../../content";
 import {
@@ -17,7 +28,9 @@ import { BondPool } from "../bond/BondPool";
 import { BondRecoveryDetails } from "../bond/BondRecoveryDetails";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
+import { EnterTransition } from "../EnterTransition";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
+import TweenedNumber from "../TweenedNumber";
 import { InnerTournamentAction } from "./InnerTournamentAction";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
@@ -66,11 +79,19 @@ export type TournamentParentMatch = {
     winnerChildrenLoading?: boolean;
 };
 
+export type TournamentTab = "matches" | "bonds";
+
 export interface TournamentViewProps {
     /**
      * Bond refund and recovery events of the tournament.
      */
     bondEvents?: BondEvent[];
+
+    /**
+     * Total bond events of the tournament, as reported by the node. Defaults
+     * to the number of events given.
+     */
+    bondEventsTotal?: number;
 
     /**
      * Bonds deposited into the tournament and its balance.
@@ -93,9 +114,25 @@ export interface TournamentViewProps {
     matches: Match[];
 
     /**
+     * Total matches of the tournament, as reported by the node. Defaults to
+     * the number of matches given.
+     */
+    matchesTotal?: number;
+
+    /**
+     * Called when another tab is selected.
+     */
+    onTabChange?: (tab: TournamentTab) => void;
+
+    /**
      * Parent match of an inner tournament, to settle it once finished.
      */
     parent?: TournamentParentMatch;
+
+    /**
+     * The selected tab. Without it, the view keeps its own selection.
+     */
+    tab?: TournamentTab;
 
     /**
      * The tournament to display.
@@ -106,15 +143,22 @@ export interface TournamentViewProps {
 export const TournamentView: FC<TournamentViewProps> = (props) => {
     const {
         bondEvents = [],
+        bondEventsTotal = bondEvents.length,
         bondPool,
         commitments,
         matches,
+        matchesTotal = matches.length,
         onBondRecovered,
+        onTabChange,
         parent,
+        tab,
         tournament,
     } = props;
 
+    const theme = useMantineTheme();
     const [hideWinners, setHideWinners] = useState(false);
+    const [ownTab, setOwnTab] = useState<TournamentTab>("matches");
+    const activeTab = tab ?? ownTab;
     const noCommitments = isEmpty(commitments);
     const text = content.tournament;
     const bondSettled =
@@ -189,39 +233,75 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                 </Stack>
             )}
 
-            <Stack gap="sm">
-                <Title order={3} c="dimmed">
-                    {text.matchesTxt}
-                </Title>
-                <Switch
-                    label={text.showPendingMatchesTxt}
-                    labelPosition="left"
-                    size="md"
-                    checked={hideWinners}
-                    onChange={(event) =>
-                        setHideWinners(event.currentTarget.checked)
-                    }
-                />
-                <TournamentTable
-                    candidate={tournament.snapshot.candidate}
-                    matches={matches}
-                    hideWinners={hideWinners}
-                />
-                {noCommitments && (
-                    <Card>
-                        <Center>
-                            <Title order={3}>{text.noClaimsTxt}</Title>
-                        </Center>
-                    </Card>
-                )}
-            </Stack>
+            <Tabs
+                value={activeTab}
+                onChange={(value) => {
+                    const next = value === "bonds" ? "bonds" : "matches";
+                    setOwnTab(next);
+                    onTabChange?.(next);
+                }}
+                keepMounted={false}
+            >
+                <Tabs.List>
+                    <Tabs.Tab
+                        value="matches"
+                        leftSection={<TbSwords size={theme.other.smIconSize} />}
+                        rightSection={
+                            <Badge size="sm" variant="light">
+                                <TweenedNumber value={matchesTotal} />
+                            </Badge>
+                        }
+                    >
+                        {text.tabs.matchesTxt}
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                        value="bonds"
+                        leftSection={<TbCoins size={theme.other.smIconSize} />}
+                        rightSection={
+                            <Badge size="sm" variant="light">
+                                <TweenedNumber value={bondEventsTotal} />
+                            </Badge>
+                        }
+                    >
+                        {text.tabs.bondsTxt}
+                    </Tabs.Tab>
+                </Tabs.List>
 
-            <Stack gap="sm">
-                <Title order={3} c="dimmed">
-                    {text.bondEventsTxt}
-                </Title>
-                <BondLedger events={bondEvents} />
-            </Stack>
+                <Tabs.Panel value="matches" pt="md">
+                    <EnterTransition>
+                        <Stack gap="sm">
+                            <Switch
+                                label={text.showPendingMatchesTxt}
+                                labelPosition="left"
+                                size="md"
+                                checked={hideWinners}
+                                onChange={(event) =>
+                                    setHideWinners(event.currentTarget.checked)
+                                }
+                            />
+                            <TournamentTable
+                                candidate={tournament.snapshot.candidate}
+                                matches={matches}
+                                hideWinners={hideWinners}
+                            />
+                            {noCommitments && (
+                                <Card>
+                                    <Center>
+                                        <Title order={3}>
+                                            {text.noClaimsTxt}
+                                        </Title>
+                                    </Center>
+                                </Card>
+                            )}
+                        </Stack>
+                    </EnterTransition>
+                </Tabs.Panel>
+                <Tabs.Panel value="bonds" pt="md">
+                    <EnterTransition>
+                        <BondLedger events={bondEvents} />
+                    </EnterTransition>
+                </Tabs.Panel>
+            </Tabs>
         </Stack>
     );
 };

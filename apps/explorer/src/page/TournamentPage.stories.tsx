@@ -163,3 +163,8 @@ export const TopLevelBondPoolNoWinner: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.BondPoolNoWinner.args,
 };
+
+export const TopLevelBondsTab: Story = {
+    render: WithBreadcrumb,
+    args: { ...TopLevelDisputeWithRefunds.args, tab: "bonds" },
+};

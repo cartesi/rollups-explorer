@@ -2,12 +2,13 @@ import { foundry } from "viem/chains";
 import { describe, expect, it, vi } from "vitest";
 import { TournamentView } from "../../../src/components/tournament/TournamentView";
 import {
+    createBondEvent,
     createCommitment,
     createJoinBond,
     createMatch,
     createTournament,
 } from "../../../src/stories/prt";
-import { render, screen } from "../../test-utils";
+import { fireEvent, render, screen } from "../../test-utils";
 
 vi.mock("next/navigation", () => ({
     usePathname: () => "/tournament",
@@ -30,19 +31,87 @@ vi.mock("../../../src/components/bond/BondRecoveryAction", () => ({
 }));
 
 describe("TournamentView", () => {
-    it("should show the details and titled sections", () => {
+    it("should show the details, then matches and bonds tabs with totals", () => {
         render(
             <TournamentView
+                bondEvents={[createBondEvent()]}
+                bondEventsTotal={14}
                 commitments={[]}
-                matches={[]}
+                matches={[createMatch()]}
+                matchesTotal={4}
                 tournament={createTournament()}
             />,
         );
 
         expect(screen.getByText("Level")).toBeInTheDocument();
         expect(screen.getByText("Standing")).toBeInTheDocument();
-        expect(screen.getByText("Matches")).toBeInTheDocument();
-        expect(screen.getByText("Bond events")).toBeInTheDocument();
+        expect(
+            screen.getByRole("tab", { name: /Matches\s*4/ }),
+        ).toHaveAttribute("aria-selected", "true");
+        expect(
+            screen.getByRole("tab", { name: /Bonds\s*14/ }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("Show only eliminated and pending matches"),
+        ).toBeInTheDocument();
+        expect(screen.queryByText("Block")).not.toBeInTheDocument();
+    });
+
+    it("should count what it was given without node totals", () => {
+        render(
+            <TournamentView
+                bondEvents={[createBondEvent(), createBondEvent()]}
+                commitments={[]}
+                matches={[createMatch()]}
+                tournament={createTournament()}
+            />,
+        );
+
+        expect(
+            screen.getByRole("tab", { name: /Matches\s*1/ }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("tab", { name: /Bonds\s*2/ }),
+        ).toBeInTheDocument();
+    });
+
+    it("should switch to the bond events and report the tab", () => {
+        const onTabChange = vi.fn();
+        render(
+            <TournamentView
+                bondEvents={[createBondEvent()]}
+                commitments={[]}
+                matches={[]}
+                onTabChange={onTabChange}
+                tournament={createTournament()}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole("tab", { name: /Bonds/ }));
+
+        expect(onTabChange).toHaveBeenCalledWith("bonds");
+        expect(screen.getByText("Block")).toBeInTheDocument();
+        expect(
+            screen.queryByText("Show only eliminated and pending matches"),
+        ).not.toBeInTheDocument();
+    });
+
+    it("should open on the tab it is given", () => {
+        render(
+            <TournamentView
+                bondEvents={[createBondEvent()]}
+                commitments={[]}
+                matches={[]}
+                tab="bonds"
+                tournament={createTournament()}
+            />,
+        );
+
+        expect(screen.getByRole("tab", { name: /Bonds/ })).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+        expect(screen.getByText("Block")).toBeInTheDocument();
     });
 
     it("should leave out the bond section while the tournament runs", () => {

@@ -704,3 +704,17 @@ export const BondPoolNoWinner: Story = {
         },
     },
 };
+
+/**
+ * The bonds tab lists the tournament's bond events.
+ */
+export const BondsTab: Story = {
+    args: { ...RefundsOngoing.args, tab: "bonds" },
+};
+
+/**
+ * The bonds tab of a tournament without bond events yet.
+ */
+export const BondsTabEmpty: Story = {
+    args: { ...Ongoing.args, tab: "bonds" },
+};

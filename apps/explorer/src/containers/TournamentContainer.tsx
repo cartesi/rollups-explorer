@@ -7,7 +7,7 @@ import {
     useMatches,
     useTournament,
 } from "@cartesi/react";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { isNotNil } from "ramda";
 import type { FC } from "react";
 import { useBalance } from "wagmi";
@@ -27,6 +27,9 @@ import { ContainerSkeleton } from "./ContainerSkeleton";
 import ContainerStack from "./ContainerStack";
 
 export const TournamentContainer: FC<TournamentParams> = (params) => {
+    const searchParams = useSearchParams();
+    const tab = searchParams.get("tab") === "bonds" ? "bonds" : "matches";
+
     const tournamentQuery = useTournament({
         application: params.application,
         address: params.tournamentAddress,
@@ -170,6 +173,11 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             {!!tournament && (
                 <TournamentPage
                     bondEvents={bondEventsQuery.data?.data}
+                    bondEventsTotal={
+                        bondEventsQuery.data?.pagination.totalCount
+                    }
+                    matchesTotal={matches?.pagination.totalCount}
+                    tab={tab}
                     bondPool={{
                         balance: balanceQuery.data?.value,
                         bondValue: joinBonds.bondValue,
