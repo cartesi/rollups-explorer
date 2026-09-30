@@ -91,31 +91,42 @@ export type JoinBond = {
     txHash: Hash;
     value: bigint;
     exact: boolean;
+    /**
+     * Root children of the commitment, read from a direct join.
+     */
+    children?: readonly [Hash, Hash];
 };
 
 export type Depositor = Pick<JoinBond, "commitment" | "depositor">;
 
-const isDirectJoin = (
+/**
+ * Decode a direct `joinTournament` call to the tournament.
+ * @returns the commitment root children, or `undefined` for any other call.
+ */
+const decodeDirectJoin = (
     tournament: Address,
     transaction: Pick<Transaction, "to" | "input">,
-) => {
+): readonly [Hash, Hash] | undefined => {
     if (!transaction.to || !isAddressEqual(transaction.to, tournament)) {
-        return false;
+        return undefined;
     }
     try {
-        return (
-            decodeFunctionData({ abi: iTournamentAbi, data: transaction.input })
-                .functionName === "joinTournament"
-        );
+        const call = decodeFunctionData({
+            abi: iTournamentAbi,
+            data: transaction.input,
+        });
+        return call.functionName === "joinTournament"
+            ? [call.args[2], call.args[3]]
+            : undefined;
     } catch {
-        return false;
+        return undefined;
     }
 };
 
 /**
  * The bond a commitment posted on join. A direct `joinTournament` call carries
- * the exact amount; a join sent through another contract only guarantees the
- * tournament bond value.
+ * the exact amount and the commitment root children; a join sent through
+ * another contract only guarantees the tournament bond value.
  * @returns the bond, or `undefined` while neither amount is known.
  */
 export const toJoinBond = (
@@ -124,10 +135,11 @@ export const toJoinBond = (
     transaction?: Pick<Transaction, "to" | "input" | "value">,
     bondValue?: bigint,
 ): JoinBond | undefined => {
-    const exact =
-        transaction !== undefined &&
-        isDirectJoin(tournament.address, transaction);
-    const value = exact ? transaction.value : bondValue;
+    const children = transaction
+        ? decodeDirectJoin(tournament.address, transaction)
+        : undefined;
+    const exact = children !== undefined;
+    const value = exact && transaction ? transaction.value : bondValue;
     if (value === undefined) return undefined;
     return {
         commitment: commitment.commitment,
@@ -135,6 +147,7 @@ export const toJoinBond = (
         txHash: commitment.txHash,
         value,
         exact,
+        ...(children && { children }),
     };
 };
 
