@@ -86,6 +86,7 @@ describe("useJoinBonds", () => {
             txHash: direct.txHash,
             value: 25_000_000_000_000_000n,
             exact: true,
+            children: [zeroHash, zeroHash],
         });
     });
 

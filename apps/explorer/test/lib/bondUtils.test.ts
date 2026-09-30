@@ -1,5 +1,5 @@
 import { iTournamentAbi } from "@cartesi/client/abi";
-import { encodeFunctionData, zeroHash } from "viem";
+import { encodeFunctionData, keccak256, toHex, zeroHash } from "viem";
 import { describe, expect, it } from "vitest";
 import {
     formatBondValue,
@@ -100,23 +100,26 @@ describe("toJoinBond", () => {
     const tournament = createTournament();
     const commitment = createCommitment();
     const bondValue = 21_000_000_000_000_000n;
+    const leftNode = keccak256(toHex("left"));
+    const rightNode = keccak256(toHex("right"));
     const join = {
         to: tournament.address,
         input: encodeFunctionData({
             abi: iTournamentAbi,
             functionName: "joinTournament",
-            args: [zeroHash, [], zeroHash, zeroHash],
+            args: [zeroHash, [], leftNode, rightNode],
         }),
         value: 25_000_000_000_000_000n,
     };
 
-    it("should read the exact amount from a direct join", () => {
+    it("should read the exact amount and root children from a direct join", () => {
         expect(toJoinBond(tournament, commitment, join, bondValue)).toEqual({
             commitment: commitment.commitment,
             depositor: commitment.submitterAddress,
             txHash: commitment.txHash,
             value: 25_000_000_000_000_000n,
             exact: true,
+            children: [leftNode, rightNode],
         });
     });
 
@@ -126,9 +129,12 @@ describe("toJoinBond", () => {
             to: "0x9c1e7a3c1d0b8f2e4a6b5c7d8e9f0a1b2c3d33d0",
         } as const;
 
+        expect(toJoinBond(tournament, commitment, relayed, bondValue)).toEqual(
+            expect.objectContaining({ value: bondValue, exact: false }),
+        );
         expect(
-            toJoinBond(tournament, commitment, relayed, bondValue),
-        ).toMatchObject({ value: bondValue, exact: false });
+            toJoinBond(tournament, commitment, relayed, bondValue)?.children,
+        ).toBeUndefined();
     });
 
     it("should use the bond value for another call to the tournament", () => {
