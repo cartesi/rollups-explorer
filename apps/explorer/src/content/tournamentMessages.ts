@@ -4,7 +4,10 @@
 export const tournamentMessages = {
     levelTxt: "Level",
     cycleRangeTxt: "Cycle range",
-    matchesTxt: "Matches",
+    tabs: {
+        matchesTxt: "Matches",
+        bondsTxt: "Bonds",
+    },
     showPendingMatchesTxt: "Show only eliminated and pending matches",
     noClaimsTxt: "No claims submitted",
     leafSizeTxt: "Leaf size",
@@ -29,7 +32,6 @@ export const tournamentMessages = {
         inputSlotHint:
             "An input slot within the epoch: slot 0 holds the epoch's first input. Every slot has the same fixed capacity, and slots after the epoch's last input are padding with no input.",
     },
-    bondEventsTxt: "Bond events",
     standingTxt: "Standing",
     winnerTxt: "Winner",
     finalStateTxt: "Final state",

@@ -7,13 +7,20 @@ import {
     TournamentView,
     type TournamentBondPool,
     type TournamentParentMatch,
+    type TournamentTab,
 } from "../components/tournament/TournamentView";
+import useUpdateQueryString from "../hooks/useUpdateQueryString";
 
 export interface TournamentPageProps {
     /**
      * Bond refund and recovery events of the tournament.
      */
     bondEvents?: BondEvent[];
+
+    /**
+     * Total bond events of the tournament, as reported by the node.
+     */
+    bondEventsTotal?: number;
 
     /**
      * Bonds deposited into the tournament and its balance.
@@ -36,9 +43,19 @@ export interface TournamentPageProps {
     matches: Match[];
 
     /**
+     * Total matches of the tournament, as reported by the node.
+     */
+    matchesTotal?: number;
+
+    /**
      * Parent match of an inner tournament, to settle it once finished.
      */
     parent?: TournamentParentMatch;
+
+    /**
+     * The selected tab, kept in the URL.
+     */
+    tab?: TournamentTab;
 
     /**
      * Tournament to display.
@@ -49,18 +66,30 @@ export interface TournamentPageProps {
 export const TournamentPage: FC<TournamentPageProps> = (props) => {
     const {
         bondEvents,
+        bondEventsTotal,
         bondPool,
         commitments,
         matches,
+        matchesTotal,
         onBondRecovered,
         parent,
+        tab,
         tournament,
     } = props;
+    const [updateUrlQueryString] = useUpdateQueryString();
     return (
         <Stack>
             <PageTitle Icon={TbTrophyFilled} title="Tournament" />
             <TournamentView
                 bondEvents={bondEvents}
+                bondEventsTotal={bondEventsTotal}
+                matchesTotal={matchesTotal}
+                tab={tab}
+                onTabChange={(next) =>
+                    updateUrlQueryString([
+                        { name: "tab", value: next === "bonds" ? next : "" },
+                    ])
+                }
                 bondPool={bondPool}
                 parent={parent}
                 onBondRecovered={onBondRecovered}
