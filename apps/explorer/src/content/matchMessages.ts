@@ -2,6 +2,10 @@
  * Content/copy for match related messages.
  */
 export const matchMessages = {
+    tabs: {
+        overviewTxt: "Overview",
+        bondsTxt: "Bonds",
+    },
     claimsTxt: "Claims",
     actionsTxt: "Actions",
     phaseTxt: "Phase",

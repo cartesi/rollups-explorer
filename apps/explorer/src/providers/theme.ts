@@ -6,6 +6,7 @@ import {
     Spoiler,
     Tooltip,
     virtualColor,
+    type CSSVariablesResolver,
     type MantineTheme,
 } from "@mantine/core";
 
@@ -102,5 +103,11 @@ const customTheme = createTheme({
 }) as MantineTheme;
 
 const theme = mergeMantineTheme(DEFAULT_THEME, customTheme);
+
+export const cssVariablesResolver: CSSVariablesResolver = () => ({
+    variables: {},
+    light: { "--mantine-color-warning-text": "var(--mantine-color-yellow-8)" },
+    dark: {},
+});
 
 export default theme;

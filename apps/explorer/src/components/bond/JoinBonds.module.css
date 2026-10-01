@@ -1,0 +1,25 @@
+.container {
+    overflow-x: auto;
+}
+
+.container table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.container th,
+.container td {
+    white-space: nowrap;
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+    .container {
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 13px,
+            black calc(100% - 34px),
+            transparent
+        );
+    }
+}

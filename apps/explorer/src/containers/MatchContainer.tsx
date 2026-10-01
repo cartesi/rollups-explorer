@@ -7,7 +7,7 @@ import {
     useTournament,
     useTournaments,
 } from "@cartesi/react";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { isNotNil } from "ramda";
 import { useMemo, type FC } from "react";
 import {
@@ -30,6 +30,8 @@ import ContainerStack from "./ContainerStack";
 
 export const MatchContainer: FC<MatchParams> = (params) => {
     const now = Date.now();
+    const searchParams = useSearchParams();
+    const tab = searchParams.get("tab") === "bonds" ? "bonds" : "overview";
 
     const tournamentQuery = useTournament({
         application: params.application,
@@ -208,6 +210,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                     tournament={tournament}
                     refunds={refunds}
                     subTournament={subTournament}
+                    tab={tab}
                     stepProof={stepProof}
                     timestamps={timestamps}
                     timestampsLoading={timestampsLoading}
