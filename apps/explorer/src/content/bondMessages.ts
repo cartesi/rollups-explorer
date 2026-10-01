@@ -24,10 +24,14 @@ export const bondMessages = {
         hint: "Paid from the tournament's pooled bonds to the account that sent the move (contract event PartialBondRefund). Capped, so it may not cover the full gas cost.",
     },
     join: {
-        bondsTxt: "Bonds",
-        bondsHint:
+        columns: {
+            claimTxt: "Claim",
+            depositorTxt: "Depositor",
+            amountTxt: "Amount",
+            transactionTxt: "Transaction",
+        },
+        depositorHint:
             "Posted once by the depositor when the claim joined this tournament. Any account can send the moves and timeouts afterwards, and gas refunds go to whoever sent them, not to the depositor.",
-        depositorTxt: "Depositor",
         atLeastTxt: "at least",
         atLeastHint:
             "This join went through another contract, so its transaction doesn't show the exact amount. The contract requires at least the bond value.",

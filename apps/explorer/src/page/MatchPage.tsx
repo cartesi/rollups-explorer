@@ -9,7 +9,8 @@ import type { FC } from "react";
 import { TbSwords } from "react-icons/tb";
 import type { Hash, Hex } from "viem";
 import PageTitle from "../components/layout/PageTitle";
-import { MatchView } from "../components/match/MatchView";
+import { MatchView, type MatchTab } from "../components/match/MatchView";
+import useUpdateQueryString from "../hooks/useUpdateQueryString";
 import type { JoinBond, PartialBondRefundEvent } from "../lib/bondUtils";
 
 export interface MatchPageProps {
@@ -54,6 +55,11 @@ export interface MatchPageProps {
     subTournament?: Tournament;
 
     /**
+     * The selected tab, kept in the URL.
+     */
+    tab?: MatchTab;
+
+    /**
      * The tournament to display.
      */
     tournament: Tournament;
@@ -91,10 +97,12 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
         refunds,
         stepProof,
         subTournament,
+        tab,
         now,
         timestamps,
         timestampsLoading,
     } = props;
+    const [updateUrlQueryString] = useUpdateQueryString();
 
     return (
         <Stack>
@@ -109,6 +117,12 @@ export const MatchPage: FC<MatchPageProps> = (props) => {
                 now={now}
                 refunds={refunds}
                 subTournament={subTournament}
+                tab={tab}
+                onTabChange={(next) =>
+                    updateUrlQueryString([
+                        { name: "tab", value: next === "bonds" ? next : "" },
+                    ])
+                }
                 stepProof={stepProof}
                 timestamps={timestamps}
                 timestampsLoading={timestampsLoading}

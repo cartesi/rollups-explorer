@@ -215,12 +215,16 @@ export const WithJoinBonds: Story = {
     },
 };
 
+export const BondsTab: Story = {
+    args: { ...WithJoinBonds.args, tab: "bonds" },
+};
+
 /**
  * The depositors show while the bond amounts load.
  */
 export const JoinBondsLoading: Story = {
     args: {
-        ...WithJoinBonds.args,
+        ...BondsTab.args,
         joinBonds: new Map(),
         joinBondsLoading: true,
     },

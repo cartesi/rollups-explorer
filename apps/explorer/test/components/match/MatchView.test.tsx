@@ -9,7 +9,7 @@ import {
     createRefunds,
     createTournament,
 } from "../../../src/stories/prt";
-import { render, screen } from "../../test-utils";
+import { fireEvent, render, screen } from "../../test-utils";
 
 vi.mock("next/navigation", () => ({
     useParams: () => ({ application: "app", epochIndex: "0" }),
@@ -51,7 +51,30 @@ const advances = [
 ];
 
 describe("MatchView", () => {
-    it("should show the depositor of each claim bond", () => {
+    it("should open on the overview with a bonds tab", () => {
+        render(
+            <MatchView
+                advances={[]}
+                commitments={commitments}
+                match={match}
+                now={Date.now()}
+                tournament={tournament}
+            />,
+        );
+
+        expect(screen.getByRole("tab", { name: /Overview/ })).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+        expect(
+            screen.getByRole("tab", { name: /Bonds\s*2/ }),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Claims")).toBeInTheDocument();
+        expect(screen.queryByText("Depositor")).not.toBeInTheDocument();
+    });
+
+    it("should show the depositor of each claim bond on the bonds tab", () => {
+        const onTabChange = vi.fn();
         render(
             <MatchView
                 advances={[]}
@@ -63,12 +86,17 @@ describe("MatchView", () => {
                 }
                 match={match}
                 now={Date.now()}
+                onTabChange={onTabChange}
                 tournament={tournament}
             />,
         );
 
-        expect(screen.getByText("Bonds")).toBeInTheDocument();
-        expect(screen.getAllByText("Depositor")).toHaveLength(2);
+        fireEvent.click(screen.getByRole("tab", { name: /Bonds/ }));
+
+        expect(onTabChange).toHaveBeenCalledWith("bonds");
+        expect(screen.getByText("Depositor")).toBeInTheDocument();
+        expect(screen.getByText("0xf39Fd6...b92266")).toBeInTheDocument();
+        expect(screen.getByText("0x709979...dc79C8")).toBeInTheDocument();
         expect(screen.getByText("0.021 ETH")).toBeInTheDocument();
     });
 
@@ -92,17 +120,22 @@ describe("MatchView", () => {
         expect(screen.getByText("other account")).toBeInTheDocument();
     });
 
-    it("should leave out the bonds without commitments", () => {
+    it("should show no bond rows without commitments", () => {
         render(
             <MatchView
                 advances={[]}
                 match={match}
                 now={Date.now()}
+                tab="bonds"
                 tournament={tournament}
             />,
         );
 
-        expect(screen.queryByText("Bonds")).not.toBeInTheDocument();
+        expect(screen.getByRole("tab", { name: /Bonds\s*0/ })).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+        expect(screen.getAllByRole("row")).toHaveLength(1);
     });
 
     it("should offer closing the match once its sub tournament is eliminable", () => {

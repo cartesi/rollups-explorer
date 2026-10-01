@@ -1,11 +1,14 @@
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import type { FC, PropsWithChildren } from "react";
-import theme from "./theme";
+import theme, { cssVariablesResolver } from "./theme";
 
 export const StyleProvider: FC<PropsWithChildren> = ({ children }) => {
     return (
-        <MantineProvider theme={theme}>
+        <MantineProvider
+            theme={theme}
+            cssVariablesResolver={cssVariablesResolver}
+        >
             <Notifications />
             {children}
         </MantineProvider>

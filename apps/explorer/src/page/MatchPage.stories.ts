@@ -83,3 +83,7 @@ export const WithRefunds: Story = {
 export const WithJoinBonds: Story = {
     args: MatchViewStories.WithJoinBonds.args,
 };
+
+export const WithJoinBondsBondsTab: Story = {
+    args: MatchViewStories.BondsTab.args,
+};

@@ -28,7 +28,14 @@ describe("JoinBonds", () => {
             />,
         );
 
-        expect(screen.getByText("Depositor")).toBeInTheDocument();
+        expect(
+            screen
+                .getAllByRole("columnheader")
+                .map(({ textContent }) => textContent),
+        ).toEqual(["Claim", "Depositor", "Amount", "Transaction"]);
+        expect(
+            screen.getByLabelText(/Posted once by the depositor/),
+        ).toBeInTheDocument();
         expect(screen.getByText("0x709979...dc79C8")).toBeInTheDocument();
         expect(screen.getByText("0.021 ETH")).toBeInTheDocument();
     });

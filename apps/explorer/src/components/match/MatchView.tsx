@@ -4,8 +4,16 @@ import type {
     MatchAdvanced,
     Tournament,
 } from "@cartesi/client";
-import { Stack, Text, Title } from "@mantine/core";
-import { type FC } from "react";
+import {
+    Badge,
+    Stack,
+    Tabs,
+    Text,
+    Title,
+    useMantineTheme,
+} from "@mantine/core";
+import { useState, type FC } from "react";
+import { TbCoins, TbListDetails } from "react-icons/tb";
 import type { Hash, Hex } from "viem";
 import { content } from "../../content";
 import type { JoinBond, PartialBondRefundEvent } from "../../lib/bondUtils";
@@ -14,10 +22,13 @@ import { JoinBonds } from "../bond/JoinBonds";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
+import { EnterTransition } from "../EnterTransition";
 import { getInnerTournamentAction } from "../../lib/disputeActions";
 import { InnerTournamentAction } from "../tournament/InnerTournamentAction";
 import { MatchActions } from "./MatchActions";
 import { MatchState } from "./MatchState";
+
+export type MatchTab = "overview" | "bonds";
 
 export interface MatchViewProps {
     /**
@@ -51,6 +62,11 @@ export interface MatchViewProps {
     onActionConfirmed?: () => void;
 
     /**
+     * Called when another tab is selected.
+     */
+    onTabChange?: (tab: MatchTab) => void;
+
+    /**
      * Partial bond refunds of the tournament, by transaction hash.
      */
     refunds?: Map<Hash, PartialBondRefundEvent>;
@@ -59,6 +75,11 @@ export interface MatchViewProps {
      * The sub tournament to display.
      */
     subTournament?: Tournament;
+
+    /**
+     * The selected tab. Without it, the view keeps its own selection.
+     */
+    tab?: MatchTab;
 
     /**
      * The parent Tournament
@@ -93,6 +114,8 @@ export const MatchView: FC<MatchViewProps> = (props) => {
         joinBonds,
         joinBondsLoading,
         onActionConfirmed,
+        onTabChange,
+        tab,
         tournament,
         match,
         refunds,
@@ -102,6 +125,10 @@ export const MatchView: FC<MatchViewProps> = (props) => {
         timestamps,
         timestampsLoading,
     } = props;
+    const theme = useMantineTheme();
+    const [ownTab, setOwnTab] = useState<MatchTab>("overview");
+    const activeTab = tab ?? ownTab;
+    const text = content.match;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
     const innerAction = subTournament
@@ -116,44 +143,77 @@ export const MatchView: FC<MatchViewProps> = (props) => {
 
     return (
         <Stack gap="xl">
-            <Stack gap="xs">
-                <DetailRow
-                    label={content.tournament.cycleRangeTxt}
-                    hint={content.tournament.cycle.rangeHint}
-                >
-                    <CycleRangeFormatted
-                        range={getTournamentCycleRange(tournament)}
-                    />
-                </DetailRow>
-                <DetailRow label={content.match.claimsTxt}>
-                    <ClaimText claim={claim1} />
-                    <Text>vs</Text>
-                    <ClaimText claim={claim2} />
-                </DetailRow>
-                {commitments.length > 0 && (
-                    <DetailRow
-                        label={content.bond.join.bondsTxt}
-                        hint={content.bond.join.bondsHint}
+            <Tabs
+                value={activeTab}
+                onChange={(value) => {
+                    const next = value === "bonds" ? "bonds" : "overview";
+                    setOwnTab(next);
+                    onTabChange?.(next);
+                }}
+                keepMounted={false}
+            >
+                <Tabs.List>
+                    <Tabs.Tab
+                        value="overview"
+                        leftSection={
+                            <TbListDetails size={theme.other.smIconSize} />
+                        }
                     >
+                        {text.tabs.overviewTxt}
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                        value="bonds"
+                        leftSection={<TbCoins size={theme.other.smIconSize} />}
+                        rightSection={
+                            <Badge size="sm" variant="light">
+                                {commitments.length}
+                            </Badge>
+                        }
+                    >
+                        {text.tabs.bondsTxt}
+                    </Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value="overview" pt="md">
+                    <EnterTransition>
+                        <Stack gap="xs">
+                            <DetailRow
+                                label={content.tournament.cycleRangeTxt}
+                                hint={content.tournament.cycle.rangeHint}
+                            >
+                                <CycleRangeFormatted
+                                    range={getTournamentCycleRange(tournament)}
+                                />
+                            </DetailRow>
+                            <DetailRow label={text.claimsTxt}>
+                                <ClaimText claim={claim1} />
+                                <Text>vs</Text>
+                                <ClaimText claim={claim2} />
+                            </DetailRow>
+                            <MatchState
+                                commitments={commitments}
+                                joinBonds={joinBonds}
+                                joinBondsLoading={joinBondsLoading}
+                                onActionConfirmed={onActionConfirmed}
+                                match={match}
+                                tournament={tournament}
+                            />
+                        </Stack>
+                    </EnterTransition>
+                </Tabs.Panel>
+                <Tabs.Panel value="bonds" pt="md">
+                    <EnterTransition>
                         <JoinBonds
                             bonds={joinBonds}
                             commitments={commitments}
                             loading={joinBondsLoading}
                         />
-                    </DetailRow>
-                )}
-                <MatchState
-                    commitments={commitments}
-                    joinBonds={joinBonds}
-                    joinBondsLoading={joinBondsLoading}
-                    onActionConfirmed={onActionConfirmed}
-                    match={match}
-                    tournament={tournament}
-                />
-            </Stack>
+                    </EnterTransition>
+                </Tabs.Panel>
+            </Tabs>
             <Stack gap="sm">
                 <Title order={3} c="dimmed">
-                    {content.match.actionsTxt}
+                    {text.actionsTxt}
                 </Title>
                 <MatchActions
                     advances={advances}
