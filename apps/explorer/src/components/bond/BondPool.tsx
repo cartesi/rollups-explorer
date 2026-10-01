@@ -6,6 +6,7 @@ import {
     Text,
     Tooltip,
     type MantineColor,
+    type ProgressRootProps,
 } from "@mantine/core";
 import type { FC, ReactNode } from "react";
 import { content } from "../../content";
@@ -47,15 +48,18 @@ const Value: FC<{ value?: ReactNode; loading?: boolean }> = ({
 const count = (value: number, one: string, many: string) =>
     `${value} ${value === 1 ? one : many}`;
 
+export type BondSplitBarProps = Pick<BondPoolProps, "balance" | "pool"> &
+    Omit<ProgressRootProps, "children">;
+
 /**
- * The bonds a tournament holds: what its joins deposited, the gas refunds paid
- * from them, and the balance left, with a bar splitting where the money went.
+ * A bar splitting where the tournament bonds went: the balance left, the gas
+ * refunds, the winner payment and the burned residual.
+ * @returns nothing until the balance is known and some money moved.
  */
-export const BondPool: FC<BondPoolProps> = ({
+export const BondSplitBar: FC<BondSplitBarProps> = ({
     balance,
-    bondValue,
-    loading,
     pool,
+    ...props
 }) => {
     const sections: { label: string; value: bigint; color: MantineColor }[] = [
         { label: text.split.balanceTxt, value: balance ?? 0n, color: "blue" },
@@ -68,6 +72,37 @@ export const BondPool: FC<BondPoolProps> = ({
         { label: text.split.burnedTxt, value: pool.burned, color: "gray" },
     ];
     const total = sections.reduce((sum, { value }) => sum + value, 0n);
+    if (balance === undefined || total === 0n) return null;
+
+    return (
+        <Progress.Root size="sm" w={260} aria-label={text.splitTxt} {...props}>
+            {sections
+                .filter(({ value }) => value > 0n)
+                .map(({ label, value, color }) => (
+                    <Tooltip
+                        key={label}
+                        label={`${label}: ${formatBondValue(value)}`}
+                    >
+                        <Progress.Section
+                            value={Number((value * 10_000n) / total) / 100}
+                            color={color}
+                        />
+                    </Tooltip>
+                ))}
+        </Progress.Root>
+    );
+};
+
+/**
+ * The bonds a tournament holds: what its joins deposited, the gas refunds paid
+ * from them, and the balance left, with a bar splitting where the money went.
+ */
+export const BondPool: FC<BondPoolProps> = ({
+    balance,
+    bondValue,
+    loading,
+    pool,
+}) => {
     const depositedReady = pool.exact || !loading;
 
     return (
@@ -128,28 +163,12 @@ export const BondPool: FC<BondPoolProps> = ({
                     }
                 />
             </DetailRow>
-            {balance !== undefined && total > 0n && (
-                <DetailRow label="">
-                    <Progress.Root size="sm" w={260} aria-label={text.splitTxt}>
-                        {sections
-                            .filter(({ value }) => value > 0n)
-                            .map(({ label, value, color }) => (
-                                <Tooltip
-                                    key={label}
-                                    label={`${label}: ${formatBondValue(value)}`}
-                                >
-                                    <Progress.Section
-                                        value={
-                                            Number((value * 10_000n) / total) /
-                                            100
-                                        }
-                                        color={color}
-                                    />
-                                </Tooltip>
-                            ))}
-                    </Progress.Root>
-                </DetailRow>
-            )}
+            {balance !== undefined &&
+                balance + pool.refunded + pool.paid + pool.burned > 0n && (
+                    <DetailRow label="">
+                        <BondSplitBar balance={balance} pool={pool} />
+                    </DetailRow>
+                )}
         </Stack>
     );
 };

@@ -1,5 +1,12 @@
 import type { BondDisposition, TournamentBondRecovery } from "@cartesi/client";
-import { Badge, Stack, Text, type MantineColor } from "@mantine/core";
+import {
+    Badge,
+    Group,
+    Stack,
+    Text,
+    type BadgeProps,
+    type MantineColor,
+} from "@mantine/core";
 import type { FC } from "react";
 import type { Address as EthAddress } from "viem";
 import { formatBondValue, type BondRecoveredEvent } from "../../lib/bondUtils";
@@ -11,7 +18,7 @@ import TransactionHash from "../TransactionHash";
 
 const text = content.bond;
 
-type SettledDisposition = Exclude<BondDisposition, "TOURNAMENT_RUNNING">;
+export type SettledDisposition = Exclude<BondDisposition, "TOURNAMENT_RUNNING">;
 
 const dispositionColors: Record<SettledDisposition, MantineColor> = {
     NO_WINNER: "gray",
@@ -21,6 +28,14 @@ const dispositionColors: Record<SettledDisposition, MantineColor> = {
 
 const dispositionHints: Partial<Record<SettledDisposition, string>> =
     text.dispositionHint;
+
+export const BondDispositionBadge: FC<
+    { disposition: SettledDisposition } & Omit<BadgeProps, "color" | "children">
+> = ({ disposition, ...props }) => (
+    <Badge color={dispositionColors[disposition]} {...props}>
+        {text.disposition[disposition]}
+    </Badge>
+);
 
 export interface BondRecoveryDetailsProps {
     /**
@@ -43,6 +58,12 @@ export interface BondRecoveryDetailsProps {
      * recovery.
      */
     tournamentAddress?: EthAddress;
+
+    /**
+     * Whether to offer the recovery next to the unclaimed payment. Defaults to
+     * true.
+     */
+    withAction?: boolean;
 }
 
 export const BondRecoveryDetails: FC<BondRecoveryDetailsProps> = ({
@@ -50,6 +71,7 @@ export const BondRecoveryDetails: FC<BondRecoveryDetailsProps> = ({
     onRecovered,
     recovery,
     tournamentAddress,
+    withAction = true,
 }) => {
     const { disposition } = bondRecovery;
     if (disposition === "TOURNAMENT_RUNNING") return null;
@@ -59,9 +81,7 @@ export const BondRecoveryDetails: FC<BondRecoveryDetailsProps> = ({
     return (
         <Stack gap="xs">
             <DetailRow label={text.statusTxt} hint={hint}>
-                <Badge color={dispositionColors[disposition]}>
-                    {text.disposition[disposition]}
-                </Badge>
+                <BondDispositionBadge disposition={disposition} />
             </DetailRow>
             {bondRecovery.disposition === "RECOVERABLE" && (
                 <>
@@ -70,19 +90,21 @@ export const BondRecoveryDetails: FC<BondRecoveryDetailsProps> = ({
                             <Address value={bondRecovery.claimer} />
                         </DetailRow>
                     )}
-                    {bondRecovery.payment !== null && (
-                        <DetailRow label={text.unclaimedPaymentTxt}>
-                            <Text>{formatBondValue(bondRecovery.payment)}</Text>
-                        </DetailRow>
-                    )}
-                    {tournamentAddress && (
-                        <DetailRow label="">
-                            <BondRecoveryAction
-                                tournamentAddress={tournamentAddress}
-                                onRecovered={onRecovered}
-                            />
-                        </DetailRow>
-                    )}
+                    <DetailRow label={text.unclaimedPaymentTxt}>
+                        <Group gap="sm" wrap="nowrap" align="flex-start">
+                            {bondRecovery.payment !== null && (
+                                <Text mt={6}>
+                                    {formatBondValue(bondRecovery.payment)}
+                                </Text>
+                            )}
+                            {withAction && tournamentAddress && (
+                                <BondRecoveryAction
+                                    tournamentAddress={tournamentAddress}
+                                    onRecovered={onRecovered}
+                                />
+                            )}
+                        </Group>
+                    </DetailRow>
                 </>
             )}
             {recovery && (
