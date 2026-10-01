@@ -15,23 +15,18 @@ import { useState, type FC } from "react";
 import { TbCoins, TbSwords } from "react-icons/tb";
 import type { Hash } from "viem";
 import { content } from "../../content";
-import {
-    getBondPool,
-    isBondRecovery,
-    type JoinBond,
-} from "../../lib/bondUtils";
+import type { JoinBond } from "../../lib/bondUtils";
 import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import { getInnerTournamentAction } from "../../lib/disputeActions";
 import { getTournamentCycleRange } from "../../lib/prtUtils";
 import { BondLedger } from "../bond/BondLedger";
-import { BondPool } from "../bond/BondPool";
-import { BondRecoveryDetails } from "../bond/BondRecoveryDetails";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
 import { EnterTransition } from "../EnterTransition";
 import { TournamentBreadcrumbSegment } from "../navigation/TournamentBreadcrumbSegment";
 import TweenedNumber from "../TweenedNumber";
 import { InnerTournamentAction } from "./InnerTournamentAction";
+import { TournamentBondSection } from "./TournamentBondSection";
 import { TournamentOutcome } from "./TournamentOutcome";
 import { TournamentTable } from "./TournamentTable";
 
@@ -208,29 +203,13 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
             </Stack>
 
             {(bondSettled || bondPool) && (
-                <Stack gap="sm">
-                    <Title order={3} c="dimmed">
-                        {content.bond.bondTxt}
-                    </Title>
-                    <BondRecoveryDetails
-                        bondRecovery={tournament.snapshot.bondRecovery}
-                        recovery={bondEvents.find(isBondRecovery)}
-                        tournamentAddress={tournament.address}
-                        onRecovered={onBondRecovered}
-                    />
-                    {bondPool && (
-                        <BondPool
-                            balance={bondPool.balance}
-                            bondValue={bondPool.bondValue}
-                            loading={bondPool.loading}
-                            pool={getBondPool(
-                                bondPool.bonds,
-                                commitments.length,
-                                bondEvents,
-                            )}
-                        />
-                    )}
-                </Stack>
+                <TournamentBondSection
+                    bondEvents={bondEvents}
+                    bondPool={bondPool}
+                    joins={commitments.length}
+                    onBondRecovered={onBondRecovered}
+                    tournament={tournament}
+                />
             )}
 
             <Tabs

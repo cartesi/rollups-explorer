@@ -5,6 +5,10 @@ import type { BondRecoveredEvent } from "../../../src/lib/bondUtils";
 import { createBondEvent } from "../../../src/stories/prt";
 import { render, screen } from "../../test-utils";
 
+vi.mock("../../../src/components/bond/BondRecoveryAction", () => ({
+    BondRecoveryAction: () => <button type="button">Recover bond</button>,
+}));
+
 vi.mock("wagmi", async () => {
     const actual = await vi.importActual("wagmi");
     return { ...actual, useConfig: () => ({ chains: [foundry] }) };
@@ -102,5 +106,42 @@ describe("BondRecoveryDetails", () => {
                 "The tournament finished without a winner. Its balance stays locked in the contract; it is not burned.",
             ),
         ).toBeInTheDocument();
+    });
+
+    it("should offer the recovery next to the unclaimed payment", () => {
+        render(
+            <BondRecoveryDetails
+                bondRecovery={{
+                    disposition: "RECOVERABLE",
+                    claimer,
+                    payment: 250_000_000_000_000_000n,
+                }}
+                tournamentAddress="0xA2835312696Afa86c969e40831857dbB1412627f"
+            />,
+        );
+
+        const payment = screen.getByText("0.25 ETH");
+        expect(payment.parentElement).toContainElement(
+            screen.getByRole("button", { name: "Recover bond" }),
+        );
+    });
+
+    it("should leave the recovery out when asked", () => {
+        render(
+            <BondRecoveryDetails
+                bondRecovery={{
+                    disposition: "RECOVERABLE",
+                    claimer,
+                    payment: 250_000_000_000_000_000n,
+                }}
+                tournamentAddress="0xA2835312696Afa86c969e40831857dbB1412627f"
+                withAction={false}
+            />,
+        );
+
+        expect(screen.getByText("0.25 ETH")).toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: "Recover bond" }),
+        ).not.toBeInTheDocument();
     });
 });

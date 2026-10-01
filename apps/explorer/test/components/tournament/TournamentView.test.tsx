@@ -145,8 +145,9 @@ describe("TournamentView", () => {
             />,
         );
 
-        expect(screen.getByText("Bond")).toBeInTheDocument();
-        expect(screen.getByText("recoverable")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /Bond/, expanded: false }),
+        ).toBeInTheDocument();
         expect(
             screen.getByRole("button", { name: "Recover bond" }),
         ).toBeInTheDocument();
@@ -167,9 +168,10 @@ describe("TournamentView", () => {
             />,
         );
 
-        expect(screen.getByText("Bond")).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /Bond/, expanded: false }),
+        ).toBeInTheDocument();
         expect(screen.getByText("Deposited")).toBeInTheDocument();
-        expect(screen.getByText("0.02 ETH")).toBeInTheDocument();
         expect(screen.queryByText("Status")).not.toBeInTheDocument();
     });
 
