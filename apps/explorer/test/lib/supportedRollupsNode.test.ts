@@ -3,9 +3,10 @@ import { checkNodeVersion } from "../../src/lib/supportedRollupsNode";
 
 describe("checkNodeVersion function", () => {
     test("should return supported for versions inside the configured range", () => {
-        expect(checkNodeVersion("2.0.0-alpha.12")).toEqual({
+        expect(checkNodeVersion("2.0.0-alpha.13")).toEqual({
             status: "supported",
         });
+        expect(checkNodeVersion("2.0.0")).toEqual({ status: "supported" });
     });
 
     test("should return not-valid-semantic-versioning for invalid versions", () => {
@@ -16,14 +17,14 @@ describe("checkNodeVersion function", () => {
     });
 
     test("should return not-supported-version for older versions", () => {
-        const result = checkNodeVersion("2.0.0-alpha.8");
+        const result = checkNodeVersion("2.0.0-alpha.12");
 
         expect(result.status).toBe("not-supported-version");
         if (result.status === "not-supported-version") {
-            expect(result.error.message).toContain(
-                "is older than minimal version",
+            expect(result.error.message).toBe(
+                "The version 2.0.0-alpha.12 is older than minimal version (2.0.0-alpha.13)",
             );
-            expect(result.extra.supportedRange).toContain("2.0.0-alpha.12");
+            expect(result.extra.supportedRange).toContain("2.0.0-alpha.13");
         }
     });
 
@@ -37,7 +38,7 @@ describe("checkNodeVersion function", () => {
                 `The version ${version} is not supported yet`,
             );
             expect(result.extra.supportedRange).toBe(
-                ">=2.0.0-alpha.12 <3.0.0-0",
+                ">=2.0.0-alpha.13 <3.0.0-0",
             );
         }
     });
