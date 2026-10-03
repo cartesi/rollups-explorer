@@ -54,7 +54,7 @@ const nodeConfig: DbNodeConnectionConfig = {
     isDeletable: false,
     isPreferred: true,
     timestamp: Date.now(),
-    version: "2.0.0-alpha.12",
+    version: "2.0.0-alpha.13",
     name: "storybook-mocked-setup",
     type: "system_mock",
     url: "local://in-memory",
@@ -66,7 +66,12 @@ const withProviders = (StoryFn: StoryFn, context: StoryContext) => {
                 <AppConfigProvider value={{cartesiNodeRpcUrl: '', nodeRpcUrl: '', isMockEnabled: true, isDebugEnabled: false}}>
                     <JotaiProvider>
                         <ConnectionProvider
-                            systemConnection={nodeConfig}
+                            systemConnection={{
+                                ...nodeConfig,
+                                type:
+                                    context.parameters.connectionType ??
+                                    nodeConfig.type,
+                            }}
                         >
                             <DataProvider>
                                 <SendProvider>

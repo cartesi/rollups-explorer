@@ -1,8 +1,8 @@
 "use client";
 import type { Match, Tournament } from "@cartesi/client";
-import { useMatch, useTournament } from "@cartesi/react";
+import { serverUrl, useCartesiClient } from "@cartesi/react";
+import { useQuery } from "@tanstack/react-query";
 import { isNotNil } from "ramda";
-import { useEffect, useRef, useState } from "react";
 import type { Address } from "viem";
 
 export type UseTournamentHierarchyOpts = {
@@ -11,102 +11,61 @@ export type UseTournamentHierarchyOpts = {
     tournament?: Tournament;
 };
 
-type SearchStatus = "idle" | "searching" | "done";
-
-type NextParents = {
-    parentTournamentAddress?: Tournament["parentTournamentAddress"];
-    parentMatchIdHash?: Tournament["parentMatchIdHash"];
+type TournamentHierarchy = {
+    matches: Match[];
+    tournaments: Tournament[];
 };
 
-const newAccumulators = () => ({
-    matches: [] as Match[],
-    tournaments: [] as Tournament[],
-});
-
-const getSearchStatus = (params: {
-    hasParentsToSearch: boolean;
-    isFetching: boolean;
-}): SearchStatus => {
-    if (params.hasParentsToSearch && params.isFetching) return "searching";
-    if (params.hasParentsToSearch && !params.isFetching) return "done";
-
-    return "idle";
-};
+const emptyHierarchy: TournamentHierarchy = { matches: [], tournaments: [] };
 
 /**
  * Hook to get the tournament hierarchy for a given tournament.
  * @param options options for the tournament hierarchy query.
- * @returns
+ * @returns the ancestor tournaments and the matches that created their
+ * children, ordered from the root tournament down.
  */
 export const useTournamentHierarchy = (options: UseTournamentHierarchyOpts) => {
-    const [nextParents, setNextParents] = useState<NextParents>({});
-    const [tournaments, setTournaments] = useState<Tournament[]>([]);
-    const [matches, setMatches] = useState<Match[]>([]);
+    const client = useCartesiClient();
+    const { application, epochIndex, tournament } = options;
 
-    const accRef = useRef({
-        matches: [] as Match[],
-        tournaments: [] as Tournament[],
-    });
-
-    const tournamentQuery = useTournament({
-        application: options.application,
-        address: nextParents.parentTournamentAddress!,
-        enabled: isNotNil(nextParents.parentTournamentAddress),
-    });
-
-    const matchQuery = useMatch({
-        application: options.application,
-        epochIndex: options.epochIndex,
-        tournamentAddress: nextParents.parentTournamentAddress!,
-        idHash: nextParents.parentMatchIdHash!,
-        enabled:
-            isNotNil(nextParents.parentMatchIdHash) &&
-            isNotNil(nextParents.parentTournamentAddress),
-    });
-
-    const hasParentsToSearch =
-        isNotNil(nextParents.parentMatchIdHash) &&
-        isNotNil(nextParents.parentTournamentAddress);
-    const isFetching = tournamentQuery.isFetching || matchQuery.isFetching;
-
-    const searchStatus: SearchStatus = getSearchStatus({
-        hasParentsToSearch,
-        isFetching,
-    });
-
-    useEffect(() => {
-        setNextParents({
-            parentMatchIdHash: options.tournament?.parentMatchIdHash,
-            parentTournamentAddress:
-                options.tournament?.parentTournamentAddress,
-        });
-    }, [options.tournament]);
-
-    useEffect(() => {
-        if (searchStatus === "done") {
-            const pTournament = tournamentQuery.data;
-            const pMatch = matchQuery.data;
-            const { parentMatchIdHash, parentTournamentAddress } =
-                pTournament ?? {};
-            if (!parentMatchIdHash && !parentTournamentAddress) {
-                const matches = isNotNil(pMatch)
-                    ? [pMatch, ...accRef.current.matches]
-                    : accRef.current.matches;
-                const tournaments = isNotNil(pTournament)
-                    ? [pTournament, ...accRef.current.tournaments]
-                    : accRef.current.tournaments;
-
-                setMatches(matches);
-                setTournaments(tournaments);
-                accRef.current = newAccumulators();
-            } else {
-                accRef.current.matches.unshift(pMatch!);
-                accRef.current.tournaments.unshift(pTournament!);
+    const { data } = useQuery({
+        queryKey: [
+            serverUrl(client),
+            "tournamentHierarchy",
+            application,
+            epochIndex.toString(),
+            tournament?.address,
+        ],
+        queryFn: async () => {
+            const hierarchy: TournamentHierarchy = {
+                matches: [],
+                tournaments: [],
+            };
+            let tournamentAddress = tournament?.parentTournamentAddress;
+            let idHash = tournament?.parentMatchIdHash;
+            while (tournamentAddress && idHash) {
+                const [parent, match] = await Promise.all([
+                    client.getTournament({
+                        application,
+                        address: tournamentAddress,
+                    }),
+                    client.getMatch({
+                        application,
+                        epochIndex,
+                        tournamentAddress,
+                        idHash,
+                    }),
+                ]);
+                hierarchy.tournaments.unshift(parent);
+                hierarchy.matches.unshift(match);
+                tournamentAddress = parent.parentTournamentAddress;
+                idHash = parent.parentMatchIdHash;
             }
+            return hierarchy;
+        },
+        enabled: isNotNil(tournament),
+        staleTime: Infinity,
+    });
 
-            setNextParents({ parentMatchIdHash, parentTournamentAddress });
-        }
-    }, [searchStatus, matchQuery.data, tournamentQuery.data]);
-
-    return { matches, tournaments };
+    return data ?? emptyHierarchy;
 };

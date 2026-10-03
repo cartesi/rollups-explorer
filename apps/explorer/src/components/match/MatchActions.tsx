@@ -13,10 +13,28 @@ import {
     useMergedRef,
     useScrollIntoView,
 } from "@mantine/hooks";
-import { useEffect, useMemo, useState, type FC } from "react";
+import {
+    useEffect,
+    useMemo,
+    useState,
+    type FC,
+    type ReactElement,
+    type ReactNode,
+} from "react";
 import { TbArrowUp } from "react-icons/tb";
-import type { CycleRange } from "../types";
+import {
+    getAdvanceRanges,
+    getAdvanceSide,
+    getLoser,
+    getMatchProgress,
+    getTournamentCycleRange,
+    getWinner,
+} from "../../lib/prtUtils";
+import type { Hash, Hex } from "viem";
+import { content } from "../../content";
+import type { Depositor, PartialBondRefundEvent } from "../../lib/bondUtils";
 import { BisectionItem } from "./BisectionItem";
+import { BondRefundItem } from "./BondRefundItem";
 import { ClaimsEliminatedItem } from "./ClaimsEliminatedItem";
 import { EliminationTimeoutItem } from "./EliminationTimeoutItem";
 import { LoserItem } from "./LoserItem";
@@ -36,10 +54,14 @@ interface MatchActionsProps {
     autoAdjustRanges?: boolean;
 
     /**
-     * Maximum number of bisections to reach the target subdivision
-     * height = 48 means 47 bisections
+     * Accounts that deposited the bonds of the match claims.
      */
-    height: bigint;
+    depositors?: Depositor[];
+
+    /**
+     * Call settling the match once its sub tournament finished.
+     */
+    innerAction?: ReactNode;
 
     /**
      * The match to display actions for
@@ -52,62 +74,75 @@ interface MatchActionsProps {
     now: number;
 
     /**
+     * Partial bond refunds of the tournament, by transaction hash.
+     */
+    refunds?: Map<Hash, PartialBondRefundEvent>;
+
+    /**
      * The sub tournament to display.
      */
     subTournament?: Tournament;
+
+    /**
+     * Proof of a leaf step win, `null` when it cannot be read.
+     */
+    stepProof?: Hex | null;
+
+    /**
+     * Timestamps in milliseconds of the blocks the match events happened in.
+     */
+    timestamps?: Map<bigint, number>;
+
+    /**
+     * Whether the block timestamps are still being fetched.
+     */
+    timestampsLoading?: boolean;
+
+    /**
+     * The tournament the match belongs to.
+     */
+    tournament: Tournament;
 }
 
 export const MatchActions: FC<MatchActionsProps> = (props) => {
-    const { advances, height, match, now, subTournament } = props;
+    const {
+        advances,
+        depositors,
+        innerAction,
+        match,
+        now,
+        refunds,
+        stepProof,
+        subTournament,
+        timestamps,
+        timestampsLoading,
+        tournament,
+    } = props;
+    const isTimestampLoading = (timestamp?: number) =>
+        Boolean(timestampsLoading) && timestamp === undefined;
     const claim1 = { hash: match.commitmentOne };
     const claim2 = { hash: match.commitmentTwo };
-
-    // filter the bisection items
-    const bisections = advances.map((matchAdvanced, index, array) => {
-        // direction is defined whether the parent of the advance is the left node of the previous advance, otherwise it's the right node
-        const left = index === 0 ? match.leftOfTwo : array[index - 1].leftNode;
-        const direction = matchAdvanced.otherParent === left ? 0 : 1;
-        return {
-            direction,
-            timestamp: matchAdvanced.updatedAt.getTime(),
-        };
-    });
+    const total = Number(tournament.height - 1n);
 
     // track the width of the timeline, so we can adjust the number of bars before size reset
     const { width: bisectionWidth, ref: bisectionWidthRef } = useElementSize();
 
     // calculate the number of bars until the size resets
-    const [bars, setBars] = useState(bisections.length);
+    const [bars, setBars] = useState(advances.length);
     useEffect(() => {
         const minWidth = 28;
         if (bisectionWidth === 0) {
-            setBars(bisections.length);
+            setBars(advances.length);
         } else {
             setBars(Math.floor(Math.log2(bisectionWidth / minWidth)));
         }
     }, [bisectionWidth]);
 
-    // dynamic domain, based on first visible item
-    const maxRange: CycleRange = [0, 2 ** Number(height - 1n)];
+    const progress = getMatchProgress(match, tournament, advances.length);
 
-    // progress bar, based on last visible item
-    const progress = (bisections.length / Number(height - 1n)) * 100;
-
-    // create ranges for each bisection
     const ranges = useMemo(
-        () =>
-            bisections.reduce(
-                (r, bisection, i) => {
-                    const { direction } = bisection;
-                    const l = r[i];
-                    const [s, e] = l;
-                    const mid = Math.floor((s + e) / 2);
-                    r.push(direction === 0 ? [s, mid] : [mid, e]);
-                    return r;
-                },
-                [maxRange],
-            ),
-        [bisections],
+        () => getAdvanceRanges(tournament, advances),
+        [tournament, advances],
     );
 
     // scroll hook points
@@ -131,6 +166,95 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const theme = useMantineTheme();
     const color = theme.primaryColor;
 
+    const winner = getWinner(match);
+    const loser = getLoser(match);
+    const nextClaim =
+        getAdvanceSide(advances.length) === "ONE" ? claim1 : claim2;
+    const waitingClaim = nextClaim === claim1 ? claim2 : claim1;
+    const closedAt = match.deletionBlockNumber
+        ? timestamps?.get(match.deletionBlockNumber)
+        : undefined;
+
+    const refundItems = [
+        {
+            label: content.match.gasRefund.leafSealTxt,
+            txHash: match.leafSeal?.txHash,
+        },
+        {
+            label: content.match.gasRefund.subTournamentCreationTxt,
+            txHash: subTournament?.creationEvent?.txHash,
+        },
+        {
+            label: content.match.gasRefund.matchClosingTxt,
+            txHash: match.deletionTxHash,
+        },
+    ].flatMap(({ label, txHash }) => {
+        const refund = txHash ? refunds?.get(txHash) : undefined;
+        return refund ? [{ label, refund }] : [];
+    });
+
+    const getOutcomeItems = (): ReactElement[] => {
+        switch (match.deletionReason) {
+            case "TIMEOUT":
+                return winner && loser
+                    ? [
+                          <WinnerTimeoutItem
+                              key="timeout"
+                              loser={{ hash: loser }}
+                              now={now}
+                              timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
+                              winner={{ hash: winner }}
+                          />,
+                      ]
+                    : [
+                          <EliminationTimeoutItem
+                              key="elimination-timeout"
+                              claim1={nextClaim}
+                              claim2={waitingClaim}
+                              now={now}
+                              timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
+                          />,
+                      ];
+            case "CHILD_TOURNAMENT":
+            case "STEP":
+                if (winner && loser) {
+                    return [
+                        <WinnerItem
+                            key="winner"
+                            claim={{ hash: winner }}
+                            now={now}
+                            timestamp={closedAt}
+                            timestampLoading={isTimestampLoading(closedAt)}
+                            proof={
+                                match.deletionReason === "STEP"
+                                    ? stepProof
+                                    : undefined
+                            }
+                        />,
+                        <LoserItem
+                            key="loser"
+                            claim={{ hash: loser }}
+                            now={now}
+                        />,
+                    ];
+                }
+                return match.deletionReason === "CHILD_TOURNAMENT"
+                    ? [
+                          <ClaimsEliminatedItem
+                              key="eliminated"
+                              now={now}
+                              timestamp={closedAt}
+                              timestampLoading={isTimestampLoading(closedAt)}
+                          />,
+                      ]
+                    : [];
+            case "NOT_DELETED":
+                return [];
+        }
+    };
+
     return (
         <Stack>
             <Timeline ref={ref} bulletSize={24} lineWidth={2}>
@@ -141,126 +265,51 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
                 </Timeline.Item>
             </Timeline>
             <Timeline bulletSize={24} lineWidth={2}>
-                {bisections.map((value, i) => (
+                {advances.map((advance, i) => (
                     <BisectionItem
-                        key={i}
-                        claim={i % 2 === 0 ? claim1 : claim2}
+                        key={`${advance.txHash}-${advance.logIndex}`}
+                        claim={getAdvanceSide(i) === "ONE" ? claim1 : claim2}
                         color={theme.colors.gray[6]}
-                        domain={ranges[Math.floor(i / bars) * bars] ?? [0, 1]} //xxx : a default to avoid unstable undefined error and division by zero.
+                        domain={ranges[Math.floor(i / bars) * bars] ?? [0n, 1n]} //xxx : a default to avoid unstable undefined error and division by zero.
                         expand={
-                            i % bars === bars - 1 && i < bisections.length - 1
+                            i % bars === bars - 1 && i < advances.length - 1
                         }
                         index={i + 1}
                         now={now}
                         range={ranges[i + 1]}
-                        timestamp={value.timestamp}
-                        total={Number(height - 1n)}
+                        depositors={depositors}
+                        refund={refunds?.get(advance.txHash)}
+                        timestamp={timestamps?.get(advance.blockNumber)}
+                        timestampLoading={isTimestampLoading(
+                            timestamps?.get(advance.blockNumber),
+                        )}
+                        total={total}
                     />
                 ))}
-                {match.deletionReason === "TIMEOUT" &&
-                    match.winnerCommitment === "NONE" && (
-                        <EliminationTimeoutItem
-                            key="elimination-timeout"
-                            claim1={
-                                bisections.length % 2 === 0 ? claim1 : claim2
-                            }
-                            claim2={
-                                bisections.length % 2 === 0 ? claim2 : claim1
-                            }
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                        />
-                    )}
-                {match.deletionReason === "TIMEOUT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerTimeoutItem
-                            key="timeout"
-                            loser={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            winner={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                        />
-                    )}
                 {subTournament && (
                     <SubTournamentItem
-                        claim={bisections.length % 2 === 0 ? claim1 : claim2}
+                        action={innerAction}
+                        claim={nextClaim}
                         key="sub-tournament"
                         tournament={subTournament}
                         now={now}
-                        range={[0, 0]} // XXX: need to get range from somewhere
-                        timestamp={subTournament.updatedAt.getTime()}
+                        range={getTournamentCycleRange(subTournament)}
+                        timestamp={timestamps?.get(subTournament.startInstant)}
+                        timestampLoading={isTimestampLoading(
+                            timestamps?.get(subTournament.startInstant),
+                        )}
                     />
                 )}
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerItem
-                            key="winner"
-                            claim={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
-                        />
-                    )}
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <LoserItem
-                            claim={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                        />
-                    )}
-
-                {match.deletionReason === "CHILD_TOURNAMENT" &&
-                    match.winnerCommitment === "NONE" && (
-                        <ClaimsEliminatedItem
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                        />
-                    )}
-
-                {match.deletionReason === "STEP" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <WinnerItem
-                            key="winner"
-                            claim={{
-                                hash:
-                                    match.winnerCommitment === "ONE"
-                                        ? claim1.hash
-                                        : claim2.hash,
-                            }}
-                            now={now}
-                            timestamp={match.updatedAt.getTime()}
-                            proof={"0x0"} // XXX: need to get proof from somewhere
-                        />
-                    )}
-                {match.deletionReason === "STEP" &&
-                    match.winnerCommitment !== "NONE" && (
-                        <LoserItem
-                            claim={
-                                match.winnerCommitment === "ONE"
-                                    ? claim2
-                                    : claim1
-                            }
-                            now={now}
-                        />
-                    )}
+                {getOutcomeItems()}
+                {refundItems.map(({ label, refund }) => (
+                    <BondRefundItem
+                        key={`${refund.txHash}-${refund.logIndex}`}
+                        depositors={depositors}
+                        label={label}
+                        now={now}
+                        refund={refund}
+                    />
+                ))}
             </Timeline>
             <Group justify="flex-end" ref={bottomRef}>
                 {!topInViewport && (

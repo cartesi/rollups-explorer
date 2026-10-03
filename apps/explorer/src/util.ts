@@ -14,6 +14,13 @@ export const toBoolean = (
 };
 
 /**
+ * Ratio between two bigints as a number, precise beyond the safe integer range.
+ */
+export const toRatio = (numerator: bigint, denominator: bigint) =>
+    Number((numerator * 1_000_000n) / (denominator > 0n ? denominator : 1n)) /
+    1_000_000;
+
+/**
  * Convert a string or string array to a number
  * @param value string or string array to convert to a number
  * @returns

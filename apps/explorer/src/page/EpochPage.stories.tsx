@@ -5,6 +5,7 @@ import { keccak256 } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
 import { applications } from "../stories/data";
 import { EpochPage } from "./EpochPage";
+import { createTournament } from "../stories/prt";
 
 const meta = {
     title: "Pages/Epoch Details",
@@ -48,7 +49,7 @@ export const Open: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
                 decodedData: {
                     payload:
@@ -78,7 +79,7 @@ export const Open: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0xabbc4c1594a60078ddfc55bb7c96f1b5f4b3b67302c336cc98dc327fbe05e637",
                 decodedData: {
                     payload:
@@ -108,7 +109,7 @@ export const Open: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0x4eae49a33bf0456bfdcc9653b2b422b831acb318dc2e38b7d12a5af66a14ae78",
                 decodedData: {
                     payload:
@@ -148,7 +149,7 @@ export const ClosedInDispute: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
                 decodedData: {
                     applicationContract: applications[0].applicationAddress,
@@ -177,7 +178,7 @@ export const ClosedInDispute: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0xabbc4c1594a60078ddfc55bb7c96f1b5f4b3b67302c336cc98dc327fbe05e637",
                 decodedData: {
                     payload:
@@ -206,7 +207,7 @@ export const ClosedInDispute: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0x4eae49a33bf0456bfdcc9653b2b422b831acb318dc2e38b7d12a5af66a14ae78",
                 decodedData: {
                     applicationContract: applications[0].applicationAddress,
@@ -229,6 +230,23 @@ export const ClosedInDispute: Story = {
                 logIndex: 0n,
             },
         ],
+    },
+};
+
+/**
+ * An epoch whose root tournament has active matches.
+ */
+export const Disputed: Story = {
+    render: WithBreadcrumb,
+    args: {
+        ...Open.args,
+        epoch: applications[0].epochs[3],
+        tournament: createTournament({
+            baseCycle: 0n,
+            log2step: 44n,
+            height: 48n,
+            snapshot: { standing: "MATCHES_ACTIVE" },
+        }),
     },
 };
 
@@ -255,8 +273,12 @@ export const AuthorityOpenEpoch: Story = {
             tournamentAddress: null,
             updatedAt: currentDatetime,
             virtualIndex: 0n,
-            outputsMerkleProof: null,
-            outputsMerkleRoot: null,
+            txBufferDataBlock: null,
+            txBufferProof: null,
+            iflagsYDataBlock: null,
+            iflagsYProof: null,
+            htifTohostDataBlock: null,
+            htifTohostProof: null,
         },
         inputs: [
             {
@@ -266,7 +288,7 @@ export const AuthorityOpenEpoch: Story = {
                 epochIndex: 0n,
                 machineHash:
                     "0xd721e60f83c8fc277b2d2e23a24e77a4035ee1f482b64486a78dd5598f11364b",
-                outputsHash:
+                txBufferDataBlock:
                     "0x0a162946e56158bac0673e6dd3bdfdc1e4a0e7744a120fdb640050c8d7abe1c6",
                 decodedData: {
                     applicationContract: authorityApp.applicationAddress,

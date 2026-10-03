@@ -1,10 +1,17 @@
-import type { Match, MatchAdvanced, Tournament } from "@cartesi/client";
+import type {
+    Commitment,
+    Match,
+    MatchAdvanced,
+    Tournament,
+} from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { FC } from "react";
 import { TbSwords } from "react-icons/tb";
+import type { Hash, Hex } from "viem";
 import PageTitle from "../components/layout/PageTitle";
-import { MatchView } from "../components/match/MatchView";
-import type { CycleRange } from "../components/types";
+import { MatchView, type MatchTab } from "../components/match/MatchView";
+import useUpdateQueryString from "../hooks/useUpdateQueryString";
+import type { JoinBond, PartialBondRefundEvent } from "../lib/bondUtils";
 
 export interface MatchPageProps {
     /**
@@ -13,14 +20,44 @@ export interface MatchPageProps {
     advances: MatchAdvanced[];
 
     /**
+     * Current snapshots of the two match commitments.
+     */
+    commitments?: Commitment[];
+
+    /**
+     * Bonds the two commitments posted on join, by commitment.
+     */
+    joinBonds?: Map<Hash, JoinBond>;
+
+    /**
+     * Whether the join bonds are still being fetched.
+     */
+    joinBondsLoading?: boolean;
+
+    /**
      * The match to display.
      */
     match: Match;
 
     /**
+     * Called once a dispute call sent from the match is confirmed.
+     */
+    onActionConfirmed?: () => void;
+
+    /**
+     * Partial bond refunds of the tournament, by transaction hash.
+     */
+    refunds?: Map<Hash, PartialBondRefundEvent>;
+
+    /**
      * The sub tournament to display.
      */
     subTournament?: Tournament;
+
+    /**
+     * The selected tab, kept in the URL.
+     */
+    tab?: MatchTab;
 
     /**
      * The tournament to display.
@@ -31,23 +68,64 @@ export interface MatchPageProps {
      * The current timestamp.
      */
     now: number;
+
+    /**
+     * Proof of a leaf step win, `null` when it cannot be read.
+     */
+    stepProof?: Hex | null;
+
+    /**
+     * Timestamps in milliseconds of the blocks the match events happened in.
+     */
+    timestamps?: Map<bigint, number>;
+
+    /**
+     * Whether the block timestamps are still being fetched.
+     */
+    timestampsLoading?: boolean;
 }
 
 export const MatchPage: FC<MatchPageProps> = (props) => {
-    const { advances, tournament, match, subTournament, now } = props;
-    // XXX: where the range is coming from?
-    // const range = [tournament.startCycle, tournament.endCycle] as CycleRange;
-    const range = [0, 0] as CycleRange;
+    const {
+        advances,
+        commitments,
+        joinBonds,
+        joinBondsLoading,
+        onActionConfirmed,
+        tournament,
+        match,
+        refunds,
+        stepProof,
+        subTournament,
+        tab,
+        now,
+        timestamps,
+        timestampsLoading,
+    } = props;
+    const [updateUrlQueryString] = useUpdateQueryString();
 
     return (
         <Stack>
             <PageTitle Icon={TbSwords} title="Match" />
             <MatchView
                 advances={advances}
+                commitments={commitments}
+                joinBonds={joinBonds}
+                joinBondsLoading={joinBondsLoading}
+                onActionConfirmed={onActionConfirmed}
                 match={match}
                 now={now}
-                range={range}
+                refunds={refunds}
                 subTournament={subTournament}
+                tab={tab}
+                onTabChange={(next) =>
+                    updateUrlQueryString([
+                        { name: "tab", value: next === "bonds" ? next : "" },
+                    ])
+                }
+                stepProof={stepProof}
+                timestamps={timestamps}
+                timestampsLoading={timestampsLoading}
                 tournament={tournament}
             />
         </Stack>

@@ -193,10 +193,6 @@ const application: GetApplicationReturnType = {
     templateHash:
         "0xfc7bad5b457f3129058d9dd26a916c684dfca4369935f21561255f7529344692",
     epochLength: 720n,
-    dataAvailability: {
-        type: "InputBox",
-        inputBoxAddress: "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac",
-    },
     consensusType: "AUTHORITY",
     status: "OK",
     enabled: true,

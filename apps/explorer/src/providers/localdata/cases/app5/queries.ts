@@ -187,13 +187,35 @@ const queries = [
             level: "$bigint:0",
             log2step: "$bigint:44",
             height: "$bigint:48",
-            winnerCommitment:
-                "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
-            finalStateHash:
-                "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
-            finishedAtBlock: "$bigint:1504",
             createdAt: "2026-01-09T12:35:11.927Z",
             updatedAt: "2026-01-09T12:35:11.927Z",
+            initialHash:
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+            baseCycle: "$bigint:0",
+            kind: "NON_LEAF",
+            startInstant: "$bigint:1",
+            allowance: "$bigint:1000",
+            creationEvent: null,
+            snapshot: {
+                asOfBlock: "$bigint:1504",
+                standing: "ROOT_WINNER",
+                acceptsJoins: false,
+                candidate:
+                    "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
+                winnerCommitment:
+                    "0xfc01e1004bdb867cf245517bfcaae66a9c2940bc8db16ff6733d9f61ea8225e7",
+                finalStateHash:
+                    "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
+                parentCommitment: null,
+                finishedAtBlock: "$bigint:1504",
+                winnerExpiresAt: "$bigint:0",
+                innerResult: null,
+                bondRecovery: {
+                    disposition: "TOURNAMENT_RUNNING",
+                    claimer: null,
+                    payment: null,
+                },
+            },
         },
     },
     {
@@ -227,6 +249,18 @@ const queries = [
                         "0x270ff512ce6282fc112d18e8acea1afca630aa3f33f947592e42e8b002b70f0f",
                     createdAt: "2026-01-09T12:35:11.930Z",
                     updatedAt: "2026-01-09T12:35:11.953Z",
+                    logIndex: "$bigint:0",
+                    eliminableAt: "$bigint:0",
+                    leafSeal: null,
+                    deletionLogIndex: null,
+                    snapshot: {
+                        asOfBlock: "$bigint:100",
+                        timeoutOutcome: "NONE",
+                        deferredCharge: "$bigint:0",
+                        phase: "UNINITIALIZED",
+                        bisection: null,
+                        sealed: null,
+                    },
                 },
             ],
             pagination: {
@@ -261,6 +295,14 @@ const queries = [
                     txHash: "0x9a6161d38a550939dc497715ee57a1d99197ee9ba24af5937c45783d7d761430",
                     createdAt: "2026-01-09T12:35:11.929Z",
                     updatedAt: "2026-01-09T12:35:11.929Z",
+                    logIndex: "$bigint:0",
+                    snapshot: {
+                        asOfBlock: "$bigint:100",
+                        claimer: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+                        clockRunning: false,
+                        clockDeadline: "$bigint:0",
+                        clockAllowance: "$bigint:1000",
+                    },
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -276,6 +318,14 @@ const queries = [
                     txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
                     createdAt: "2026-01-09T12:35:11.930Z",
                     updatedAt: "2026-01-09T12:35:11.930Z",
+                    logIndex: "$bigint:0",
+                    snapshot: {
+                        asOfBlock: "$bigint:100",
+                        claimer: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                        clockRunning: false,
+                        clockDeadline: "$bigint:0",
+                        clockAllowance: "$bigint:1000",
+                    },
                 },
             ],
             pagination: {
@@ -355,6 +405,18 @@ const queries = [
                 "0x270ff512ce6282fc112d18e8acea1afca630aa3f33f947592e42e8b002b70f0f",
             createdAt: "2026-01-09T12:35:11.930Z",
             updatedAt: "2026-01-09T12:35:11.953Z",
+            logIndex: "$bigint:0",
+            eliminableAt: "$bigint:0",
+            leafSeal: null,
+            deletionLogIndex: null,
+            snapshot: {
+                asOfBlock: "$bigint:100",
+                timeoutOutcome: "NONE",
+                deferredCharge: "$bigint:0",
+                phase: "UNINITIALIZED",
+                bisection: null,
+                sealed: null,
+            },
         },
     },
     {
@@ -382,6 +444,9 @@ const queries = [
                     txHash: "0xda3e53c9ccf0914d77eef53adeb14a692f79a6e60f2b74d05dfb6eaa7f1800ea",
                     createdAt: "2026-01-09T12:35:11.931Z",
                     updatedAt: "2026-01-09T12:35:11.931Z",
+                    logIndex: "$bigint:0",
+                    segmentStartPosition: "$bigint:0",
+                    eliminableAt: "$bigint:0",
                 },
             ],
             pagination: {

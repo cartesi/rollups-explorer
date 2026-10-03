@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const now = Math.floor(Date.now() / 1000);
-const range = [1837880065, 2453987565] as CycleRange;
+const range: CycleRange = [1837880065n, 2453987565n];
 const [start, end] = range;
 
 /**
@@ -34,7 +34,7 @@ export const Middle: Story = {
         domain: range,
         index: 5,
         now,
-        range: [(start + end) / 2, end],
+        range: [(start + end) / 2n, end],
         timestamp: now - 64,
         total: 48,
     },
@@ -47,10 +47,10 @@ export const Quarter: Story = {
     args: {
         claim: claim(1),
         color: "gray.6",
-        domain: [0, 100],
+        domain: [0n, 100n],
         index: 15,
         now,
-        range: [25, 50],
+        range: [25n, 50n],
         timestamp: now - 5398,
         total: 20,
     },
@@ -63,12 +63,23 @@ export const Expand: Story = {
     args: {
         claim: claim(1),
         color: "gray.6",
-        domain: [0, 100],
+        domain: [0n, 100n],
         expand: true,
         index: 15,
         now,
-        range: [(100 / 16) * 3, (100 / 16) * 4],
+        range: [(100n * 3n) / 16n, (100n * 4n) / 16n],
         timestamp: now - 5398,
         total: 20,
+    },
+};
+
+/**
+ * The block timestamp of the bisection is still loading.
+ */
+export const TimestampLoading: Story = {
+    args: {
+        ...Middle.args,
+        timestamp: undefined,
+        timestampLoading: true,
     },
 };

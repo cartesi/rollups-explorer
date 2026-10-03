@@ -1,4 +1,9 @@
-import type { Match, Tournament, WinnerCommitment } from "@cartesi/client";
+import type {
+    Match,
+    MatchAdvanced,
+    Tournament,
+    WinnerCommitment,
+} from "@cartesi/client";
 import { HttpResponse } from "msw";
 import {
     concat,
@@ -13,6 +18,7 @@ import {
     type Hex,
 } from "viem";
 import type { Claim } from "../components/types";
+import { createMatch } from "./prt";
 
 /**
  * Create a pseudo-random number generator from a seed
@@ -137,23 +143,25 @@ export const randomMatches = (
         if (danglingClaim) {
             // create a match with the dangling claim
             const claim1 = danglingClaim;
-            matches.push({
-                idHash: generateMatchID(claim1, claim),
-                commitmentOne: claim1,
-                commitmentTwo: claim,
-                blockNumber: 1n,
-                createdAt: new Date(timestamp),
-                deletionBlockNumber: null,
-                deletionReason: "NOT_DELETED",
-                deletionTxHash: null,
-                epochIndex: 0n,
-                leftOfTwo:
-                    "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
-                tournamentAddress: tournament.address,
-                txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-                updatedAt: new Date(timestamp),
-                winnerCommitment: "NONE",
-            });
+            matches.push(
+                createMatch({
+                    idHash: generateMatchID(claim1, claim),
+                    commitmentOne: claim1,
+                    commitmentTwo: claim,
+                    blockNumber: 1n,
+                    createdAt: new Date(timestamp),
+                    deletionBlockNumber: null,
+                    deletionReason: "NOT_DELETED",
+                    deletionTxHash: null,
+                    epochIndex: 0n,
+                    leftOfTwo:
+                        "0x7b39d1c90850f72daa51599ec1ff041aa5b1eda8f6ef1d00ce853b8f89462002",
+                    tournamentAddress: tournament.address,
+                    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+                    updatedAt: new Date(timestamp),
+                    winnerCommitment: "NONE",
+                }),
+            );
             danglingClaim = undefined;
             timestamp++; // XXX: improve this timestamp increment
         } else {
@@ -188,6 +196,13 @@ export const randomMatches = (
         claim = claims.shift();
     }
 
+    if (danglingClaim) {
+        tournament.snapshot = {
+            ...tournament.snapshot,
+            candidate: danglingClaim,
+        };
+    }
+
     // define tournament winner
     const pending = matches.filter(
         (match) => match.winnerCommitment === "NONE",
@@ -195,14 +210,47 @@ export const randomMatches = (
     if (pending.length === 0) {
         // all matches are resolved, the winner is the last surviving claim
         const lastMatch = matches[matches.length - 1];
-        tournament.winnerCommitment =
+        const winner =
             lastMatch.winnerCommitment === "ONE"
                 ? lastMatch.commitmentOne
                 : lastMatch.commitmentTwo;
+        tournament.snapshot = {
+            ...tournament.snapshot,
+            standing: tournament.level === 0n ? "ROOT_WINNER" : "INNER_WINNER",
+            candidate: winner,
+            winnerCommitment: winner,
+        };
     }
 
     return matches;
 };
+
+/**
+ * Use the record dates as the timestamps of the blocks the match events
+ * happened in: advances, the match deletion and the sub-tournament creation.
+ */
+export const toBlockTimestamps = (
+    advances: MatchAdvanced[],
+    match?: Match,
+    subTournament?: Tournament,
+) =>
+    new Map<bigint, number>([
+        ...advances.map(
+            (advance) =>
+                [advance.blockNumber, advance.createdAt.getTime()] as const,
+        ),
+        ...(match?.deletionBlockNumber
+            ? [[match.deletionBlockNumber, match.updatedAt.getTime()] as const]
+            : []),
+        ...(subTournament
+            ? [
+                  [
+                      subTournament.startInstant,
+                      subTournament.createdAt.getTime(),
+                  ] as const,
+              ]
+            : []),
+    ]);
 
 export const STORIES_RPC_URL = "http://127.0.0.1:8545";
 

@@ -1,17 +1,31 @@
 import type { Match, Tournament } from "@cartesi/client";
-import { useMatch, useTournament } from "@cartesi/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
 import type { Address } from "viem";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTournamentHierarchy } from "../../src/hooks/useTournamentHierarchy";
+import { createMatch, createTournament } from "../../src/stories/prt";
 
-vi.mock("@cartesi/react", () => ({
-    useMatch: vi.fn(),
-    useTournament: vi.fn(),
+const client = vi.hoisted(() => ({
+    getTournament: vi.fn(),
+    getMatch: vi.fn(),
 }));
 
-const mockUseTournament = vi.mocked(useTournament, { partial: true });
-const mockUseMatch = vi.mocked(useMatch, { partial: true });
+vi.mock("@cartesi/react", () => ({
+    serverUrl: () => "http://127.0.0.1:10011/rpc",
+    useCartesiClient: () => client,
+}));
+
+const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider
+        client={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+        }
+    >
+        {children}
+    </QueryClientProvider>
+);
 
 const application = "0x1111111111111111111111111111111111111111" as Address;
 const epochIndex = 0n;
@@ -23,94 +37,91 @@ const parentTournamentAddress =
 const parentMatchIdHash =
     "0xcccc000000000000000000000000000000000000000000000000000000000003" as `0x${string}`;
 
-const makeTournament = (overrides: Partial<Tournament> = {}): Tournament => ({
-    address: rootTournamentAddress,
-    createdAt: new Date(),
-    epochIndex,
-    finalStateHash: null,
-    finishedAtBlock: 0n,
-    height: 48n,
-    level: 0n,
-    log2step: 44n,
-    maxLevel: 3n,
-    parentMatchIdHash: null,
-    parentTournamentAddress: null,
-    updatedAt: new Date(),
-    winnerCommitment: null,
-    ...overrides,
-});
+const makeTournament = (overrides: Partial<Tournament> = {}): Tournament =>
+    createTournament({
+        address: rootTournamentAddress,
+        epochIndex,
+        ...overrides,
+    });
 
-const makeMatch = (overrides: Partial<Match> = {}): Match => ({
-    blockNumber: 1n,
-    commitmentOne:
-        "0x1111111111111111111111111111111111111111111111111111111111111111",
-    commitmentTwo:
-        "0x2222222222222222222222222222222222222222222222222222222222222222",
-    createdAt: new Date(),
-    deletionBlockNumber: null,
-    deletionReason: "NOT_DELETED",
-    deletionTxHash: null,
-    epochIndex,
-    idHash: parentMatchIdHash,
-    leftOfTwo: "0x01" as `0x${string}`,
-    tournamentAddress: rootTournamentAddress,
-    txHash: "0xdeadbeef" as `0x${string}`,
-    updatedAt: new Date(),
-    winnerCommitment: "NONE" as const,
-    ...overrides,
-});
-
-const idleQuery = { data: undefined, isFetching: false };
-const loadingQuery = { data: undefined, isFetching: true };
+const makeMatch = (overrides: Partial<Match> = {}): Match =>
+    createMatch({
+        commitmentOne:
+            "0x1111111111111111111111111111111111111111111111111111111111111111",
+        commitmentTwo:
+            "0x2222222222222222222222222222222222222222222222222222222222222222",
+        epochIndex,
+        idHash: parentMatchIdHash,
+        leftOfTwo: "0x01" as `0x${string}`,
+        tournamentAddress: rootTournamentAddress,
+        txHash: "0xdeadbeef" as `0x${string}`,
+        ...overrides,
+    });
 
 describe("useTournamentHierarchy", () => {
     beforeEach(() => {
-        mockUseTournament.mockReturnValue(idleQuery);
-        mockUseMatch.mockReturnValue(idleQuery);
+        client.getTournament.mockReset();
+        client.getMatch.mockReset();
     });
+
+    const serve = (tournaments: Tournament[], matches: Match[]) => {
+        client.getTournament.mockImplementation(
+            async ({ address }: { address: Address }) =>
+                tournaments.find(
+                    (tournament) => tournament.address === address,
+                ),
+        );
+        client.getMatch.mockImplementation(
+            async ({ idHash }: { idHash: string }) =>
+                matches.find((match) => match.idHash === idHash),
+        );
+    };
 
     describe("initial state", () => {
         it("should return empty matches and tournaments when no tournament option provided", () => {
-            const { result } = renderHook(() =>
-                useTournamentHierarchy({ application, epochIndex }),
+            const { result } = renderHook(
+                () => useTournamentHierarchy({ application, epochIndex }),
+                { wrapper },
             );
 
             expect(result.current.matches).toEqual([]);
             expect(result.current.tournaments).toEqual([]);
+            expect(client.getTournament).not.toHaveBeenCalled();
         });
 
-        it("should return empty matches and tournaments when tournament has no parents", () => {
-            const tournament = makeTournament();
-
-            const { result } = renderHook(() =>
-                useTournamentHierarchy({
-                    application,
-                    epochIndex,
-                    tournament: tournament,
-                }),
+        it("should return empty matches and tournaments when tournament has no parents", async () => {
+            const { result } = renderHook(
+                () =>
+                    useTournamentHierarchy({
+                        application,
+                        epochIndex,
+                        tournament: makeTournament(),
+                    }),
+                { wrapper },
             );
 
+            await waitFor(() => expect(result.current.tournaments).toEqual([]));
             expect(result.current.matches).toEqual([]);
-            expect(result.current.tournaments).toEqual([]);
+            expect(client.getTournament).not.toHaveBeenCalled();
         });
     });
 
     describe("searching state", () => {
         it("should remain with empty collections while fetching parent data", () => {
-            const tournament = makeTournament({
-                parentMatchIdHash,
-                parentTournamentAddress,
-            });
+            client.getTournament.mockReturnValue(new Promise(() => {}));
+            client.getMatch.mockReturnValue(new Promise(() => {}));
 
-            mockUseTournament.mockReturnValue(loadingQuery);
-            mockUseMatch.mockReturnValue(loadingQuery);
-
-            const { result } = renderHook(() =>
-                useTournamentHierarchy({
-                    application,
-                    epochIndex,
-                    tournament: tournament,
-                }),
+            const { result } = renderHook(
+                () =>
+                    useTournamentHierarchy({
+                        application,
+                        epochIndex,
+                        tournament: makeTournament({
+                            parentMatchIdHash,
+                            parentTournamentAddress,
+                        }),
+                    }),
+                { wrapper },
             );
 
             expect(result.current.matches).toEqual([]);
@@ -119,139 +130,91 @@ describe("useTournamentHierarchy", () => {
     });
 
     describe("Build parent child hierarchy", () => {
-        describe("Single level tournament", () => {
-            it("should return parent tournament and match", async () => {
-                const childTournament = makeTournament({
-                    parentMatchIdHash,
-                    parentTournamentAddress,
-                    level: 1n,
-                });
+        it("should return parent tournament and match", async () => {
+            const parentTournament = makeTournament({
+                address: parentTournamentAddress,
+            });
+            const parentMatch = makeMatch({
+                tournamentAddress: parentTournamentAddress,
+            });
+            serve([parentTournament], [parentMatch]);
 
-                const parentTournament = makeTournament({
-                    address: parentTournamentAddress,
-                    parentMatchIdHash: null,
-                    parentTournamentAddress: null,
-                    level: 0n,
-                });
-
-                const parentMatch = makeMatch({
-                    tournamentAddress: parentTournamentAddress,
-                });
-
-                // Simulate that the queries have completed.
-                mockUseTournament.mockReturnValue({
-                    data: parentTournament,
-                    isFetching: false,
-                });
-
-                mockUseMatch.mockReturnValue({
-                    data: parentMatch,
-                    isFetching: false,
-                });
-
-                const { result } = renderHook(useTournamentHierarchy, {
-                    initialProps: {
+            const { result } = renderHook(
+                () =>
+                    useTournamentHierarchy({
                         application,
                         epochIndex,
-                        tournament: childTournament,
-                    },
-                });
+                        tournament: makeTournament({
+                            parentMatchIdHash,
+                            parentTournamentAddress,
+                            level: 1n,
+                        }),
+                    }),
+                { wrapper },
+            );
 
-                await waitFor(() => {
-                    expect(result.current.tournaments).toHaveLength(1);
-                });
-
-                expect(result.current.tournaments[0]).toMatchObject({
-                    address: parentTournamentAddress,
-                });
-                expect(result.current.matches).toHaveLength(1);
-                expect(result.current.matches[0]).toMatchObject(parentMatch);
+            await waitFor(() =>
+                expect(result.current.tournaments).toEqual([parentTournament]),
+            );
+            expect(result.current.matches).toEqual([parentMatch]);
+            expect(client.getMatch).toHaveBeenCalledWith({
+                application,
+                epochIndex,
+                tournamentAddress: parentTournamentAddress,
+                idHash: parentMatchIdHash,
             });
         });
 
-        describe("Multi level tournament", () => {
-            it("should return hierarchy of tournaments and matches ordered by parent-child relationship", async () => {
-                const childMatchIdHash =
-                    "0xdddd000000000000000000000000000000000000000000000000000000000004" as `0x${string}`;
-                const childTournamentAddress =
-                    "0xeeee000000000000000000000000000000000003" as Address;
+        it("should return hierarchy of tournaments and matches ordered by parent-child relationship", async () => {
+            const childMatchIdHash =
+                "0xdddd000000000000000000000000000000000000000000000000000000000004" as `0x${string}`;
+            const childTournamentAddress =
+                "0xeeee000000000000000000000000000000000003" as Address;
 
-                const grandchildTournament = makeTournament({
-                    address:
-                        "0xffff000000000000000000000000000000000005" as Address,
-                    parentMatchIdHash: childMatchIdHash,
-                    parentTournamentAddress: childTournamentAddress,
-                    level: 2n,
-                });
+            const parentTournament = makeTournament({
+                address: parentTournamentAddress,
+            });
+            const parentMatch = makeMatch({
+                tournamentAddress: parentTournamentAddress,
+            });
+            const childTournament = makeTournament({
+                address: childTournamentAddress,
+                parentMatchIdHash,
+                parentTournamentAddress,
+                level: 1n,
+            });
+            const childMatch = makeMatch({
+                idHash: childMatchIdHash,
+                tournamentAddress: childTournamentAddress,
+            });
+            serve(
+                [parentTournament, childTournament],
+                [parentMatch, childMatch],
+            );
 
-                const childMatch = makeMatch({
-                    idHash: childMatchIdHash,
-                    tournamentAddress: childTournamentAddress,
-                });
-
-                const childTournament = makeTournament({
-                    address: childTournamentAddress,
-                    parentMatchIdHash,
-                    parentTournamentAddress,
-                    level: 1n,
-                });
-
-                const parentTournament = makeTournament({
-                    address: parentTournamentAddress,
-                    parentMatchIdHash: null,
-                    parentTournamentAddress: null,
-                    level: 0n,
-                });
-
-                const parentMatch = makeMatch({
-                    tournamentAddress: parentTournamentAddress,
-                });
-
-                mockUseTournament
-                    .mockReturnValueOnce(idleQuery)
-                    .mockReturnValueOnce({
-                        isFetching: false,
-                        data: childTournament,
-                    })
-                    .mockReturnValueOnce({
-                        isFetching: false,
-                        data: parentTournament,
-                    });
-
-                mockUseMatch
-                    .mockReturnValueOnce(idleQuery)
-                    .mockReturnValueOnce({
-                        data: childMatch,
-                        isFetching: false,
-                    })
-                    .mockReturnValueOnce({
-                        data: parentMatch,
-                        isFetching: false,
-                    });
-
-                const { result } = renderHook(useTournamentHierarchy, {
-                    initialProps: {
+            const { result } = renderHook(
+                () =>
+                    useTournamentHierarchy({
                         application,
                         epochIndex,
-                        tournament: grandchildTournament,
-                    },
-                });
+                        tournament: makeTournament({
+                            address:
+                                "0xffff000000000000000000000000000000000005" as Address,
+                            parentMatchIdHash: childMatchIdHash,
+                            parentTournamentAddress: childTournamentAddress,
+                            level: 2n,
+                        }),
+                    }),
+                { wrapper },
+            );
 
-                await waitFor(() =>
-                    expect(result.current.tournaments).toHaveLength(2),
-                );
-
-                expect(result.current.tournaments[0]).toMatchObject({
-                    address: parentTournamentAddress,
-                });
-
-                expect(result.current.tournaments[1]).toMatchObject({
-                    address: childTournament.address,
-                });
-                expect(result.current.matches).toHaveLength(2);
-                expect(result.current.matches[0]).toMatchObject(parentMatch);
-                expect(result.current.matches[1]).toMatchObject(childMatch);
-            });
+            await waitFor(() =>
+                expect(result.current.tournaments).toEqual([
+                    parentTournament,
+                    childTournament,
+                ]),
+            );
+            expect(result.current.matches).toEqual([parentMatch, childMatch]);
         });
     });
 });

@@ -1,5 +1,6 @@
 import {
     Group,
+    Skeleton,
     Stack,
     Text,
     Timeline,
@@ -30,6 +31,11 @@ export interface ClaimTimelineItemProps extends TimelineItemProps {
      * The timestamp to display.
      */
     timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 }
 
 const formatTime = (now: number, timestamp: number) => {
@@ -40,7 +46,15 @@ export const ClaimTimelineItem = forwardRef<
     HTMLDivElement,
     ClaimTimelineItemProps
 >((props, ref) => {
-    const { children, claim, now, rightSection, timestamp } = props;
+    const { children, claim, now, rightSection, timestamp, timestampLoading } =
+        props;
+    const time = timestamp ? (
+        <Text size="xs" c="dimmed">
+            {formatTime(now, timestamp)}
+        </Text>
+    ) : timestampLoading ? (
+        <Skeleton h={10} w={72} radius="xl" data-testid="timestamp-loading" />
+    ) : null;
     return (
         <Timeline.Item
             bullet={
@@ -49,11 +63,9 @@ export const ClaimTimelineItem = forwardRef<
             ref={ref}
         >
             <Stack gap={3}>
-                {(timestamp || rightSection) && (
-                    <Group justify="space-between">
-                        <Text size="xs" c="dimmed">
-                            {timestamp ? formatTime(now, timestamp) : undefined}
-                        </Text>
+                {(time || rightSection) && (
+                    <Group justify={time ? "space-between" : "flex-end"}>
+                        {time}
                         {rightSection}
                     </Group>
                 )}

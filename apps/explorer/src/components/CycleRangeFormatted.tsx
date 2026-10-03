@@ -1,10 +1,13 @@
-import { Text, type TextProps } from "@mantine/core";
+import { Text, Tooltip, type TextProps } from "@mantine/core";
 import type { FC } from "react";
+import { content } from "../content";
+import { formatMetaCycleRange } from "../lib/metaCycleFormat";
 import type { CycleRange } from "./types";
 
-const formatter = new Intl.NumberFormat("en-US", {});
-
 interface CycleRangeFormattedProps extends TextProps {
+    /**
+     * Half-open meta-cycle range, shown with an inclusive end.
+     */
     range: CycleRange;
 }
 
@@ -13,6 +16,14 @@ export const CycleRangeFormatted: FC<CycleRangeFormattedProps> = ({
     ...textProps
 }) => {
     const [start, end] = range;
-    const formattedText = `${formatter.format(start)} → ${formatter.format(end)}`;
-    return <Text {...textProps}>{formattedText}</Text>;
+    const last = end > start ? end - 1n : start;
+    return (
+        <Tooltip
+            label={`${content.tournament.cycle.metaCyclesTxt} ${start} – ${last}`}
+            multiline
+            withArrow
+        >
+            <Text {...textProps}>{formatMetaCycleRange(range)}</Text>
+        </Tooltip>
+    );
 };

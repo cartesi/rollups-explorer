@@ -1,4 +1,10 @@
-import type { Application, Epoch, Input, Pagination } from "@cartesi/client";
+import type {
+    Application,
+    Epoch,
+    Input,
+    Pagination,
+    Tournament,
+} from "@cartesi/client";
 import {
     Anchor,
     Badge,
@@ -20,12 +26,14 @@ import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
 import { NextPagination } from "../components/navigation/NextPagination";
+import { getTournamentCycleRange } from "../lib/prtUtils";
 
 type Props = {
     application: Application;
     epoch: Epoch;
     inputs: Input[];
     pagination?: Pagination;
+    tournament?: Tournament;
 };
 
 const NoInputs = () => (
@@ -43,6 +51,7 @@ export const EpochPage: FC<Props> = ({
     inputs,
     pagination,
     application,
+    tournament,
 }) => {
     const theme = useMantineTheme();
     const epochStatusColor = useEpochStatusColor(epoch);
@@ -50,10 +59,8 @@ export const EpochPage: FC<Props> = ({
     const tournamentUrl = isAddress(tournamentAddress ?? "0x")
         ? `${epoch.index}/tournaments/${tournamentAddress}`
         : null;
-    const inDispute = false; // XXX: how to know if an epoch is in dispute?
+    const inDispute = tournament?.snapshot.standing === "MATCHES_ACTIVE";
     const tournamentColor = inDispute ? epochStatusColor : "";
-    const startCycle = 0; // XXX: how to know the startCycle?
-    const endCycle = 0; // XXX: how to know the endCycle?
 
     return (
         <Stack>
@@ -88,10 +95,12 @@ export const EpochPage: FC<Props> = ({
                                 />
                                 <Text c={tournamentColor}>Tournament</Text>
                             </Group>
-                            <CycleRangeFormatted
-                                size="md"
-                                range={[startCycle, endCycle]}
-                            />
+                            {tournament && (
+                                <CycleRangeFormatted
+                                    size="md"
+                                    range={getTournamentCycleRange(tournament)}
+                                />
+                            )}
                         </Group>
                     </Anchor>
                 ) : (

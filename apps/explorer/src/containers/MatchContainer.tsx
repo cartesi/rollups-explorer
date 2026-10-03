@@ -1,19 +1,28 @@
 "use client";
 import {
+    useBondEvents,
+    useCommitment,
     useMatch,
     useMatchAdvances,
     useTournament,
     useTournaments,
 } from "@cartesi/react";
-import { notFound } from "next/navigation";
-import type { FC } from "react";
+import { notFound, useSearchParams } from "next/navigation";
+import { isNotNil } from "ramda";
+import { useMemo, type FC } from "react";
 import {
     Hierarchy,
     type HierarchyConfig,
 } from "../components/navigation/Hierarchy";
 import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
+import { useBlockTimestamps } from "../hooks/useBlockTimestamps";
+import { useJoinBonds } from "../hooks/useJoinBonds";
+import { useLeafStepProof } from "../hooks/useLeafStepProof";
+import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
+import { isBondRefund } from "../lib/bondUtils";
+import { isTournamentSettled } from "../lib/prtUtils";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
@@ -21,6 +30,8 @@ import ContainerStack from "./ContainerStack";
 
 export const MatchContainer: FC<MatchParams> = (params) => {
     const now = Date.now();
+    const searchParams = useSearchParams();
+    const tab = searchParams.get("tab") === "bonds" ? "bonds" : "overview";
 
     const tournamentQuery = useTournament({
         application: params.application,
@@ -35,6 +46,57 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         parentMatchIdHash: params.idHash,
     });
 
+    const commitmentParams = {
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: params.tournamentAddress,
+    };
+    const commitmentOneQuery = useCommitment({
+        ...commitmentParams,
+        commitment: matchQuery.data?.commitmentOne,
+        enabled: isNotNil(matchQuery.data),
+    });
+    const commitmentTwoQuery = useCommitment({
+        ...commitmentParams,
+        commitment: matchQuery.data?.commitmentTwo,
+        enabled: isNotNil(matchQuery.data),
+    });
+    const commitments = [
+        commitmentOneQuery.data,
+        commitmentTwoQuery.data,
+    ].filter(isNotNil);
+
+    const bondEventsQuery = useBondEvents({
+        application: params.application,
+        epochIndex: params.epochIndex,
+        tournamentAddress: params.tournamentAddress,
+        limit: 10_000,
+        descending: true,
+    });
+    const refunds = useMemo(
+        () =>
+            new Map(
+                (bondEventsQuery.data?.data ?? [])
+                    .filter(isBondRefund)
+                    .map((refund) => [refund.txHash, refund]),
+            ),
+        [bondEventsQuery.data],
+    );
+
+    useRefetchOnFinalizedBlock(
+        isNotNil(tournamentQuery.data) &&
+            !isTournamentSettled(tournamentQuery.data),
+        [
+            tournamentQuery.refetch,
+            matchQuery.refetch,
+            advancesQuery.refetch,
+            subTournamentQuery.refetch,
+            commitmentOneQuery.refetch,
+            commitmentTwoQuery.refetch,
+            bondEventsQuery.refetch,
+        ],
+    );
+
     const isLoading =
         tournamentQuery.isLoading ||
         matchQuery.isLoading ||
@@ -43,6 +105,17 @@ export const MatchContainer: FC<MatchParams> = (params) => {
     const match = matchQuery.data ?? null;
     const tournament = tournamentQuery.data ?? null;
     const subTournament = subTournamentQuery.data?.data[0];
+
+    const stepProof = useLeafStepProof(match);
+    const joinBonds = useJoinBonds(tournament, commitments);
+
+    const { timestamps, isLoading: timestampsLoading } = useBlockTimestamps([
+        ...(advancesQuery.data?.data ?? []).map(
+            ({ blockNumber }) => blockNumber,
+        ),
+        match?.deletionBlockNumber,
+        subTournament?.startInstant,
+    ]);
 
     const { matches: parentMatches, tournaments: parentTournaments } =
         useTournamentHierarchy({
@@ -122,8 +195,25 @@ export const MatchContainer: FC<MatchParams> = (params) => {
             {tournament !== null && match !== null && (
                 <MatchPage
                     advances={advancesQuery.data?.data ?? []}
+                    commitments={commitments}
+                    joinBonds={joinBonds.bonds}
+                    joinBondsLoading={joinBonds.isLoading}
+                    onActionConfirmed={() => {
+                        tournamentQuery.refetch();
+                        matchQuery.refetch();
+                        advancesQuery.refetch();
+                        subTournamentQuery.refetch();
+                        commitmentOneQuery.refetch();
+                        commitmentTwoQuery.refetch();
+                        bondEventsQuery.refetch();
+                    }}
                     tournament={tournament}
+                    refunds={refunds}
                     subTournament={subTournament}
+                    tab={tab}
+                    stepProof={stepProof}
+                    timestamps={timestamps}
+                    timestampsLoading={timestampsLoading}
                     match={match}
                     now={now}
                 />

@@ -1,5 +1,8 @@
 import { Stack, Text, type TimelineItemProps } from "@mantine/core";
 import { forwardRef, useMemo, type FC } from "react";
+import type { Depositor, PartialBondRefundEvent } from "../../lib/bondUtils";
+import { toRatio } from "../../util";
+import { BondRefund } from "../bond/BondRefund";
 import type { Claim, CycleRange } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
 import { CurlyBracket } from "./CurlyBracket";
@@ -10,6 +13,11 @@ export interface BisectionItemProps extends TimelineItemProps {
      * Claim that performed the bisection
      */
     claim: Claim;
+
+    /**
+     * Accounts that deposited the bonds of the match claims.
+     */
+    depositors?: Depositor[];
 
     /**
      * Domain of the bisection
@@ -37,9 +45,19 @@ export interface BisectionItemProps extends TimelineItemProps {
     range: CycleRange;
 
     /**
+     * Bond refund paid for the bisection
+     */
+    refund?: PartialBondRefundEvent;
+
+    /**
      * Timestamp of the bisection
      */
-    timestamp: number;
+    timestamp?: number;
+
+    /**
+     * Whether the timestamp is still being resolved.
+     */
+    timestampLoading?: boolean;
 
     /**
      * Total number of bisections
@@ -51,16 +69,28 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
     HTMLDivElement,
     BisectionItemProps
 >((props, ref) => {
-    const { claim, domain, expand, index, now, range, timestamp, total } =
-        props;
+    const {
+        claim,
+        depositors,
+        domain,
+        expand,
+        index,
+        now,
+        range,
+        refund,
+        timestamp,
+        timestampLoading,
+        total,
+    } = props;
 
     // percentage of the middle of the range relative to the bar
     const p = useMemo(() => {
         const [start, end] = range;
         const [domainStart, domainEnd] = domain;
-        const numerator = start + end - 2 * domainStart;
-        const denominator = Math.max(2 * (domainEnd - domainStart), 1);
-        return numerator / denominator;
+        return toRatio(
+            start + end - 2n * domainStart,
+            2n * (domainEnd - domainStart),
+        );
     }, [domain, range]);
 
     return (
@@ -74,6 +104,7 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                 </Text>
             }
             timestamp={timestamp}
+            timestampLoading={timestampLoading}
         >
             <Stack gap="xs">
                 <RangeIndicator
@@ -91,12 +122,15 @@ const BisectionItem: FC<BisectionItemProps> = forwardRef<
                             tip={p}
                         />
                         <RangeIndicator
-                            domain={[0, 1]}
-                            value={[0, 1]}
+                            domain={[0n, 1n]}
+                            value={[0n, 1n]}
                             h={16}
                             color={props.color}
                         />
                     </>
+                )}
+                {refund && (
+                    <BondRefund depositors={depositors} refund={refund} />
                 )}
             </Stack>
         </ClaimTimelineItem>

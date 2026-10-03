@@ -16,6 +16,11 @@ export type MatchParams = TournamentParams & {
     idHash: Hex;
 };
 
+export type BondEventParams = ApplicationParams & {
+    txHash: Hex;
+    logIndex: bigint;
+};
+
 export const pathBuilder = {
     base: "/" as const,
     specifications: () => `${pathBuilder.base}specifications` as const,
@@ -30,6 +35,10 @@ export const pathBuilder = {
         `${pathBuilder.application(params)}/withdrawals` as const,
     outputs: (params: ApplicationParams) =>
         `${pathBuilder.application(params)}/outputs` as const,
+    bonds: (params: ApplicationParams) =>
+        `${pathBuilder.application(params)}/bonds` as const,
+    bondEvent: (params: BondEventParams) =>
+        `${pathBuilder.bonds(params)}/${params.txHash}/${params.logIndex}` as const,
     epochs: (params: ApplicationParams) =>
         `${pathBuilder.application(params)}/epochs` as const,
     epoch: (params: EpochParams) =>

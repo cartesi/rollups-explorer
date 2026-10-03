@@ -14,6 +14,11 @@ import {
     randomMatches,
 } from "../stories/util";
 import { TournamentPage } from "./TournamentPage";
+import {
+    createCommitment,
+    createJoinBond,
+    createTournament,
+} from "../stories/prt";
 
 const meta = {
     title: "Pages/Tournament",
@@ -56,29 +61,17 @@ const WithBreadcrumb = (props: Props) => {
 
 export const TopLevelClosed: Story = {
     render: WithBreadcrumb,
-    args: {
-        commitments: TournamentViewStories.NoChallengerYet.args.commitments,
-        matches: TournamentViewStories.NoChallengerYet.args.matches,
-        tournament: TournamentViewStories.NoChallengerYet.args.tournament,
-    },
+    args: TournamentViewStories.NoChallengerYet.args,
 };
 
 export const TopLevelFinalized: Story = {
     render: WithBreadcrumb,
-    args: {
-        commitments: TournamentViewStories.Finalized.args.commitments,
-        matches: TournamentViewStories.Finalized.args.matches,
-        tournament: TournamentViewStories.Finalized.args.tournament,
-    },
+    args: TournamentViewStories.Finalized.args,
 };
 
 export const TopLevelDispute: Story = {
     render: WithBreadcrumb,
-    args: {
-        commitments: TournamentViewStories.Ongoing.args.commitments,
-        matches: TournamentViewStories.Ongoing.args.matches,
-        tournament: TournamentViewStories.Ongoing.args.tournament,
-    },
+    args: TournamentViewStories.Ongoing.args,
 };
 
 /**
@@ -89,12 +82,10 @@ const claims: Claim[] = Array.from({ length: 128 }).map((_, i) => claim(i));
 const startCycle = 1837880065;
 const endCycle = 2453987565;
 
-const randomTournament: Tournament = {
+const randomTournament: Tournament = createTournament({
     address: generateTournamentAddress(startCycle, endCycle),
     createdAt: new Date(now),
     epochIndex: 0n,
-    finalStateHash: null,
-    finishedAtBlock: 1n,
     height: 48n,
     level: 0n,
     log2step: 1n,
@@ -102,20 +93,24 @@ const randomTournament: Tournament = {
     parentMatchIdHash: null,
     parentTournamentAddress: null,
     updatedAt: new Date(now),
-    winnerCommitment: null,
-};
+    snapshot: { standing: "MATCHES_ACTIVE" },
+});
 
-const commitments: Commitment[] = claims.map((claim, i) => ({
-    blockNumber: BigInt(i),
-    commitment: claim.hash,
-    createdAt: new Date(now + i),
-    epochIndex: 0n,
-    finalStateHash: zeroHash,
-    submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-    tournamentAddress: randomTournament.address,
-    txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
-    updatedAt: new Date(now + i),
-}));
+const commitments: Commitment[] = claims.map((claim, i) =>
+    createCommitment({
+        blockNumber: BigInt(i),
+        commitment: claim.hash,
+        createdAt: new Date(now + i),
+        epochIndex: 0n,
+        finalStateHash: zeroHash,
+        submitterAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        tournamentAddress: randomTournament.address,
+        txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
+        updatedAt: new Date(now + i),
+    }),
+);
+
+const largeBondValue = 21_300_000_000_000_000n;
 
 const matches = randomMatches(
     now,
@@ -126,6 +121,13 @@ const matches = randomMatches(
 export const TopLevelLargeDispute: Story = {
     render: WithBreadcrumb,
     args: {
+        bondPool: {
+            balance: BigInt(commitments.length) * largeBondValue,
+            bondValue: largeBondValue,
+            bonds: commitments.map((commitment) =>
+                createJoinBond(commitment, { value: largeBondValue }),
+            ),
+        },
         commitments,
         matches,
         tournament: randomTournament,
@@ -134,9 +136,35 @@ export const TopLevelLargeDispute: Story = {
 
 export const MidLevelDispute: Story = {
     render: WithBreadcrumb,
-    args: {
-        commitments: TournamentViewStories.MidLevelDispute.args.commitments,
-        matches: TournamentViewStories.MidLevelDispute.args.matches,
-        tournament: TournamentViewStories.MidLevelDispute.args.tournament,
-    },
+    args: TournamentViewStories.MidLevelDispute.args,
+};
+
+export const TopLevelDisputeWithRefunds: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.RefundsOngoing.args,
+};
+
+export const TopLevelBondRecovered: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.BondRecovered.args,
+};
+
+export const TopLevelBondPoolRunning: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.BondPoolRunning.args,
+};
+
+export const TopLevelBondPoolRecovered: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.BondPoolRecovered.args,
+};
+
+export const TopLevelBondPoolNoWinner: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.BondPoolNoWinner.args,
+};
+
+export const TopLevelBondsTab: Story = {
+    render: WithBreadcrumb,
+    args: { ...TopLevelDisputeWithRefunds.args, tab: "bonds" },
 };

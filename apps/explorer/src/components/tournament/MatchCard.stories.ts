@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs";
 import { fn } from "storybook/test";
 import { claim, generateMatchID } from "../../stories/util";
 import { MatchCard } from "./MatchCard";
+import { createMatch } from "../../stories/prt";
 
 const meta = {
     title: "Components/Tournament/MatchCard",
@@ -18,7 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 const timestamp = Math.floor(Date.now() / 1000);
 
-const match: Match = {
+const match: Match = createMatch({
     blockNumber: 1n,
     commitmentOne: claim(0).hash,
     commitmentTwo: claim(1).hash,
@@ -34,7 +35,7 @@ const match: Match = {
     txHash: "0x06ad8f0ce427010498fbb2388b432f6d578e4e1ffe5dbf20869629b09dcf0d70",
     updatedAt: new Date(timestamp),
     winnerCommitment: "NONE",
-};
+});
 /**
  * A match that is ongoing, which means that both claims are still in dispute, with no winner yet.
  */
@@ -51,11 +52,11 @@ export const Ongoing: Story = {
  */
 export const MidLevel: Story = {
     args: {
-        match: {
+        match: createMatch({
             ...match,
             commitmentOne: claim(0, 2).hash,
             commitmentTwo: claim(1, 3).hash,
-        },
+        }),
         onClick: fn(),
     },
 };
@@ -66,11 +67,11 @@ export const MidLevel: Story = {
  */
 export const BottomLevel: Story = {
     args: {
-        match: {
+        match: createMatch({
             ...match,
             commitmentOne: claim(0, 2, 4).hash,
             commitmentTwo: claim(1, 3, 5).hash,
-        },
+        }),
         onClick: fn(),
     },
 };
