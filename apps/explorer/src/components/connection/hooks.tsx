@@ -418,7 +418,7 @@ const defaultVal = {
     isDeletable: false,
     isPreferred: true,
     timestamp: Date.now(),
-    version: "2.0.0-alpha.12",
+    version: "2.0.0-alpha.13",
 };
 
 type BuildSystemNodeReturn = {
