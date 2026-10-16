@@ -31,4 +31,8 @@ export const globalMessages = {
         address: "Application Address",
     },
     toTxt: "to",
+    summary: {
+        showMoreTxt: (count: number) => `Show ${count} more counters`,
+        hideTxt: "Hide extra counters",
+    },
 } as const;
