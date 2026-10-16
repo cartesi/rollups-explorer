@@ -30,4 +30,5 @@ export const globalMessages = {
     application: {
         address: "Application Address",
     },
+    toTxt: "to",
 } as const;
