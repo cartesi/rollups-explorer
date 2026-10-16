@@ -1,3 +1,4 @@
+import type { Application } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { getUnixTime, subMinutes, subSeconds } from "date-fns";
@@ -6,6 +7,14 @@ import { Hierarchy } from "../components/navigation/Hierarchy";
 import { applications } from "../stories/data";
 import { EpochPage } from "./EpochPage";
 import { createTournament } from "../stories/prt";
+import {
+    acceptedDepositInput,
+    erc1155BatchDepositInput,
+    erc20DepositInput,
+    etherDepositInput,
+    refundEpochs,
+    refundRpcHandler,
+} from "../stories/refunds";
 
 const meta = {
     title: "Pages/Epoch Details",
@@ -311,5 +320,46 @@ export const AuthorityOpenEpoch: Story = {
                 logIndex: 0n,
             },
         ],
+    },
+};
+
+const foreclosedApp: Application = {
+    ...authorityApp,
+    applicationAddress: "0x40a7C73a6a592D8697bE97254E273E6f3FB46000",
+    forecloseBlock: 15498n,
+    forecloseTransaction:
+        "0x0000000000000000000000000000000000000000000000000000000000000012",
+};
+
+const refundParameters = {
+    connectionType: "system",
+    msw: {
+        handlers: [refundRpcHandler({ issued: [erc20DepositInput.index] })],
+    },
+};
+
+/** Foreclosed application, epoch open at foreclosure: each deposit carries the refund action and the ERC-20 one was already refunded. Needs the `system` connection, which also raises the connectivity toast. */
+export const ForeclosedWithDeposits: Story = {
+    render: WithBreadcrumb,
+    parameters: refundParameters,
+    args: {
+        application: foreclosedApp,
+        epoch: refundEpochs[0],
+        inputs: [
+            etherDepositInput,
+            erc20DepositInput,
+            erc1155BatchDepositInput,
+        ],
+    },
+};
+
+/** Foreclosed application, epoch accepted before foreclosure: its deposit was processed, so no refund is offered. */
+export const ForeclosedAcceptedEpoch: Story = {
+    render: WithBreadcrumb,
+    parameters: refundParameters,
+    args: {
+        application: foreclosedApp,
+        epoch: refundEpochs[1],
+        inputs: [acceptedDepositInput],
     },
 };
