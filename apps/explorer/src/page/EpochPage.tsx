@@ -115,7 +115,13 @@ export const EpochPage: FC<Props> = ({
                 <TbInbox size={theme.other.mdIconSize} />
                 <Title order={3}>Inputs</Title>
             </Group>
-            {inputs.length > 0 && <InputList inputs={inputs} />}
+            {inputs.length > 0 && (
+                <InputList
+                    inputs={inputs}
+                    application={application}
+                    epochStatusByIndex={new Map([[epoch.index, epoch.status]])}
+                />
+            )}
             {isEmpty(inputs) && <NoInputs />}
             {pagination && <NextPagination pagination={pagination} />}
         </Stack>
