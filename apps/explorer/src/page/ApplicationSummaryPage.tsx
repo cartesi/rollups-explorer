@@ -16,12 +16,17 @@ import {
     TbInbox,
     TbMail,
     TbMessageReport,
+    TbReceiptRefund,
     TbStack2,
     TbTransferOut,
     TbTrophy,
 } from "react-icons/tb";
 import Address from "../components/Address";
 import { ApplicationForecloseStatus } from "../components/application/ApplicationForecloseStatus";
+import {
+    RefundableDeposits,
+    type RefundableDeposit,
+} from "../components/refund/RefundableDeposits";
 import { isForeclosed } from "../components/application/utils";
 import CenteredText from "../components/CenteredText";
 import { EpochList } from "../components/epoch/EpochList";
@@ -42,6 +47,10 @@ type Meta<T> = OmitNever<{
     totalCount: number;
     data: T extends never ? never : T;
     isLoading: boolean;
+    /**
+     * Refreshes the source of this block, when the container has one.
+     */
+    refetch?: () => void;
 }>;
 
 interface Props {
@@ -50,9 +59,21 @@ interface Props {
     inputs: Meta<GetInputReturnType[]>;
     epochs: Meta<GetEpochReturnType[]>;
     withdrawals: Meta<GetWithdrawalReturnType[]>;
+
+    /**
+     * Deposit refunds issued by the application. Shown only for a
+     * foreclosed application.
+     */
+    refunds: Meta<never>;
     outputs: Meta<never>;
     reports: Meta<never>;
     tournaments: Meta<GetTournamentReturnType[]>;
+
+    /**
+     * Deposits of epochs not finalized before foreclosure. Shown only for a
+     * foreclosed application, and only when there is something to refund.
+     */
+    refundableDeposits?: Meta<RefundableDeposit[]>;
 }
 
 const getCardsPerRow = (
@@ -75,6 +96,8 @@ export const ApplicationSummaryPage: FC<Props> = ({
     reports,
     tournaments,
     withdrawals,
+    refunds,
+    refundableDeposits,
 }) => {
     const appId = application.name ?? application.applicationAddress;
     const latestTournament = head(tournaments.data);
@@ -82,6 +105,13 @@ export const ApplicationSummaryPage: FC<Props> = ({
     const appIsForeclosed = isForeclosed(application);
     const showWithdrawalsData = appIsForeclosed;
     const isPrt = application.consensusType === "PRT";
+
+    // A refund issued from the latest inputs changes the refundable deposits
+    // table and the Refunds counter, both rendered by this page.
+    const onRefunded = () => {
+        refundableDeposits?.refetch?.();
+        refunds.refetch?.();
+    };
 
     const cards: SummaryCardProps[] = [
         {
@@ -116,6 +146,12 @@ export const ApplicationSummaryPage: FC<Props> = ({
                       value: withdrawals.totalCount,
                       icon: TbTransferOut,
                       displaySkeleton: withdrawals.isLoading,
+                  },
+                  {
+                      title: content.refund.summaryCardTxt,
+                      value: refunds.totalCount,
+                      icon: TbReceiptRefund,
+                      displaySkeleton: refunds.isLoading,
                   },
               ]
             : []),
@@ -156,6 +192,13 @@ export const ApplicationSummaryPage: FC<Props> = ({
 
             {appIsForeclosed && (
                 <ApplicationForecloseStatus application={application} />
+            )}
+
+            {appIsForeclosed && refundableDeposits && (
+                <RefundableDeposits
+                    application={application}
+                    deposits={refundableDeposits.data}
+                />
             )}
 
             {tournamentUrl && (
@@ -258,6 +301,16 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     <InputList
                         key={`${appId}-latest-inputs-${inputs.data.length}`}
                         inputs={inputs.data}
+                        application={application}
+                        epochStatusByIndex={
+                            new Map(
+                                epochs.data.map((epoch) => [
+                                    epoch.index,
+                                    epoch.status,
+                                ]),
+                            )
+                        }
+                        onRefunded={onRefunded}
                     />
                 )}
             </Stack>

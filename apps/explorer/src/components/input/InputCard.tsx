@@ -14,7 +14,7 @@ import {
     type MantineColor,
 } from "@mantine/core";
 import { isNotNil } from "ramda";
-import { Activity, useMemo, useState, type FC } from "react";
+import { Activity, useMemo, useState, type FC, type ReactNode } from "react";
 import { TbReceipt } from "react-icons/tb";
 import { zeroAddress } from "viem";
 import useRightColorShade from "../../hooks/useRightColorShade";
@@ -30,6 +30,9 @@ import { contentDisplayOptions, type DecoderType } from "../types";
 
 interface Props {
     input: Input;
+
+    /** Extra section above the transaction footer, such as the refund action. */
+    footer?: ReactNode;
 }
 
 const getStatusColor = (status: InputStatus): MantineColor => {
@@ -46,8 +49,7 @@ const getStatusColor = (status: InputStatus): MantineColor => {
 type ViewControl = "payload" | "output" | "report";
 
 const maxHeight = 450;
-// TODO: Define what else will be inside like payload (decoding etc)
-export const InputCard: FC<Props> = ({ input }) => {
+export const InputCard: FC<Props> = ({ input, footer }) => {
     const theme = useMantineTheme();
     const statusColor = useRightColorShade(getStatusColor(input.status));
     const [viewControl, setViewControl] = useState<ViewControl>("payload");
@@ -171,6 +173,11 @@ export const InputCard: FC<Props> = ({ input }) => {
                     </Activity>
                 </ScrollArea.Autosize>
             </Stack>
+            {footer && (
+                <Card.Section inheritPadding withBorder py="sm">
+                    {footer}
+                </Card.Section>
+            )}
             <Card.Section inheritPadding withBorder py="sm">
                 <Group gap="xs" justify="space-between">
                     <Group gap={3}>

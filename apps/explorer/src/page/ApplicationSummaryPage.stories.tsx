@@ -8,6 +8,13 @@ import {
 } from "../stories/util";
 import { ApplicationSummaryPage } from "./ApplicationSummaryPage";
 import { createTournament } from "../stories/prt";
+import {
+    erc20DepositInput,
+    etherDepositInput,
+    refundEpochs,
+    refundRpcHandler,
+    refundableDeposits,
+} from "../stories/refunds";
 
 const meta = {
     title: "Pages/Application/summary",
@@ -125,6 +132,10 @@ const params: Params = {
     },
     outputs: {
         totalCount: 2,
+        isLoading: false,
+    },
+    refunds: {
+        totalCount: 0,
         isLoading: false,
     },
     bondEvents: {
@@ -295,6 +306,10 @@ const authorityAppParams: Params = {
         totalCount: 2,
         isLoading: false,
     },
+    refunds: {
+        totalCount: 0,
+        isLoading: false,
+    },
     bondEvents: {
         totalCount: 0,
         isLoading: false,
@@ -442,4 +457,38 @@ export const ForeclosedApplicationDriveProved: Story = {
         },
     },
     args: ForeclosedAppDriveProvedParams,
+};
+
+/**
+ * Foreclosed application whose last epoch holds three deposits: the
+ * refundable deposits are listed under the foreclosure status and the
+ * latest inputs carry the refund action.
+ */
+export const ForeclosedWithRefundableDeposits: Story = {
+    parameters: {
+        connectionType: "system",
+        msw: {
+            handlers: [
+                refundRpcHandler({
+                    issued: [erc20DepositInput.index],
+                    fallback: getMockResponse,
+                }),
+            ],
+        },
+    },
+    args: {
+        ...ForeclosedAppDriveProvedParams,
+        epochs: { data: refundEpochs, totalCount: 53, isLoading: false },
+        inputs: {
+            data: [etherDepositInput, erc20DepositInput],
+            totalCount: 4,
+            isLoading: false,
+        },
+        refunds: { totalCount: 1, isLoading: false },
+        refundableDeposits: {
+            data: refundableDeposits,
+            totalCount: refundableDeposits.length,
+            isLoading: false,
+        },
+    },
 };
