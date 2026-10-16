@@ -5,11 +5,11 @@ import type {
     GetTournamentReturnType,
     GetWithdrawalReturnType,
 } from "@cartesi/client";
-import { Anchor, Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
+import { Anchor, Card, Group, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { head } from "ramda";
 import { isNilOrEmpty } from "ramda-adjunct";
-import { Activity, type FC } from "react";
+import { type FC } from "react";
 import {
     TbCoins,
     TbClock,
@@ -27,7 +27,11 @@ import CenteredText from "../components/CenteredText";
 import { EpochList } from "../components/epoch/EpochList";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
-import { SummaryCard } from "../components/SummaryCard";
+import type { SummaryCardProps } from "../components/SummaryCard";
+import {
+    SummaryCards,
+    type CardsPerRow,
+} from "../components/application/SummaryCards";
 import { WithdrawalList } from "../components/withdrawal/WithdrawalList";
 import { content } from "../content";
 import { pathBuilder } from "../routes/routePathBuilder";
@@ -51,12 +55,14 @@ interface Props {
     tournaments: Meta<GetTournamentReturnType[]>;
 }
 
-const getGridSpan = (consensusType: Application["consensusType"]) => {
+const getCardsPerRow = (
+    consensusType: Application["consensusType"],
+): CardsPerRow => {
     switch (consensusType) {
         case "PRT":
-            return { base: 12, xs: 6, sm: 4 };
+            return { base: 1, xs: 2, sm: 3 };
         default:
-            return { base: 12, xs: 6 };
+            return { base: 1, xs: 2, sm: 2 };
     }
 };
 
@@ -73,9 +79,64 @@ export const ApplicationSummaryPage: FC<Props> = ({
     const appId = application.name ?? application.applicationAddress;
     const latestTournament = head(tournaments.data);
     const epochsUrls = pathBuilder.epochs({ application: appId });
-    const gridSpan = getGridSpan(application.consensusType);
     const appIsForeclosed = isForeclosed(application);
     const showWithdrawalsData = appIsForeclosed;
+    const isPrt = application.consensusType === "PRT";
+
+    const cards: SummaryCardProps[] = [
+        {
+            title: "Epochs",
+            value: epochs.totalCount,
+            icon: TbClock,
+            displaySkeleton: epochs.isLoading,
+        },
+        {
+            title: "Inputs",
+            value: inputs.totalCount,
+            icon: TbInbox,
+            displaySkeleton: inputs.isLoading,
+        },
+        {
+            title: "Outputs",
+            value: outputs.totalCount,
+            icon: TbMail,
+            displaySkeleton: outputs.isLoading,
+            href: pathBuilder.outputs({ application: appId }),
+        },
+        {
+            title: "Reports",
+            value: reports.totalCount,
+            icon: TbMessageReport,
+            displaySkeleton: reports.isLoading,
+        },
+        ...(appIsForeclosed
+            ? [
+                  {
+                      title: "Withdrawals",
+                      value: withdrawals.totalCount,
+                      icon: TbTransferOut,
+                      displaySkeleton: withdrawals.isLoading,
+                  },
+              ]
+            : []),
+        ...(isPrt
+            ? [
+                  {
+                      title: "Tournaments",
+                      value: tournaments.totalCount,
+                      icon: TbTrophy,
+                      displaySkeleton: tournaments.isLoading,
+                  },
+                  {
+                      title: content.bond.summaryCardTxt,
+                      value: bondEvents.totalCount,
+                      icon: TbCoins,
+                      displaySkeleton: bondEvents.isLoading,
+                      href: pathBuilder.bonds({ application: appId }),
+                  },
+              ]
+            : []),
+    ];
 
     const tournamentUrl =
         latestTournament !== undefined
@@ -88,79 +149,10 @@ export const ApplicationSummaryPage: FC<Props> = ({
     return (
         <Stack gap="xl">
             <PageTitle Icon={TbStack2} title="Summary" />
-            <Grid gutter="sm">
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Epochs"
-                        value={epochs.totalCount}
-                        icon={TbClock}
-                        displaySkeleton={epochs.isLoading}
-                    />
-                </Grid.Col>
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Inputs"
-                        value={inputs.totalCount}
-                        icon={TbInbox}
-                        displaySkeleton={inputs.isLoading}
-                    />
-                </Grid.Col>
-
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Outputs"
-                        value={outputs.totalCount}
-                        icon={TbMail}
-                        displaySkeleton={outputs.isLoading}
-                        href={pathBuilder.outputs({ application: appId })}
-                    />
-                </Grid.Col>
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Reports"
-                        value={reports.totalCount}
-                        icon={TbMessageReport}
-                        displaySkeleton={reports.isLoading}
-                    />
-                </Grid.Col>
-
-                <Activity mode={showWithdrawalsData ? "visible" : "hidden"}>
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title="Withdrawals"
-                            value={withdrawals.totalCount}
-                            icon={TbTransferOut}
-                            displaySkeleton={withdrawals.isLoading}
-                        />
-                    </Grid.Col>
-                </Activity>
-
-                <Activity
-                    mode={
-                        application.consensusType === "PRT"
-                            ? "visible"
-                            : "hidden"
-                    }
-                >
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title="Tournaments"
-                            value={tournaments.totalCount}
-                            icon={TbTrophy}
-                            displaySkeleton={tournaments.isLoading}
-                        />
-                    </Grid.Col>
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title={content.bond.summaryCardTxt}
-                            value={bondEvents.totalCount}
-                            icon={TbCoins}
-                            displaySkeleton={bondEvents.isLoading}
-                            href={pathBuilder.bonds({ application: appId })}
-                        />
-                    </Grid.Col>
-                </Activity>
-            </Grid>
+            <SummaryCards
+                cards={cards}
+                perRow={getCardsPerRow(application.consensusType)}
+            />
 
             {appIsForeclosed && (
                 <ApplicationForecloseStatus application={application} />
