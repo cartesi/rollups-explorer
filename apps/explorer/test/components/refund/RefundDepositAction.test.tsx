@@ -179,6 +179,42 @@ describe("RefundDepositAction", () => {
         expect(screen.queryByText(/Refund/)).not.toBeInTheDocument();
     });
 
+    it("should offer a retry when the refund status cannot be read", () => {
+        mocks.useRefundStatus.mockReturnValue({
+            refundIssued: undefined,
+            isLoading: false,
+            isFetching: false,
+            error: new Error("rpc down"),
+            refetch: mocks.refetch,
+        });
+        renderAction();
+
+        expect(
+            screen.getByText("Could not check the refund status."),
+        ).toBeInTheDocument();
+        fireEvent.click(screen.getByRole("button", { name: "Check again" }));
+
+        expect(mocks.refetch).toHaveBeenCalledTimes(1);
+        expect(mocks.writeContract).not.toHaveBeenCalled();
+        expect(mocks.useSimulate).toHaveBeenCalledWith(
+            expect.objectContaining({ query: { enabled: false } }),
+        );
+    });
+
+    it("should keep checking while the status read is retried", () => {
+        mocks.useRefundStatus.mockReturnValue({
+            refundIssued: undefined,
+            isLoading: false,
+            isFetching: true,
+            error: new Error("rpc down"),
+            refetch: mocks.refetch,
+        });
+        renderAction();
+
+        expect(screen.getByText("Checking refund status…")).toBeInTheDocument();
+        expect(refundButton()).toHaveAttribute("data-loading", "true");
+    });
+
     it("should show the deposit as refunded when the chain says so", () => {
         mocks.useRefundStatus.mockReturnValue({
             refundIssued: true,

@@ -16,6 +16,8 @@ export const refundMessages = {
             "The application no longer holds enough Ether to pay this refund.",
     },
     checkingTxt: "Checking refund status…",
+    unavailableTxt: "Could not check the refund status.",
+    retryTxt: "Check again",
     hint: "Anyone can issue a refund. The smart contract pays the original depositor. The caller only pays gas.",
     previewTxt: "Refund",
     unitsTxt: "units of",

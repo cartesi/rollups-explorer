@@ -28,12 +28,13 @@ export const useRefundStatus = (
     return {
         refundIssued: query.data,
         isLoading: query.isLoading,
+        isFetching: query.isFetching,
         error: query.error,
         refetch: query.refetch,
     };
 };
 
-/** Refund flags of several inputs in one batched read; `byIndex` holds the reads that succeeded. */
+/** Refund flags of several inputs in one batched read; `byIndex` holds the reads that succeeded and `failed` the indices of those that did not. */
 export const useRefundStatuses = (
     application: Address | undefined,
     inputIndices: bigint[],
@@ -62,8 +63,15 @@ export const useRefundStatuses = (
         }),
     );
 
+    const failed = new Set(
+        inputIndices.filter(
+            (_, i) => query.isError || query.data?.[i]?.status === "failure",
+        ),
+    );
+
     return {
         byIndex,
+        failed,
         isLoading: query.isLoading,
         error: query.error,
         refetch: query.refetch,

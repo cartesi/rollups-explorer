@@ -55,7 +55,8 @@ export const RefundDepositAction: FC<RefundDepositActionProps> = ({
     const asset = useRefundAsset(deposit ? toRefundAsset(deposit) : undefined, {
         enabled,
     });
-    const baseStatus = refundStatusFromRead(refund.refundIssued);
+    const statusFailed = isNotNil(refund.error) && !refund.isFetching;
+    const baseStatus = refundStatusFromRead(refund.refundIssued, statusFailed);
 
     const prepare = useSimulateIApplicationIssueRefund({
         address: application,
@@ -115,12 +116,13 @@ export const RefundDepositAction: FC<RefundDepositActionProps> = ({
                       })
                     : undefined
             }
-            onRefund={() =>
+            onRefund={() => {
+                if (status === "unavailable") return void refetchStatus();
                 sender.send(() => {
                     if (prepare.data)
                         execute.writeContract(prepare.data.request);
-                })
-            }
+                });
+            }}
         />
     );
 };

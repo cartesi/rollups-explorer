@@ -134,9 +134,12 @@ export const useRefundableDeposits = (
             selected.map((input, i) => ({
                 input,
                 asset: assets[i] ?? rawAssets[i],
-                status: refundStatusFromRead(statuses.byIndex.get(input.index)),
+                status: refundStatusFromRead(
+                    statuses.byIndex.get(input.index),
+                    statuses.failed.has(input.index),
+                ),
             })),
-        [selected, assets, rawAssets, statuses.byIndex],
+        [selected, assets, rawAssets, statuses.byIndex, statuses.failed],
     );
 
     return {

@@ -77,6 +77,15 @@ export const RefundStatusLabel: FC<RefundStatusLabelProps> = ({
                     {text.checkingTxt}
                 </Text>
             );
+        case "unavailable":
+            return (
+                <Group gap={6}>
+                    <TbExclamationCircle size={iconSize} color={errorColor} />
+                    <Text size="sm" c={errorColor}>
+                        {text.unavailableTxt}
+                    </Text>
+                </Group>
+            );
         case "refundable":
             return (
                 <Group gap={6}>
@@ -151,7 +160,9 @@ export const RefundDepositView: FC<RefundDepositViewProps> = ({
                         loading={status === "refunding" || status === "unknown"}
                         onClick={onRefund}
                     >
-                        {text.refundTxt}
+                        {status === "unavailable"
+                            ? text.retryTxt
+                            : text.refundTxt}
                     </Button>
                 )}
                 {showLabel && (
