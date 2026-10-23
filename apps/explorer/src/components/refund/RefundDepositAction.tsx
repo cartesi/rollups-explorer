@@ -5,7 +5,7 @@ import {
     useWriteIApplicationIssueRefund,
 } from "@cartesi/react";
 import { isNil, isNotNil } from "ramda";
-import { useEffect, useMemo, useRef, type FC } from "react";
+import { useEffect, useMemo, useRef, useState, type FC } from "react";
 import type { Address } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { useRefundAsset } from "./hooks/useRefundAssets";
@@ -89,6 +89,20 @@ export const RefundDepositAction: FC<RefundDepositActionProps> = ({
         }
     }, [wait.isSuccess, refetchStatus, onRefunded]);
 
+    // A failed or stale simulation is re-run on click, so the button never sends a request the chain already rejected.
+    const [retrying, setRetrying] = useState(false);
+    const send = async () => {
+        if (prepare.data && !prepare.error)
+            return execute.writeContract(prepare.data.request);
+        setRetrying(true);
+        try {
+            const { data } = await prepare.refetch();
+            if (data) execute.writeContract(data.request);
+        } finally {
+            setRetrying(false);
+        }
+    };
+
     if (isNil(deposit) || isNil(asset) || !enabled) return null;
 
     const failure = execute.error ?? wait.error ?? prepare.error;
@@ -114,12 +128,10 @@ export const RefundDepositAction: FC<RefundDepositActionProps> = ({
                       })
                     : undefined
             }
+            busy={retrying}
             onRefund={() => {
                 if (status === "unavailable") return void refetchStatus();
-                sender.send(() => {
-                    if (prepare.data)
-                        execute.writeContract(prepare.data.request);
-                });
+                sender.send(send);
             }}
         />
     );

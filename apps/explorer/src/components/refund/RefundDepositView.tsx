@@ -126,6 +126,9 @@ const BatchItems: FC<{ items: { tokenId: bigint; value: bigint }[] }> = ({
 export interface RefundDepositViewProps extends RefundStatusLabelProps {
     asset: RefundAsset;
 
+    /** The refund is being prepared after a click. */
+    busy?: boolean;
+
     onRefund?: () => void;
 }
 
@@ -135,6 +138,7 @@ export const RefundDepositView: FC<RefundDepositViewProps> = ({
     status,
     transactionHash,
     errorMessage,
+    busy = false,
     onRefund,
 }) => {
     const iconSize = useMantineTheme().other.smIconSize;
@@ -165,7 +169,11 @@ export const RefundDepositView: FC<RefundDepositViewProps> = ({
                     <Button
                         size="xs"
                         leftSection={<TbCoins size={iconSize} />}
-                        loading={status === "refunding" || status === "unknown"}
+                        loading={
+                            busy ||
+                            status === "refunding" ||
+                            status === "unknown"
+                        }
                         onClick={onRefund}
                     >
                         {status === "unavailable"
