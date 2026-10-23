@@ -1,5 +1,5 @@
 "use client";
-import type { EpochStatus, Input } from "@cartesi/client";
+import type { Input } from "@cartesi/client";
 import {
     useSimulateIApplicationIssueRefund,
     useWriteIApplicationIssueRefund,
@@ -17,7 +17,6 @@ import {
 } from "../../lib/contractErrors";
 import {
     decodeDepositInput,
-    isRefundableEpoch,
     refundErrorMessage,
     refundStatusFromRead,
     toRefundAsset,
@@ -31,25 +30,19 @@ export interface RefundDepositActionProps {
 
     input: Input;
 
-    /** An accepted epoch was processed by the application: nothing is rendered for it. */
-    epochStatus?: EpochStatus;
-
     /** Called once the refund transaction is confirmed. */
     onRefunded?: () => void;
 }
 
-/** Permissionless `issueRefund` for a deposit input of a foreclosed application. Renders nothing for non-deposits, processed epochs and the mocked connection. */
+/** Permissionless `issueRefund` for a deposit input of a foreclosed application. Renders nothing for non-deposits and the mocked connection. */
 export const RefundDepositAction: FC<RefundDepositActionProps> = ({
     application,
     input,
-    epochStatus,
     onRefunded,
 }) => {
     const deposit = useMemo(() => decodeDepositInput(input), [input]);
     const sender = useTransactionSender();
-    const refundableEpoch =
-        isNil(epochStatus) || isRefundableEpoch(epochStatus);
-    const enabled = isNotNil(deposit) && !sender.hidden && refundableEpoch;
+    const enabled = isNotNil(deposit) && !sender.hidden;
 
     const refund = useRefundStatus(application, input.index, { enabled });
     const rawAsset = useMemo(

@@ -1,9 +1,8 @@
-import type { Application, EpochStatus, Input } from "@cartesi/client";
+import type { Application, Input } from "@cartesi/client";
 import { Stack } from "@mantine/core";
 import { isNotNil } from "ramda";
 import type { FC } from "react";
 import { isForeclosed } from "../application/utils";
-import { isRefundableEpoch } from "../refund/lib/refundUtils";
 import { RefundDepositAction } from "../refund/RefundDepositAction";
 import { InputCard } from "./InputCard";
 
@@ -13,8 +12,8 @@ interface Props {
     /** Only a foreclosed application gets the refund action on its deposit inputs. */
     application?: Application;
 
-    /** Inputs of an accepted epoch never get the refund action. */
-    epochStatusByIndex?: Map<bigint, EpochStatus>;
+    /** Inputs of this epoch and later get the refund action; none until set. */
+    refundableFromEpoch?: bigint;
 
     onRefunded?: () => void;
 }
@@ -22,19 +21,19 @@ interface Props {
 export const InputList: FC<Props> = ({
     inputs,
     application,
-    epochStatusByIndex,
+    refundableFromEpoch,
     onRefunded,
 }) => {
-    const refundable = isNotNil(application) && isForeclosed(application);
+    const refundable =
+        isNotNil(application) &&
+        isForeclosed(application) &&
+        isNotNil(refundableFromEpoch);
 
     return (
         <Stack gap="xs" pb="md">
             {inputs.map((input) => {
-                const epochStatus = epochStatusByIndex?.get(input.epochIndex);
                 const showRefund =
-                    refundable &&
-                    (epochStatus === undefined ||
-                        isRefundableEpoch(epochStatus));
+                    refundable && input.epochIndex >= refundableFromEpoch;
 
                 return (
                     <InputCard
@@ -45,7 +44,6 @@ export const InputList: FC<Props> = ({
                                 <RefundDepositAction
                                     application={application.applicationAddress}
                                     input={input}
-                                    epochStatus={epochStatus}
                                     onRefunded={onRefunded}
                                 />
                             ) : undefined

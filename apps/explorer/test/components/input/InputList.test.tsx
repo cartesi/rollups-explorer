@@ -17,15 +17,13 @@ vi.mock("../../../src/components/input/InputCard", () => ({
 vi.mock("../../../src/components/refund/RefundDepositAction", () => ({
     RefundDepositAction: ({
         input,
-        epochStatus,
         onRefunded,
     }: {
         input: Input;
-        epochStatus?: string;
         onRefunded?: () => void;
     }) => (
         <button data-testid="refund-action" onClick={onRefunded}>
-            {input.index.toString()}:{epochStatus ?? "unknown"}
+            {input.index.toString()}
         </button>
     ),
 }));
@@ -54,24 +52,19 @@ describe("InputList", () => {
         expect(screen.queryByTestId("refund-action")).not.toBeInTheDocument();
     });
 
-    it("should add the refund action to inputs of a foreclosed application", () => {
+    it("should add the refund action to inputs from the refundable epoch on", () => {
         render(
             <InputList
                 inputs={inputs}
                 application={foreclosed}
-                epochStatusByIndex={
-                    new Map([
-                        [52n, "CLAIM_FORECLOSED"],
-                        [51n, "CLAIM_ACCEPTED"],
-                    ])
-                }
+                refundableFromEpoch={52n}
             />,
         );
 
         const actions = screen.getAllByTestId("refund-action");
 
         expect(actions).toHaveLength(1);
-        expect(actions[0]).toHaveTextContent("3:CLAIM_FORECLOSED");
+        expect(actions[0]).toHaveTextContent("3");
     });
 
     it("should pass the refund callback to every action", () => {
@@ -80,6 +73,7 @@ describe("InputList", () => {
             <InputList
                 inputs={inputs}
                 application={foreclosed}
+                refundableFromEpoch={0n}
                 onRefunded={onRefunded}
             />,
         );
@@ -89,10 +83,10 @@ describe("InputList", () => {
         expect(onRefunded).toHaveBeenCalledOnce();
     });
 
-    it("should leave the epoch check to the action when the status is unknown", () => {
+    it("should offer nothing until the refundable epoch is known", () => {
         render(<InputList inputs={inputs} application={foreclosed} />);
 
-        expect(screen.getAllByTestId("refund-action")).toHaveLength(2);
-        expect(screen.getByText("0:unknown")).toBeInTheDocument();
+        expect(screen.getAllByTestId("input-card")).toHaveLength(2);
+        expect(screen.queryByTestId("refund-action")).not.toBeInTheDocument();
     });
 });

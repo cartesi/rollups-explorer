@@ -74,6 +74,9 @@ interface Props {
      * foreclosed application, and only when there is something to refund.
      */
     refundableDeposits?: Meta<RefundableDeposit[]>;
+
+    /** First epoch after the last accepted one; the latest inputs from it on get the refund action. */
+    refundableFromEpoch?: bigint;
 }
 
 const getCardsPerRow = (
@@ -98,6 +101,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
     withdrawals,
     refunds,
     refundableDeposits,
+    refundableFromEpoch,
 }) => {
     const appId = application.name ?? application.applicationAddress;
     const latestTournament = head(tournaments.data);
@@ -302,14 +306,7 @@ export const ApplicationSummaryPage: FC<Props> = ({
                         key={`${appId}-latest-inputs-${inputs.data.length}`}
                         inputs={inputs.data}
                         application={application}
-                        epochStatusByIndex={
-                            new Map(
-                                epochs.data.map((epoch) => [
-                                    epoch.index,
-                                    epoch.status,
-                                ]),
-                            )
-                        }
+                        refundableFromEpoch={refundableFromEpoch}
                         onRefunded={onRefunded}
                     />
                 )}

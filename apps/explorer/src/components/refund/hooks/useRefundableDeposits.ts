@@ -115,6 +115,7 @@ export const useRefundableDeposits = (
 
     return {
         deposits,
+        fromEpoch,
         isLoading:
             enabled &&
             (boundary.isLoading ||

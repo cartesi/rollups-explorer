@@ -165,6 +165,7 @@ export const ApplicationSummaryContainer: FC<
                     withdrawals={withdrawals}
                     refunds={refunds}
                     refundableDeposits={refundableDeposits}
+                    refundableFromEpoch={refundableDepositsResult.fromEpoch}
                 />
             ) : (
                 <DisplayContainerError

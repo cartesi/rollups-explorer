@@ -23,10 +23,16 @@ vi.mock("../../src/components/input/InputCard", () => ({
 }));
 
 vi.mock("../../src/components/refund/RefundDepositAction", () => ({
-    RefundDepositAction: ({ epochStatus }: { epochStatus?: string }) => (
-        <div data-testid="refund-action">{epochStatus}</div>
-    ),
+    RefundDepositAction: () => <div data-testid="refund-action" />,
 }));
+
+const foreclosed = {
+    ...createApplication(),
+    consensusType: "PRT",
+    forecloseBlock: 15498n,
+    forecloseTransaction:
+        "0x0000000000000000000000000000000000000000000000000000000000000012",
+} satisfies Application;
 
 const epoch = applications[0].epochs[3];
 
@@ -75,20 +81,26 @@ describe("EpochPage", () => {
     it("should offer the refund on deposits of a foreclosed application", () => {
         render(
             <EpochPage
-                application={{
-                    ...application,
-                    forecloseBlock: 15498n,
-                    forecloseTransaction:
-                        "0x0000000000000000000000000000000000000000000000000000000000000012",
-                }}
+                application={foreclosed}
                 epoch={{ ...epoch, status: "CLAIM_FORECLOSED" }}
                 inputs={[createDepositInput({ epochIndex: epoch.index })]}
             />,
         );
 
-        expect(screen.getByTestId("refund-action")).toHaveTextContent(
-            "CLAIM_FORECLOSED",
+        expect(screen.getByTestId("refund-action")).toBeInTheDocument();
+    });
+
+    it("should not offer the refund on an epoch accepted before foreclosure", () => {
+        render(
+            <EpochPage
+                application={foreclosed}
+                epoch={{ ...epoch, status: "CLAIM_ACCEPTED" }}
+                inputs={[createDepositInput({ epochIndex: epoch.index })]}
+            />,
         );
+
+        expect(screen.getByTestId("input-card")).toBeInTheDocument();
+        expect(screen.queryByTestId("refund-action")).not.toBeInTheDocument();
     });
 
     it("should not mention refunds for an application that is not foreclosed", () => {
