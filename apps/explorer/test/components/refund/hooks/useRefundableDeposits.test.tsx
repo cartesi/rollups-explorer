@@ -80,7 +80,7 @@ describe("useRefundableDeposits", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockEpochs.mockReturnValue({
-            data: { data: [refundEpochs[0]] },
+            data: { data: [refundEpochs[1]] },
             isLoading: false,
         } as never);
         inputsBySender({
@@ -127,19 +127,18 @@ describe("useRefundableDeposits", () => {
     it("should fetch the newest deposits of every portal", () => {
         renderHook(() => useRefundableDeposits(foreclosed));
 
-        expect(mockEpochs).toHaveBeenCalledWith(
-            expect.objectContaining({
-                application: foreclosed.applicationAddress,
-                status: expect.not.arrayContaining(["CLAIM_ACCEPTED"]),
-                descending: true,
-                enabled: true,
-            }),
-        );
+        expect(mockEpochs).toHaveBeenCalledWith({
+            application: foreclosed.applicationAddress,
+            status: ["CLAIM_ACCEPTED"],
+            descending: true,
+            limit: 1,
+            enabled: true,
+        });
         for (const sender of portals) {
             expect(mockInputs).toHaveBeenCalledWith({
                 application: foreclosed.applicationAddress,
                 sender,
-                from: refundEpochs[0].inputIndexLowerBound,
+                from: refundEpochs[1].inputIndexUpperBound,
                 descending: true,
                 limit: 3,
                 enabled: true,
@@ -189,6 +188,24 @@ describe("useRefundableDeposits", () => {
         ]);
     });
 
+    it("should list every deposit when no epoch was accepted", () => {
+        mockEpochs.mockReturnValue({
+            data: { data: [] },
+            isLoading: false,
+        } as never);
+
+        const { result } = renderHook(() =>
+            useRefundableDeposits(foreclosed, { limit: 4 }),
+        );
+
+        expect(mockInputs).toHaveBeenCalledWith(
+            expect.objectContaining({ from: 0n, enabled: true }),
+        );
+        expect(result.current.deposits.map(({ input }) => input.index)).toEqual(
+            [3n, 2n, 1n, 0n],
+        );
+    });
+
     it("should keep only the newest deposits up to the limit", () => {
         const { result } = renderHook(() =>
             useRefundableDeposits(foreclosed, { limit: 2 }),
@@ -202,7 +219,7 @@ describe("useRefundableDeposits", () => {
         );
     });
 
-    it("should not list inputs before the epochs are known", () => {
+    it("should not list inputs before the boundary is known", () => {
         mockEpochs.mockReturnValue({
             data: undefined,
             isLoading: true,

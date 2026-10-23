@@ -1,12 +1,11 @@
 "use client";
-import type { Application, EpochStatus, Input } from "@cartesi/client";
+import type { Application, Input } from "@cartesi/client";
 import {
     erc1155BatchPortalAddress,
     erc1155SinglePortalAddress,
     erc20PortalAddress,
     erc721PortalAddress,
     etherPortalAddress,
-    useEpochs,
     useInputs,
 } from "@cartesi/react";
 import { isNotNil } from "ramda";
@@ -20,65 +19,37 @@ import {
     type RefundAsset,
 } from "../lib/refundUtils";
 import { useRefundAssets } from "./useRefundAssets";
+import { useRefundBoundary } from "./useRefundBoundary";
 import { useRefundStatuses } from "./useRefundStatus";
-
-const refundableStatuses: [EpochStatus, ...EpochStatus[]] = [
-    "OPEN",
-    "CLOSED",
-    "INPUTS_PROCESSED",
-    "CLAIM_COMPUTED",
-    "CLAIM_SUBMITTED",
-    "CLAIM_STAGED",
-    "CLAIM_REJECTED",
-    "CLAIM_FORECLOSED",
-];
 
 interface Options {
     /** How many deposits to return, newest first. Default `3`. */
     limit?: number;
-    /** How many unaccepted epochs to consider. Default `20`. */
-    scan?: number;
 }
 
 /**
- * Newest deposits of a foreclosed application sitting in epochs not
- * accepted before foreclosure, with their on-chain refund status and token
- * metadata. Deposits are fetched per portal sender, so generic inputs never
- * hide them. The refund flags are not polled: call `refetch` after a refund
- * issued from the page.
+ * Newest deposits of a foreclosed application after its last accepted epoch,
+ * with their on-chain refund status and token metadata. Deposits are fetched
+ * per portal sender, so generic inputs never hide them. The refund flags are
+ * not polled: call `refetch` after a refund issued from the page.
  */
 export const useRefundableDeposits = (
     application: Application | undefined,
-    { limit = 3, scan = 20 }: Options = {},
+    { limit = 3 }: Options = {},
 ) => {
     const enabled = isNotNil(application) && isForeclosed(application);
     const address = application?.applicationAddress;
 
-    const epochs = useEpochs({
-        application: address,
-        status: refundableStatuses,
-        descending: true,
-        limit: scan,
-        enabled,
-    });
-    const epochData = epochs.data?.data;
-    const statusByIndex = useMemo(
-        () =>
-            new Map(
-                (epochData ?? []).map(
-                    (epoch) => [epoch.index, epoch.status] as const,
-                ),
-            ),
-        [epochData],
-    );
-    const lowerBound = epochData?.at(-1)?.inputIndexLowerBound;
+    const boundary = useRefundBoundary(address, { enabled });
+    const fromEpoch = boundary.epochIndex;
+    const known = isNotNil(boundary.inputIndex);
 
     const portalInputs = {
         application: address,
-        from: lowerBound,
+        from: boundary.inputIndex,
         descending: true,
         limit,
-        enabled: enabled && isNotNil(lowerBound),
+        enabled: enabled && known,
     };
     const byPortal = [
         useInputs({ ...portalInputs, sender: etherPortalAddress }),
@@ -95,7 +66,7 @@ export const useRefundableDeposits = (
         const selected: Input[] = [];
         const indices: bigint[] = [];
         const rawAssets: RefundAsset[] = [];
-        if (enabled) {
+        if (enabled && isNotNil(fromEpoch)) {
             const newestFirst = [
                 ...(ether ?? []),
                 ...(erc20 ?? []),
@@ -108,7 +79,7 @@ export const useRefundableDeposits = (
             for (const input of newestFirst) {
                 if (selected.length === limit) break;
                 const deposit = decodeDepositInput(input);
-                if (!deposit || !statusByIndex.has(input.epochIndex)) continue;
+                if (!deposit || input.epochIndex < fromEpoch) continue;
                 selected.push(input);
                 indices.push(input.index);
                 rawAssets.push(toRefundAsset(deposit));
@@ -122,7 +93,7 @@ export const useRefundableDeposits = (
         erc721,
         erc1155,
         erc1155Batch,
-        statusByIndex,
+        fromEpoch,
         limit,
     ]);
 
@@ -146,9 +117,8 @@ export const useRefundableDeposits = (
         deposits,
         isLoading:
             enabled &&
-            (epochs.isLoading ||
-                (isNotNil(lowerBound) &&
-                    byPortal.some((query) => query.isLoading)) ||
+            (boundary.isLoading ||
+                (known && byPortal.some((query) => query.isLoading)) ||
                 (selected.length > 0 && statuses.isLoading)),
         refetch: statuses.refetch,
     };
