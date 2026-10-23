@@ -152,3 +152,8 @@ export const ErrorUnknown: Story = {
 export const Loading: Story = {
     args: { ...Ether.args, status: "unknown" },
 };
+
+/** The refund flag could not be read from the chain; the button retries the read. */
+export const Unavailable: Story = {
+    args: { ...Ether.args, status: "unavailable" },
+};

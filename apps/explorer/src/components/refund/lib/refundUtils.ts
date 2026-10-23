@@ -13,13 +13,15 @@ const text = content.refund;
  * - `refunded`: `wasRefundForInputIssued` is true on chain
  * - `failed`: the call reverted
  * - `unknown`: the on-chain flag is still being read
+ * - `unavailable`: the on-chain flag could not be read
  */
 export type RefundStatus =
     | "refundable"
     | "refunding"
     | "refunded"
     | "failed"
-    | "unknown";
+    | "unknown"
+    | "unavailable";
 
 export type RefundAssetItem = { tokenId: bigint; value: bigint };
 
@@ -166,7 +168,9 @@ export const isRefundableEpoch = (epochStatus: EpochStatus): boolean =>
 
 export const refundStatusFromRead = (
     refundIssued: boolean | undefined,
+    failed = false,
 ): RefundStatus => {
+    if (failed) return "unavailable";
     if (isNil(refundIssued)) return "unknown";
     return refundIssued ? "refunded" : "refundable";
 };

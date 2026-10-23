@@ -93,6 +93,7 @@ describe("useRefundableDeposits", () => {
                 [3n, false],
                 [2n, true],
             ]),
+            failed: new Set(),
             isLoading: false,
             error: null,
             refetch,
@@ -168,6 +169,24 @@ describe("useRefundableDeposits", () => {
         ]);
         expect(result.current.isLoading).toBe(false);
         expect(result.current.refetch).toBe(refetch);
+    });
+
+    it("should mark a deposit whose flag could not be read as unavailable", () => {
+        mockStatuses.mockReturnValue({
+            byIndex: new Map([[3n, false]]),
+            failed: new Set([2n]),
+            isLoading: false,
+            error: null,
+            refetch,
+        });
+
+        const { result } = renderHook(() => useRefundableDeposits(foreclosed));
+
+        expect(result.current.deposits.map(({ status }) => status)).toEqual([
+            "refundable",
+            "unavailable",
+            "unknown",
+        ]);
     });
 
     it("should keep only the newest deposits up to the limit", () => {

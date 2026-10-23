@@ -174,6 +174,10 @@ describe("refundUtils", () => {
         ] as const)("should map %s to %s", (read, status) => {
             expect(refundStatusFromRead(read)).toBe(status);
         });
+
+        it("should map a failed read to unavailable", () => {
+            expect(refundStatusFromRead(undefined, true)).toBe("unavailable");
+        });
     });
 
     describe("refundErrorMessage", () => {
