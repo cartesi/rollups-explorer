@@ -28,14 +28,14 @@ vi.mock("../../src/components/input/InputCard", () => ({
 
 vi.mock("../../src/components/refund/RefundDepositAction", () => ({
     RefundDepositAction: ({
-        epochStatus,
+        input,
         onRefunded,
     }: {
-        epochStatus?: string;
+        input: Input;
         onRefunded?: () => void;
     }) => (
         <button data-testid="refund-action" onClick={onRefunded}>
-            {epochStatus}
+            {input.index.toString()}
         </button>
     ),
 }));
@@ -61,6 +61,7 @@ const baseProps = {
     refunds: { totalCount: 1, ...loaded },
     reports: { totalCount: 0, ...loaded },
     tournaments: { data: [], totalCount: 0, ...loaded },
+    refundableFromEpoch: refundEpochs[0].index,
 };
 const refundable = {
     data: refundableDeposits,
@@ -106,8 +107,22 @@ describe("ApplicationSummaryPage", () => {
         );
         const actions = screen.getAllByTestId("refund-action");
         expect(actions).toHaveLength(2);
-        expect(actions[0]).toHaveTextContent("CLAIM_FORECLOSED");
+        expect(actions[0]).toHaveTextContent("3");
         expect(screen.getByText("Refunds")).toBeInTheDocument();
+    });
+
+    it("should not offer the refund on the latest inputs until the refundable epoch is known", () => {
+        render(
+            <ApplicationSummaryPage
+                {...baseProps}
+                application={foreclosed}
+                refundableDeposits={refundable}
+                refundableFromEpoch={undefined}
+            />,
+        );
+
+        expect(screen.getByTestId("refundable-deposits")).toBeInTheDocument();
+        expect(screen.queryByTestId("refund-action")).not.toBeInTheDocument();
     });
 
     it("should refresh the deposits and the refund count after a refund", () => {

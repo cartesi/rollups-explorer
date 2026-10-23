@@ -77,7 +77,6 @@ const renderAction = (
         <RefundDepositAction
             application={application}
             input={input}
-            epochStatus="CLAIM_FORECLOSED"
             {...props}
         />,
     );
@@ -162,12 +161,6 @@ describe("RefundDepositAction", () => {
             generic.index,
             { enabled: false },
         );
-    });
-
-    it("should render nothing for an accepted epoch", () => {
-        renderAction({ epochStatus: "CLAIM_ACCEPTED" });
-
-        expect(screen.queryByText(/Refund/)).not.toBeInTheDocument();
     });
 
     it("should render nothing on the mock connection", () => {

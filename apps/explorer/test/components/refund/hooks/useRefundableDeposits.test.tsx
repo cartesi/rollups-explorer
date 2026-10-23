@@ -166,6 +166,7 @@ describe("useRefundableDeposits", () => {
             [2n, "erc20", "USDC", "refunded"],
             [1n, "erc1155-batch", undefined, "unknown"],
         ]);
+        expect(result.current.fromEpoch).toBe(refundEpochs[0].index);
         expect(result.current.isLoading).toBe(false);
         expect(result.current.refetch).toBe(refetch);
     });
@@ -204,6 +205,7 @@ describe("useRefundableDeposits", () => {
         expect(result.current.deposits.map(({ input }) => input.index)).toEqual(
             [3n, 2n, 1n, 0n],
         );
+        expect(result.current.fromEpoch).toBe(0n);
     });
 
     it("should keep only the newest deposits up to the limit", () => {

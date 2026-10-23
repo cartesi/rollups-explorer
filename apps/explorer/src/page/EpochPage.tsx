@@ -24,6 +24,7 @@ import { isAddress } from "viem";
 import { CycleRangeFormatted } from "../components/CycleRangeFormatted";
 import { useEpochStatusColor } from "../components/epoch/useEpochStatusColor";
 import { InputList } from "../components/input/InputList";
+import { isRefundableEpoch } from "../components/refund/lib/refundUtils";
 import PageTitle from "../components/layout/PageTitle";
 import { NextPagination } from "../components/navigation/NextPagination";
 import { getTournamentCycleRange } from "../lib/prtUtils";
@@ -119,7 +120,11 @@ export const EpochPage: FC<Props> = ({
                 <InputList
                     inputs={inputs}
                     application={application}
-                    epochStatusByIndex={new Map([[epoch.index, epoch.status]])}
+                    refundableFromEpoch={
+                        isRefundableEpoch(epoch.status)
+                            ? epoch.index
+                            : undefined
+                    }
                 />
             )}
             {isEmpty(inputs) && <NoInputs />}

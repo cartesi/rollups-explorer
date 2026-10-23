@@ -17,11 +17,7 @@ const application = "0x40a7C73a6a592D8697bE97254E273E6f3FB46000";
 /** An Ether deposit of an epoch that was open at foreclosure, not refunded yet. */
 export const Refundable: Story = {
     parameters: { msw: { handlers: [refundRpcHandler()] } },
-    args: {
-        application,
-        input: etherDepositInput,
-        epochStatus: "CLAIM_FORECLOSED",
-    },
+    args: { application, input: etherDepositInput },
 };
 
 /** The same deposit after someone issued its refund. */

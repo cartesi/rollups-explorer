@@ -490,5 +490,6 @@ export const ForeclosedWithRefundableDeposits: Story = {
             totalCount: refundableDeposits.length,
             isLoading: false,
         },
+        refundableFromEpoch: refundEpochs[0].index,
     },
 };
