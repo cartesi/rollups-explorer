@@ -101,6 +101,26 @@ describe("RefundDepositView", () => {
         expect(screen.getByText("Checking refund status…")).toBeInTheDocument();
     });
 
+    it("should offer to check again when the status could not be read", () => {
+        const onRefund = vi.fn();
+        render(
+            <RefundDepositView
+                status="unavailable"
+                asset={ether}
+                onRefund={onRefund}
+            />,
+        );
+
+        expect(
+            screen.getByText("Could not check the refund status."),
+        ).toBeInTheDocument();
+        const button = screen.getByRole("button", { name: "Check again" });
+        expect(button).not.toHaveAttribute("data-loading");
+        fireEvent.click(button);
+
+        expect(onRefund).toHaveBeenCalledOnce();
+    });
+
     it("should list every token id of an ERC-1155 batch", () => {
         render(
             <RefundDepositView

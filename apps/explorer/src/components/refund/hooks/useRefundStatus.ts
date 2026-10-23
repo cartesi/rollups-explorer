@@ -3,7 +3,7 @@ import {
     iApplicationAbi,
     useReadIApplicationWasRefundForInputIssued,
 } from "@cartesi/react";
-import { isNotNil } from "ramda";
+import { isNil, isNotNil } from "ramda";
 import { useMemo } from "react";
 import type { Address } from "viem";
 import { useReadContracts } from "wagmi";
@@ -29,12 +29,13 @@ export const useRefundStatus = (
     return {
         refundIssued: query.data,
         isLoading: query.isLoading,
+        isFetching: query.isFetching,
         error: query.error,
         refetch: query.refetch,
     };
 };
 
-/** Refund flags of several inputs in one batched read; `byIndex` holds the reads that succeeded. */
+/** Refund flags of several inputs in one batched read; `byIndex` holds the reads that succeeded and `failed` the indices with no value, cached or fresh. */
 export const useRefundStatuses = (
     application: Address | undefined,
     inputIndices: bigint[],
@@ -68,8 +69,22 @@ export const useRefundStatuses = (
         [inputIndices, data],
     );
 
+    const isError = query.isError;
+    const failed = useMemo(
+        () =>
+            new Set(
+                inputIndices.filter(
+                    (_, i) =>
+                        (isError && isNil(data)) ||
+                        data?.[i]?.status === "failure",
+                ),
+            ),
+        [inputIndices, data, isError],
+    );
+
     return {
         byIndex,
+        failed,
         isLoading: query.isLoading,
         error: query.error,
         refetch: query.refetch,

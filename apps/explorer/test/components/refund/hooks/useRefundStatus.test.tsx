@@ -108,6 +108,47 @@ describe("useRefundStatuses", () => {
             [3n, false],
             [1n, true],
         ]);
+        expect([...result.current.failed]).toEqual([2n]);
+    });
+
+    it("should keep the cached flags when a refetch fails", () => {
+        mockReadContracts.mockReturnValue({
+            data: [
+                { status: "success", result: false },
+                { status: "success", result: true },
+            ],
+            isLoading: false,
+            isError: true,
+            error: new Error("rpc down"),
+            refetch: vi.fn(),
+        } as never);
+
+        const { result } = renderHook(() =>
+            useRefundStatuses(application, [3n, 2n]),
+        );
+
+        expect([...result.current.byIndex]).toEqual([
+            [3n, false],
+            [2n, true],
+        ]);
+        expect(result.current.failed.size).toBe(0);
+    });
+
+    it("should mark every input as failed when the batch read fails", () => {
+        mockReadContracts.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isError: true,
+            error: new Error("rpc down"),
+            refetch: vi.fn(),
+        } as never);
+
+        const { result } = renderHook(() =>
+            useRefundStatuses(application, [3n, 2n]),
+        );
+
+        expect(result.current.byIndex.size).toBe(0);
+        expect([...result.current.failed]).toEqual([3n, 2n]);
     });
 
     it("should not read an empty list", () => {
