@@ -12,10 +12,8 @@ import type { Address, Hash } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { content } from "../../content";
 import { getMatchTimeoutAction } from "../../lib/disputeActions";
-import {
-    DisputeActionButton,
-    useDisputeSender,
-} from "../dispute/DisputeAction";
+import { DisputeActionButton } from "../dispute/DisputeAction";
+import { useTransactionSender } from "../transactions/hooks/useTransactionSender";
 import { InfoHint } from "../InfoHint";
 
 const text = content.match.timeoutAction;
@@ -62,7 +60,7 @@ export const MatchTimeoutAction: FC<MatchTimeoutActionProps> = ({
     winnerChildrenLoading,
 }) => {
     const action = getMatchTimeoutAction(match);
-    const sender = useDisputeSender();
+    const sender = useTransactionSender();
     const matchId = {
         commitmentOne: match.commitmentOne,
         commitmentTwo: match.commitmentTwo,

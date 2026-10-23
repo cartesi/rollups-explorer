@@ -5,29 +5,38 @@ import type {
     GetTournamentReturnType,
     GetWithdrawalReturnType,
 } from "@cartesi/client";
-import { Anchor, Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
+import { Anchor, Card, Group, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { head } from "ramda";
 import { isNilOrEmpty } from "ramda-adjunct";
-import { Activity, type FC } from "react";
+import { type FC } from "react";
 import {
     TbCoins,
     TbClock,
     TbInbox,
     TbMail,
     TbMessageReport,
+    TbReceiptRefund,
     TbStack2,
     TbTransferOut,
     TbTrophy,
 } from "react-icons/tb";
 import Address from "../components/Address";
 import { ApplicationForecloseStatus } from "../components/application/ApplicationForecloseStatus";
+import {
+    RefundableDeposits,
+    type RefundableDeposit,
+} from "../components/refund/RefundableDeposits";
 import { isForeclosed } from "../components/application/utils";
 import CenteredText from "../components/CenteredText";
 import { EpochList } from "../components/epoch/EpochList";
 import { InputList } from "../components/input/InputList";
 import PageTitle from "../components/layout/PageTitle";
-import { SummaryCard } from "../components/SummaryCard";
+import type { SummaryCardProps } from "../components/SummaryCard";
+import {
+    SummaryCards,
+    type CardsPerRow,
+} from "../components/application/SummaryCards";
 import { WithdrawalList } from "../components/withdrawal/WithdrawalList";
 import { content } from "../content";
 import { pathBuilder } from "../routes/routePathBuilder";
@@ -38,6 +47,10 @@ type Meta<T> = OmitNever<{
     totalCount: number;
     data: T extends never ? never : T;
     isLoading: boolean;
+    /**
+     * Refreshes the source of this block, when the container has one.
+     */
+    refetch?: () => void;
 }>;
 
 interface Props {
@@ -46,17 +59,31 @@ interface Props {
     inputs: Meta<GetInputReturnType[]>;
     epochs: Meta<GetEpochReturnType[]>;
     withdrawals: Meta<GetWithdrawalReturnType[]>;
+
+    /**
+     * Deposit refunds issued by the application. Shown only for a
+     * foreclosed application.
+     */
+    refunds: Meta<never>;
     outputs: Meta<never>;
     reports: Meta<never>;
     tournaments: Meta<GetTournamentReturnType[]>;
+
+    /**
+     * Deposits of epochs not finalized before foreclosure. Shown only for a
+     * foreclosed application, and only when there is something to refund.
+     */
+    refundableDeposits?: Meta<RefundableDeposit[]>;
 }
 
-const getGridSpan = (consensusType: Application["consensusType"]) => {
+const getCardsPerRow = (
+    consensusType: Application["consensusType"],
+): CardsPerRow => {
     switch (consensusType) {
         case "PRT":
-            return { base: 12, xs: 6, sm: 4 };
+            return { base: 1, xs: 2, sm: 3 };
         default:
-            return { base: 12, xs: 6 };
+            return { base: 1, xs: 2, sm: 2 };
     }
 };
 
@@ -69,13 +96,83 @@ export const ApplicationSummaryPage: FC<Props> = ({
     reports,
     tournaments,
     withdrawals,
+    refunds,
+    refundableDeposits,
 }) => {
     const appId = application.name ?? application.applicationAddress;
     const latestTournament = head(tournaments.data);
     const epochsUrls = pathBuilder.epochs({ application: appId });
-    const gridSpan = getGridSpan(application.consensusType);
     const appIsForeclosed = isForeclosed(application);
     const showWithdrawalsData = appIsForeclosed;
+    const isPrt = application.consensusType === "PRT";
+
+    // A refund issued from the latest inputs changes the refundable deposits
+    // table and the Refunds counter, both rendered by this page.
+    const onRefunded = () => {
+        refundableDeposits?.refetch?.();
+        refunds.refetch?.();
+    };
+
+    const cards: SummaryCardProps[] = [
+        {
+            title: "Epochs",
+            value: epochs.totalCount,
+            icon: TbClock,
+            displaySkeleton: epochs.isLoading,
+        },
+        {
+            title: "Inputs",
+            value: inputs.totalCount,
+            icon: TbInbox,
+            displaySkeleton: inputs.isLoading,
+        },
+        {
+            title: "Outputs",
+            value: outputs.totalCount,
+            icon: TbMail,
+            displaySkeleton: outputs.isLoading,
+            href: pathBuilder.outputs({ application: appId }),
+        },
+        {
+            title: "Reports",
+            value: reports.totalCount,
+            icon: TbMessageReport,
+            displaySkeleton: reports.isLoading,
+        },
+        ...(appIsForeclosed
+            ? [
+                  {
+                      title: "Withdrawals",
+                      value: withdrawals.totalCount,
+                      icon: TbTransferOut,
+                      displaySkeleton: withdrawals.isLoading,
+                  },
+                  {
+                      title: content.refund.summaryCardTxt,
+                      value: refunds.totalCount,
+                      icon: TbReceiptRefund,
+                      displaySkeleton: refunds.isLoading,
+                  },
+              ]
+            : []),
+        ...(isPrt
+            ? [
+                  {
+                      title: "Tournaments",
+                      value: tournaments.totalCount,
+                      icon: TbTrophy,
+                      displaySkeleton: tournaments.isLoading,
+                  },
+                  {
+                      title: content.bond.summaryCardTxt,
+                      value: bondEvents.totalCount,
+                      icon: TbCoins,
+                      displaySkeleton: bondEvents.isLoading,
+                      href: pathBuilder.bonds({ application: appId }),
+                  },
+              ]
+            : []),
+    ];
 
     const tournamentUrl =
         latestTournament !== undefined
@@ -88,82 +185,20 @@ export const ApplicationSummaryPage: FC<Props> = ({
     return (
         <Stack gap="xl">
             <PageTitle Icon={TbStack2} title="Summary" />
-            <Grid gutter="sm">
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Epochs"
-                        value={epochs.totalCount}
-                        icon={TbClock}
-                        displaySkeleton={epochs.isLoading}
-                    />
-                </Grid.Col>
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Inputs"
-                        value={inputs.totalCount}
-                        icon={TbInbox}
-                        displaySkeleton={inputs.isLoading}
-                    />
-                </Grid.Col>
-
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Outputs"
-                        value={outputs.totalCount}
-                        icon={TbMail}
-                        displaySkeleton={outputs.isLoading}
-                        href={pathBuilder.outputs({ application: appId })}
-                    />
-                </Grid.Col>
-                <Grid.Col span={gridSpan} mb="sm">
-                    <SummaryCard
-                        title="Reports"
-                        value={reports.totalCount}
-                        icon={TbMessageReport}
-                        displaySkeleton={reports.isLoading}
-                    />
-                </Grid.Col>
-
-                <Activity mode={showWithdrawalsData ? "visible" : "hidden"}>
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title="Withdrawals"
-                            value={withdrawals.totalCount}
-                            icon={TbTransferOut}
-                            displaySkeleton={withdrawals.isLoading}
-                        />
-                    </Grid.Col>
-                </Activity>
-
-                <Activity
-                    mode={
-                        application.consensusType === "PRT"
-                            ? "visible"
-                            : "hidden"
-                    }
-                >
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title="Tournaments"
-                            value={tournaments.totalCount}
-                            icon={TbTrophy}
-                            displaySkeleton={tournaments.isLoading}
-                        />
-                    </Grid.Col>
-                    <Grid.Col span={gridSpan} mb="sm">
-                        <SummaryCard
-                            title={content.bond.summaryCardTxt}
-                            value={bondEvents.totalCount}
-                            icon={TbCoins}
-                            displaySkeleton={bondEvents.isLoading}
-                            href={pathBuilder.bonds({ application: appId })}
-                        />
-                    </Grid.Col>
-                </Activity>
-            </Grid>
+            <SummaryCards
+                cards={cards}
+                perRow={getCardsPerRow(application.consensusType)}
+            />
 
             {appIsForeclosed && (
                 <ApplicationForecloseStatus application={application} />
+            )}
+
+            {appIsForeclosed && refundableDeposits && (
+                <RefundableDeposits
+                    application={application}
+                    deposits={refundableDeposits.data}
+                />
             )}
 
             {tournamentUrl && (
@@ -266,6 +301,16 @@ export const ApplicationSummaryPage: FC<Props> = ({
                     <InputList
                         key={`${appId}-latest-inputs-${inputs.data.length}`}
                         inputs={inputs.data}
+                        application={application}
+                        epochStatusByIndex={
+                            new Map(
+                                epochs.data.map((epoch) => [
+                                    epoch.index,
+                                    epoch.status,
+                                ]),
+                            )
+                        }
+                        onRefunded={onRefunded}
                     />
                 )}
             </Stack>

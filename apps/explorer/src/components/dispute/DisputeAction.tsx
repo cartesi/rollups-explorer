@@ -1,37 +1,10 @@
 import { Button, Collapse, Group, Stack, Text } from "@mantine/core";
-import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
-import { isNil } from "ramda";
 import { useEffect, useRef, type FC, type ReactNode } from "react";
-import { useAccount } from "wagmi";
-import { useSelectedNodeConnection } from "../connection/hooks";
 import { InfoHint } from "../InfoHint";
 import {
     TransactionProgress,
     type TransactionProgressProps,
 } from "../transactions/TransactionProgress";
-
-/**
- * Wallet state for a permissionless dispute call: whether it can be sent,
- * and a guard that opens the connect or chain modal first when needed.
- */
-export const useDisputeSender = () => {
-    const selectedConnection = useSelectedNodeConnection();
-    const account = useAccount();
-    const connectModal = useConnectModal();
-    const chainModal = useChainModal();
-    const needSwitchNetwork = account.isConnected && isNil(account.chain);
-    const canSend = !needSwitchNetwork && account.isConnected;
-
-    return {
-        canSend,
-        hidden: selectedConnection?.type === "system_mock",
-        send: (write: () => void) => {
-            if (needSwitchNetwork) return chainModal.openChainModal?.();
-            if (!canSend) return connectModal.openConnectModal?.();
-            write();
-        },
-    };
-};
 
 type Stages = Pick<TransactionProgressProps, "prepare" | "execute" | "wait">;
 

@@ -1,0 +1,40 @@
+/* Wrapper of the always-visible row; the fade is positioned against it. */
+.visible {
+    position: relative;
+}
+
+/* Soft fade over the bottom of the visible row while collapsed, so the
+   cut-off reads as "there is more below". */
+.fade {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: rem(48px);
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        var(--mantine-color-body)
+    );
+}
+
+/* The drawer edge: no border line, only an upward shadow in the colour the
+   cards use for their borders, so it follows the colour scheme. The cards
+   keep their `sm` bottom margin; the edge lands one `lg` below the last row. */
+.edge {
+    position: relative;
+    margin-top: calc(var(--mantine-spacing-lg) - var(--mantine-spacing-sm));
+    box-shadow: 0 rem(-6px) rem(10px) rem(-8px)
+        var(--mantine-color-default-border);
+}
+
+/* Centers the caret on the edge, shifted up by half its height so the
+   round button straddles the shadow line. */
+.caret {
+    display: flex;
+    justify-content: center;
+    transform: translateY(-50%);
+}
+
+.caretButton {
+    box-shadow: var(--mantine-shadow-sm);
+}

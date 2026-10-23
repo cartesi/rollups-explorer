@@ -15,10 +15,8 @@ import {
     getInnerTournamentAction,
     getInnerWinExpiry,
 } from "../../lib/disputeActions";
-import {
-    DisputeActionButton,
-    useDisputeSender,
-} from "../dispute/DisputeAction";
+import { DisputeActionButton } from "../dispute/DisputeAction";
+import { useTransactionSender } from "../transactions/hooks/useTransactionSender";
 import { InfoHint } from "../InfoHint";
 
 const text = content.tournament.innerAction;
@@ -62,7 +60,7 @@ export const InnerTournamentAction: FC<InnerTournamentActionProps> = ({
     winnerChildrenLoading,
 }) => {
     const action = getInnerTournamentAction(child, parentMatch);
-    const sender = useDisputeSender();
+    const sender = useTransactionSender();
     const parent = child.parentTournamentAddress ?? zeroAddress;
     const isWin = action?.kind === "win";
 

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { keccak256 } from "viem";
+import { refundableDeposits } from "../../stories/refunds";
 import { InputCard } from "./InputCard";
+import { RefundDepositView } from "../refund/RefundDepositView";
 
 const meta = {
     title: "Components/Input/InputCard",
@@ -151,5 +153,21 @@ export const Exception: Story = {
             createdAt: new Date(),
             updatedAt: new Date(),
         },
+    },
+};
+
+/**
+ * A deposit input of a foreclosed application, with the refund action in
+ * the footer slot.
+ */
+export const ForeclosedDeposit: Story = {
+    args: {
+        input: refundableDeposits[0].input,
+        footer: (
+            <RefundDepositView
+                status="refundable"
+                asset={refundableDeposits[0].asset}
+            />
+        ),
     },
 };

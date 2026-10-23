@@ -12,6 +12,8 @@ import {
 import { isNotNil } from "ramda";
 import type { FC } from "react";
 import { isForeclosed } from "../components/application/utils";
+import { useIssuedRefundCount } from "../components/refund/hooks/useIssuedRefundCount";
+import { useRefundableDeposits } from "../components/refund/hooks/useRefundableDeposits";
 import {
     Hierarchy,
     type HierarchyConfig,
@@ -77,10 +79,26 @@ export const ApplicationSummaryContainer: FC<
         enabled: isNotNil(application) && isForeclosed(application),
     });
 
+    const refundableDepositsResult = useRefundableDeposits(application);
+    const refundCount = useIssuedRefundCount(application);
+
     const withdrawals = {
         data: withdrawalsResult.data?.data ?? [],
         totalCount: withdrawalsResult.data?.pagination.totalCount ?? 0,
         isLoading: withdrawalsResult.isLoading,
+    };
+
+    const refunds = {
+        totalCount: refundCount.count,
+        isLoading: refundCount.isLoading,
+        refetch: refundCount.refetch,
+    };
+
+    const refundableDeposits = {
+        data: refundableDepositsResult.deposits,
+        totalCount: refundableDepositsResult.deposits.length,
+        isLoading: refundableDepositsResult.isLoading,
+        refetch: refundableDepositsResult.refetch,
     };
 
     const epochs = {
@@ -145,6 +163,8 @@ export const ApplicationSummaryContainer: FC<
                     reports={reports}
                     tournaments={tournaments}
                     withdrawals={withdrawals}
+                    refunds={refunds}
+                    refundableDeposits={refundableDeposits}
                 />
             ) : (
                 <DisplayContainerError
