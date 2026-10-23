@@ -95,6 +95,15 @@ describe("RefundDepositView", () => {
         ).toBeInTheDocument();
     });
 
+    it("should show the button busy while the refund is prepared", () => {
+        render(<RefundDepositView status="failed" asset={ether} busy />);
+
+        expect(screen.getByRole("button")).toHaveAttribute(
+            "data-loading",
+            "true",
+        );
+    });
+
     it("should report that the status is still being read", () => {
         render(<RefundDepositView status="unknown" asset={ether} />);
 

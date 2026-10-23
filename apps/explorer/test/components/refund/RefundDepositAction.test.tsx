@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { foundry } from "wagmi/chains";
 import { RefundDepositAction } from "../../../src/components/refund/RefundDepositAction";
 import { createDepositInput, depositor } from "../../../src/stories/deposits";
-import { fireEvent, render, screen } from "../../test-utils";
+import { act, fireEvent, render, screen, waitFor } from "../../test-utils";
 
 const mocks = vi.hoisted(() => ({
     useAccount: vi.fn(),
@@ -27,6 +27,7 @@ const mocks = vi.hoisted(() => ({
     writeContract: vi.fn(),
     reset: vi.fn(),
     refetch: vi.fn(),
+    refetchSimulation: vi.fn(),
 }));
 
 vi.mock("wagmi", async () => {
@@ -98,6 +99,7 @@ describe("RefundDepositAction", () => {
             data: { request },
             isFetching: false,
             error: null,
+            refetch: mocks.refetchSimulation,
         });
         mocks.useWrite.mockReturnValue({
             writeContract: mocks.writeContract,
@@ -135,6 +137,100 @@ describe("RefundDepositAction", () => {
             }),
         );
         expect(mocks.writeContract).toHaveBeenCalledWith(request);
+    });
+
+    it("should re-run a failed simulation and send once it succeeds", async () => {
+        mocks.useSimulate.mockReturnValue({
+            data: undefined,
+            isFetching: false,
+            error: new Error("rpc down"),
+            refetch: mocks.refetchSimulation.mockResolvedValue({
+                data: { request },
+            }),
+        });
+        renderAction();
+
+        fireEvent.click(refundButton()!);
+
+        await waitFor(() =>
+            expect(mocks.writeContract).toHaveBeenCalledWith(request),
+        );
+        expect(mocks.refetchSimulation).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not send while the re-run simulation still fails", async () => {
+        mocks.useSimulate.mockReturnValue({
+            data: undefined,
+            isFetching: false,
+            error: new Error("rpc down"),
+            refetch: mocks.refetchSimulation.mockResolvedValue({
+                data: undefined,
+            }),
+        });
+        renderAction();
+
+        fireEvent.click(refundButton()!);
+
+        await waitFor(() =>
+            expect(mocks.refetchSimulation).toHaveBeenCalledTimes(1),
+        );
+        expect(mocks.writeContract).not.toHaveBeenCalled();
+    });
+
+    it("should re-run the simulation instead of sending a stale request", async () => {
+        const fresh = { functionName: "issueRefund", stale: false };
+        mocks.useSimulate.mockReturnValue({
+            data: { request },
+            isFetching: false,
+            error: new Error("rpc down"),
+            refetch: mocks.refetchSimulation.mockResolvedValue({
+                data: { request: fresh },
+            }),
+        });
+        renderAction();
+
+        fireEvent.click(refundButton()!);
+
+        await waitFor(() =>
+            expect(mocks.writeContract).toHaveBeenCalledWith(fresh),
+        );
+        expect(mocks.writeContract).not.toHaveBeenCalledWith(request);
+    });
+
+    it("should keep the button busy while the simulation is re-run", async () => {
+        let resolve!: (value: { data: { request: typeof request } }) => void;
+        mocks.useSimulate.mockReturnValue({
+            data: undefined,
+            isFetching: false,
+            error: new Error("rpc down"),
+            refetch: mocks.refetchSimulation.mockReturnValue(
+                new Promise((r) => {
+                    resolve = r;
+                }),
+            ),
+        });
+        renderAction();
+
+        fireEvent.click(refundButton()!);
+
+        await waitFor(() =>
+            expect(refundButton()).toHaveAttribute("data-loading", "true"),
+        );
+        await act(async () => resolve({ data: { request } }));
+        expect(refundButton()).not.toHaveAttribute("data-loading");
+        expect(mocks.writeContract).toHaveBeenCalledWith(request);
+    });
+
+    it("should not spin while the simulation refreshes on its own", () => {
+        mocks.useSimulate.mockReturnValue({
+            data: undefined,
+            isFetching: true,
+            error: null,
+            refetch: mocks.refetchSimulation,
+        });
+        renderAction();
+
+        expect(refundButton()).not.toHaveAttribute("data-loading");
     });
 
     it("should ask to connect a wallet when disconnected", () => {
