@@ -41,7 +41,10 @@ const Address: FC<AddressProps> = ({
     value = getAddress(value);
     const name = RollupContractResolver.resolveName(value);
     const text = shorten ? shortenAddress(value) : value;
-    const textStyle: MantineStyleProp = { wordBreak: "break-all" };
+    const textStyle: MantineStyleProp =
+        restProps.wrap === "nowrap"
+            ? { whiteSpace: "nowrap" }
+            : { wordBreak: "break-all" };
 
     const label = name ? (
         <Tooltip label={value} withArrow>
@@ -56,7 +59,7 @@ const Address: FC<AddressProps> = ({
     );
     return (
         <Group gap={0} {...restProps}>
-            <Group gap={8}>
+            <Group gap={8} wrap={restProps.wrap}>
                 {icon && (
                     <Jazzicon
                         diameter={iconSize ?? 20}

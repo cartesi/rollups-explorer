@@ -22,6 +22,41 @@ describe("Address Component", () => {
         expect(screen.getByText("InputBox")).toBeVisible();
     });
 
+    it("should wrap the icon and the text by default", () => {
+        render(
+            <Address
+                value="0x0000000000000000000000000000000000000001"
+                shorten
+                icon
+                canCopy={false}
+            />,
+        );
+
+        const text = screen.getByText("0x000000...000001");
+        const group = text.closest(".mantine-Group-root") as HTMLElement;
+
+        expect(text).toHaveStyle({ wordBreak: "break-all" });
+        expect(group.style.getPropertyValue("--group-wrap")).toBe("wrap");
+    });
+
+    it("should keep the icon and the text on one line when asked not to wrap", () => {
+        render(
+            <Address
+                value="0x0000000000000000000000000000000000000001"
+                shorten
+                icon
+                canCopy={false}
+                wrap="nowrap"
+            />,
+        );
+
+        const text = screen.getByText("0x000000...000001");
+        const group = text.closest(".mantine-Group-root") as HTMLElement;
+
+        expect(text).toHaveStyle({ whiteSpace: "nowrap" });
+        expect(group.style.getPropertyValue("--group-wrap")).toBe("nowrap");
+    });
+
     it("should render link when href is provided", () => {
         render(
             <Address
