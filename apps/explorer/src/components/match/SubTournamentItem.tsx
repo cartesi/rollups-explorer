@@ -13,6 +13,8 @@ import { useParams } from "next/navigation";
 import { type FC, type ReactNode } from "react";
 import { TbTrendingDown } from "react-icons/tb";
 import type { ParamsOf } from "../../../.next/types/routes";
+import { content } from "../../content";
+import { getTournamentLabel } from "../../lib/prtUtils";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import type { Claim, CycleRange } from "../types";
 import { ClaimTimelineItem } from "./ClaimTimelineItem";
@@ -70,7 +72,6 @@ export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
     const theme = useMantineTheme();
     const scheme = useComputedColorScheme();
     const bg = scheme === "light" ? theme.colors.gray[0] : undefined;
-    const labels = ["none", "middle", "bottom"];
 
     return (
         <ClaimTimelineItem
@@ -89,7 +90,11 @@ export const SubTournamentItem: FC<SubTournamentItemProps> = (props) => {
                         href={url}
                         rightSection={<TbTrendingDown />}
                     >
-                        {labels[Number(tournament.level)] ?? "none"}
+                        {
+                            content.tournament.label[
+                                getTournamentLabel(tournament)
+                            ]
+                        }
                     </Button>
                 </Group>
                 {action && <Box mt="sm">{action}</Box>}

@@ -143,7 +143,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                 {
                     title: (
                         <TournamentBreadcrumbSegment
-                            level={tournament.level}
+                            tournament={tournament}
                             variant="default"
                         />
                     ),
@@ -172,7 +172,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         {
             title: (
                 <TournamentBreadcrumbSegment
-                    level={tournament?.level ?? 0n}
+                    tournament={tournament ?? undefined}
                     variant="default"
                 />
             ),

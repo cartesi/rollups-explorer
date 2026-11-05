@@ -3,6 +3,7 @@ import { Stack } from "@mantine/core";
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { zeroHash } from "viem";
 import { Hierarchy } from "../components/navigation/Hierarchy";
+import { MatchBreadcrumbSegment } from "../components/navigation/MatchBreadcrumbSegment";
 import { TournamentBreadcrumbSegment } from "../components/navigation/TournamentBreadcrumbSegment";
 import * as TournamentViewStories from "../components/tournament/TournamentView.stories";
 import type { Claim } from "../components/types";
@@ -31,9 +32,37 @@ type Story = StoryObj<typeof meta>;
 
 type Props = Parameters<typeof TournamentPage>[0];
 
+/**
+ * The breadcrumb of the container: an inner tournament comes after its root
+ * tournament and parent match.
+ */
 const WithBreadcrumb = (props: Props) => {
     const app = applications[0];
     const params = { application: app.name, epochIndex: 4n };
+    const { tournament, parent } = props;
+    const ancestors =
+        tournament.level > 0n
+            ? [
+                  {
+                      title: (
+                          <TournamentBreadcrumbSegment
+                              tournament={{ level: 0n, kind: "NON_LEAF" }}
+                              variant="default"
+                          />
+                      ),
+                      href: "#",
+                  },
+                  {
+                      title: (
+                          <MatchBreadcrumbSegment
+                              match={parent?.match}
+                              variant="default"
+                          />
+                      ),
+                      href: "#",
+                  },
+              ]
+            : [];
 
     return (
         <Stack gap="lg">
@@ -48,8 +77,14 @@ const WithBreadcrumb = (props: Props) => {
                         title: `Epoch #4`,
                         href: pathBuilder.epoch(params),
                     },
+                    ...ancestors,
                     {
-                        title: <TournamentBreadcrumbSegment level={0n} />,
+                        title: (
+                            <TournamentBreadcrumbSegment
+                                tournament={tournament}
+                                variant="filled"
+                            />
+                        ),
                         href: "#",
                     },
                 ]}
@@ -59,17 +94,17 @@ const WithBreadcrumb = (props: Props) => {
     );
 };
 
-export const TopLevelClosed: Story = {
+export const RootClosed: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.NoChallengerYet.args,
 };
 
-export const TopLevelFinalized: Story = {
+export const RootFinalized: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.Finalized.args,
 };
 
-export const TopLevelDispute: Story = {
+export const RootDispute: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.Ongoing.args,
 };
@@ -118,7 +153,7 @@ const matches = randomMatches(
     claims.map(({ hash }) => hash),
 );
 
-export const TopLevelLargeDispute: Story = {
+export const RootLargeDispute: Story = {
     render: WithBreadcrumb,
     args: {
         bondPool: {
@@ -134,42 +169,42 @@ export const TopLevelLargeDispute: Story = {
     },
 };
 
-export const MidLevelDispute: Story = {
+export const LeafDispute: Story = {
     render: WithBreadcrumb,
-    args: TournamentViewStories.MidLevelDispute.args,
+    args: TournamentViewStories.LeafDispute.args,
 };
 
-export const MidLevelWinner: Story = {
+export const LeafWinner: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.ProvisionalInnerWinner.args,
 };
 
-export const TopLevelDisputeWithRefunds: Story = {
+export const RootDisputeWithRefunds: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.RefundsOngoing.args,
 };
 
-export const TopLevelBondRecovered: Story = {
+export const RootBondRecovered: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.BondRecovered.args,
 };
 
-export const TopLevelBondPoolRunning: Story = {
+export const RootBondPoolRunning: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.BondPoolRunning.args,
 };
 
-export const TopLevelBondPoolRecovered: Story = {
+export const RootBondPoolRecovered: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.BondPoolRecovered.args,
 };
 
-export const TopLevelBondPoolNoWinner: Story = {
+export const RootBondPoolNoWinner: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.BondPoolNoWinner.args,
 };
 
-export const TopLevelBondsTab: Story = {
+export const RootBondsTab: Story = {
     render: WithBreadcrumb,
-    args: { ...TopLevelDisputeWithRefunds.args, tab: "bonds" },
+    args: { ...RootDisputeWithRefunds.args, tab: "bonds" },
 };

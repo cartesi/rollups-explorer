@@ -15,6 +15,7 @@ import {
     getMetaSpan,
     decomposeMetaCycle,
     getTournamentCycleRange,
+    getTournamentLabel,
     getTournamentOutcome,
     getWinner,
     isTournamentSettled,
@@ -243,6 +244,27 @@ describe("prtUtils", () => {
             expect(getMatchProgress(match, tournament, advances)).toBe(25);
             expect(getCurrentHeight(match, tournament, advances)).toBe(4n);
             expect(getCurrentHeight(match, tournament, [])).toBe(5n);
+        });
+    });
+
+    describe("getTournamentLabel", () => {
+        it("should name the root, the leaves and the levels between", () => {
+            expect(getTournamentLabel(createTournament())).toBe("root");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 1n, kind: "LEAF" }),
+                ),
+            ).toBe("leaf");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 1n, kind: "NON_LEAF" }),
+                ),
+            ).toBe("inner");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 2n, kind: "LEAF" }),
+                ),
+            ).toBe("leaf");
         });
     });
 
