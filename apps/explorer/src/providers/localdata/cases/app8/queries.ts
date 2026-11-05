@@ -217,6 +217,9 @@ const queries = [
                     payment: null,
                 },
             },
+            bondValue: "$bigint:1000000000000000000",
+            contestedFinalStateOne: null,
+            contestedFinalStateTwo: null,
         },
     },
     {
@@ -262,6 +265,7 @@ const queries = [
                         bisection: null,
                         sealed: null,
                     },
+                    responderDeadline: "$bigint:2133",
                 },
             ],
             pagination: {
@@ -418,6 +422,7 @@ const queries = [
                 bisection: null,
                 sealed: null,
             },
+            responderDeadline: "$bigint:2133",
         },
     },
     {
@@ -448,6 +453,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:47",
+                    responderDeadline: "$bigint:2134",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -465,6 +472,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:46",
+                    responderDeadline: "$bigint:2135",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -482,6 +491,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:45",
+                    responderDeadline: "$bigint:2136",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -499,6 +510,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:44",
+                    responderDeadline: "$bigint:2137",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -516,6 +529,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:43",
+                    responderDeadline: "$bigint:2138",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -533,6 +548,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:42",
+                    responderDeadline: "$bigint:2139",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -550,6 +567,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:41",
+                    responderDeadline: "$bigint:2140",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -567,6 +586,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:40",
+                    responderDeadline: "$bigint:2141",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -584,6 +605,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:39",
+                    responderDeadline: "$bigint:2142",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -601,6 +624,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:38",
+                    responderDeadline: "$bigint:2143",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -618,6 +643,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:37",
+                    responderDeadline: "$bigint:2144",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -635,6 +662,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:36",
+                    responderDeadline: "$bigint:2145",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -652,6 +681,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:35",
+                    responderDeadline: "$bigint:2146",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -669,6 +700,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:34",
+                    responderDeadline: "$bigint:2147",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -686,6 +719,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:33",
+                    responderDeadline: "$bigint:2148",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -703,6 +738,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:32",
+                    responderDeadline: "$bigint:2149",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -720,6 +757,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:31",
+                    responderDeadline: "$bigint:2150",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -737,6 +776,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:30",
+                    responderDeadline: "$bigint:2151",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -754,6 +795,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:29",
+                    responderDeadline: "$bigint:2152",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -771,6 +814,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:28",
+                    responderDeadline: "$bigint:2153",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -788,6 +833,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:27",
+                    responderDeadline: "$bigint:2154",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -805,6 +852,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:26",
+                    responderDeadline: "$bigint:2155",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -822,6 +871,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:25",
+                    responderDeadline: "$bigint:2156",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -839,6 +890,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:24",
+                    responderDeadline: "$bigint:2157",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -856,6 +909,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:23",
+                    responderDeadline: "$bigint:2158",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -873,6 +928,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:22",
+                    responderDeadline: "$bigint:2159",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -890,6 +947,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:21",
+                    responderDeadline: "$bigint:2160",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -907,6 +966,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:20",
+                    responderDeadline: "$bigint:2161",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -924,6 +985,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:19",
+                    responderDeadline: "$bigint:2162",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -941,6 +1004,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:18",
+                    responderDeadline: "$bigint:2163",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -958,6 +1023,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:17",
+                    responderDeadline: "$bigint:2164",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -975,6 +1042,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:16",
+                    responderDeadline: "$bigint:2165",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -992,6 +1061,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:15",
+                    responderDeadline: "$bigint:2166",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1009,6 +1080,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:14",
+                    responderDeadline: "$bigint:2167",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1026,6 +1099,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:13",
+                    responderDeadline: "$bigint:2168",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1043,6 +1118,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:12",
+                    responderDeadline: "$bigint:2169",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1060,6 +1137,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:11",
+                    responderDeadline: "$bigint:2170",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1077,6 +1156,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:10",
+                    responderDeadline: "$bigint:2171",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1094,6 +1175,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:9",
+                    responderDeadline: "$bigint:2172",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1111,6 +1194,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:8",
+                    responderDeadline: "$bigint:2173",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1128,6 +1213,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:7",
+                    responderDeadline: "$bigint:2174",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1145,6 +1232,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:6",
+                    responderDeadline: "$bigint:2175",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1162,6 +1251,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:5",
+                    responderDeadline: "$bigint:2176",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1179,6 +1270,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:4",
+                    responderDeadline: "$bigint:2177",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1196,6 +1289,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:3",
+                    responderDeadline: "$bigint:2178",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1213,6 +1308,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:2",
+                    responderDeadline: "$bigint:2179",
                 },
                 {
                     epochIndex: "$bigint:0",
@@ -1230,6 +1327,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:1",
+                    responderDeadline: "$bigint:2180",
                 },
             ],
             pagination: {
@@ -1295,6 +1394,11 @@ const queries = [
                             payment: null,
                         },
                     },
+                    bondValue: "$bigint:1000000000000000000",
+                    contestedFinalStateOne:
+                        "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
+                    contestedFinalStateTwo:
+                        "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
                 },
             ],
             pagination: {
@@ -1352,6 +1456,11 @@ const queries = [
                     payment: null,
                 },
             },
+            bondValue: "$bigint:1000000000000000000",
+            contestedFinalStateOne:
+                "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
+            contestedFinalStateTwo:
+                "0xc28d05262866798692219c469f0aa53d5258aca01b8bb0ff050b6e2b14e0af29",
         },
     },
     {
@@ -1397,6 +1506,7 @@ const queries = [
                         bisection: null,
                         sealed: null,
                     },
+                    responderDeadline: "$bigint:2183",
                 },
             ],
             pagination: {
@@ -1518,6 +1628,9 @@ const queries = [
                     payment: null,
                 },
             },
+            bondValue: "$bigint:1000000000000000000",
+            contestedFinalStateOne: null,
+            contestedFinalStateTwo: null,
         },
     },
     {
@@ -1562,6 +1675,7 @@ const queries = [
                 bisection: null,
                 sealed: null,
             },
+            responderDeadline: "$bigint:2133",
         },
     },
     {
@@ -1605,6 +1719,7 @@ const queries = [
                 bisection: null,
                 sealed: null,
             },
+            responderDeadline: "$bigint:2183",
         },
     },
     {
@@ -1635,6 +1750,8 @@ const queries = [
                     logIndex: "$bigint:0",
                     segmentStartPosition: "$bigint:0",
                     eliminableAt: "$bigint:0",
+                    currentHeight: "$bigint:16",
+                    responderDeadline: "$bigint:2134",
                 },
             ],
             pagination: {
