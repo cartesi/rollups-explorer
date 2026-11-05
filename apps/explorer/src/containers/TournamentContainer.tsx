@@ -180,7 +180,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
                     tab={tab}
                     bondPool={{
                         balance: balanceQuery.data?.value,
-                        bondValue: joinBonds.bondValue,
+                        bondValue: tournament.bondValue,
                         bonds: [...joinBonds.bonds.values()],
                         loading: joinBonds.isLoading || balanceQuery.isPending,
                     }}
