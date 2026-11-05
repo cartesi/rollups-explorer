@@ -35,6 +35,11 @@ export const tournamentMessages = {
     standingTxt: "Standing",
     winnerTxt: "Winner",
     finalStateTxt: "Final state",
+    contestedTxt: "Contested states",
+    contestedHint:
+        "The two final states of the parent match this inner tournament settles, each with the parent commitment that claims it. The winner defends the one equal to its own final state.",
+    contestedClaimsTxt: "claims",
+    defendedTxt: "defended by the winner",
     candidateTxt: "candidate",
     noWinnerTxt: "No winner",
     asOfBlockTxt: "as of block",

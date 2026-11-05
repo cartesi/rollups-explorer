@@ -1,6 +1,6 @@
 import type { BondEvent, Commitment, Match, Tournament } from "@cartesi/client";
 import type { Meta, StoryObj } from "@storybook/nextjs";
-import { zeroHash, type Address } from "viem";
+import { keccak256, toHex, zeroHash, type Address } from "viem";
 import { claim, generateMatchID } from "../../stories/util";
 import { TournamentView } from "./TournamentView";
 import { getBondTotals } from "../../lib/bondUtils";
@@ -351,6 +351,9 @@ export const MidLevelDispute: Story = {
 const rootTournamentAddress: Address =
     "0xA2835312696Afa86c969e40831857dbB1412627f";
 
+const contestedFinalStateOne = keccak256(toHex("state-one"));
+const contestedFinalStateTwo = keccak256(toHex("state-two"));
+
 const parentMatch = createMatch({
     commitmentOne: claim(0).hash,
     commitmentTwo: claim(1).hash,
@@ -362,8 +365,8 @@ const parentMatch = createMatch({
             agreeState: zeroHash,
             divergencePosition: 1024n,
             divergenceCycle: 1024n << 44n,
-            finalStateOne: zeroHash,
-            finalStateTwo: zeroHash,
+            finalStateOne: contestedFinalStateOne,
+            finalStateTwo: contestedFinalStateTwo,
         },
     }),
 });
@@ -372,6 +375,8 @@ const innerTournament = {
     ...MidLevelDispute.args.tournament,
     parentTournamentAddress: rootTournamentAddress,
     parentMatchIdHash: parentMatch.idHash,
+    contestedFinalStateOne,
+    contestedFinalStateTwo,
 };
 
 /**
@@ -389,7 +394,7 @@ export const ProvisionalInnerWinner: Story = {
                 standing: "INNER_WINNER",
                 candidate: claim(7, 5).hash,
                 winnerCommitment: claim(7, 5).hash,
-                finalStateHash: zeroHash,
+                finalStateHash: contestedFinalStateOne,
                 finishedAtBlock: 90n,
                 winnerExpiresAt: 180n,
                 innerResult: {
