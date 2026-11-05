@@ -117,6 +117,27 @@ export const LeafSealed: Story = {
     },
 };
 
+/**
+ * A leaf match closed by a step proof keeps its seal: the divergence, the
+ * agree state, the final states and the proof deadlines.
+ */
+export const LeafClosed: Story = {
+    args: {
+        tournament,
+        match: {
+            ...match,
+            deletionReason: "STEP",
+            deletionBlockNumber: 1250n,
+            winnerCommitment: "ONE",
+            snapshot: createMatchSnapshot({ asOfBlock: 1250n }),
+            leafSeal: createLeafSeal({
+                divergencePosition:
+                    advances(47).at(-1)?.segmentStartPosition ?? 0n,
+            }),
+        },
+    },
+};
+
 const children = (side: string) =>
     [
         keccak256(toHex(`${side}-left`)),

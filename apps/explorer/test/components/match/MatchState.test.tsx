@@ -5,6 +5,7 @@ import {
     createBisection,
     createCommitment,
     createJoinBond,
+    createLeafSeal,
     createMatch,
     createMatchSnapshot,
     createTournament,
@@ -127,6 +128,29 @@ describe("MatchState", () => {
         ).toBeInTheDocument();
         expect(screen.queryByText("Clocks")).not.toBeInTheDocument();
         expect(screen.queryByText("Responder")).not.toBeInTheDocument();
+    });
+
+    it("should keep the seal of a closed leaf match", () => {
+        render(
+            <MatchState
+                match={createMatch({
+                    deletionReason: "STEP",
+                    winnerCommitment: "ONE",
+                    leafSeal: createLeafSeal({ divergencePosition: 5n }),
+                })}
+                tournament={tournament}
+            />,
+        );
+
+        expect(screen.getByText("Divergence")).toBeInTheDocument();
+        expect(screen.getByText("Agree state")).toBeInTheDocument();
+        expect(screen.getByText("Final states")).toBeInTheDocument();
+        expect(screen.getByText("at block 1190")).toBeInTheDocument();
+        expect(screen.getByText("proof until block 1300")).toBeInTheDocument();
+        expect(screen.getByText("proof until block 1400")).toBeInTheDocument();
+        expect(
+            screen.getByText("both eliminable at block 1400"),
+        ).toBeInTheDocument();
     });
 
     it("should offer the timeout call with the winner's root children", () => {

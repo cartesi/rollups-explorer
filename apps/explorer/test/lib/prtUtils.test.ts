@@ -9,6 +9,7 @@ import {
     getLoser,
     getMatchProgress,
     getResponder,
+    getSealedState,
     getSegmentRange,
     getMetaSpan,
     decomposeMetaCycle,
@@ -20,6 +21,7 @@ import {
 } from "../../src/lib/prtUtils";
 import {
     createBisection,
+    createLeafSeal,
     createMatch,
     createMatchAdvanced,
     createMatchSnapshot,
@@ -240,6 +242,49 @@ describe("prtUtils", () => {
             expect(getMatchProgress(match, tournament, advances)).toBe(25);
             expect(getCurrentHeight(match, tournament, advances)).toBe(4n);
             expect(getCurrentHeight(match, tournament, [])).toBe(5n);
+        });
+    });
+
+    describe("getSealedState", () => {
+        const tournament = createTournament({
+            baseCycle: 1000n,
+            log2step: 4n,
+            height: 3n,
+        });
+
+        it("should read the snapshot of a sealed match", () => {
+            const sealed = {
+                agreeState: keccak256(toHex("agree")),
+                divergencePosition: 2n,
+                divergenceCycle: 1032n,
+                finalStateOne: keccak256(toHex("one")),
+                finalStateTwo: keccak256(toHex("two")),
+            };
+            const match = createMatch({
+                snapshot: createMatchSnapshot({
+                    phase: "SEALED",
+                    bisection: null,
+                    sealed,
+                }),
+            });
+
+            expect(getSealedState(match, tournament)).toEqual(sealed);
+        });
+
+        it("should derive the cycle from the leaf seal of a deleted match", () => {
+            const match = createMatch({
+                deletionReason: "STEP",
+                leafSeal: createLeafSeal({ divergencePosition: 2n }),
+            });
+
+            expect(getSealedState(match, tournament)).toMatchObject({
+                divergencePosition: 2n,
+                divergenceCycle: 1032n,
+            });
+        });
+
+        it("should have nothing for an unsealed match", () => {
+            expect(getSealedState(createMatch(), tournament)).toBeNull();
         });
     });
 
