@@ -224,6 +224,21 @@ export const getMetaSpan = (log2: bigint): MetaSpan => {
  * Meta-cycle range of the current divergence segment of a match, or null when
  * the match has no bisection frontier.
  */
+export type TournamentLabel = "root" | "inner" | "leaf";
+
+/**
+ * How the protocol names a tournament: the root at level 0, a leaf by kind,
+ * and inner for the levels between, whatever the table's level count.
+ */
+export const getTournamentLabel = (
+    tournament: Pick<Tournament, "level" | "kind">,
+): TournamentLabel =>
+    tournament.level === 0n
+        ? "root"
+        : tournament.kind === "LEAF"
+          ? "leaf"
+          : "inner";
+
 /**
  * The parent side a final state defends, as the contract maps it: the side
  * whose contested final state it equals. Nothing for a root tournament.

@@ -446,6 +446,7 @@ export const applications: ApplicationEpochs[] = [
                                                 updatedAt: currentDate,
                                                 height: 17n,
                                                 level: 2n,
+                                                kind: "LEAF",
                                                 snapshot: {
                                                     standing: "INNER_WINNER",
                                                     candidate: keccak256("0x8"),

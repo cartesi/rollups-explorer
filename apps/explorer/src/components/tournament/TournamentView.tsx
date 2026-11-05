@@ -164,7 +164,7 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
             <Stack gap="xs">
                 <DetailRow label={text.levelTxt}>
                     <TournamentBreadcrumbSegment
-                        level={tournament.level}
+                        tournament={tournament}
                         variant="filled"
                     />
                 </DetailRow>
