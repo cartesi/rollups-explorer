@@ -2,6 +2,7 @@ import type {
     CommitmentSide,
     Match,
     MatchAdvanced,
+    MatchSealedSnapshot,
     Tournament,
     TournamentSnapshot,
     TournamentStandingState,
@@ -223,6 +224,27 @@ export const getMetaSpan = (log2: bigint): MetaSpan => {
  * Meta-cycle range of the current divergence segment of a match, or null when
  * the match has no bisection frontier.
  */
+/**
+ * The sealed values of a match: its snapshot while sealed, otherwise the
+ * durable leaf seal, whose cycle is derived the way the contract does.
+ */
+export const getSealedState = (
+    match: Match,
+    tournament: Tournament,
+): MatchSealedSnapshot | null => {
+    if (match.snapshot.phase === "SEALED") return match.snapshot.sealed;
+    if (!match.leafSeal) return null;
+    const { agreeState, divergencePosition, finalStateOne, finalStateTwo } =
+        match.leafSeal;
+    return {
+        agreeState,
+        divergencePosition,
+        divergenceCycle: toCycle(tournament, divergencePosition),
+        finalStateOne,
+        finalStateTwo,
+    };
+};
+
 export const getSegmentRange = (
     match: Match,
     tournament: Tournament,
