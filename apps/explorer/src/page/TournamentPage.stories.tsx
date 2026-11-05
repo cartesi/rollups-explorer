@@ -139,6 +139,11 @@ export const MidLevelDispute: Story = {
     args: TournamentViewStories.MidLevelDispute.args,
 };
 
+export const MidLevelWinner: Story = {
+    render: WithBreadcrumb,
+    args: TournamentViewStories.ProvisionalInnerWinner.args,
+};
+
 export const TopLevelDisputeWithRefunds: Story = {
     render: WithBreadcrumb,
     args: TournamentViewStories.RefundsOngoing.args,

@@ -5,6 +5,7 @@ import {
     getAdvanceSide,
     getBlocksLeft,
     getCurrentHeight,
+    getDefendedSide,
     getDeletionBlock,
     getLoser,
     getMatchProgress,
@@ -242,6 +243,26 @@ describe("prtUtils", () => {
             expect(getMatchProgress(match, tournament, advances)).toBe(25);
             expect(getCurrentHeight(match, tournament, advances)).toBe(4n);
             expect(getCurrentHeight(match, tournament, [])).toBe(5n);
+        });
+    });
+
+    describe("getDefendedSide", () => {
+        const one = keccak256(toHex("state-one"));
+        const two = keccak256(toHex("state-two"));
+        const inner = createTournament({
+            level: 1n,
+            contestedFinalStateOne: one,
+            contestedFinalStateTwo: two,
+        });
+
+        it("should map a final state to the parent side claiming it", () => {
+            expect(getDefendedSide(inner, one)).toBe("ONE");
+            expect(getDefendedSide(inner, two)).toBe("TWO");
+        });
+
+        it("should have no side without a result or for a root", () => {
+            expect(getDefendedSide(inner, null)).toBeNull();
+            expect(getDefendedSide(createTournament(), one)).toBeNull();
         });
     });
 
