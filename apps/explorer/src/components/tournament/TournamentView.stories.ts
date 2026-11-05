@@ -292,7 +292,34 @@ const midCommitments: Commitment[] = [
     }),
 ];
 
-export const MidLevelDispute: Story = {
+const rootTournamentAddress: Address =
+    "0xA2835312696Afa86c969e40831857dbB1412627f";
+
+const contestedFinalStateOne = keccak256(toHex("state-one"));
+const contestedFinalStateTwo = keccak256(toHex("state-two"));
+
+const parentMatch = createMatch({
+    commitmentOne: claim(0).hash,
+    commitmentTwo: claim(1).hash,
+    tournamentAddress: rootTournamentAddress,
+    snapshot: createMatchSnapshot({
+        phase: "SEALED",
+        bisection: null,
+        sealed: {
+            agreeState: zeroHash,
+            divergencePosition: 1024n,
+            divergenceCycle: 1024n << 44n,
+            finalStateOne: contestedFinalStateOne,
+            finalStateTwo: contestedFinalStateTwo,
+        },
+    }),
+});
+
+/**
+ * A leaf tournament settling a sealed match of the root tournament: it
+ * contests the two final states of that match.
+ */
+export const LeafDispute: Story = {
     args: {
         commitments: midCommitments,
         bondPool: poolFor(midCommitments, [], 1),
@@ -300,15 +327,18 @@ export const MidLevelDispute: Story = {
             address: "0x61bcab9d0d8b554009824292d2d6855dfa3aab86",
             createdAt: new Date(timestamp),
             epochIndex,
-            log2step: 27n,
-            maxLevel: 3n,
-            parentMatchIdHash: null,
-            parentTournamentAddress: null,
+            kind: "LEAF",
+            log2step: 0n,
+            parentMatchIdHash: parentMatch.idHash,
+            parentTournamentAddress: rootTournamentAddress,
+            contestedFinalStateOne,
+            contestedFinalStateTwo,
             updatedAt: new Date(timestamp),
-            height: 17n,
+            height: 38n,
             level: 1n,
             snapshot: { standing: "MATCHES_ACTIVE" },
         }),
+        parent: { match: parentMatch },
         matches: [
             createMatch({
                 idHash: generateMatchID(claim(7, 5).hash, claim(8, 4).hash),
@@ -348,37 +378,6 @@ export const MidLevelDispute: Story = {
     },
 };
 
-const rootTournamentAddress: Address =
-    "0xA2835312696Afa86c969e40831857dbB1412627f";
-
-const contestedFinalStateOne = keccak256(toHex("state-one"));
-const contestedFinalStateTwo = keccak256(toHex("state-two"));
-
-const parentMatch = createMatch({
-    commitmentOne: claim(0).hash,
-    commitmentTwo: claim(1).hash,
-    tournamentAddress: rootTournamentAddress,
-    snapshot: createMatchSnapshot({
-        phase: "SEALED",
-        bisection: null,
-        sealed: {
-            agreeState: zeroHash,
-            divergencePosition: 1024n,
-            divergenceCycle: 1024n << 44n,
-            finalStateOne: contestedFinalStateOne,
-            finalStateTwo: contestedFinalStateTwo,
-        },
-    }),
-});
-
-const innerTournament = {
-    ...MidLevelDispute.args.tournament,
-    parentTournamentAddress: rootTournamentAddress,
-    parentMatchIdHash: parentMatch.idHash,
-    contestedFinalStateOne,
-    contestedFinalStateTwo,
-};
-
 /**
  * The inner tournament has a live winner until block 180. Anyone can
  * propagate it to the parent match before then.
@@ -386,11 +385,11 @@ const innerTournament = {
 export const ProvisionalInnerWinner: Story = {
     parameters: { connectionType: "system" },
     args: {
-        ...MidLevelDispute.args,
+        ...LeafDispute.args,
         tournament: {
-            ...innerTournament,
+            ...LeafDispute.args.tournament,
             snapshot: {
-                ...MidLevelDispute.args.tournament.snapshot,
+                ...LeafDispute.args.tournament.snapshot,
                 standing: "INNER_WINNER",
                 candidate: claim(7, 5).hash,
                 winnerCommitment: claim(7, 5).hash,
@@ -418,11 +417,11 @@ export const ProvisionalInnerWinner: Story = {
 export const ExpiredInnerWinner: Story = {
     parameters: { connectionType: "system" },
     args: {
-        ...MidLevelDispute.args,
+        ...LeafDispute.args,
         tournament: {
-            ...innerTournament,
+            ...LeafDispute.args.tournament,
             snapshot: {
-                ...MidLevelDispute.args.tournament.snapshot,
+                ...LeafDispute.args.tournament.snapshot,
                 standing: "INNER_ELIMINABLE_WINNER_EXPIRED",
                 candidate: claim(7, 5).hash,
                 finishedAtBlock: 90n,
@@ -504,14 +503,16 @@ export const BondRecovered: Story = {
 };
 
 /**
- * A middle-level tournament covers one root leaf: 16,777,216 mcycles of one
+ * A middle-level tournament of a three-level table covers one root leaf: 16,777,216 mcycles of one
  * input, with 128-mcycle leaves.
  */
 export const MiddleLevelGeometry: Story = {
     args: {
-        ...MidLevelDispute.args,
+        ...LeafDispute.args,
         tournament: {
-            ...MidLevelDispute.args.tournament,
+            ...LeafDispute.args.tournament,
+            kind: "NON_LEAF",
+            maxLevel: 3n,
             level: 1n,
             log2step: 27n,
             height: 17n,
@@ -521,14 +522,15 @@ export const MiddleLevelGeometry: Story = {
 };
 
 /**
- * A bottom-level tournament covers one middle leaf: 128 mcycles resolved to
+ * The bottom level of a three-level table covers one middle leaf: 128 mcycles resolved to
  * single ucycles.
  */
 export const BottomLevelGeometry: Story = {
     args: {
-        ...MidLevelDispute.args,
+        ...LeafDispute.args,
         tournament: {
-            ...MidLevelDispute.args.tournament,
+            ...LeafDispute.args.tournament,
+            maxLevel: 3n,
             level: 2n,
             log2step: 0n,
             height: 27n,

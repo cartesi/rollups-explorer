@@ -24,31 +24,31 @@ type Story = StoryObj<typeof meta>;
 const now = Math.floor(Date.now() / 1000);
 const range: CycleRange = [1837880065n, 2453987565n];
 
-const middle = applications[0].epochs[3].tournament?.matches?.[0].tournament!;
-const bottom = middle.matches?.[0].tournament!;
+const inner = applications[0].epochs[3].tournament?.matches?.[0].tournament!;
+const leaf = inner.matches?.[0].tournament!;
 
 /**
- * Navigation to middle tournament.
+ * Navigation to an inner tournament of a three-level table.
  */
-export const Middle: Story = {
+export const Inner: Story = {
     args: {
         claim: claim(0),
         now,
         range,
         timestamp: now,
-        tournament: middle,
+        tournament: inner,
     },
 };
 
 /**
- * Navigation to bottom tournament.
+ * Navigation to a leaf tournament.
  */
-export const Bottom: Story = {
+export const Leaf: Story = {
     args: {
         claim: claim(0),
         now,
         range,
         timestamp: now,
-        tournament: bottom,
+        tournament: leaf,
     },
 };

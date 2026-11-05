@@ -102,7 +102,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
             {
                 title: (
                     <TournamentBreadcrumbSegment
-                        level={tournament.level}
+                        tournament={tournament}
                         variant="default"
                     />
                 ),
@@ -150,7 +150,7 @@ export const TournamentContainer: FC<TournamentParams> = (params) => {
         {
             title: (
                 <TournamentBreadcrumbSegment
-                    level={tournament?.level ?? 0n}
+                    tournament={tournament}
                     variant="filled"
                 />
             ),

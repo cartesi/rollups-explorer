@@ -3,6 +3,11 @@
  */
 export const tournamentMessages = {
     levelTxt: "Level",
+    label: {
+        root: "root",
+        inner: "inner",
+        leaf: "leaf",
+    },
     cycleRangeTxt: "Cycle range",
     tabs: {
         matchesTxt: "Matches",
