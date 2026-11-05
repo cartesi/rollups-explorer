@@ -225,6 +225,23 @@ export const getMetaSpan = (log2: bigint): MetaSpan => {
  * the match has no bisection frontier.
  */
 /**
+ * The parent side a final state defends, as the contract maps it: the side
+ * whose contested final state it equals. Nothing for a root tournament.
+ */
+export const getDefendedSide = (
+    tournament: Pick<
+        Tournament,
+        "contestedFinalStateOne" | "contestedFinalStateTwo"
+    >,
+    finalStateHash: Hash | null,
+): CommitmentSide | null => {
+    if (!finalStateHash) return null;
+    if (finalStateHash === tournament.contestedFinalStateOne) return "ONE";
+    if (finalStateHash === tournament.contestedFinalStateTwo) return "TWO";
+    return null;
+};
+
+/**
  * The sealed values of a match: its snapshot while sealed, otherwise the
  * durable leaf seal, whose cycle is derived the way the contract does.
  */

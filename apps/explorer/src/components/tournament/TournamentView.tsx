@@ -186,7 +186,10 @@ export const TournamentView: FC<TournamentViewProps> = (props) => {
                         )}
                     </Text>
                 </DetailRow>
-                <TournamentOutcome snapshot={tournament.snapshot} />
+                <TournamentOutcome
+                    tournament={tournament}
+                    parentMatch={parent?.match}
+                />
                 {getInnerTournamentAction(tournament, parent?.match) && (
                     <DetailRow label={text.innerAction.labelTxt}>
                         <InnerTournamentAction
