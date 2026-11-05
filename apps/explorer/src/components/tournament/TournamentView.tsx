@@ -39,7 +39,7 @@ export type TournamentBondPool = {
     /**
      * Minimum bond each join must post.
      */
-    bondValue?: bigint;
+    bondValue: bigint;
 
     /**
      * Bonds the commitments posted on join, as they resolve.
@@ -47,7 +47,7 @@ export type TournamentBondPool = {
     bonds: JoinBond[];
 
     /**
-     * Whether the bond value, join bonds or balance are still being fetched.
+     * Whether the join bonds or balance are still being fetched.
      */
     loading?: boolean;
 };
