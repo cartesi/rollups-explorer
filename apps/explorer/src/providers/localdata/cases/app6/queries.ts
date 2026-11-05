@@ -213,6 +213,9 @@ const queries = [
                     payment: null,
                 },
             },
+            bondValue: "$bigint:1000000000000000000",
+            contestedFinalStateOne: null,
+            contestedFinalStateTwo: null,
         },
     },
     {
@@ -258,6 +261,7 @@ const queries = [
                         bisection: null,
                         sealed: null,
                     },
+                    responderDeadline: "$bigint:2133",
                 },
             ],
             pagination: {
@@ -414,6 +418,7 @@ const queries = [
                 bisection: null,
                 sealed: null,
             },
+            responderDeadline: "$bigint:2133",
         },
     },
     {

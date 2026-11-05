@@ -24,7 +24,7 @@ const match: Match = createMatch({
     commitmentOne: claim(0).hash,
     commitmentTwo: claim(1).hash,
     createdAt: new Date(timestamp),
-    deletionBlockNumber: null,
+    deletionBlockNumber: 0n,
     deletionReason: "NOT_DELETED",
     deletionTxHash: null,
     epochIndex: 0n,

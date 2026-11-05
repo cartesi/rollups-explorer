@@ -2,6 +2,7 @@ import type {
     BondEvent,
     Commitment,
     CommitmentSnapshot,
+    LeafMatchSeal,
     Match,
     MatchAdvanced,
     MatchBisectionSnapshot,
@@ -65,7 +66,7 @@ export const createTournament = (
         address: defaultTournamentAddress,
         parentTournamentAddress: null,
         parentMatchIdHash: null,
-        maxLevel: 3n,
+        maxLevel: 2n,
         level: 0n,
         log2step: 44n,
         height: 48n,
@@ -77,6 +78,9 @@ export const createTournament = (
         startInstant: 1n,
         allowance: 1000n,
         creationEvent: null,
+        bondValue: 1_000_000_000_000_000_000n,
+        contestedFinalStateOne: null,
+        contestedFinalStateTwo: null,
         ...rest,
         snapshot: createTournamentSnapshot(snapshot),
     };
@@ -125,8 +129,9 @@ export const createMatch = (
         txHash: defaultTxHash,
         winnerCommitment: "NONE",
         deletionReason,
-        deletionBlockNumber: null,
+        deletionBlockNumber: 0n,
         deletionTxHash: null,
+        responderDeadline: 1001n,
         createdAt: defaultDate,
         updatedAt: defaultDate,
         logIndex: 0n,
@@ -250,6 +255,24 @@ export const createMatchAdvanced = (
     logIndex: 0n,
     segmentStartPosition: 0n,
     eliminableAt: 0n,
+    currentHeight: 47n,
+    responderDeadline: 1001n,
+    ...overrides,
+});
+
+export const createLeafSeal = (
+    overrides: Partial<LeafMatchSeal> = {},
+): LeafMatchSeal => ({
+    eliminableAt: 1400n,
+    blockNumber: 1190n,
+    txHash: keccak256(toHex("seal")),
+    logIndex: 2n,
+    agreeState: keccak256(toHex("agree")),
+    divergencePosition: 0n,
+    finalStateOne: keccak256(toHex("one")),
+    finalStateTwo: keccak256(toHex("two")),
+    deadlineOne: 1300n,
+    deadlineTwo: 1400n,
     ...overrides,
 });
 
