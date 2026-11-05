@@ -139,7 +139,7 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
         }
     }, [bisectionWidth]);
 
-    const progress = getMatchProgress(match, tournament, advances.length);
+    const progress = getMatchProgress(match, tournament, advances);
 
     const ranges = useMemo(
         () => getAdvanceRanges(tournament, advances),
