@@ -25,6 +25,7 @@ import { TbArrowUp } from "react-icons/tb";
 import {
     getAdvanceRanges,
     getAdvanceSide,
+    getDeletionBlock,
     getLoser,
     getMatchProgress,
     getTournamentCycleRange,
@@ -171,9 +172,8 @@ export const MatchActions: FC<MatchActionsProps> = (props) => {
     const nextClaim =
         getAdvanceSide(advances.length) === "ONE" ? claim1 : claim2;
     const waitingClaim = nextClaim === claim1 ? claim2 : claim1;
-    const closedAt = match.deletionBlockNumber
-        ? timestamps?.get(match.deletionBlockNumber)
-        : undefined;
+    const deletionBlock = getDeletionBlock(match);
+    const closedAt = deletionBlock ? timestamps?.get(deletionBlock) : undefined;
 
     const refundItems = [
         {
