@@ -150,7 +150,7 @@ export const randomMatches = (
                     commitmentTwo: claim,
                     blockNumber: 1n,
                     createdAt: new Date(timestamp),
-                    deletionBlockNumber: null,
+                    deletionBlockNumber: 0n,
                     deletionReason: "NOT_DELETED",
                     deletionTxHash: null,
                     epochIndex: 0n,
