@@ -70,6 +70,14 @@ export const Closed: Story = {
     },
 };
 
+export const ClosedLeaf: Story = {
+    args: {
+        ...TopLevelMatch.args,
+        advances: advances(47),
+        match: MatchStateStories.LeafClosed.args.match,
+    },
+};
+
 export const WithRefunds: Story = {
     args: {
         ...TopLevelMatch.args,
