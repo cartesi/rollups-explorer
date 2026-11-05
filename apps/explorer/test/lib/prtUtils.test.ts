@@ -4,6 +4,7 @@ import {
     getAdvanceRanges,
     getAdvanceSide,
     getBlocksLeft,
+    getDeletionBlock,
     getLoser,
     getMatchProgress,
     getResponder,
@@ -210,6 +211,20 @@ describe("prtUtils", () => {
             const match = createMatch({ deletionReason: "TIMEOUT" });
 
             expect(getMatchProgress(match, tournament, 1)).toBe(25);
+        });
+    });
+
+    describe("getDeletionBlock", () => {
+        it("should skip the zero block of an open match", () => {
+            expect(getDeletionBlock(createMatch())).toBeUndefined();
+        });
+
+        it("should return the block a match was deleted in", () => {
+            const match = createMatch({
+                deletionReason: "STEP",
+                deletionBlockNumber: 1230n,
+            });
+            expect(getDeletionBlock(match)).toBe(1230n);
         });
     });
 

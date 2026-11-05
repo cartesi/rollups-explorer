@@ -150,6 +150,15 @@ export const getLoser = (match: Match) =>
               match.winnerCommitment === "ONE" ? "TWO" : "ONE",
           );
 
+/**
+ * The block a match was deleted in, `undefined` while it is open: the record
+ * carries zero until then, which is not a block to look up.
+ */
+export const getDeletionBlock = (match: Match): bigint | undefined =>
+    match.deletionReason === "NOT_DELETED"
+        ? undefined
+        : match.deletionBlockNumber;
+
 export const getResponder = (match: Match): CommitmentSide | null =>
     match.snapshot.phase === "BISECTING" ||
     match.snapshot.phase === "READY_TO_SEAL"
