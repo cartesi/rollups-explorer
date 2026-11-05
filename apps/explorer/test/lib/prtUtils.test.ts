@@ -4,6 +4,7 @@ import {
     getAdvanceRanges,
     getAdvanceSide,
     getBlocksLeft,
+    getCurrentHeight,
     getDeletionBlock,
     getLoser,
     getMatchProgress,
@@ -166,16 +167,41 @@ describe("prtUtils", () => {
             expect(getTournamentCycleRange(tournament)).toEqual([1000n, 1128n]);
         });
 
-        it("should derive the advance ranges from the segment positions", () => {
+        it("should size the advance ranges by their reported height", () => {
             const advances = [
-                createMatchAdvanced({ segmentStartPosition: 4n }),
-                createMatchAdvanced({ segmentStartPosition: 4n }),
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 2n,
+                }),
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 1n,
+                }),
             ];
 
             expect(getAdvanceRanges(tournament, advances)).toEqual([
                 [0n, 8n],
                 [4n, 8n],
                 [4n, 6n],
+            ]);
+        });
+
+        it("should keep the ranges right when an advance is missing", () => {
+            const advances = [
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 2n,
+                }),
+                createMatchAdvanced({
+                    segmentStartPosition: 5n,
+                    currentHeight: 0n,
+                }),
+            ];
+
+            expect(getAdvanceRanges(tournament, advances)).toEqual([
+                [0n, 8n],
+                [4n, 8n],
+                [5n, 6n],
             ]);
         });
     });
@@ -192,7 +218,7 @@ describe("prtUtils", () => {
                 }),
             });
 
-            expect(getMatchProgress(match, tournament, 0)).toBe(50);
+            expect(getMatchProgress(match, tournament, [])).toBe(50);
         });
 
         it("should be complete once ready to seal", () => {
@@ -204,13 +230,16 @@ describe("prtUtils", () => {
                 }),
             });
 
-            expect(getMatchProgress(match, tournament, 0)).toBe(100);
+            expect(getMatchProgress(match, tournament, [])).toBe(100);
         });
 
-        it("should count the advances of a deleted match", () => {
+        it("should take the height of the last advance of a deleted match", () => {
             const match = createMatch({ deletionReason: "TIMEOUT" });
+            const advances = [createMatchAdvanced({ currentHeight: 4n })];
 
-            expect(getMatchProgress(match, tournament, 1)).toBe(25);
+            expect(getMatchProgress(match, tournament, advances)).toBe(25);
+            expect(getCurrentHeight(match, tournament, advances)).toBe(4n);
+            expect(getCurrentHeight(match, tournament, [])).toBe(5n);
         });
     });
 
