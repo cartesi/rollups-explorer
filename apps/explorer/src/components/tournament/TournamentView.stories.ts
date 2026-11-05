@@ -607,12 +607,12 @@ export const BondPoolRelayedJoin: Story = {
 };
 
 /**
- * The bond value, join bonds and balance are still loading.
+ * The join bonds and balance are still loading.
  */
 export const BondPoolLoading: Story = {
     args: {
         ...RefundsOngoing.args,
-        bondPool: { bonds: [], loading: true },
+        bondPool: { bondValue, bonds: [], loading: true },
     },
 };
 

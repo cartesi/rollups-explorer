@@ -64,10 +64,11 @@ export const RelayedJoin: Story = {
 };
 
 /**
- * The bond value, join bonds and balance are still loading.
+ * The join bonds and balance are still loading.
  */
 export const Loading: Story = {
     args: {
+        bondValue,
         pool: { ...Running.args.pool, deposited: 0n, exact: false },
         loading: true,
     },

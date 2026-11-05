@@ -24,10 +24,10 @@ export interface BondPoolProps {
     /**
      * Minimum bond each join must post.
      */
-    bondValue?: bigint;
+    bondValue: bigint;
 
     /**
-     * Whether the bond value, join bonds or balance are still being fetched.
+     * Whether the join bonds or balance are still being fetched.
      */
     loading?: boolean;
 
@@ -108,19 +108,12 @@ export const BondPool: FC<BondPoolProps> = ({
     return (
         <Stack gap="xs">
             <DetailRow label={text.bondValueTxt} hint={text.bondValueHint}>
-                <Value
-                    loading={loading}
-                    value={
-                        bondValue !== undefined ? (
-                            <Group gap={6}>
-                                <Text>{formatBondValue(bondValue)}</Text>
-                                <Text size="sm" c="dimmed">
-                                    {text.perJoinTxt}
-                                </Text>
-                            </Group>
-                        ) : undefined
-                    }
-                />
+                <Group gap={6}>
+                    <Text>{formatBondValue(bondValue)}</Text>
+                    <Text size="sm" c="dimmed">
+                        {text.perJoinTxt}
+                    </Text>
+                </Group>
             </DetailRow>
             <DetailRow label={text.depositedTxt}>
                 <Value
