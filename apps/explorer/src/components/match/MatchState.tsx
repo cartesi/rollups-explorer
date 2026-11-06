@@ -8,6 +8,7 @@ import {
     type MantineColor,
 } from "@mantine/core";
 import type { FC } from "react";
+import { TbFileCheck, TbLock, TbSwordOff } from "react-icons/tb";
 import { zeroAddress, type Hash } from "viem";
 import { content } from "../../content";
 import type { JoinBond } from "../../lib/bondUtils";
@@ -19,6 +20,7 @@ import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import {
     getBlocksLeft,
     getCommitment,
+    getProofDeadline,
     getResponder,
     getSealedState,
     getSegmentRange,
@@ -196,6 +198,7 @@ export const MatchState: FC<MatchStateProps> = ({
                                 <Group key={side} gap="xs" wrap="nowrap">
                                     <HashAvatar
                                         hash={getCommitment(match, side)}
+                                        alt={`${text.sideTxt[side]} ${getCommitment(match, side)}`}
                                         size={iconSize}
                                     />
                                     <LongText
@@ -218,23 +221,36 @@ export const MatchState: FC<MatchStateProps> = ({
                     hint={text.leafSeal.deadlinesHint}
                 >
                     <Stack gap="xs">
-                        <Text size="sm" c="dimmed">
-                            {`${text.leafSeal.atBlockTxt} ${leafSeal.blockNumber}`}
-                        </Text>
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbLock size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.atBlockTxt} ${leafSeal.blockNumber}`}
+                            </Text>
+                        </Group>
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbFileCheck size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.proofBeforeBlockTxt} ${getProofDeadline(leafSeal)}`}
+                            </Text>
+                        </Group>
                         {sides.map((side) => (
                             <Group key={side} gap="xs" wrap="nowrap">
                                 <HashAvatar
                                     hash={getCommitment(match, side)}
+                                    alt={`${text.sideTxt[side]} ${getCommitment(match, side)}`}
                                     size={iconSize}
                                 />
                                 <Text size="sm" c="dimmed">
-                                    {`${text.leafSeal.proofUntilBlockTxt} ${side === "ONE" ? leafSeal.deadlineOne : leafSeal.deadlineTwo}`}
+                                    {`${text.leafSeal.timesOutAtBlockTxt} ${side === "ONE" ? leafSeal.deadlineOne : leafSeal.deadlineTwo}`}
                                 </Text>
                             </Group>
                         ))}
-                        <Text size="sm" c="dimmed">
-                            {`${text.leafSeal.eliminableAtBlockTxt} ${leafSeal.eliminableAt}`}
-                        </Text>
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbSwordOff size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.eliminableAtBlockTxt} ${leafSeal.eliminableAt}`}
+                            </Text>
+                        </Group>
                     </Stack>
                 </DetailRow>
             )}
