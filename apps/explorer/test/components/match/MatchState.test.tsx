@@ -146,11 +146,16 @@ describe("MatchState", () => {
         expect(screen.getByText("Agree state")).toBeInTheDocument();
         expect(screen.getByText("Final states")).toBeInTheDocument();
         expect(screen.getByText("at block 1190")).toBeInTheDocument();
-        expect(screen.getByText("proof until block 1300")).toBeInTheDocument();
-        expect(screen.getByText("proof until block 1400")).toBeInTheDocument();
+        expect(
+            screen.getByText("proof accepted before block 1300"),
+        ).toBeInTheDocument();
+        expect(screen.getByText("times out at block 1300")).toBeInTheDocument();
+        expect(screen.getByText("times out at block 1400")).toBeInTheDocument();
         expect(
             screen.getByText("both eliminable at block 1400"),
         ).toBeInTheDocument();
+        expect(screen.getAllByAltText(/^Commitment one 0x/)).toHaveLength(2);
+        expect(screen.getAllByAltText(/^Commitment two 0x/)).toHaveLength(2);
     });
 
     it("should offer the timeout call with the winner's root children", () => {

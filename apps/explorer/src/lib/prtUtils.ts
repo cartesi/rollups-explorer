@@ -1,5 +1,6 @@
 import type {
     CommitmentSide,
+    LeafMatchSeal,
     Match,
     MatchAdvanced,
     MatchSealedSnapshot,
@@ -276,6 +277,14 @@ export const getSealedState = (
         finalStateTwo,
     };
 };
+
+/**
+ * The block before which a leaf proof is accepted: the earlier deadline.
+ */
+export const getProofDeadline = (
+    seal: Pick<LeafMatchSeal, "deadlineOne" | "deadlineTwo">,
+): bigint =>
+    seal.deadlineOne < seal.deadlineTwo ? seal.deadlineOne : seal.deadlineTwo;
 
 export const getSegmentRange = (
     match: Match,
