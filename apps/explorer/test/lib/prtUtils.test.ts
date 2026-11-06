@@ -4,13 +4,19 @@ import {
     getAdvanceRanges,
     getAdvanceSide,
     getBlocksLeft,
+    getCurrentHeight,
+    getDefendedSide,
+    getDeletionBlock,
     getLoser,
     getMatchProgress,
+    getProofDeadline,
     getResponder,
+    getSealedState,
     getSegmentRange,
     getMetaSpan,
     decomposeMetaCycle,
     getTournamentCycleRange,
+    getTournamentLabel,
     getTournamentOutcome,
     getWinner,
     isTournamentSettled,
@@ -18,6 +24,7 @@ import {
 } from "../../src/lib/prtUtils";
 import {
     createBisection,
+    createLeafSeal,
     createMatch,
     createMatchAdvanced,
     createMatchSnapshot,
@@ -165,16 +172,41 @@ describe("prtUtils", () => {
             expect(getTournamentCycleRange(tournament)).toEqual([1000n, 1128n]);
         });
 
-        it("should derive the advance ranges from the segment positions", () => {
+        it("should size the advance ranges by their reported height", () => {
             const advances = [
-                createMatchAdvanced({ segmentStartPosition: 4n }),
-                createMatchAdvanced({ segmentStartPosition: 4n }),
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 2n,
+                }),
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 1n,
+                }),
             ];
 
             expect(getAdvanceRanges(tournament, advances)).toEqual([
                 [0n, 8n],
                 [4n, 8n],
                 [4n, 6n],
+            ]);
+        });
+
+        it("should keep the ranges right when an advance is missing", () => {
+            const advances = [
+                createMatchAdvanced({
+                    segmentStartPosition: 4n,
+                    currentHeight: 2n,
+                }),
+                createMatchAdvanced({
+                    segmentStartPosition: 5n,
+                    currentHeight: 0n,
+                }),
+            ];
+
+            expect(getAdvanceRanges(tournament, advances)).toEqual([
+                [0n, 8n],
+                [4n, 8n],
+                [5n, 6n],
             ]);
         });
     });
@@ -191,7 +223,7 @@ describe("prtUtils", () => {
                 }),
             });
 
-            expect(getMatchProgress(match, tournament, 0)).toBe(50);
+            expect(getMatchProgress(match, tournament, [])).toBe(50);
         });
 
         it("should be complete once ready to seal", () => {
@@ -203,13 +235,128 @@ describe("prtUtils", () => {
                 }),
             });
 
-            expect(getMatchProgress(match, tournament, 0)).toBe(100);
+            expect(getMatchProgress(match, tournament, [])).toBe(100);
         });
 
-        it("should count the advances of a deleted match", () => {
+        it("should take the height of the last advance of a deleted match", () => {
             const match = createMatch({ deletionReason: "TIMEOUT" });
+            const advances = [createMatchAdvanced({ currentHeight: 4n })];
 
-            expect(getMatchProgress(match, tournament, 1)).toBe(25);
+            expect(getMatchProgress(match, tournament, advances)).toBe(25);
+            expect(getCurrentHeight(match, tournament, advances)).toBe(4n);
+            expect(getCurrentHeight(match, tournament, [])).toBe(5n);
+        });
+    });
+
+    describe("getTournamentLabel", () => {
+        it("should name the root, the leaves and the levels between", () => {
+            expect(getTournamentLabel(createTournament())).toBe("root");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 1n, kind: "LEAF" }),
+                ),
+            ).toBe("leaf");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 1n, kind: "NON_LEAF" }),
+                ),
+            ).toBe("inner");
+            expect(
+                getTournamentLabel(
+                    createTournament({ level: 2n, kind: "LEAF" }),
+                ),
+            ).toBe("leaf");
+        });
+    });
+
+    describe("getDefendedSide", () => {
+        const one = keccak256(toHex("state-one"));
+        const two = keccak256(toHex("state-two"));
+        const inner = createTournament({
+            level: 1n,
+            contestedFinalStateOne: one,
+            contestedFinalStateTwo: two,
+        });
+
+        it("should map a final state to the parent side claiming it", () => {
+            expect(getDefendedSide(inner, one)).toBe("ONE");
+            expect(getDefendedSide(inner, two)).toBe("TWO");
+        });
+
+        it("should have no side without a result or for a root", () => {
+            expect(getDefendedSide(inner, null)).toBeNull();
+            expect(getDefendedSide(createTournament(), one)).toBeNull();
+        });
+    });
+
+    describe("getSealedState", () => {
+        const tournament = createTournament({
+            baseCycle: 1000n,
+            log2step: 4n,
+            height: 3n,
+        });
+
+        it("should read the snapshot of a sealed match", () => {
+            const sealed = {
+                agreeState: keccak256(toHex("agree")),
+                divergencePosition: 2n,
+                divergenceCycle: 1032n,
+                finalStateOne: keccak256(toHex("one")),
+                finalStateTwo: keccak256(toHex("two")),
+            };
+            const match = createMatch({
+                snapshot: createMatchSnapshot({
+                    phase: "SEALED",
+                    bisection: null,
+                    sealed,
+                }),
+            });
+
+            expect(getSealedState(match, tournament)).toEqual(sealed);
+        });
+
+        it("should derive the cycle from the leaf seal of a deleted match", () => {
+            const match = createMatch({
+                deletionReason: "STEP",
+                leafSeal: createLeafSeal({ divergencePosition: 2n }),
+            });
+
+            expect(getSealedState(match, tournament)).toMatchObject({
+                divergencePosition: 2n,
+                divergenceCycle: 1032n,
+            });
+        });
+
+        it("should have nothing for an unsealed match", () => {
+            expect(getSealedState(createMatch(), tournament)).toBeNull();
+        });
+    });
+
+    describe("getProofDeadline", () => {
+        it("should be the earlier of the two deadlines", () => {
+            expect(
+                getProofDeadline({ deadlineOne: 1300n, deadlineTwo: 1400n }),
+            ).toBe(1300n);
+            expect(
+                getProofDeadline({ deadlineOne: 1400n, deadlineTwo: 1300n }),
+            ).toBe(1300n);
+            expect(
+                getProofDeadline({ deadlineOne: 1300n, deadlineTwo: 1300n }),
+            ).toBe(1300n);
+        });
+    });
+
+    describe("getDeletionBlock", () => {
+        it("should skip the zero block of an open match", () => {
+            expect(getDeletionBlock(createMatch())).toBeUndefined();
+        });
+
+        it("should return the block a match was deleted in", () => {
+            const match = createMatch({
+                deletionReason: "STEP",
+                deletionBlockNumber: 1230n,
+            });
+            expect(getDeletionBlock(match)).toBe(1230n);
         });
     });
 

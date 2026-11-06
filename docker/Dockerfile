@@ -13,6 +13,8 @@ WORKDIR /app
 ARG TURBO_VERSION
 RUN npm install -g turbo@^${TURBO_VERSION}
 COPY . .
+# Vendored rollups-ts tarballs, if any (see README); the directory must exist to be copied
+RUN mkdir -p vendor
 RUN turbo prune --scope=explorer --docker
 
 # Add lockfile and package.json's of isolated subworkspace
@@ -26,6 +28,7 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/vendor ./vendor
 RUN pnpm install --frozen-lockfile
 
 # Build the project

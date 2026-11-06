@@ -22,7 +22,7 @@ import { useLeafStepProof } from "../hooks/useLeafStepProof";
 import { useRefetchOnFinalizedBlock } from "../hooks/useRefetchOnFinalizedBlock";
 import { useTournamentHierarchy } from "../hooks/useTournamentHierarchy";
 import { isBondRefund } from "../lib/bondUtils";
-import { isTournamentSettled } from "../lib/prtUtils";
+import { getDeletionBlock, isTournamentSettled } from "../lib/prtUtils";
 import { MatchPage } from "../page/MatchPage";
 import { pathBuilder, type MatchParams } from "../routes/routePathBuilder";
 import { ContainerSkeleton } from "./ContainerSkeleton";
@@ -113,7 +113,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         ...(advancesQuery.data?.data ?? []).map(
             ({ blockNumber }) => blockNumber,
         ),
-        match?.deletionBlockNumber,
+        match ? getDeletionBlock(match) : undefined,
         subTournament?.startInstant,
     ]);
 
@@ -143,7 +143,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
                 {
                     title: (
                         <TournamentBreadcrumbSegment
-                            level={tournament.level}
+                            tournament={tournament}
                             variant="default"
                         />
                     ),
@@ -172,7 +172,7 @@ export const MatchContainer: FC<MatchParams> = (params) => {
         {
             title: (
                 <TournamentBreadcrumbSegment
-                    level={tournament?.level ?? 0n}
+                    tournament={tournament ?? undefined}
                     variant="default"
                 />
             ),

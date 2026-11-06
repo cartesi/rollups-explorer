@@ -84,7 +84,7 @@ overrides:
  "@cartesi/rpc": file:vendor/cartesi-rpc.tgz
 ```
 
-Commit `vendor/`, `pnpm-workspace.yaml` and `pnpm-lock.yaml` in a dedicated commit.
+Commit `vendor/`, `pnpm-workspace.yaml` and `pnpm-lock.yaml` in a dedicated commit. The Docker build copies `vendor/` into the image, so the PR image builds with the tarballs.
 
 > [!IMPORTANT]
 > Vendored tarballs must not be merged. Once the rollups-ts packages are published, add a fixup to the vendoring commit that removes `vendor/` and the overrides and bumps `apps/explorer` to the published versions, then autosquash it before merging.

@@ -158,6 +158,9 @@ const queries = [
                     payment: null,
                 },
             },
+            bondValue: "$bigint:1000000000000000000",
+            contestedFinalStateOne: null,
+            contestedFinalStateTwo: null,
         },
     },
     {

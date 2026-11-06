@@ -16,6 +16,9 @@ export const matchMessages = {
     divergenceTxt: "Divergence",
     agreeStateTxt: "Agree state",
     leafSealedTxt: "Leaf sealed",
+    finalStatesTxt: "Final states",
+    finalStatesHint:
+        "The state each commitment claims right after the divergence cycle. An inner tournament contests exactly these two states.",
     clocksTxt: "Clocks",
     asOfBlockTxt: "as of block",
     phase: {
@@ -46,9 +49,17 @@ export const matchMessages = {
         winSuccessTxt: "Timeout win confirmed.",
         eliminateSuccessTxt: "Elimination confirmed.",
     },
+    sideTxt: {
+        ONE: "Commitment one",
+        TWO: "Commitment two",
+    },
     leafSeal: {
         atBlockTxt: "at block",
+        proofBeforeBlockTxt: "proof accepted before block",
+        timesOutAtBlockTxt: "times out at block",
         eliminableAtBlockTxt: "both eliminable at block",
+        deadlinesHint:
+            "A step proof is accepted before the earlier deadline. From then until both are eliminable, only the commitment with the later deadline can still win, by timeout. Equal deadlines leave no such window.",
     },
     deferredCharge: {
         prefixTxt: "Deferred charge of",

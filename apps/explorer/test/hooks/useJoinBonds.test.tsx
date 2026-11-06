@@ -1,5 +1,4 @@
 import { iTournamentAbi } from "@cartesi/client/abi";
-import { useReadITournamentBondValue } from "@cartesi/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -17,12 +16,7 @@ vi.mock("wagmi/actions", () => ({
     getTransaction: vi.fn(),
 }));
 
-vi.mock("@cartesi/react", () => ({
-    useReadITournamentBondValue: vi.fn(),
-}));
-
 const mockGetTransaction = vi.mocked(getTransaction);
-const mockBondValue = vi.mocked(useReadITournamentBondValue);
 
 const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider
@@ -34,8 +28,8 @@ const wrapper = ({ children }: { children: ReactNode }) => (
     </QueryClientProvider>
 );
 
-const tournament = createTournament();
 const bondValue = 21_000_000_000_000_000n;
+const tournament = createTournament({ bondValue });
 const joinInput = encodeFunctionData({
     abi: iTournamentAbi,
     functionName: "joinTournament",
@@ -52,10 +46,6 @@ const relayed = createCommitment({
 
 describe("useJoinBonds", () => {
     beforeEach(() => {
-        mockBondValue.mockReturnValue({
-            data: bondValue,
-            isPending: false,
-        } as never);
         mockGetTransaction.mockReset();
         mockGetTransaction.mockImplementation(
             async (_config, { hash }) =>
@@ -103,12 +93,8 @@ describe("useJoinBonds", () => {
         });
     });
 
-    it("should report loading until the transactions arrive", () => {
+    it("should fall back to the bond value until the transaction arrives", () => {
         mockGetTransaction.mockImplementation(() => new Promise(() => {}));
-        mockBondValue.mockReturnValue({
-            data: undefined,
-            isPending: true,
-        } as never);
 
         const { result } = renderHook(
             () => useJoinBonds(tournament, [direct]),
@@ -116,7 +102,10 @@ describe("useJoinBonds", () => {
         );
 
         expect(result.current.isLoading).toBe(true);
-        expect(result.current.bonds.size).toBe(0);
+        expect(result.current.bonds.get(direct.commitment)).toMatchObject({
+            value: bondValue,
+            exact: false,
+        });
     });
 
     it("should resolve nothing without commitments", () => {

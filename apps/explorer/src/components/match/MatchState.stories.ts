@@ -5,6 +5,7 @@ import { randomAdvances } from "../../stories/data";
 import {
     createCommitment,
     createJoinBond,
+    createLeafSeal,
     createMatch,
     createMatchSnapshot,
     createMatchState,
@@ -108,12 +109,31 @@ export const LeafSealed: Story = {
         ...Sealed.args,
         match: {
             ...Sealed.args.match,
-            leafSeal: {
-                eliminableAt: 1400n,
-                blockNumber: 1190n,
-                txHash: keccak256(toHex("seal")),
-                logIndex: 2n,
-            },
+            leafSeal: createLeafSeal({
+                divergencePosition:
+                    advances(47).at(-1)?.segmentStartPosition ?? 0n,
+            }),
+        },
+    },
+};
+
+/**
+ * A leaf match closed by a step proof keeps its seal: the divergence, the
+ * agree state, the final states and the proof deadlines.
+ */
+export const LeafClosed: Story = {
+    args: {
+        tournament,
+        match: {
+            ...match,
+            deletionReason: "STEP",
+            deletionBlockNumber: 1250n,
+            winnerCommitment: "ONE",
+            snapshot: createMatchSnapshot({ asOfBlock: 1250n }),
+            leafSeal: createLeafSeal({
+                divergencePosition:
+                    advances(47).at(-1)?.segmentStartPosition ?? 0n,
+            }),
         },
     },
 };

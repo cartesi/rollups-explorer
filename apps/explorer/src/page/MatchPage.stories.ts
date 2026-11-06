@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 
 const now = Date.now();
 
-export const TopLevelMatch: Story = {
+export const RootMatch: Story = {
     args: {
         advances: [],
         match: Ongoing.args.matches[1],
@@ -48,7 +48,7 @@ const advances = (count: number) =>
 
 export const BisectingWithClocks: Story = {
     args: {
-        ...TopLevelMatch.args,
+        ...RootMatch.args,
         advances: advances(31),
         match: MatchStateStories.Bisecting.args.match,
         commitments: MatchStateStories.Bisecting.args.commitments,
@@ -57,7 +57,7 @@ export const BisectingWithClocks: Story = {
 
 export const Sealed: Story = {
     args: {
-        ...TopLevelMatch.args,
+        ...RootMatch.args,
         advances: advances(47),
         match: MatchStateStories.Sealed.args.match,
     },
@@ -65,14 +65,22 @@ export const Sealed: Story = {
 
 export const Closed: Story = {
     args: {
-        ...TopLevelMatch.args,
+        ...RootMatch.args,
         match: MatchStateStories.Closed.args.match,
+    },
+};
+
+export const ClosedLeaf: Story = {
+    args: {
+        ...RootMatch.args,
+        advances: advances(47),
+        match: MatchStateStories.LeafClosed.args.match,
     },
 };
 
 export const WithRefunds: Story = {
     args: {
-        ...TopLevelMatch.args,
+        ...RootMatch.args,
         advances: MatchActionsStories.WithRefunds.args.advances,
         match: MatchActionsStories.WithRefunds.args.match,
         refunds: MatchActionsStories.WithRefunds.args.refunds,

@@ -1,6 +1,14 @@
 import type { Commitment, Match, Tournament } from "@cartesi/client";
-import { Badge, Group, Stack, Text, type MantineColor } from "@mantine/core";
+import {
+    Badge,
+    Group,
+    Stack,
+    Text,
+    useMantineTheme,
+    type MantineColor,
+} from "@mantine/core";
 import type { FC } from "react";
+import { TbFileCheck, TbLock, TbSwordOff } from "react-icons/tb";
 import { zeroAddress, type Hash } from "viem";
 import { content } from "../../content";
 import type { JoinBond } from "../../lib/bondUtils";
@@ -12,12 +20,15 @@ import { formatMetaSpan } from "../../lib/metaCycleFormat";
 import {
     getBlocksLeft,
     getCommitment,
+    getProofDeadline,
     getResponder,
+    getSealedState,
     getSegmentRange,
 } from "../../lib/prtUtils";
 import { ClaimText } from "../ClaimText";
 import { CycleRangeFormatted } from "../CycleRangeFormatted";
 import { DetailRow } from "../DetailRow";
+import { HashAvatar } from "../HashAvatar";
 import { InfoHint } from "../InfoHint";
 import { LongText } from "../LongText";
 import { MetaCycle } from "../MetaCycle";
@@ -56,6 +67,7 @@ export interface MatchStateProps {
 }
 
 const text = content.match;
+const sides = ["ONE", "TWO"] as const;
 
 const phaseColors: Record<Match["snapshot"]["phase"], MantineColor> = {
     UNINITIALIZED: "gray",
@@ -107,10 +119,13 @@ export const MatchState: FC<MatchStateProps> = ({
     onActionConfirmed,
     tournament,
 }) => {
-    const { snapshot } = match;
+    const theme = useMantineTheme();
+    const iconSize = theme.other.smIconSize;
+    const { snapshot, leafSeal } = match;
     const deleted = match.deletionReason !== "NOT_DELETED";
     const responder = getResponder(match);
     const segment = getSegmentRange(match, tournament);
+    const sealed = getSealedState(match, tournament);
     const timeoutAction = getMatchTimeoutAction(match);
     const winner =
         timeoutAction?.kind === "win"
@@ -163,27 +178,80 @@ export const MatchState: FC<MatchStateProps> = ({
                     />
                 </DetailRow>
             )}
-            {snapshot.phase === "SEALED" && (
+            {sealed && (
                 <>
                     <DetailRow
                         label={text.divergenceTxt}
                         hint={content.tournament.cycle.inputSlotHint}
                     >
-                        <MetaCycle value={snapshot.sealed.divergenceCycle} />
+                        <MetaCycle value={sealed.divergenceCycle} />
                     </DetailRow>
                     <DetailRow label={text.agreeStateTxt}>
-                        <LongText
-                            value={snapshot.sealed.agreeState}
-                            ff="monospace"
-                        />
+                        <LongText value={sealed.agreeState} ff="monospace" />
+                    </DetailRow>
+                    <DetailRow
+                        label={text.finalStatesTxt}
+                        hint={text.finalStatesHint}
+                    >
+                        <Stack gap="xs">
+                            {sides.map((side) => (
+                                <Group key={side} gap="xs" wrap="nowrap">
+                                    <HashAvatar
+                                        hash={getCommitment(match, side)}
+                                        alt={`${text.sideTxt[side]} ${getCommitment(match, side)}`}
+                                        size={iconSize}
+                                    />
+                                    <LongText
+                                        value={
+                                            side === "ONE"
+                                                ? sealed.finalStateOne
+                                                : sealed.finalStateTwo
+                                        }
+                                        ff="monospace"
+                                    />
+                                </Group>
+                            ))}
+                        </Stack>
                     </DetailRow>
                 </>
             )}
-            {match.leafSeal && (
-                <DetailRow label={text.leafSealedTxt}>
-                    <Text size="sm" c="dimmed">
-                        {`${text.leafSeal.atBlockTxt} ${match.leafSeal.blockNumber}, ${text.leafSeal.eliminableAtBlockTxt} ${match.leafSeal.eliminableAt}`}
-                    </Text>
+            {leafSeal && (
+                <DetailRow
+                    label={text.leafSealedTxt}
+                    hint={text.leafSeal.deadlinesHint}
+                >
+                    <Stack gap="xs">
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbLock size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.atBlockTxt} ${leafSeal.blockNumber}`}
+                            </Text>
+                        </Group>
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbFileCheck size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.proofBeforeBlockTxt} ${getProofDeadline(leafSeal)}`}
+                            </Text>
+                        </Group>
+                        {sides.map((side) => (
+                            <Group key={side} gap="xs" wrap="nowrap">
+                                <HashAvatar
+                                    hash={getCommitment(match, side)}
+                                    alt={`${text.sideTxt[side]} ${getCommitment(match, side)}`}
+                                    size={iconSize}
+                                />
+                                <Text size="sm" c="dimmed">
+                                    {`${text.leafSeal.timesOutAtBlockTxt} ${side === "ONE" ? leafSeal.deadlineOne : leafSeal.deadlineTwo}`}
+                                </Text>
+                            </Group>
+                        ))}
+                        <Group gap="xs" wrap="nowrap" c="dimmed">
+                            <TbSwordOff size={iconSize} />
+                            <Text size="sm">
+                                {`${text.leafSeal.eliminableAtBlockTxt} ${leafSeal.eliminableAt}`}
+                            </Text>
+                        </Group>
+                    </Stack>
                 </DetailRow>
             )}
             {!deleted && snapshot.timeoutOutcome !== "NONE" && (

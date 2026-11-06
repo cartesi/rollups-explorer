@@ -38,6 +38,7 @@ describe("BondPool", () => {
         render(
             <BondPool
                 pool={{ ...pool, exact: false, joins: 1 }}
+                bondValue={21_000_000_000_000_000n}
                 balance={0n}
             />,
         );
@@ -47,7 +48,13 @@ describe("BondPool", () => {
     });
 
     it("should show skeletons while the values load", () => {
-        render(<BondPool pool={{ ...pool, exact: false }} loading />);
+        render(
+            <BondPool
+                pool={{ ...pool, exact: false }}
+                bondValue={21_000_000_000_000_000n}
+                loading
+            />,
+        );
 
         expect(screen.queryByText("0.042 ETH")).not.toBeInTheDocument();
         expect(

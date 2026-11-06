@@ -13,36 +13,34 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/**
- * Breadcrumbs for a bottom tournament.
- */
-export const BottomTournament: Story = {
+export const RootTournament: Story = {
     args: {
-        level: 2n,
+        tournament: { level: 0n, kind: "NON_LEAF" },
     },
 };
 
 /**
- * Breadcrumbs for a middle tournament.
+ * A level between the root and the leaves, in tables with more than two.
  */
-export const MidTournament: Story = {
+export const InnerTournament: Story = {
     args: {
-        level: 1n,
+        tournament: { level: 1n, kind: "NON_LEAF" },
     },
 };
 
-/**
- * Breadcrumbs for a top tournament.
- */
-export const TopTournament: Story = {
+export const LeafTournament: Story = {
     args: {
-        level: 0n,
+        tournament: { level: 1n, kind: "LEAF" },
     },
 };
 
-export const TopTournamentVariant: Story = {
+export const RootTournamentVariant: Story = {
     args: {
-        level: 0n,
+        tournament: { level: 0n, kind: "NON_LEAF" },
         variant: "outline",
     },
+};
+
+export const Loading: Story = {
+    args: {},
 };

@@ -1,7 +1,9 @@
 import type {
     CommitmentSide,
+    LeafMatchSeal,
     Match,
     MatchAdvanced,
+    MatchSealedSnapshot,
     Tournament,
     TournamentSnapshot,
     TournamentStandingState,
@@ -86,46 +88,56 @@ export const getTournamentCycleRange = (
 
 /**
  * Leaf ranges of the divergence frontier, the first one being the whole
- * commitment tree and each following one the segment left by an advance.
+ * commitment tree and each following one the segment left by an advance, as
+ * wide as the height the advance reported.
  */
 export const getAdvanceRanges = (
     tournament: Tournament,
     advances: MatchAdvanced[],
 ): [bigint, bigint][] => [
     [0n, 1n << tournament.height],
-    ...advances.map((advance, index): [bigint, bigint] => [
+    ...advances.map((advance): [bigint, bigint] => [
         advance.segmentStartPosition,
-        advance.segmentStartPosition +
-            (1n << (tournament.height - BigInt(index) - 1n)),
+        advance.segmentStartPosition + (1n << advance.currentHeight),
     ]),
 ];
 
 /**
- * Percentage of the bisection already done. A deleted match carries no phase
- * payload, so its progress comes from the recorded advances.
+ * Height of the segment a match still disputes: from the snapshot while it is
+ * open, and from the last recorded advance once it is deleted, since a deleted
+ * match carries no phase payload.
+ */
+export const getCurrentHeight = (
+    match: Match,
+    tournament: Tournament,
+    advances: MatchAdvanced[],
+): bigint => {
+    switch (match.snapshot.phase) {
+        case "BISECTING":
+            return match.snapshot.bisection.currentHeight;
+        case "READY_TO_SEAL":
+            return 1n;
+        case "SEALED":
+            return 0n;
+        case "UNINITIALIZED":
+            return advances.at(-1)?.currentHeight ?? tournament.height;
+    }
+};
+
+/**
+ * Percentage of the bisection already done.
  */
 export const getMatchProgress = (
     match: Match,
     tournament: Tournament,
-    advancesCount: number,
+    advances: MatchAdvanced[],
 ) => {
     const total = Number(tournament.height - 1n);
     if (total <= 0) return 100;
-    switch (match.snapshot.phase) {
-        case "BISECTING":
-            return (
-                (Number(
-                    tournament.height - match.snapshot.bisection.currentHeight,
-                ) /
-                    total) *
-                100
-            );
-        case "READY_TO_SEAL":
-        case "SEALED":
-            return 100;
-        case "UNINITIALIZED":
-            return Math.min(advancesCount / total, 1) * 100;
-    }
+    const done = Number(
+        tournament.height - getCurrentHeight(match, tournament, advances),
+    );
+    return Math.min(done / total, 1) * 100;
 };
 
 /**
@@ -149,6 +161,15 @@ export const getLoser = (match: Match) =>
               match,
               match.winnerCommitment === "ONE" ? "TWO" : "ONE",
           );
+
+/**
+ * The block a match was deleted in, `undefined` while it is open: the record
+ * carries zero until then, which is not a block to look up.
+ */
+export const getDeletionBlock = (match: Match): bigint | undefined =>
+    match.deletionReason === "NOT_DELETED"
+        ? undefined
+        : match.deletionBlockNumber;
 
 export const getResponder = (match: Match): CommitmentSide | null =>
     match.snapshot.phase === "BISECTING" ||
@@ -204,6 +225,67 @@ export const getMetaSpan = (log2: bigint): MetaSpan => {
  * Meta-cycle range of the current divergence segment of a match, or null when
  * the match has no bisection frontier.
  */
+export type TournamentLabel = "root" | "inner" | "leaf";
+
+/**
+ * How the protocol names a tournament: the root at level 0, a leaf by kind,
+ * and inner for the levels between, whatever the table's level count.
+ */
+export const getTournamentLabel = (
+    tournament: Pick<Tournament, "level" | "kind">,
+): TournamentLabel =>
+    tournament.level === 0n
+        ? "root"
+        : tournament.kind === "LEAF"
+          ? "leaf"
+          : "inner";
+
+/**
+ * The parent side a final state defends, as the contract maps it: the side
+ * whose contested final state it equals. Nothing for a root tournament.
+ */
+export const getDefendedSide = (
+    tournament: Pick<
+        Tournament,
+        "contestedFinalStateOne" | "contestedFinalStateTwo"
+    >,
+    finalStateHash: Hash | null,
+): CommitmentSide | null => {
+    if (!finalStateHash) return null;
+    if (finalStateHash === tournament.contestedFinalStateOne) return "ONE";
+    if (finalStateHash === tournament.contestedFinalStateTwo) return "TWO";
+    return null;
+};
+
+/**
+ * The sealed values of a match: its snapshot while sealed, otherwise the
+ * durable leaf seal, whose cycle is derived the way the contract does.
+ */
+export const getSealedState = (
+    match: Match,
+    tournament: Tournament,
+): MatchSealedSnapshot | null => {
+    if (match.snapshot.phase === "SEALED") return match.snapshot.sealed;
+    if (!match.leafSeal) return null;
+    const { agreeState, divergencePosition, finalStateOne, finalStateTwo } =
+        match.leafSeal;
+    return {
+        agreeState,
+        divergencePosition,
+        divergenceCycle: toCycle(tournament, divergencePosition),
+        finalStateOne,
+        finalStateTwo,
+    };
+};
+
+/**
+ * The block before which a leaf proof is accepted: the earlier deadline.
+ */
+export const getProofDeadline = (
+    seal: Pick<LeafMatchSeal, "deadlineOne" | "deadlineTwo">,
+): bigint =>
+    seal.deadlineOne < seal.deadlineTwo ? seal.deadlineOne : seal.deadlineTwo;
+
 export const getSegmentRange = (
     match: Match,
     tournament: Tournament,

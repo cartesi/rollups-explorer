@@ -88,6 +88,7 @@ export const randomAdvances = (options: {
                 createMatchAdvanced({
                     blockNumber: BigInt(i),
                     createdAt: new Date(now + i * 60),
+                    currentHeight: height - BigInt(i) - 1n,
                     epochIndex: epochIndex ?? 0n,
                     idHash,
                     leftNode: keccak256(numberToHex(i)),
@@ -97,6 +98,7 @@ export const randomAdvances = (options: {
                             : right
                               ? zeroHash
                               : previous.leftNode,
+                    responderDeadline: BigInt(i) + 1000n,
                     segmentStartPosition,
                     tournamentAddress,
                     txHash: keccak256(numberToHex(i)),
@@ -326,7 +328,7 @@ export const applications: ApplicationEpochs[] = [
                                 commitmentOne: keccak256("0x4"),
                                 commitmentTwo: keccak256("0x5"),
                                 createdAt: currentDate,
-                                deletionBlockNumber: null,
+                                deletionBlockNumber: 0n,
                                 deletionReason: "NOT_DELETED",
                                 deletionTxHash: null,
                                 epochIndex: 0n,
@@ -388,7 +390,7 @@ export const applications: ApplicationEpochs[] = [
                                         ...createMatch({
                                             blockNumber: 1n,
                                             createdAt: currentDate,
-                                            deletionBlockNumber: null,
+                                            deletionBlockNumber: 0n,
                                             deletionReason: "NOT_DELETED",
                                             deletionTxHash: null,
                                             epochIndex: 3n,
@@ -444,6 +446,7 @@ export const applications: ApplicationEpochs[] = [
                                                 updatedAt: currentDate,
                                                 height: 17n,
                                                 level: 2n,
+                                                kind: "LEAF",
                                                 snapshot: {
                                                     standing: "INNER_WINNER",
                                                     candidate: keccak256("0x8"),
