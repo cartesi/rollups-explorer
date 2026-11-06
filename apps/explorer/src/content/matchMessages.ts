@@ -49,9 +49,14 @@ export const matchMessages = {
         winSuccessTxt: "Timeout win confirmed.",
         eliminateSuccessTxt: "Elimination confirmed.",
     },
+    sideTxt: {
+        ONE: "Commitment one",
+        TWO: "Commitment two",
+    },
     leafSeal: {
         atBlockTxt: "at block",
-        proofUntilBlockTxt: "proof until block",
+        proofBeforeBlockTxt: "proof accepted before block",
+        timesOutAtBlockTxt: "times out at block",
         eliminableAtBlockTxt: "both eliminable at block",
         deadlinesHint:
             "A step proof is accepted before the earlier deadline. From then until both are eliminable, only the commitment with the later deadline can still win, by timeout. Equal deadlines leave no such window.",

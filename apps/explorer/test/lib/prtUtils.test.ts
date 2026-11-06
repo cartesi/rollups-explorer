@@ -9,6 +9,7 @@ import {
     getDeletionBlock,
     getLoser,
     getMatchProgress,
+    getProofDeadline,
     getResponder,
     getSealedState,
     getSegmentRange,
@@ -328,6 +329,20 @@ describe("prtUtils", () => {
 
         it("should have nothing for an unsealed match", () => {
             expect(getSealedState(createMatch(), tournament)).toBeNull();
+        });
+    });
+
+    describe("getProofDeadline", () => {
+        it("should be the earlier of the two deadlines", () => {
+            expect(
+                getProofDeadline({ deadlineOne: 1300n, deadlineTwo: 1400n }),
+            ).toBe(1300n);
+            expect(
+                getProofDeadline({ deadlineOne: 1400n, deadlineTwo: 1300n }),
+            ).toBe(1300n);
+            expect(
+                getProofDeadline({ deadlineOne: 1300n, deadlineTwo: 1300n }),
+            ).toBe(1300n);
         });
     });
 
