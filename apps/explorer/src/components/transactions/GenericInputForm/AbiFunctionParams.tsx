@@ -2,10 +2,12 @@
 import { Alert, Stack, Text, TextInput } from "@mantine/core";
 import { Fragment } from "react";
 import { TbAlertCircle } from "react-icons/tb";
+import { ArrayParamInput } from "./ArrayParamInput";
 import { useFormContext } from "./context";
 import { InputLabel } from "./FunctionSignature";
 import { TupleComponents } from "./TupleComponents";
 import type { AbiInputParam } from "./types";
+import { isArrayType } from "./utils";
 
 export const AbiFunctionParams = () => {
     const form = useFormContext();
@@ -29,6 +31,12 @@ export const AbiFunctionParams = () => {
                                         {input.type === "tuple" ? (
                                             <TupleComponents
                                                 input={input as AbiInputParam}
+                                            />
+                                        ) : isArrayType(input.type) ? (
+                                            <ArrayParamInput
+                                                param={input}
+                                                path={`abiFunctionParams.${inputIndex}.value`}
+                                                rootPath={`abiFunctionParams.${inputIndex}.value`}
                                             />
                                         ) : (
                                             <TextInput

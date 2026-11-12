@@ -1,9 +1,11 @@
 "use client";
 import { Fieldset, type FieldsetProps, TextInput } from "@mantine/core";
 import { type FC, Fragment } from "react";
+import { ArrayParamInput } from "./ArrayParamInput";
 import { useFormContext } from "./context";
 import { InputLabel } from "./FunctionSignature";
 import type { AbiInputParam } from "./types";
+import { isArrayType } from "./utils";
 
 interface TupleComponentsProps extends FieldsetProps {
     input: AbiInputParam;
@@ -40,6 +42,13 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                                         ? 16
                                         : 0
                                 }
+                            />
+                        ) : isArrayType(component.type) ? (
+                            <ArrayParamInput
+                                param={component}
+                                path={`abiFunctionParams.${inputIndex}.value`}
+                                rootPath={`abiFunctionParams.${inputIndex}.value`}
+                                mt={isFirstStandardInput ? 0 : 16}
                             />
                         ) : (
                             <TextInput
