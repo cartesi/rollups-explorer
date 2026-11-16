@@ -11,6 +11,41 @@ Rollups Explorer is a web application that facilitates interacting with [Cartesi
 - Execution of outputs (i.e., Vouchers).
 - Follow disputes for [Cartesi](https://cartesi.io) applications that use PRT consensus.
 
+> [!NOTE]
+> This README covers Rollups Explorer 2.x, which is currently published as alpha pre-releases. The Docker `latest` tag and the latest non-prerelease on [GitHub Releases](https://github.com/cartesi/rollups-explorer/releases) are still 1.x.
+
+## Run with Docker
+
+You need a compatible Cartesi Rollups Node JSON-RPC endpoint, an Ethereum JSON-RPC endpoint for the same chain, and Docker.
+
+```shell
+EXPLORER_VERSION="<version>"   # a 2.x Docker tag, without the "v" prefix, for example 2.0.0-alpha.6
+
+docker run --rm --name cartesi-rollups-explorer \
+  -p 3000:3000 \
+  -e CARTESI_NODE_RPC_URL=http://127.0.0.1:6751/rpc \
+  -e NODE_RPC_URL=http://127.0.0.1:6751/anvil \
+  "cartesi/rollups-explorer:${EXPLORER_VERSION}"
+```
+
+Open [http://localhost:3000/explorer](http://localhost:3000/explorer). The example URLs match the local environment started by [Cartesi CLI](https://github.com/cartesi/cli) with `cartesi run` on its default port. Available versions are published on [Docker Hub](https://hub.docker.com/r/cartesi/rollups-explorer/tags) and [GitHub Container Registry](https://github.com/cartesi/rollups-explorer/pkgs/container/rollups-explorer).
+
+## Configuration
+
+The published image serves the application below `/explorer` and reads the following variables at runtime:
+
+| Variable                 | Purpose                                                                          | Published-image default       |
+| ------------------------ | -------------------------------------------------------------------------------- | ----------------------------- |
+| `CARTESI_NODE_RPC_URL`   | Default Rollups Node JSON-RPC endpoint                                           | `http://127.0.0.1:6751/rpc`   |
+| `NODE_RPC_URL`           | Base-layer Ethereum RPC endpoint used for wallet interactions and contract reads | `http://127.0.0.1:6751/anvil` |
+| `DEBUG_ENABLED`          | Enable debugging actions in the interface                                        | `false`                       |
+| `HEALTHZ_UPTIME_ENABLED` | Include process uptime in the health response                                    | `true`                        |
+
+The health endpoint is `/explorer/api/healthz`.
+
+> [!IMPORTANT]
+> The browser contacts these RPC URLs directly, so they must be reachable from the user's browser, not only from the container. Do not place secrets in them, and make sure the endpoints have appropriate access controls and browser-compatible CORS settings.
+
 ## Apps and Packages
 
 - `apps/explorer`: The web application that serves as client to connect to a rollups-node.
@@ -94,3 +129,7 @@ For Docker image build check [here](./docs/DOCKER.md)
 For CartesiScan information check [here](./docs/CARTESISCAN.md)
 
 For release information check [here](./docs/RELEASE.md)
+
+## Security
+
+Do not open a public issue, pull request, or discussion for a security problem. Report it privately by email to [rollups@cartesi.foundation](mailto:rollups@cartesi.foundation) with the affected component and version, the impact and who is affected, and steps to reproduce. The full policy and the published security reviews are on the [Audit reports](https://docs.cartesi.io/get-started/audit-reports/) page.
