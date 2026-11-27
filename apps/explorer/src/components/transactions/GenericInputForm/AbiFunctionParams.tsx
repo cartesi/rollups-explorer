@@ -20,7 +20,7 @@ export const AbiFunctionParams = () => {
                 <Stack>
                     {abiFunction.inputs.length > 0 ? (
                         <>
-                            {abiFunction.inputs.map((input) => {
+                            {abiFunction.inputs.map((input, index) => {
                                 const inputIndex =
                                     abiFunctionParams.value.findIndex(
                                         (p: AbiInputParam) => p.id === input.id,
@@ -35,6 +35,9 @@ export const AbiFunctionParams = () => {
                                         ) : isArrayType(input.type) ? (
                                             <ArrayParamInput
                                                 param={input}
+                                                label={
+                                                    input.name || `arg${index}`
+                                                }
                                                 path={`abiFunctionParams.${inputIndex}.value`}
                                                 rootPath={`abiFunctionParams.${inputIndex}.value`}
                                             />

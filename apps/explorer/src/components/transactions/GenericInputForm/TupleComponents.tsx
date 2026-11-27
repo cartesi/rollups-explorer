@@ -46,6 +46,7 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                         ) : isArrayType(component.type) ? (
                             <ArrayParamInput
                                 param={component}
+                                label={component.name || `arg${componentIndex}`}
                                 path={`abiFunctionParams.${inputIndex}.value`}
                                 rootPath={`abiFunctionParams.${inputIndex}.value`}
                                 mt={isFirstStandardInput ? 0 : 16}
