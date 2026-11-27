@@ -5,6 +5,7 @@ export default defineConfig({
         globals: true,
         environment: "jsdom",
         setupFiles: ["./vitest-setup.ts"],
+        testTimeout: 10_000,
         coverage: {
             reporter: ["text", "lcov"],
             ignoreEmptyLines: true,

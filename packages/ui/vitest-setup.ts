@@ -1,6 +1,10 @@
 import { Globals } from "@react-spring/web";
 import "@testing-library/jest-dom";
+import { configure } from "@testing-library/react";
 import { beforeAll, vi } from "vitest";
+
+// Give waitFor/findBy* more than the default 1s, as the undeployed application warning is debounced by 1s and slower CI runners need extra room.
+configure({ asyncUtilTimeout: 5000 });
 
 Object.defineProperty(window, "matchMedia", {
     writable: true,
