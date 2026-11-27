@@ -54,7 +54,7 @@ const ConnectivityProblem: FC<{ message: string; onClick: () => void }> = ({
             </Text>
             <Group>
                 <Button onClick={onClick} size="compact-md">
-                    <Text tt="uppercase">manage</Text>
+                    manage
                 </Button>
             </Group>
         </Stack>

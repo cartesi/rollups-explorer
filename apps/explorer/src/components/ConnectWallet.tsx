@@ -145,6 +145,7 @@ export const ConnectWallet: FC<ConnectWalletProps> = ({
                                 lineClamp={1}
                                 maw="7rem"
                                 fw="bold"
+                                tt="none"
                             >
                                 {account.displayName}
                             </Text>

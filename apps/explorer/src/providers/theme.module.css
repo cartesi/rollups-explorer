@@ -4,6 +4,13 @@
     }
 }
 
+.button {
+    &:where([data-variant="filled"], [data-variant="outline"]) {
+        text-transform: uppercase;
+        letter-spacing: var(--cartesi-tracking-eyebrow);
+    }
+}
+
 .switchThumb {
     input:checked:not(:disabled, [data-disabled]) + * > & {
         --switch-thumb-bg: var(--mantine-primary-color-contrast);

@@ -1,9 +1,11 @@
-import { cartesiColors, cartesiFonts } from "@cartesi/brand";
+import { cartesiColors, cartesiFonts, cartesiShape } from "@cartesi/brand";
 import {
+    ActionIcon,
     Anchor,
     AppShell,
     Autocomplete,
     Badge,
+    Button,
     Checkbox,
     Combobox,
     createTheme,
@@ -123,9 +125,23 @@ const customTheme = createTheme({
         zIndexXL: 500,
     },
     components: {
+        ActionIcon: ActionIcon.extend({
+            defaultProps: {
+                variant: "subtle",
+            },
+        }),
         Anchor: Anchor.extend({
             defaultProps: {
                 underline: "always",
+            },
+        }),
+        Button: Button.extend({
+            defaultProps: {
+                variant: "filled",
+                radius: cartesiShape.radiusPill,
+            },
+            classNames: {
+                root: classes.button,
             },
         }),
         Title: Title.extend({
