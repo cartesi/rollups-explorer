@@ -68,6 +68,9 @@ importers:
 
   apps/explorer:
     dependencies:
+      '@cartesi/brand':
+        specifier: 0.1.0-alpha.0
+        version: 0.1.0-alpha.0
       '@cartesi/client':
         specifier: 2.0.0-alpha.41
         version: 2.0.0-alpha.41(typescript@5.9.3)(viem@2.55.13(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)
@@ -77,6 +80,9 @@ importers:
       '@cartesi/react':
         specifier: 2.0.0-alpha.45
         version: 2.0.0-alpha.45(@tanstack/react-query@5.90.12(react@19.2.3))(react@19.2.3)(typescript@5.9.3)(viem@2.55.13(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.3))(@types/react@19.2.7)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.2.3)(supports-color@8.1.1)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.55.13(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))(zod@4.1.12)
+      '@fontsource/inter':
+        specifier: 5.3.0
+        version: 5.3.0
       '@mantine/code-highlight':
         specifier: ^8.3.15
         version: 8.3.15(@mantine/core@8.3.15(@mantine/hooks@8.3.15(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.15(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1597,6 +1603,9 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
+  '@cartesi/brand@0.1.0-alpha.0':
+    resolution: {integrity: sha512-jaq0M5DT1vDKRBN3HxFuV4btLro6e0C4SyI/oioW05nEcrEc4AFOEvXicdjwe2+EentBLj4iHnqxYLB5Mp4GAQ==}
+
   '@cartesi/client@2.0.0-alpha.41':
     resolution: {integrity: sha512-DellqUph2yKdmCV4YxQSIupXqdoYSpetdGC0LQfvswGZurpAiTpPjuMs+OPm2r3lCqW/ZmMv3s+vygs4cFs42A==}
     peerDependencies:
@@ -2503,6 +2512,12 @@ packages:
 
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
+
+  '@fontsource/inter@5.3.0':
+    resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
+
+  '@fontsource/plus-jakarta-sans@5.3.0':
+    resolution: {integrity: sha512-9WRw3G74Ve4cyPApAZSXLPY5DiLOZXDn7Q7dIBjFBpA0Pj56ljDItEdy2UUajjJxRuTg2HkMLO5C3K2nAQORWg==}
 
   '@gemini-wallet/core@0.2.0':
     resolution: {integrity: sha512-vv9aozWnKrrPWQ3vIFcWk7yta4hQW1Ie0fsNNPeXnjAxkbXr2hqMagEptLuMxpEP2W3mnRu05VDNKzcvAuuZDw==}
@@ -13204,6 +13219,11 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
+  '@cartesi/brand@0.1.0-alpha.0':
+    dependencies:
+      '@fontsource/inter': 5.3.0
+      '@fontsource/plus-jakarta-sans': 5.3.0
+
   '@cartesi/client@2.0.0-alpha.41(typescript@5.9.3)(viem@2.55.13(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12)':
     dependencies:
       '@cartesi/rpc': 2.0.0-alpha.30
@@ -14058,6 +14078,10 @@ snapshots:
   '@floating-ui/utils@0.2.10': {}
 
   '@floating-ui/utils@0.2.9': {}
+
+  '@fontsource/inter@5.3.0': {}
+
+  '@fontsource/plus-jakarta-sans@5.3.0': {}
 
   '@gemini-wallet/core@0.2.0(supports-color@8.1.1)(viem@2.55.13(bufferutil@4.0.8)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:

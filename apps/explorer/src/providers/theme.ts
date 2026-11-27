@@ -1,3 +1,4 @@
+import { cartesiFonts } from "@cartesi/brand";
 import {
     AppShell,
     createTheme,
@@ -11,6 +12,11 @@ import {
 } from "@mantine/core";
 
 const customTheme = createTheme({
+    fontFamily: cartesiFonts.body.stack,
+    headings: {
+        fontFamily: cartesiFonts.headline.stack,
+        fontWeight: String(cartesiFonts.headline.weight),
+    },
     colors: {
         open: virtualColor({ name: "open", light: "green", dark: "green" }),
         disputed: virtualColor({

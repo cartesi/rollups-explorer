@@ -3,6 +3,8 @@ import "@mantine/core/styles.css";
 // prettier-ignore code-highlight styles must be imported after the core.
 import "@mantine/code-highlight/styles.css";
 import "@mantine/notifications/styles.css";
+import "@cartesi/brand/styles.css";
+import "@fontsource/inter/latin-500.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { FC, ReactNode } from "react";
 import { StrictMode } from "react";
