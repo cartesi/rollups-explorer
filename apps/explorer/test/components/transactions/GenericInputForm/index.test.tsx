@@ -87,21 +87,12 @@ describe("GenericInputForm", () => {
 
             fireEvent.click(screen.getByText("Add uint256 item"));
             fireEvent.click(screen.getByText("Add uint256 item"));
-            const [firstAmount, secondAmount] = screen.getAllByPlaceholderText(
-                "Enter uint256 value",
-            );
-            typeInto(firstAmount, "10");
-            typeInto(secondAmount, "20");
+            typeInto(screen.getByLabelText("amounts[0]"), "10");
+            typeInto(screen.getByLabelText("amounts[1]"), "20");
 
             fireEvent.click(screen.getByText("Add tuple item"));
-            typeInto(
-                screen.getByPlaceholderText("Enter address value"),
-                addressA,
-            );
-            typeInto(
-                screen.getAllByPlaceholderText("Enter uint256 value")[2],
-                "5",
-            );
+            typeInto(screen.getByLabelText("items[0].to"), addressA);
+            typeInto(screen.getByLabelText("items[0].value"), "5");
 
             const expected = encodeFunctionData({
                 abi,
@@ -128,7 +119,7 @@ describe("GenericInputForm", () => {
             typeInto(firstAmount, "10");
             typeInto(secondAmount, "20");
 
-            fireEvent.click(screen.getByLabelText("Remove uint256[] item 0"));
+            fireEvent.click(screen.getByLabelText("Remove amounts[0]"));
 
             expect(
                 screen.getByPlaceholderText("Enter uint256 value"),

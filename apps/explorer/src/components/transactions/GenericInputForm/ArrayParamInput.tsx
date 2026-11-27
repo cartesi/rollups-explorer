@@ -22,16 +22,27 @@ import {
 
 interface ParamInputProps {
     param: AbiParamShape;
+    label: string;
     path: string;
     rootPath: string;
 }
 
-const ParamValueInput: FC<ParamInputProps> = ({ param, path, rootPath }) => {
+const ParamValueInput: FC<ParamInputProps> = ({
+    param,
+    label,
+    path,
+    rootPath,
+}) => {
     const form = useFormContext();
 
     if (parseArrayType(param.type)) {
         return (
-            <ArrayParamInput param={param} path={path} rootPath={rootPath} />
+            <ArrayParamInput
+                param={param}
+                label={label}
+                path={path}
+                rootPath={rootPath}
+            />
         );
     }
 
@@ -43,6 +54,7 @@ const ParamValueInput: FC<ParamInputProps> = ({ param, path, rootPath }) => {
                         <ParamValueInput
                             key={index}
                             param={component}
+                            label={`${label}.${component.name || index}`}
                             path={`${path}.${index}`}
                             rootPath={rootPath}
                         />
@@ -57,6 +69,7 @@ const ParamValueInput: FC<ParamInputProps> = ({ param, path, rootPath }) => {
     return (
         <TextInput
             label={param.name ? <InputLabel input={param} /> : undefined}
+            aria-label={label}
             placeholder={`Enter ${param.type} value`}
             value={value}
             onChange={onChange}
@@ -70,6 +83,7 @@ interface ArrayParamInputProps
 
 export const ArrayParamInput: FC<ArrayParamInputProps> = ({
     param,
+    label,
     path,
     rootPath,
     mt,
@@ -102,6 +116,7 @@ export const ArrayParamInput: FC<ArrayParamInputProps> = ({
                         <Stack flex={1}>
                             <ParamValueInput
                                 param={itemParam}
+                                label={`${label}[${index}]`}
                                 path={`${path}.${index}`}
                                 rootPath={rootPath}
                             />
@@ -111,7 +126,7 @@ export const ArrayParamInput: FC<ArrayParamInputProps> = ({
                                 variant="subtle"
                                 color="red"
                                 size="lg"
-                                aria-label={`Remove ${param.type} item ${index}`}
+                                aria-label={`Remove ${label}[${index}]`}
                                 onClick={() => {
                                     form.removeListItem(path, index);
                                     revalidate();
