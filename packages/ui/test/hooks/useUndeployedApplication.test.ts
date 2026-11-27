@@ -5,7 +5,6 @@ import useUndeployedApplication from "../../src/hooks/useUndeployedApplication";
 
 const applications = ["0x60a7048c3136293071605a4eaffef49923e981cc"];
 const delay = 1000;
-const waitTimeout = delay + 100;
 
 describe("useUndeployedApplication hook", () => {
     it('should return "false" when address is invalid', async () => {
@@ -15,9 +14,7 @@ describe("useUndeployedApplication hook", () => {
             useUndeployedApplication(invalidAddress, applications, delay),
         );
 
-        await waitFor(() => expect(result.current).toBe(false), {
-            timeout: waitTimeout,
-        });
+        await waitFor(() => expect(result.current).toBe(false));
     });
 
     it('should return "false" when address is "zeroAddress"', async () => {
@@ -25,9 +22,7 @@ describe("useUndeployedApplication hook", () => {
             useUndeployedApplication(zeroAddress, applications, delay),
         );
 
-        await waitFor(() => expect(result.current).toBe(false), {
-            timeout: waitTimeout,
-        });
+        await waitFor(() => expect(result.current).toBe(false));
     });
 
     it('should return "false" when address exists in applications', async () => {
@@ -41,9 +36,7 @@ describe("useUndeployedApplication hook", () => {
             ),
         );
 
-        await waitFor(() => expect(result.current).toBe(false), {
-            timeout: waitTimeout,
-        });
+        await waitFor(() => expect(result.current).toBe(false));
     });
 
     it("should return 'true' when address is valid and non-zero and address doesn't exist in applications", async () => {
@@ -53,8 +46,6 @@ describe("useUndeployedApplication hook", () => {
             useUndeployedApplication(address, applications, delay),
         );
 
-        await waitFor(() => expect(result.current).toBe(true), {
-            timeout: waitTimeout,
-        });
+        await waitFor(() => expect(result.current).toBe(true));
     });
 });
