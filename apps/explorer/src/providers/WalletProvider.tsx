@@ -1,8 +1,12 @@
 "use client";
+import { cartesiColors } from "@cartesi/brand";
+import { useComputedColorScheme } from "@mantine/core";
 import { useMounted } from "@mantine/hooks";
 import {
     connectorsForWallets,
+    darkTheme,
     getDefaultWallets,
+    lightTheme,
     RainbowKitProvider,
     type AvatarComponent,
     type Chain,
@@ -35,6 +39,17 @@ const { wallets } = getDefaultWallets(connectorsForWalletsParameters);
 const appInfo = {
     appName: connectorsForWalletsParameters.appName,
     learnMoreUrl: "https://dave-demo.cartesi.io",
+};
+
+const walletThemes = {
+    light: lightTheme({
+        accentColor: cartesiColors.teal,
+        accentColorForeground: cartesiColors.white,
+    }),
+    dark: darkTheme({
+        accentColor: cartesiColors.cyan,
+        accentColorForeground: cartesiColors.black,
+    }),
 };
 
 const connectors = connectorsForWallets(
@@ -131,6 +146,7 @@ const buildWagmiConfig = (
 const WalletProvider = ({ children }: { children: ReactNode }) => {
     const isMounted = useMounted();
     const selectedConnection = useSelectedNodeConnection();
+    const colorScheme = useComputedColorScheme("light");
 
     const wagmiConfig = useMemo(() => {
         return buildWagmiConfig(selectedConnection);
@@ -141,7 +157,11 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
             config={wagmiConfig}
             key={selectedConnection?.id ?? "none"}
         >
-            <RainbowKitProvider appInfo={appInfo} avatar={CustomAvatar}>
+            <RainbowKitProvider
+                appInfo={appInfo}
+                avatar={CustomAvatar}
+                theme={walletThemes[colorScheme]}
+            >
                 {children}
             </RainbowKitProvider>
         </WagmiProvider>
