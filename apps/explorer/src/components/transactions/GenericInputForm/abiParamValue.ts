@@ -1,4 +1,4 @@
-import { encodeAbiParameters, getAddress, isHex } from "viem";
+import { encodeAbiParameters, getAddress, isAddress, isHex } from "viem";
 import type { AbiParamShape, AbiParamValue, FinalValues } from "./types";
 
 const arrayTypeRegex = /^(.+)\[(\d*)\]$/;
@@ -87,7 +87,18 @@ const isValidPrimitiveValue = (type: string, value: string) => {
         return value === "true" || value === "false";
     }
 
-    if (bytesTypeRegex.test(type) && !isHex(value)) {
+    if (
+        bytesTypeRegex.test(type) &&
+        (!isHex(value) || value.length % 2 !== 0)
+    ) {
+        return false;
+    }
+
+    if (integerTypeRegex.test(type) && value.trim() === "") {
+        return false;
+    }
+
+    if (type === "address" && !isAddress(value)) {
         return false;
     }
 
