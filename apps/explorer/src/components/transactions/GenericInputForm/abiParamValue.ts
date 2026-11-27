@@ -110,12 +110,22 @@ const isValidPrimitiveValue = (type: string, value: string) => {
     }
 };
 
-export const getParamValueError = (
+export interface ParamValueError {
+    position: string;
+    message: string;
+}
+
+export const getParamValueErrors = (
     param: AbiParamShape,
     value: AbiParamValue,
     position = "",
-): string | null => {
-    const message = `Invalid ${param.type} value${position ? ` at ${position}` : ""}`;
+): ParamValueError[] => {
+    const invalid = [
+        {
+            position,
+            message: `Invalid ${param.type} value${position ? ` at ${position}` : ""}`,
+        },
+    ];
     const arrayType = parseArrayType(param.type);
 
     if (arrayType) {
@@ -124,51 +134,40 @@ export const getParamValueError = (
             (arrayType.length !== undefined &&
                 value.length !== arrayType.length)
         ) {
-            return message;
+            return invalid;
         }
 
         const itemParam = getArrayItemParam(param);
 
-        for (const [index, item] of value.entries()) {
-            const error = getParamValueError(
-                itemParam,
-                item,
-                `${position}[${index}]`,
-            );
-
-            if (error) {
-                return error;
-            }
-        }
-
-        return null;
+        return value.flatMap((item, index) =>
+            getParamValueErrors(itemParam, item, `${position}[${index}]`),
+        );
     }
 
     if (param.type === "tuple") {
         const components = param.components ?? [];
 
         if (!Array.isArray(value) || value.length !== components.length) {
-            return message;
+            return invalid;
         }
 
-        for (const [index, component] of components.entries()) {
-            const error = getParamValueError(
+        return components.flatMap((component, index) =>
+            getParamValueErrors(
                 component,
                 value[index],
                 `${position}.${component.name || index}`,
-            );
-
-            if (error) {
-                return error;
-            }
-        }
-
-        return null;
+            ),
+        );
     }
 
     return typeof value === "string" &&
         value !== "" &&
         isValidPrimitiveValue(param.type, value)
-        ? null
-        : message;
+        ? []
+        : invalid;
 };
+
+export const getParamValueError = (
+    param: AbiParamShape,
+    value: AbiParamValue,
+) => getParamValueErrors(param, value)[0]?.message ?? null;

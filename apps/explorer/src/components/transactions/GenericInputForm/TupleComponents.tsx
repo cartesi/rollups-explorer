@@ -9,10 +9,11 @@ import { isArrayType } from "./abiParamValue";
 
 interface TupleComponentsProps extends FieldsetProps {
     input: AbiInputParam;
+    label: string;
 }
 
 export const TupleComponents: FC<TupleComponentsProps> = (props) => {
-    const { input, ...restProps } = props;
+    const { input, label, ...restProps } = props;
     const form = useFormContext();
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
     const firstStandardInput = input.components.find((c) => c.type !== "tuple");
@@ -31,11 +32,14 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                     (p: AbiInputParam) => p.id === component.id,
                 );
 
+                const componentLabel = `${label}.${component.name || componentIndex}`;
+
                 return (
                     <Fragment key={component.id}>
                         {component.type === "tuple" ? (
                             <TupleComponents
                                 input={component}
+                                label={componentLabel}
                                 mt={componentIndex > 0 ? 16 : 0}
                                 mb={
                                     input.components[componentIndex + 1]
@@ -46,7 +50,7 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                         ) : isArrayType(component.type) ? (
                             <ArrayParamInput
                                 param={component}
-                                label={component.name || `arg${componentIndex}`}
+                                label={componentLabel}
                                 path={`abiFunctionParams.${inputIndex}.value`}
                                 rootPath={`abiFunctionParams.${inputIndex}.value`}
                                 mt={isFirstStandardInput ? 0 : 16}

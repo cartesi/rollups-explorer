@@ -34,6 +34,7 @@ const abi = parseAbi([
     "function setLevels(uint8[] levels)",
     "function pause()",
     "function resume()",
+    "function order((string id, uint256[] amounts) o)",
 ]);
 
 const specification = { id: "1", name: "Array specification", abi };
@@ -93,8 +94,26 @@ describe("GenericInputForm", () => {
             typeInto(screen.getByLabelText("amounts[1]"), "20");
 
             fireEvent.click(screen.getByText("Add tuple item"));
-            typeInto(screen.getByLabelText("items[0].to"), addressA);
-            typeInto(screen.getByLabelText("items[0].value"), "5");
+            typeInto(
+                screen.getByLabelText("address to, items[0].to"),
+                addressA,
+            );
+            const value = screen.getByLabelText(
+                "uint256 value, items[0].value",
+            );
+            typeInto(value, "x");
+            fireEvent.blur(value);
+
+            expect(
+                await screen.findByText("Invalid uint256 value at [0].value"),
+            ).toBeInTheDocument();
+            expect(value).toHaveAccessibleDescription(
+                "Invalid uint256 value at [0].value",
+            );
+
+            typeInto(value, "5");
+
+            expect(value).not.toHaveAccessibleDescription();
 
             const expected = encodeFunctionData({
                 abi,
@@ -222,10 +241,39 @@ describe("GenericInputForm", () => {
             expect(
                 await screen.findByText("Invalid uint8 value at [0]"),
             ).toBeInTheDocument();
+            expect(input).toHaveAttribute("aria-invalid", "true");
+            expect(input).toHaveAccessibleDescription(
+                "Invalid uint8 value at [0]",
+            );
             expect(screen.getByLabelText("Hex value")).toHaveValue("0x");
             expect(
                 screen.getByTestId("generic-input-submit-button"),
             ).toBeDisabled();
+
+            fireEvent.click(screen.getByLabelText("Remove levels[0]"));
+
+            expect(
+                screen.queryByText("Invalid uint8 value at [0]"),
+            ).not.toBeInTheDocument();
+        });
+
+        it("should encode arrays inside a tuple param", async () => {
+            renderForm();
+            selectFunction("order");
+
+            typeInto(screen.getByPlaceholderText("Enter string value"), "A1");
+            fireEvent.click(screen.getByLabelText("Add item to o.amounts"));
+            typeInto(screen.getByLabelText("o.amounts[0]"), "7");
+
+            await waitFor(() =>
+                expect(screen.getByLabelText("Hex value")).toHaveValue(
+                    encodeFunctionData({
+                        abi,
+                        functionName: "order",
+                        args: [{ id: "A1", amounts: [7n] }],
+                    }),
+                ),
+            );
         });
 
         it("should drop a pending payload when switching mode", async () => {

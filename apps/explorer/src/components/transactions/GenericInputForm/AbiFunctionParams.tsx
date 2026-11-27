@@ -31,6 +31,9 @@ export const AbiFunctionParams = () => {
                                         {input.type === "tuple" ? (
                                             <TupleComponents
                                                 input={input as AbiInputParam}
+                                                label={
+                                                    input.name || `arg${index}`
+                                                }
                                             />
                                         ) : isArrayType(input.type) ? (
                                             <ArrayParamInput
