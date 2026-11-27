@@ -1,7 +1,14 @@
 import { type UseFormReturnType } from "@mantine/form";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 import { v4 as uuidv4 } from "uuid";
-import { parseAbi, parseAbiParameters } from "viem";
+import {
+    BaseError,
+    encodeAbiParameters,
+    encodeFunctionData,
+    type Hex,
+    parseAbi,
+    parseAbiParameters,
+} from "viem";
 import { generateEmptyValue, parseParamValue } from "./abiParamValue";
 import type {
     AbiInputParam,
@@ -10,6 +17,8 @@ import type {
     FormSpecification,
     FormTransformedValues,
     FormValues,
+    GenericFormAbiFunction,
+    SpecificationMode,
 } from "./types";
 
 export const prepareSignatures = (multiline: string) =>
@@ -148,6 +157,56 @@ const getTupleValues = (
             currentArr.push(value);
         }
     });
+};
+
+interface EncodeAbiPayloadParams {
+    specification: FormSpecification | undefined;
+    specificationMode: SpecificationMode;
+    functionName: string;
+    params: AbiInputParam[];
+}
+
+export type EncodeAbiPayloadResult =
+    | { payload: Hex; error?: undefined }
+    | { payload?: undefined; error: string };
+
+export const encodeAbiPayload = ({
+    specification,
+    specificationMode,
+    functionName,
+    params,
+}: EncodeAbiPayloadParams): EncodeAbiPayloadResult | undefined => {
+    const abiFunction = (
+        (specification?.abi ?? []) as GenericFormAbiFunction[]
+    ).find((f) => f.name === functionName);
+
+    if (!specification || !abiFunction) {
+        return undefined;
+    }
+
+    try {
+        const finalValues = generateFinalValues(
+            [...abiFunction.inputs],
+            params,
+        );
+        const payload =
+            specificationMode === "json_abi"
+                ? encodeFunctionData({
+                      abi: specification.abi,
+                      functionName,
+                      args: finalValues,
+                  })
+                : encodeAbiParameters(abiFunction.inputs, finalValues);
+
+        return { payload };
+    } catch (error: unknown) {
+        return {
+            error:
+                error instanceof BaseError
+                    ? error.shortMessage
+                    : (error as Error).message,
+        };
+    }
 };
 
 export const resetAbiFunctionParams = (

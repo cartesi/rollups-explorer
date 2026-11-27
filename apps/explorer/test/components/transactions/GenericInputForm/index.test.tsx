@@ -32,6 +32,8 @@ const abi = parseAbi([
     "function transfer(uint256[] amounts, (address to, uint256 value)[] items)",
     "function pair(address[2] owners)",
     "function setLevels(uint8[] levels)",
+    "function pause()",
+    "function resume()",
 ]);
 
 const specification = { id: "1", name: "Array specification", abi };
@@ -107,7 +109,7 @@ describe("GenericInputForm", () => {
             );
         });
 
-        it("should remove items from dynamic arrays", async () => {
+        it("should block sending until the payload matches the remaining items", async () => {
             renderForm();
             selectFunction("transfer");
 
@@ -121,9 +123,13 @@ describe("GenericInputForm", () => {
 
             fireEvent.click(screen.getByLabelText("Remove amounts[0]"));
 
+            const submitButton = screen.getByTestId(
+                "generic-input-submit-button",
+            );
             expect(
                 screen.getByPlaceholderText("Enter uint256 value"),
             ).toHaveValue("20");
+            expect(submitButton).toBeDisabled();
 
             const expected = encodeFunctionData({
                 abi,
@@ -136,6 +142,7 @@ describe("GenericInputForm", () => {
                     expected,
                 ),
             );
+            expect(submitButton).toBeEnabled();
         });
 
         it("should render a fixed number of items for fixed-size arrays", async () => {
@@ -162,6 +169,31 @@ describe("GenericInputForm", () => {
             await waitFor(() =>
                 expect(screen.getByLabelText("Hex value")).toHaveValue(
                     expected,
+                ),
+            );
+        });
+
+        it("should re-encode the payload when switching to another function", async () => {
+            renderForm();
+            selectFunction("pause");
+
+            await waitFor(() =>
+                expect(screen.getByLabelText("Hex value")).toHaveValue(
+                    encodeFunctionData({ abi, functionName: "pause" }),
+                ),
+            );
+
+            fireEvent.click(
+                screen.getByRole("button", { name: /ABI Function/ }),
+            );
+            fireEvent.click(screen.getByRole("option", { name: /resume/ }));
+
+            expect(
+                screen.getByTestId("generic-input-submit-button"),
+            ).toBeDisabled();
+            await waitFor(() =>
+                expect(screen.getByLabelText("Hex value")).toHaveValue(
+                    encodeFunctionData({ abi, functionName: "resume" }),
                 ),
             );
         });
@@ -194,6 +226,27 @@ describe("GenericInputForm", () => {
             expect(
                 screen.getByTestId("generic-input-submit-button"),
             ).toBeDisabled();
+        });
+
+        it("should drop a pending payload when switching mode", async () => {
+            render(
+                <GenericInputForm
+                    application={createApplication()}
+                    specifications={[]}
+                    onSuccess={vi.fn()}
+                />,
+            );
+
+            fireEvent.click(screen.getByText("ABI to Hex"));
+            fireEvent.click(screen.getByText("ABI Parameters"));
+            typeInto(screen.getByTestId("abi-parameter-input"), "uint256 a");
+            fireEvent.click(screen.getByTestId("abi-parameter-add-button"));
+            typeInto(screen.getByPlaceholderText("Enter uint256 value"), "5");
+            fireEvent.click(screen.getByText("Hex"));
+
+            await new Promise((resolve) => setTimeout(resolve, 600));
+
+            expect(screen.getByTestId("hex-textarea")).toHaveValue("0x");
         });
     });
 });
