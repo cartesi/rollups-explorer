@@ -5,7 +5,7 @@ import { ArrayParamInput } from "./ArrayParamInput";
 import { useFormContext } from "./context";
 import { InputLabel } from "./FunctionSignature";
 import type { AbiInputParam } from "./types";
-import { isArrayType } from "./utils";
+import { isArrayType } from "./abiParamValue";
 
 interface TupleComponentsProps extends FieldsetProps {
     input: AbiInputParam;

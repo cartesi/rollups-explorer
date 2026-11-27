@@ -14,7 +14,11 @@ import { TbPlus, TbTrash } from "react-icons/tb";
 import { useFormContext } from "./context";
 import { InputLabel } from "./FunctionSignature";
 import type { AbiParamShape, AbiParamValue } from "./types";
-import { generateEmptyValue, getArrayItemParam, parseArrayType } from "./utils";
+import {
+    generateEmptyValue,
+    getArrayItemParam,
+    parseArrayType,
+} from "./abiParamValue";
 
 interface ParamInputProps {
     param: AbiParamShape;
