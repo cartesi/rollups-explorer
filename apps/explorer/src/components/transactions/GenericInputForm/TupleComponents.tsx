@@ -60,7 +60,7 @@ export const TupleComponents: FC<TupleComponentsProps> = (props) => {
                                 label={<InputLabel input={component} />}
                                 placeholder={`Enter ${component.type} value`}
                                 mt={isFirstStandardInput ? 0 : 16}
-                                withAsterisk
+                                withAsterisk={component.type !== "string"}
                                 {...form.getInputProps(
                                     `abiFunctionParams.${inputIndex}.value`,
                                 )}

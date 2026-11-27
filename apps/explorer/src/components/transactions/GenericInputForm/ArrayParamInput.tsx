@@ -95,7 +95,7 @@ const ParamValueInput: FC<ParamInputProps> = ({
             aria-label={
                 param.name ? `${param.type} ${param.name}, ${label}` : label
             }
-            required
+            required={param.type !== "string"}
             error={error}
             placeholder={`Enter ${param.type} value`}
             value={value}

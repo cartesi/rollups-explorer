@@ -261,7 +261,6 @@ describe("GenericInputForm", () => {
             renderForm();
             selectFunction("order");
 
-            typeInto(screen.getByPlaceholderText("Enter string value"), "A1");
             fireEvent.click(screen.getByLabelText("Add item to o.amounts"));
             typeInto(screen.getByLabelText("o.amounts[0]"), "7");
 
@@ -270,10 +269,13 @@ describe("GenericInputForm", () => {
                     encodeFunctionData({
                         abi,
                         functionName: "order",
-                        args: [{ id: "A1", amounts: [7n] }],
+                        args: [{ id: "", amounts: [7n] }],
                     }),
                 ),
             );
+            expect(
+                screen.getByTestId("generic-input-submit-button"),
+            ).toBeEnabled();
         });
 
         it("should drop a pending payload when switching mode", async () => {
