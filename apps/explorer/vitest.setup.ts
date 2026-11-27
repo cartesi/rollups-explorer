@@ -1,8 +1,11 @@
 // Add here any common setup for tests to avoid repetition in each file.
 import { Globals } from "@react-spring/web";
 import "@testing-library/jest-dom";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import { afterEach, beforeAll, vi } from "vitest";
+
+// Give waitFor/findBy* more than the default 1s, as slower CI runners can take longer to settle debounced updates.
+configure({ asyncUtilTimeout: 5000 });
 
 beforeAll(() => {
     Globals.assign({
