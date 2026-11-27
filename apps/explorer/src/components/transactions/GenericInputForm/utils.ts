@@ -1,11 +1,10 @@
 import { type UseFormReturnType } from "@mantine/form";
 import { isArray, isBlank, isObject } from "ramda-adjunct";
 import { v4 as uuidv4 } from "uuid";
-import { getAddress, parseAbi, parseAbiParameters } from "viem";
+import { parseAbi, parseAbiParameters } from "viem";
+import { generateEmptyValue, parseParamValue } from "./abiParamValue";
 import type {
     AbiInputParam,
-    AbiParamShape,
-    AbiParamValue,
     AbiValueParameter,
     FinalValues,
     FormSpecification,
@@ -16,90 +15,8 @@ import type {
 export const prepareSignatures = (multiline: string) =>
     multiline.split("\n").map((signature) => signature?.trim());
 
-const arrayTypeRegex = /^(.+)\[(\d*)\]$/;
-
-export const parseArrayType = (type: string) => {
-    const match = type.match(arrayTypeRegex);
-
-    if (!match) {
-        return undefined;
-    }
-
-    const [, itemType, length] = match;
-
-    return {
-        itemType,
-        length: length === "" ? undefined : Number(length),
-    };
-};
-
-export const isArrayType = (type: string) => arrayTypeRegex.test(type);
-
-export const getArrayItemParam = <T extends AbiParamShape>(param: T): T => ({
-    ...param,
-    name: "",
-    type: parseArrayType(param.type)?.itemType ?? param.type,
-});
-
-export const generateEmptyValue = (param: AbiParamShape): AbiParamValue => {
-    const arrayType = parseArrayType(param.type);
-
-    if (arrayType) {
-        const itemParam = getArrayItemParam(param);
-        return Array.from({ length: arrayType.length ?? 0 }, () =>
-            generateEmptyValue(itemParam),
-        );
-    }
-
-    if (param.type === "tuple") {
-        return (param.components ?? []).map(generateEmptyValue);
-    }
-
-    return "";
-};
-
-const encodePrimitiveValue = (type: string, value: string) => {
-    switch (type) {
-        case "bool":
-            return value === "true";
-        case "address":
-            return getAddress(value);
-        case "uint":
-        case "uint8":
-        case "uint16":
-        case "uint32":
-        case "uint64":
-        case "uint128":
-        case "uint256":
-            return BigInt(value);
-        default:
-            return value;
-    }
-};
-
-export const encodeParamValue = (
-    param: AbiParamShape,
-    value: AbiParamValue,
-): FinalValues[number] => {
-    if (isArrayType(param.type)) {
-        const itemParam = getArrayItemParam(param);
-        return (value as AbiParamValue[]).map((item) =>
-            encodeParamValue(itemParam, item),
-        );
-    }
-
-    if (param.type === "tuple") {
-        const values = value as AbiParamValue[];
-        return (param.components ?? []).map((component, index) =>
-            encodeParamValue(component, values[index]),
-        );
-    }
-
-    return encodePrimitiveValue(param.type, value as string);
-};
-
 export const encodeFunctionParam = (param: AbiValueParameter) =>
-    encodeParamValue(param, param.value);
+    parseParamValue(param, param.value);
 
 export const generateHumanAbiFormSpecification = (humanAbi: string) => {
     if (isBlank(humanAbi)) {

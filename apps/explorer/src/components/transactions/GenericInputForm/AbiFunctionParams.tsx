@@ -7,7 +7,7 @@ import { useFormContext } from "./context";
 import { InputLabel } from "./FunctionSignature";
 import { TupleComponents } from "./TupleComponents";
 import type { AbiInputParam } from "./types";
-import { isArrayType } from "./utils";
+import { isArrayType } from "./abiParamValue";
 
 export const AbiFunctionParams = () => {
     const form = useFormContext();

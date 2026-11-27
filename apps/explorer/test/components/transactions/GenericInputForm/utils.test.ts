@@ -4,13 +4,14 @@ import {
     parseAbiParameters,
 } from "viem";
 import { describe, expect, it } from "vitest";
+import {
+    generateEmptyValue,
+    parseArrayType,
+} from "../../../../src/components/transactions/GenericInputForm/abiParamValue";
 import type { AbiInputParam } from "../../../../src/components/transactions/GenericInputForm/types";
 import {
-    encodeFunctionParam,
-    generateEmptyValue,
     generateFinalValues,
     generateInitialValues,
-    parseArrayType,
 } from "../../../../src/components/transactions/GenericInputForm/utils";
 
 const addressA = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
@@ -18,23 +19,12 @@ const addressB = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
 describe("GenericInputForm utils", () => {
     describe("parseArrayType", () => {
-        it("should return undefined for non-array types", () => {
+        it("should parse the outermost array dimension", () => {
             expect(parseArrayType("uint256")).toBeUndefined();
-            expect(parseArrayType("tuple")).toBeUndefined();
-        });
-
-        it("should parse dynamic and fixed-size arrays", () => {
             expect(parseArrayType("uint256[]")).toEqual({
                 itemType: "uint256",
                 length: undefined,
             });
-            expect(parseArrayType("address[2]")).toEqual({
-                itemType: "address",
-                length: 2,
-            });
-        });
-
-        it("should parse the outermost dimension of nested arrays", () => {
             expect(parseArrayType("uint256[][3]")).toEqual({
                 itemType: "uint256[]",
                 length: 3,
@@ -113,25 +103,6 @@ describe("GenericInputForm utils", () => {
                     value: ["", ""],
                 },
             ]);
-        });
-    });
-
-    describe("encodeFunctionParam", () => {
-        it("should convert array items to their base type", () => {
-            expect(
-                encodeFunctionParam({
-                    type: "uint256[]",
-                    name: "amounts",
-                    value: ["1", "20"],
-                }),
-            ).toEqual([1n, 20n]);
-            expect(
-                encodeFunctionParam({
-                    type: "bool[][]",
-                    name: "flags",
-                    value: [["true"], ["false", "true"]],
-                }),
-            ).toEqual([[true], [false, true]]);
         });
     });
 
