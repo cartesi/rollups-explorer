@@ -28,7 +28,7 @@ describe("GenericInputForm validations", () => {
     describe("validateAbiFunctionParamValue", () => {
         it.each([
             ["uint256", "10", null],
-            ["string", "", "Invalid string value"],
+            ["string", "", null],
             ["uint8", "256", "Invalid uint8 value"],
             ["int8", "-129", "Invalid int8 value"],
             ["int256", "abc", "Invalid int256 value"],
@@ -61,9 +61,9 @@ describe("GenericInputForm validations", () => {
             expect(validate({ type: "uint256[]", value: ["1", "x"] })).toBe(
                 "Invalid uint256 value at [1]",
             );
-            expect(validate({ type: "string[]", value: ["foo", ""] })).toBe(
-                "Invalid string value at [1]",
-            );
+            expect(
+                validate({ type: "string[]", value: ["foo", ""] }),
+            ).toBeNull();
             expect(
                 validate({ type: "address[][]", value: [[address], ["0x1"]] }),
             ).toBe("Invalid address value at [1][0]");

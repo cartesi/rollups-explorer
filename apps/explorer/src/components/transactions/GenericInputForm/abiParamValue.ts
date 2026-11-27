@@ -161,7 +161,7 @@ export const getParamValueErrors = (
     }
 
     return typeof value === "string" &&
-        value !== "" &&
+        (value !== "" || param.type === "string") &&
         isValidPrimitiveValue(param.type, value)
         ? []
         : invalid;

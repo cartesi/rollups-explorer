@@ -50,7 +50,9 @@ export const AbiFunctionParams = () => {
                                                     <InputLabel input={input} />
                                                 }
                                                 placeholder={`Enter ${input.type} value`}
-                                                withAsterisk
+                                                withAsterisk={
+                                                    input.type !== "string"
+                                                }
                                                 {...form.getInputProps(
                                                     `abiFunctionParams.${inputIndex}.value`,
                                                 )}
