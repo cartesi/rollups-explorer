@@ -1,4 +1,4 @@
-import { getAddress, isAddress, isHex } from "viem";
+import { encodeAbiParameters, getAddress, isHex } from "viem";
 import type { AbiParamShape, AbiParamValue, FinalValues } from "./types";
 
 const arrayTypeRegex = /^(.+)\[(\d*)\]$/;
@@ -43,20 +43,19 @@ export const generateEmptyValue = (param: AbiParamShape): AbiParamValue => {
     return "";
 };
 
+const integerTypeRegex = /^u?int\d*$/;
+const bytesTypeRegex = /^bytes\d*$/;
+
 export const toAbiValue = (type: string, value: string) => {
+    if (integerTypeRegex.test(type)) {
+        return BigInt(value);
+    }
+
     switch (type) {
         case "bool":
             return value === "true";
         case "address":
             return getAddress(value);
-        case "uint":
-        case "uint8":
-        case "uint16":
-        case "uint32":
-        case "uint64":
-        case "uint128":
-        case "uint256":
-            return BigInt(value);
         default:
             return value;
     }
@@ -84,30 +83,19 @@ export const parseParamValue = (
 };
 
 const isValidPrimitiveValue = (type: string, value: string) => {
-    switch (type) {
-        case "uint":
-        case "uint8":
-        case "uint16":
-        case "uint32":
-        case "uint64":
-        case "uint128":
-        case "uint256":
-            try {
-                BigInt(value);
-                return true;
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (e: unknown) {
-                return false;
-            }
-        case "bool":
-            return value === "true" || value === "false";
-        case "bytes":
-            return isHex(value);
-        case "address":
-            return isAddress(value);
-        // All other types like 'string' are only validated for non-empty content
-        default:
-            return true;
+    if (type === "bool") {
+        return value === "true" || value === "false";
+    }
+
+    if (bytesTypeRegex.test(type) && !isHex(value)) {
+        return false;
+    }
+
+    try {
+        encodeAbiParameters([{ type }], [toAbiValue(type, value)]);
+        return true;
+    } catch {
+        return false;
     }
 };
 
