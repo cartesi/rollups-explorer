@@ -26,21 +26,22 @@ const validate = (param: Omit<AbiInputParam, "components" | "name">) => {
 
 describe("GenericInputForm validations", () => {
     describe("validateAbiFunctionParamValue", () => {
-        it("should keep validating primitive values", () => {
-            expect(validate({ type: "uint256", value: "10" })).toBeNull();
-            expect(validate({ type: "uint256", value: "abc" })).toBe(
-                "Invalid uint256 value",
-            );
-            expect(validate({ type: "string", value: "" })).toBe(
-                "Invalid string value",
-            );
-        });
-
         it.each([
+            ["uint256", "10", null],
+            ["string", "", "Invalid string value"],
             ["uint8", "256", "Invalid uint8 value"],
             ["int8", "-129", "Invalid int8 value"],
             ["int256", "abc", "Invalid int256 value"],
             ["bytes32", "0x12", "Invalid bytes32 value"],
+            [
+                "address",
+                "0xF39fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                "Invalid address value",
+            ],
+            ["uint256", " ", "Invalid uint256 value"],
+            ["bytes", "0x123", "Invalid bytes value"],
+            ["bytes", "hello", "Invalid bytes value"],
+            ["bool", "maybe", "Invalid bool value"],
             ["int8", "-5", null],
         ])(
             "should only accept %s values the encoder can encode (%s)",
