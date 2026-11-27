@@ -9,7 +9,7 @@ interface PageTitleProps {
 const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
     const theme = useMantineTheme();
     return (
-        <Group gap="xs">
+        <Group gap="xs" c="cartesi">
             <Icon size={theme.other.lgIconSize} />
             <Title order={1}>{title}</Title>
         </Group>

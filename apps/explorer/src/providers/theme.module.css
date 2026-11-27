@@ -1,0 +1,23 @@
+.title {
+    &:where([data-order="1"], [data-order="2"]) {
+        color: var(--mantine-color-cartesi-text);
+    }
+}
+
+.switchThumb {
+    input:checked:not(:disabled, [data-disabled]) + * > & {
+        --switch-thumb-bg: var(--mantine-primary-color-contrast);
+    }
+}
+
+.switchTrackLabel {
+    input:checked + * > & {
+        color: var(--mantine-primary-color-contrast);
+    }
+}
+
+.comboboxOption {
+    &[data-combobox-selected] {
+        color: var(--mantine-primary-color-contrast);
+    }
+}

@@ -255,7 +255,7 @@ export const ERC20DepositForm: FC<ERC20DepositFormProps> = (props) => {
                                     decimals && (
                                         <UnstyledButton
                                             fz={"xs"}
-                                            c={"cyan"}
+                                            c="cartesi"
                                             onClick={() => {
                                                 form.setFieldValue(
                                                     "amount",

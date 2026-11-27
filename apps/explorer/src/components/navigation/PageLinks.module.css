@@ -4,6 +4,6 @@
     }
 
     &:hover {
-        color: var(--mantine-primary-color-filled-hover);
+        color: var(--mantine-color-cartesi-text);
     }
 }

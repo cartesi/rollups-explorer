@@ -1,10 +1,16 @@
 import * as core from "@mantine/core";
 
 type ExtendedCustomColors =
+    | "cartesi"
+    | "cartesiTeal"
+    | "cartesiCyan"
     | "open"
     | "disputed"
     | "closed"
     | "finalized"
+    | "info"
+    | "warning"
+    | "foreclosed"
     | core.DefaultMantineColor;
 declare module "@mantine/core" {
     export { core };

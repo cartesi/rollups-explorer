@@ -75,7 +75,7 @@ export const ConnectWallet: FC<ConnectWalletProps> = ({
                 if (chain.unsupported) {
                     return (
                         <Button
-                            bg="red"
+                            color="red"
                             onClick={openChainModal}
                             rightSection={
                                 <TbCaretDownFilled

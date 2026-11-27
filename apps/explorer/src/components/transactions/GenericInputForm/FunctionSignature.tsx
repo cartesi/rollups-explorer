@@ -11,7 +11,7 @@ interface FunctionParamLabelProps {
 export const FunctionParamLabel: FC<FunctionParamLabelProps> = ({ input }) => {
     return (
         <Box display="inline">
-            <Text c="cyan" span fz="sm">
+            <Text c="cartesi" span fz="sm">
                 {input.type}
             </Text>{" "}
             <Text span fz="sm">

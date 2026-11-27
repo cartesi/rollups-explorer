@@ -84,7 +84,7 @@ const EtherDepositSection: FC<EtherDepositSectionProps> = ({
                     {accountBalance.value > 0 && (
                         <UnstyledButton
                             fz={"xs"}
-                            c={"cyan"}
+                            c="cartesi"
                             onClick={() => {
                                 form.setFieldValue(
                                     "amount",

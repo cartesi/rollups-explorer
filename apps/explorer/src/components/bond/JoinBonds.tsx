@@ -31,7 +31,7 @@ export interface JoinBondsProps {
 
 const BondValue: FC<{ bond: JoinBond }> = ({ bond }) =>
     bond.exact ? (
-        <Text size="sm" c="cyan" fw={500}>
+        <Text size="sm" c="cartesi" fw={500}>
             {formatBondValue(bond.value)}
         </Text>
     ) : (
