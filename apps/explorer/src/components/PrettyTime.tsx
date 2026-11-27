@@ -33,6 +33,7 @@ export const PrettyTime: FC<PrettyTimeProps> = ({
             {displayTimestampUTC ? (
                 <Button
                     variant="transparent"
+                    size={size}
                     px={0}
                     onClick={() => {
                         if (displayTimestampUTC) handlers.toggle();
