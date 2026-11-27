@@ -23,9 +23,13 @@ import { resetAbiFunctionParams } from "./utils";
 
 export interface AbiFieldsProps {
     specifications: FormSpecification[];
+    encodingError?: string | null;
 }
 
-export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
+export const AbiFields: FC<AbiFieldsProps> = ({
+    specifications,
+    encodingError,
+}) => {
     const form = useFormContext();
     const { abiMethod, specificationMode } = form.getTransformedValues();
     const specificationOptions = specifications.map((s) => ({
@@ -154,6 +158,7 @@ export const AbiFields: FC<AbiFieldsProps> = ({ specifications }) => {
                 label="Hex value"
                 description="Encoded hex value for the application"
                 readOnly
+                error={encodingError}
                 value={
                     form.isValid() ? form.getInputProps("rawInput").value : "0x"
                 }

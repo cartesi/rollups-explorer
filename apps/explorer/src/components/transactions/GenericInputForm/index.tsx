@@ -10,15 +10,9 @@ import {
     Textarea,
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { type FC, useCallback, useEffect, useMemo } from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { TbCheck } from "react-icons/tb";
-import {
-    type Abi,
-    type AbiFunction,
-    encodeAbiParameters,
-    encodeFunctionData,
-    stringToHex,
-} from "viem";
+import { type Abi, stringToHex } from "viem";
 import { type TransactionFormSuccessData } from "../DepositFormTypes";
 import TransactionDetails from "../TransactionDetails";
 import { TransactionProgress } from "../TransactionProgress";
@@ -26,14 +20,9 @@ import { transactionState } from "../TransactionState";
 import { AbiFields } from "./AbiFields";
 import { FormProvider } from "./context";
 import { useInputBoxAddInput } from "./hooks/useInputBoxAddInput";
-import type {
-    AbiInputParam,
-    FormMode,
-    FormSpecification,
-    GenericFormAbiFunction,
-} from "./types";
+import type { AbiInputParam, FormMode } from "./types";
 import { useGenericInputForm } from "./useGenericInputForm";
-import { generateFinalValues } from "./utils";
+import { encodeAbiPayload } from "./utils";
 
 export interface GenericInputFormSpecification {
     id: string;
@@ -64,7 +53,6 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
         address,
         rawInput,
         mode,
-        abiFunction,
         selectedSpecification,
         specificationMode,
         abiFunctionName,
@@ -78,8 +66,20 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
     });
 
     const isFormValid = form.isValid();
-    const canSubmit = isFormValid && prepare.error === null;
+    const [isEncoding, setIsEncoding] = useState(false);
+    const [encodingError, setEncodingError] = useState<string | null>(null);
+    const canSubmit =
+        isFormValid &&
+        prepare.error === null &&
+        !isEncoding &&
+        encodingError === null;
     const abiFunctionParams = form.getInputProps("abiFunctionParams");
+    const encodingKey = JSON.stringify([
+        specificationMode,
+        selectedSpecification?.id,
+        abiFunctionName,
+        abiFunctionParams.value,
+    ]);
     const { disabled: sendDisabled, loading: sendLoading } = transactionState(
         prepare,
         execute,
@@ -110,33 +110,19 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
 
     const encodeFunctionParamsDebounced = useDebouncedCallback(
         (params: AbiInputParam[]) => {
-            const abiFunctions =
-                (selectedSpecification?.abi as GenericFormAbiFunction[]) ?? [];
-            const nextAbiFunction = abiFunctions.find(
-                (f) => f.name === abiFunctionName,
-            );
+            const result = encodeAbiPayload({
+                specification: selectedSpecification,
+                specificationMode,
+                functionName: abiFunctionName,
+                params,
+            });
 
-            if (nextAbiFunction) {
-                const finalValues = generateFinalValues(
-                    [...nextAbiFunction.inputs],
-                    params,
-                );
-
-                if (specificationMode === "json_abi") {
-                    const payload = encodeFunctionData({
-                        abi: (selectedSpecification as FormSpecification)?.abi,
-                        functionName: (abiFunction as AbiFunction)?.name,
-                        args: finalValues,
-                    });
-                    form.setFieldValue("rawInput", payload);
-                } else if (specificationMode === "abi_params") {
-                    const payload = encodeAbiParameters(
-                        nextAbiFunction.inputs,
-                        finalValues,
-                    );
-                    form.setFieldValue("rawInput", payload);
-                }
+            if (result) {
+                form.setFieldValue("rawInput", result.payload ?? "0x");
+                setEncodingError(result.error ?? null);
             }
+
+            setIsEncoding(false);
         },
         400,
     );
@@ -156,10 +142,16 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
     }, [wait, onSuccess]);
 
     useEffect(() => {
-        if (isFormValid) {
+        if (isFormValid && mode === "abi") {
+            setIsEncoding(true);
             encodeFunctionParamsDebounced(abiFunctionParams.value);
+        } else {
+            encodeFunctionParamsDebounced.cancel();
+            setIsEncoding(false);
+            setEncodingError(null);
         }
-    }, [abiFunctionParams.value, isFormValid, encodeFunctionParamsDebounced]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [encodingKey, isFormValid, mode]);
 
     return (
         <FormProvider form={form}>
@@ -209,7 +201,10 @@ export const GenericInputForm: FC<GenericInputFormProps> = (props) => {
                             />
                         </>
                     ) : mode === "abi" ? (
-                        <AbiFields specifications={specifications} />
+                        <AbiFields
+                            specifications={specifications}
+                            encodingError={encodingError}
+                        />
                     ) : null}
 
                     <Collapse

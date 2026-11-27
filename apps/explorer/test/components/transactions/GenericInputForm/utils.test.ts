@@ -1,6 +1,7 @@
 import {
     decodeAbiParameters,
     encodeAbiParameters,
+    parseAbi,
     parseAbiParameters,
 } from "viem";
 import { describe, expect, it } from "vitest";
@@ -10,6 +11,7 @@ import {
 } from "../../../../src/components/transactions/GenericInputForm/abiParamValue";
 import type { AbiInputParam } from "../../../../src/components/transactions/GenericInputForm/types";
 import {
+    encodeAbiPayload,
     generateFinalValues,
     generateInitialValues,
 } from "../../../../src/components/transactions/GenericInputForm/utils";
@@ -159,6 +161,35 @@ describe("GenericInputForm utils", () => {
                 [[1n], [], [2n, 3n]],
                 { name: "baz", owners: [addressB] },
             ]);
+        });
+    });
+
+    describe("encodeAbiPayload", () => {
+        it("should return the encoding error instead of throwing", () => {
+            const specification = {
+                id: "1",
+                name: "Overloads",
+                abi: parseAbi([
+                    "function foo(string s)",
+                    "function foo(address a)",
+                ]),
+            };
+
+            const result = encodeAbiPayload({
+                specification,
+                specificationMode: "json_abi",
+                functionName: "foo",
+                params: [
+                    {
+                        type: "string",
+                        name: "s",
+                        value: addressA,
+                    } as AbiInputParam,
+                ],
+            });
+
+            expect(result?.payload).toBeUndefined();
+            expect(result?.error).toEqual(expect.any(String));
         });
     });
 });
