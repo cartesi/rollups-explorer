@@ -36,6 +36,19 @@ describe("GenericInputForm validations", () => {
             );
         });
 
+        it.each([
+            ["uint8", "256", "Invalid uint8 value"],
+            ["int8", "-129", "Invalid int8 value"],
+            ["int256", "abc", "Invalid int256 value"],
+            ["bytes32", "0x12", "Invalid bytes32 value"],
+            ["int8", "-5", null],
+        ])(
+            "should only accept %s values the encoder can encode (%s)",
+            (type, value, expected) => {
+                expect(validate({ type, value })).toBe(expected);
+            },
+        );
+
         it("should accept an empty dynamic array", () => {
             expect(validate({ type: "uint256[]", value: [] })).toBeNull();
         });

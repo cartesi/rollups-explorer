@@ -31,6 +31,7 @@ const addressB = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 const abi = parseAbi([
     "function transfer(uint256[] amounts, (address to, uint256 value)[] items)",
     "function pair(address[2] owners)",
+    "function setLevels(uint8[] levels)",
 ]);
 
 const specification = { id: "1", name: "Array specification", abi };
@@ -174,20 +175,34 @@ describe("GenericInputForm", () => {
             );
         });
 
-        it("should show item errors under the array param", async () => {
+        it("should block sending when an item can't be encoded", async () => {
             renderForm();
-            selectFunction("pair");
+            selectFunction("setLevels");
 
-            const [firstInput] = screen.getAllByPlaceholderText(
-                "Enter address value",
+            fireEvent.click(screen.getByText("Add uint8 item"));
+            const input = screen.getByPlaceholderText("Enter uint8 value");
+            typeInto(input, "25");
+
+            await waitFor(() =>
+                expect(screen.getByLabelText("Hex value")).toHaveValue(
+                    encodeFunctionData({
+                        abi,
+                        functionName: "setLevels",
+                        args: [[25]],
+                    }),
+                ),
             );
-            typeInto(firstInput, "0x1");
-            fireEvent.blur(firstInput);
+
+            typeInto(input, "256");
+            fireEvent.blur(input);
 
             expect(
-                await screen.findByText("Invalid address value at [0]"),
+                await screen.findByText("Invalid uint8 value at [0]"),
             ).toBeInTheDocument();
             expect(screen.getByLabelText("Hex value")).toHaveValue("0x");
+            expect(
+                screen.getByTestId("generic-input-submit-button"),
+            ).toBeDisabled();
         });
     });
 });
